@@ -5,7 +5,14 @@ output
    output of CTANOut for some output formats
 
 CTANLoad
-   loads CTAN XML files (and PDF files); prepares localk files for CTANOut
+   loads CTAN XML files (and PDF files); prepares local files for CTANOut
 
 CTANOut
    converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)
+
+Some information files
+======================
+
+CTAN-corrected-files.txt
+CTAN-elements.txt
+wget.txt
