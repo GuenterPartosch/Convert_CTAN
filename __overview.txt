@@ -1,6 +1,5 @@
 Folders
 =======
-
 output
    output of CTANOut for some output formats
 
@@ -12,7 +11,10 @@ CTANOut
 
 Some information files
 ======================
-
 CTAN-corrected-files.txt
 CTAN-elements.txt
 wget.txt
+
+all together in
+===============
+Convert_CTAN.zip
