@@ -1,0 +1,70 @@
+﻿Elements of CTAN XML files
+==========================
+
+File 'authors'
+---------------
+Element <authors> ... </authors>
+   sub element <authors .../>
+     attributes: id, givenname, familyname
+
+File 'topics'
+--------------
+Element <topics> ... </topics>
+   sub element <topic .../>
+     Attribute; name, details
+
+File 'packages'
+----------------
+Element <packages> ... </packages>
+   sub element <package .../>
+      attributes: key, name, caption
+
+Packagr desdcriptions
+---------------------
+Element <entry ...> ... </entry>
+   attribute: id
+   sub element <alias .../>
+      attribute: id
+   sub element <also .../>
+      attribute: refid
+   sub element <authorref .../>
+      attributes: key, id, givenname, familyname, active
+   sub element <caption> ... </caption>
+   sub element <contact .../>
+      attributes: type, href
+   sub element <copyright .../>
+      attributes: owner, year
+   sub element <ctan .../>
+      attributes: path, file
+   sub element <description ...> ... </description>
+      attribute: language
+      Sub-sub element <li> ... </li>
+      Sub-sub element <a ...> ... </a>
+         attribute: href
+      Sub-sub element <xref ...> ... </xref>
+         attribute: refid 
+      Sub-sub element <b> ... </b>
+      Sub-sub element <br/>
+      Sub-sub element <em> ... </em>
+      Sub-sub element <i> ... </i>
+      Sub-sub element <pre> ... </pre>
+      Sub-sub element <tt> ... </tt>
+      Sub-sub element <p> ... </p>
+      Sub-sub element <ul> ... </ul>
+   sub element <documentation .../>
+      attributes: details, href, language
+   sub element <home .../>
+      attribute: href
+   sub element <install .../>
+      attribute: path
+   sub element <keyval .../>
+      attributes: key, value
+   sub element <license .../>
+      attributes: type, date
+   sub element <miktex .../>
+      attribute: location
+   sub element <name> ... </name>
+   sub element <texlive .../>
+      attributes: location
+   sub element <version .../>
+      attributes: number, date

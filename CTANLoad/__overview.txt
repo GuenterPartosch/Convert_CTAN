@@ -1,0 +1,23 @@
+Overview (files in the CTANLoad folder)
+=======================================
+
+ctanload.exe
+   Windows executable of CTANLoad.py
+
+CTANLoad.man
+   manpage for CTANLoad
+
+CTANLoad.py
+   Python program
+
+ctanload.spec
+   specification file for ctanload.exe
+
+CTANLoad-examples.txt
+   examples for CTANLoad
+
+CTANLoad-messages.txt
+   messages in CTANLoad 
+
+CTANLoad-modules.txt
+   modules used in CTANLoad

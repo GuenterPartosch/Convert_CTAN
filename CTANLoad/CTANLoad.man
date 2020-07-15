@@ -1,0 +1,22 @@
+﻿CTANLoad
+========
+usage: CTAN-Load.py [-h] [-a] [-V] [-v] [-l] [-n NUMBER] [-t TEMPLATE]
+                    [-d DIREC] [-o OUTPUT_NAME]
+
+loads CTAN XLM files, generates some lists, and prepares CTAN-out [CTAN-
+Load.py; Version: 1.8 (2019-03-15)]
+
+Optional parameters:
+  -h, --help            show this help message and exit
+  -a, --author          author of the program
+  -V, --version         version of the program
+  -v, --verbose         flag: output is verbose; Default: False
+  -l, --lists           flag: generate some special lists; Default: False
+  -n NUMBER, --number NUMBER
+                        maximum file loads ; Default: 200
+  -t TEMPLATE, --template TEMPLATE
+                        name template for packages to be load; Default:
+  -d DIREC, --directory DIREC
+                        directory for output files; Default: ./
+  -o OUTPUT_NAME, --output OUTPUT_NAME
+                        generic file name for output; Default: all

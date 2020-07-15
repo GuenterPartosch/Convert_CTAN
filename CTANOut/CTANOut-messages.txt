@@ -1,0 +1,20 @@
+Messages
+
+Fatal Error
++ pickle file 'CTAN.pkl' not found
+
+Information
++ list with authors and related packages (cross-reference list) created
++ list with topics and related packages (cross-reference list) created
++ packages processed
++ program call: CTANOut.py
++ program successfully completed
++ statistics written
++ topic list created
+
+Warnings
++ '-mt'/'--make_topics' valid only for '-m LaTeX'/'--mode LaTeX'; therefore ignored
++ '-b'/'--btype' valid only for '-m BibLaTeX'/'--mode BibLaTeX'; therefore ignored
++ XML file for package 'package' not found
++ key 'key' not found
++ no correct XML file for any specified package found

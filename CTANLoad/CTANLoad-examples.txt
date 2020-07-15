@@ -1,0 +1,24 @@
+﻿Examples (CTAN-Load)
+--------------------
+CTANLoad -h
+- help, show the options
+
+CTANLoad -t "^a.+$" -v
+- load all CTAN XML files with name template "^a.+$"         [-t]
+- verbose output                                             [-v]
+
+CTANLoad -f -n 300 -t "^l3" -v
+- verbose output [-v]
+- load all CTAN XML files with the name template "^l3$"      [-t]
+- load the associated information files (PDF)                [-f]
+- maximum number of download files                           [-n]
+
+CTANLoad -v -l
+- generate some special lists, and prepare files for CTANOut [-l]
+- verbose output                                             [-v]
+
+CTANLoad -v -l -c -stat
+- generate some special lists, and prepare files for CTANOut [-l]
+- verbose output                                             [-v]
+- with integrity check                                       [-c]
+- with statistics                                            [-stat]

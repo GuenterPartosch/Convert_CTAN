@@ -1,0 +1,23 @@
+Overview (files in the CTANOut folder)
+=======================================
+
+ctanout.exe
+   Windows executable of CTANOut.py
+
+CTANOut.man
+   manpage for CTANOut
+
+CTANOut.py
+   Python program
+
+ctanout.spec
+   specification file for ctanout.exe
+
+CTANOut-examples.txt
+   examples for CTANOut
+
+CTANOut-messages.txt
+   messages in CTANOut 
+
+CTANOut-modules.txt
+   modules used in CTANOut

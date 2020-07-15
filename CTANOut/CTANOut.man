@@ -1,0 +1,28 @@
+CTANOut
+=======
+usage: CTAN-Out.py [-h] [-a] [-o OUT_FILE]
+                   [-m {LaTeX,RIS,plain,BibLaTeX,Excel}] [-v] [-V]
+                   [-t NAME_TEMPLATE] [-k SEARCH_KEY] [-d DIREC] [-mt]
+
+converts CTAN XLM package files [CTAN-Out.py; Version: 1.17 (2019-03-07)]
+
+Optional parameters:
+  -h, --help            show this help message and exit
+  -a, --author          author of the program
+  -o OUT_FILE, --output OUT_FILE
+                        generic file name for output (without name extension);
+                        Default: all
+  -m {LaTeX,RIS,plain,BibLaTeX,Excel}, --mode {LaTeX,RIS,plain,BibLaTeX,Excel}
+                        target format; Default: RIS
+  -v, --verbose         verbose output; Default: False
+  -V, --version         version of the program
+  -t NAME_TEMPLATE, --template NAME_TEMPLATE
+                        template for packages names; Default: ^.+$
+  -k SEARCH_KEY, --key SEARCH_KEY
+                        key for output filtering; Default:
+  -d DIREC, --directory DIREC
+                        directory for input and output files; Default: ./
+  -mt, --make_topics    generate topic lists (meaning, cross-reference);
+                        Default: False
+
+
