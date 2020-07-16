@@ -18,7 +18,7 @@
 #                    [-m {LaTeX,RIS,plain,BibLaTeX,Excel}] [-o OUT_FILE]
 #                    [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.64 (2020-07-14)] convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.65 (2020-07-16)] convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)
 # 
 # Options:
@@ -139,8 +139,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.64"
-programdate       = "2020-07-14"
+programversion    = "1.65"
+programdate       = "2020-07-16"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -354,14 +354,14 @@ skip          = args.skip                   # Parameter -s
 verbose       = args.verbose                # Parameter -v
 statistics    = args.statistics             # Parameter -stat
 
-if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
-    btype = "@online"                       #   btype is reset
 if mode == "latex":                         # -m latex in call
     mode = "LaTeX"                          #   mode is reset
 if mode == "ris":                           # -m ris in call
     mode = "RIS"                            #   mode is reset 
 if mode == "biblatex":                      # -m biblatex in call
     mode = "BibLaTeX"                       #   mode is reset
+if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
+    btype = "@online"                       #   btype is reset
 
 # pre-compiled regular expressions
 p2            = re.compile(name_template)   # regular expression based on -t
