@@ -2,8 +2,8 @@
 Loads XML and PDF files from CTAN and converts them to some formats (BibLaTeX, LaTeX, RIS, Excel, plain).
 
 * CTANLoad: 
-* -loads XML viles from CTAN             [-t]
-* -loads PDF from CTAN                   [-f]
+* -loads XML files from CTAN             [-t]
+* -loads PDF files from CTAN                   [-f]
 * -checks integrity of doswnloaded files [-c]
 * -prepares files for CTANOut            [-l]
 
