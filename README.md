@@ -9,6 +9,8 @@ Loads XML and PDF files from CTAN and converts them to some formats (BibLaTeX, L
 
 Call: [CTANLoad.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoad/CTANLoad.man "manpage of CTANLoad")
 
+Examples for calls: [CTANLoad-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoad/CTANLoad-examples.txt "EXamples for calls")
+
 ## CTANOut:
 * converts all or a selection of local XML files in one file with a to be specified format (BibLaTeX, LaTeX, RIS, Excel, plain) [-m]
 
