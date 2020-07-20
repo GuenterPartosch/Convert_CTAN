@@ -13,39 +13,39 @@
 # ------------------------------------------------------------------
 # Usage
 
-# usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan}]
-#                    [-d DIREC] [-k FILTER_KEY]
-#                    [-m {LaTeX,RIS,plain,BibLaTeX,Excel}] [-o OUT_FILE]
-#                    [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
+# usage: CTANOut.py [-h] [-a] [-V]
+#        [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY]
+#        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel}] [-o OUT_FILE] [-s SKIP]
+#        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.65 (2020-07-16)] convert CTAN XLM package files to
-# LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)
+# [CTANOut.py; Version: 1.66 (2020-07-20)] convert CTAN XLM package files to LaTeX, RIS, plain,
+#              BibLaTeX, Excel (tab separated)
 # 
 # Options:
 #   -h, --help            show this help message and exit
 #   -a, --author          show author of the program and exit
-#   -V, --version         show version of the program and exit
-#   -b {@online,@software,@misc,@ctan}, --btype {@online,@software,@misc,@ctan,@www}
-#                         valid only for '-m BibLaTeX'/'--mode BibLaTeX': type
-#                         of BibLaTex entries to be generated; Default:
+#   -V, --version         Flag: show version of the program and exit
+#   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
+#                         valid only for '-m BibLaTeX'/'--mode BibLaTeX': type of BibLaTex
+#                         entries to be generated; Default:
 #   -d DIREC, --directory DIREC
-#                         directory for input and output files; Default: ./
+#                         directory for input and output file; Default: ./
 #   -k FILTER_KEY, --key FILTER_KEY
-#                         template for output filtering on the base of keys;
-#                         Default: ^.+$
-#   -m {LaTeX,RIS,plain,BibLaTeX,Excel}, --mode {LaTeX,RIS,plain,BibLaTeX,Excel}
+#                         template for output filtering on the base of keys; Default: ^.+$
+#   -m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel},
+#                         --mode {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel}
 #                         target format; Default: RIS
 #   -o OUT_FILE, --output OUT_FILE
-#                         generic name for output files (without extensions);
-#                         Default: all
+#                         generic name for output files (without extensions); Default: all
 #   -s SKIP, --skip SKIP  skip specified CTAN fields; Default: []
 #   -t NAME_TEMPLATE, --template NAME_TEMPLATE
 #                         template for package names; Default: ^.+$
-#   -mt, --make_topics    valid only for '-m LaTeX'/'--mode LaTeX': generate topic
-#                         lists (meaning of topics + cross-reference
-#                         (topics/packages, authors/packages); Default: False
-#   -stat, --statistics   print statistics on terminal; Default: False
-#   -v, --verbose         verbose output; Default: False
+#   -mt, --make_topics    valid only for '-m LaTeX'/'--mode LaTeX':
+#                         generate topic lists (meaning of topics + cross-reference
+#                         (topics/packages, authors/packages);
+#                         Default: False
+#   -stat, --statistics   Flag: print statistics on terminal; Default: False
+#   -v, --verbose         Flag: verbose output; Default: False
 
 # ------------------------------------------------------------------
 # Examples
@@ -139,8 +139,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.65"
-programdate       = "2020-07-16"
+programversion    = "1.66"
+programdate       = "2020-07-20"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -1605,6 +1605,8 @@ def onepackage(s, t):
     
     global counter                                # counter for packages
 
+    left = 33
+
     try:
         onePackage     = ET.parse(s + ext)        # parse XML file
     except:                                       # not successfull
@@ -1612,7 +1614,7 @@ def onepackage(s, t):
             print("----- XML file for package '" + s + "' not well-formed")
         return
     if verbose:
-        print("    " + str(counter).ljust(5), "Package:", s.ljust(31), "Mode:", mode.ljust(7), "File:", out_file.ljust(15))
+        print("    " + str(counter).ljust(5), "Package:", s.ljust(left), "Mode:", mode.ljust(7), "File:", out_file.ljust(15))
 
     counter        = counter + 1                  # increment counter
     onePackageRoot = onePackage.getroot()         # get XML root 
