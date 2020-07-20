@@ -15,3 +15,5 @@ Examples for calls: [CTANLoad-examples.txt](https://github.com/GuenterPartosch/C
 * converts all or a selection of local XML files in one file with a to be specified format (BibLaTeX, LaTeX, RIS, Excel, plain) [-m]
 
 Call: [CTANOut.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANOut/CTANOut.man "manpage of CTANOut")
+
+Examples for calls: [CTANOut-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANOut/CTANOut-examples.txt "Examples for calls")
