@@ -1,6 +1,6 @@
 CTANOut
 =======
-[CTANOut.py; Version: 1.66 (2020-07-20)] convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)
+[CTANOut.py; Version: 1.67 (2020-07-22)] convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)
 
 Options:
   -h, --help            show this help message and exit

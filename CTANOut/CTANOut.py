@@ -1,5 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3.8
 # -*- coding: utf-8 -*-
+# please adjust these two lines if necessary
 
 # CTANOut.py
 # (C) Günter Partosch, 2019/2020
@@ -18,7 +19,7 @@
 #        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel}] [-o OUT_FILE] [-s SKIP]
 #        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.66 (2020-07-20)] convert CTAN XLM package files to LaTeX, RIS, plain,
+# [CTANOut.py; Version: 1.67 (2020-07-22)] convert CTAN XLM package files to LaTeX, RIS, plain,
 #              BibLaTeX, Excel (tab separated)
 # 
 # Options:
@@ -139,8 +140,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.66"
-programdate       = "2020-07-20"
+programversion    = "1.67"
+programdate       = "2020-07-22"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"

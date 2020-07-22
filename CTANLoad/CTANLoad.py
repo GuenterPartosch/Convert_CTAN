@@ -1,5 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3.8
 # -*- coding: utf-8 -*-
+# please adjust these two lines if necessary
+
 # CTANLoad.py
 # (C) Günter Partosch, 2019/2020
 
@@ -24,6 +26,7 @@
 # 2.0.8  2020-01-25 minor corrections
 # 2.0.9  2020-06-05 correction in load_documentation file
 # 2.0.10 2020-06-26 enhance verbose output
+# 2.0.11 2020-07-22 first lines of file
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
@@ -32,8 +35,8 @@
 #                     [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
 #
 # Loads XLM files and documentation files from CTAN a/o generates some special
-# lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.0.10
-# (2020-06-26)]
+# lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.0.11
+# (2020-07-22)]
 #
 # Optional parameters:
 #   -h, --help            show this help message and exit
@@ -152,8 +155,8 @@ import xml.etree.ElementTree as ET # XML processing
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.0.10"
-prg_date        = "2020-06-26"
+prg_version     = "2.0.11"
+prg_date        = "2020-07-22"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
