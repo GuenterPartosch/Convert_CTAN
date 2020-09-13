@@ -4,7 +4,7 @@
 CTAN file 'authors'
 -------------------
 Element <authors> ... </authors>
-   sub element <authors .../>
+   sub element <author .../>
      attributes: id, givenname, familyname
 
 CTAN file 'topics'
