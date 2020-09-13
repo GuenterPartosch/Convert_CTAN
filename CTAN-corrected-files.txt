@@ -1,6 +1,6 @@
 XML files to be corrected
 =========================
-Sometimes there are CTAN XML files with some deficiencies. Thes file are to be corrected locally-
+Sometimes there are CTAN XML files with some deficiencies. These file are to be corrected locally-
 
 not well-formed:
 ----------------
