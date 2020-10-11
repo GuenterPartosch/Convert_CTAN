@@ -734,11 +734,13 @@ def also(k):                                      # element <also .../>
 
     if mode in ["LaTeX"]:                         # LaTeX
         refid2 = re.sub("_", "-", refid)          #   substitute "_"
-        tmp1   = TeXchars(packages[refid][0])
-        tmp2   = TeXchars(packages[refid][1])
-        out.write(r"\item[see also] see section~\ref{pkg:" + refid2 + r"} on page~\pageref{pkg:" + refid2 + r"}: (\texttt{" + tmp1 + "} -- " + tmp2 + ")\n")
+        if refid in packages:
+            tmp1   = TeXchars(packages[refid][0])
+            tmp2   = TeXchars(packages[refid][1])
+            out.write(r"\item[see also] see section~\ref{pkg:" + refid2 + r"} on page~\pageref{pkg:" + refid2 + r"}: (\texttt{" + tmp1 + "} -- " + tmp2 + ")\n")
     elif mode in ["plain"]:                       # plain
-        out.write("\n" + "see also: ".ljust(labelwidth) + refid + " (" + packages[refid][0] + " -- " + packages[refid][1] + ")")
+        if refid in packages:
+            out.write("\n" + "see also: ".ljust(labelwidth) + refid + " (" + packages[refid][0] + " -- " + packages[refid][1] + ")")
     elif mode in ["RIS"]:                         # RIS
         pass                                      #   for RIS do nothing
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
