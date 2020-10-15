@@ -1,3 +1,4 @@
+
 #!/usr/bin/python3.8
 # -*- coding: utf-8 -*-
 # please adjust these two lines if necessary
@@ -16,10 +17,10 @@
 
 # usage: CTANOut.py [-h] [-a] [-V]
 #        [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY]
-#        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel}] [-o OUT_FILE] [-s SKIP]
+#        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}] [-o OUT_FILE] [-s SKIP]
 #        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.67 (2020-07-22)] convert CTAN XLM package files to LaTeX, RIS, plain,
+# [CTANOut.py; Version: 1.69 (2020-10-15)] convert CTAN XLM package files to LaTeX, RIS, plain,
 #              BibLaTeX, Excel (tab separated)
 # 
 # Options:
@@ -33,7 +34,7 @@
 #                         directory for input and output file; Default: ./
 #   -k FILTER_KEY, --key FILTER_KEY
 #                         template for output filtering on the base of keys; Default: ^.+$
-#   -m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel},
+#   -m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel},
 #                         --mode {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel}
 #                         target format; Default: RIS
 #   -o OUT_FILE, --output OUT_FILE
@@ -140,8 +141,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.67"
-programdate       = "2020-07-22"
+programversion    = "1.69"
+programdate       = "2020-10-15"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -250,7 +251,7 @@ s_version       = ""                        # Element version
 # python directories and lists
 
 languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgerian", "bn":"Bengali",
-                   "ca":"Catalan", "cs":"Czech", "da":"Danish", "de":"German", "de-de":"German",
+                   "ca":"Catalan", "cs":"Czech", "da":"Danish", "de":"German", "de-de":"German (Germany)",
                    "el":"Greek", "en":"English", "eo":"Esperanto", "en-gb":"British", "es":"Spanish",
                    "es-ve":"Spanish (Venezuela)", "et":"Estonian", "eu":"Basque", "fa":"Farsi",
                    "fa-ir":"Farsi (Iran)", "fi":"Finnish", "fr":"French", "hr":"Croatian",
@@ -258,7 +259,7 @@ languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgerian", 
                    "ka":"Georgian", "ko":"Korean", "lv":"Latvian", "mn":"Mongolian", "nl":"Dutch",
                    "nn-no":"Nynorsk", "pl":"Polish", "pt":"Portuguese",
                    "pt-br":"Portuguese (Brazilia)", "ru":"Russian", "sk":"Slovak", "sr":"Serbian",
-                   "sr-sp":"Serbian", "th":"Thai", "tr":"Turkish", "uk":"Ukrainian", "vi":"Vietnamese",
+                   "sr-sp":"Serbian (Serbia)", "th":"Thai", "tr":"Turkish", "uk":"Ukrainian", "vi":"Vietnamese",
                    "zh":"Chinese"}
 usedTopics      = {}                        # python directory: collects used topics for all packages
 usedPackages    = []                        # python list: collects used packages
@@ -308,7 +309,7 @@ parser.add_argument("-k", "--key",          # Parameter -k/--key
 
 parser.add_argument("-m", "--mode",         # Parameter -m/--mode
                     help    = mode_text + "; Default: " + "%(default)s",
-                    choices = ["LaTeX", "latex", "RIS", "plain", "BibLaTeX", "biblatex", "ris", "Excel"],
+                    choices = ["LaTeX", "latex", "RIS", "plain", "BibLaTeX", "biblatex", "ris", "Excel", "excel"],
                     dest    = "mode",
                     default = modedefault)
 
@@ -361,6 +362,8 @@ if mode == "ris":                           # -m ris in call
     mode = "RIS"                            #   mode is reset 
 if mode == "biblatex":                      # -m biblatex in call
     mode = "BibLaTeX"                       #   mode is reset
+if mode == "excel":                         # -m excel in call
+    mode = "Excel"                          #   mode is reset
 if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
     btype = "@online"                       #   btype is reset
 
