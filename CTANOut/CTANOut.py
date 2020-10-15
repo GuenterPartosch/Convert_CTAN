@@ -744,12 +744,14 @@ def also(k):                                      # element <also .../>
     elif mode in ["RIS"]:                         # RIS
         pass                                      #   for RIS do nothing
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
-        out.write("related".ljust(fieldwidth) + "= {" + refid + "},\n")
-    elif mode in ["Excel"]:                       # Excel 
-        if s_also != "":
-            s_also += "; " + refid                # accumulate s_also string 
-        else:
-            s_also = refid
+        if refid in packages:
+            out.write("related".ljust(fieldwidth) + "= {" + refid + "},\n")
+    elif mode in ["Excel"]:                       # Excel
+        if refid in packages:
+            if s_also != "":
+                s_also += "; " + refid                # accumulate s_also string 
+            else:
+                s_also = refid
 
 # ------------------------------------------------------------------
 def authorref(k):                                 # element <authorref .../>
