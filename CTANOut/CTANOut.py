@@ -1,4 +1,3 @@
-
 #!/usr/bin/python3.8
 # -*- coding: utf-8 -*-
 # please adjust these two lines if necessary
@@ -20,7 +19,7 @@
 #        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}] [-o OUT_FILE] [-s SKIP]
 #        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.69 (2020-10-15)] convert CTAN XLM package files to LaTeX, RIS, plain,
+# [CTANOut.py; Version: 1.71 (2020-10-19)] convert CTAN XLM package files to LaTeX, RIS, plain,
 #              BibLaTeX, Excel (tab separated)
 # 
 # Options:
@@ -35,7 +34,7 @@
 #   -k FILTER_KEY, --key FILTER_KEY
 #                         template for output filtering on the base of keys; Default: ^.+$
 #   -m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel},
-#                         --mode {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel}
+#                         --mode {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}
 #                         target format; Default: RIS
 #   -o OUT_FILE, --output OUT_FILE
 #                         generic name for output files (without extensions); Default: all
@@ -141,8 +140,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.69"
-programdate       = "2020-10-15"
+programversion    = "1.71"
+programdate       = "2020-10-19"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -449,7 +448,7 @@ except FileNotFoundError:                   # unable to open pickle file
     print("--- pickle file '" * pickle_name1 + "' not found")
     sys.exit("- program is terminated")
 
-try:                                        # try to second open pickle file
+try:                                        # try to open second pickle file
     pickleFile2 = open(direc + pickle_name2, "br")
     XML_toc     = pickle.load(pickleFile2)
     pickleFile2.close()                     #   close file
@@ -1859,8 +1858,13 @@ def make_xref():
             xref.write(r"\item[\texttt{" + f + "}] ")
             xref.write(r"\index{Topic!" + f + "}")
             tmp1 = topicspackage[f]               # get the packages for this topic
+            package_nr = 0
             for ff in tmp1:                       # loop: all packages with this topic
-                if ff in usedPackages:            # package is used?
+                if ff in usedPackages:            #    package is used?
+                    package_nr += 1               #    count the packages
+            xref.write(str(package_nr) + " package(s): ")
+            for ff in tmp1:                       # loop: all packages with this topic
+                if ff in usedPackages:            #    package is used?
                     ff = re.sub("_", "-", ff)
                     xref.write(r"\texttt{" + ff + "} " + r"(\ref{pkg:" + ff + "}); ")
             xref.write("\n")
@@ -1894,6 +1898,11 @@ def make_tap():
             tap.write(r"\item[" + tmp2 + "] ")
             tap.write(r"\index{Author!" + tmp2 + "}")
             tmp1 = authorpackages[f]
+            package_no = 0
+            for ff in tmp1:
+                if ff in usedPackages:
+                    package_no += 1
+            tap.write(str(package_no) + " package(s): ")
             for ff in tmp1:
                 if ff in usedPackages:
                     ff = re.sub("_", "-", ff)
