@@ -19,7 +19,7 @@
 #        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}] [-o OUT_FILE] [-s SKIP]
 #        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.71 (2020-10-19)] convert CTAN XLM package files to LaTeX, RIS, plain,
+# [CTANOut.py; Version: 1.72 (2020-10-22)] convert CTAN XLM package files to LaTeX, RIS, plain,
 #              BibLaTeX, Excel (tab separated)
 # 
 # Options:
@@ -140,8 +140,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.71"
-programdate       = "2020-10-19"
+programversion    = "1.72"
+programdate       = "2020-10-22"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -1559,7 +1559,7 @@ def mod_TeXchars(s):                              # prepares characters for LaTe
     tmp = re.sub("§§1", "{", tmp)                 # re-change {
     tmp = re.sub("§§2", "}", tmp)                 # re-change }
     tmp = re.sub("§§3", r"\\", tmp)               # re-change \
-    tmp = re.sub("&", r"\&", tmp)                 # change &
+    tmp = re.sub("&", r"{\\&}", tmp)              # change &
     return tmp
 
 # ------------------------------------------------------------------
@@ -1680,7 +1680,7 @@ def TeXchars(s):                                   # prepares characters for LaT
     tmp = s
     tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
     tmp = re.sub("_", r"\\_", tmp)
-    tmp = re.sub("&", r"\\&", tmp)
+    tmp = re.sub("&", r"{\\&}", tmp)
     tmp = re.sub(r"[\^]", r"\\textasciicircum ", tmp)
     tmp = re.sub("[$]", r"\\$", tmp)
     return tmp
