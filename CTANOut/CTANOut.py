@@ -19,7 +19,7 @@
 #        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}] [-o OUT_FILE] [-s SKIP]
 #        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.72 (2020-10-22)] convert CTAN XLM package files to LaTeX, RIS, plain,
+# [CTANOut.py; Version: 1.74 (2021-01-20)] convert CTAN XLM package files to LaTeX, RIS, plain,
 #              BibLaTeX, Excel (tab separated)
 # 
 # Options:
@@ -140,8 +140,8 @@ import os                                       # OS relevant routines
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.72"
-programdate       = "2020-10-22"
+programversion    = "1.74"
+programdate       = "2021-01-20"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -211,7 +211,7 @@ topics_text     = "valid only for '-m LaTeX'/'--mode LaTeX': generate topic list
 # Defaults for argument parsing and further processing
 
 authorexists    = False                     # default for a global flag
-btypedefault    = ""                        # default for BibLaTeX type
+btypedefault    = ""                        # default for BibLaTeX entry type
 make_topics     = False                     # default for topics output
 modedefault     = "RIS"                     # default for mode
 name_template   = """^.+$"""                # default for file name template
@@ -364,7 +364,7 @@ if mode == "biblatex":                      # -m biblatex in call
 if mode == "excel":                         # -m excel in call
     mode = "Excel"                          #   mode is reset
 if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
-    btype = "@online"                       #   btype is reset
+    btype = "@www"                          #   btype is reset
 
 # pre-compiled regular expressions
 p2            = re.compile(name_template)   # regular expression based on -t
@@ -405,7 +405,7 @@ DIV      = 12     % 12-strip layout"""
 \\usepackage[english]{babel}             % Language support
 \\usepackage{fontspec}                   % font specification
 \\usepackage{makeidx}                    % index generation
-\\usepackage{lmodern}                    % font lmodern
+%\\usepackage{lmodern}                   % font lmodern % not necessary
 \\usepackage[colorlinks=true]{hyperref}  % hypertext structures\n
 \\newcommand{\inp}[1]{\\IfFileExists{#1}{\\input{#1}}{}}\n
 \\makeindex\n"""
