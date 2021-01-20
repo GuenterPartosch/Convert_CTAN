@@ -6,6 +6,7 @@ not well-formed:
 ----------------
 (for instance: no entity for &)
 
+graphpaper
 jpeg2ps
 luximono
 makeindex
