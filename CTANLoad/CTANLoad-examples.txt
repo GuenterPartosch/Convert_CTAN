@@ -7,6 +7,12 @@ CTANLoad -t "^a.+$" -v
 - load all CTAN XML files with name template "^a.+$"         [-t]
 - verbose output                                             [-v]
 
+CTANLoad -t "graphicx|pstricks" -v -f -stat
+- load the XML files for 'graphicx' and 'pstricks'           [-t]
+- load the associated information files (PDF)                [-f]
+- verbose output                                             [-v]
+- with statistics                                            [-stat]
+
 CTANLoad -f -n 300 -t "^l3" -v
 - verbose output [-v]
 - load all CTAN XML files with the name template "^l3$"      [-t]
