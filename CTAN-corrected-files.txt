@@ -7,7 +7,6 @@ not well-formed:
 (for instance: no entity for &)
 
 graphpaper
-jpeg2ps
 luximono
 makeindex
 oriya
@@ -19,22 +18,8 @@ xpdf
 
 attribute "year" with wrong content:
 ------------------------------------
-
 hvindex
 latexdemo
 preview
+pdttex
 
-content of attribute "year" has not 4 digits:
----------------------------------------------
-(contents of year and owner are confused)
-
-add-wes
-bibbuild
-booktabs-de
-divine
-euro
-fancyhdr
-multiexpand
-syllogism
-toc-zar
-xr-hyper
