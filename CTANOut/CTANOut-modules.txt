@@ -1,10 +1,11 @@
-Modul s needed
+Modules needed
 ==============
-import xml.etree.ElementTree as ET              # XML processing
-import pickle                                   # to read pickle data, time measure
-import time                                     # to get time/date of a file
-import re                                       # regular expression
-import argparse                                 # argument parsing
-import sys                                      # system calls
-import platform                                 # get OS informations
-import os                                       # OS relevant routines
+import xml.etree.ElementTree as ET           # XML processing
+import pickle                                # to read pickle data, time measure
+import time                                  # to get time/date of a file
+import re                                    # regular expression
+import argparse                              # argument parsing
+import sys                                   # system calls
+import platform                              # get OS informations
+import os                                    # OS relevant routines
+from os import path                          # path informations

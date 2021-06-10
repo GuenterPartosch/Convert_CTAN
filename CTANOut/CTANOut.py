@@ -3,50 +3,63 @@
 # please adjust these two lines if necessary
 
 # CTANOut.py
-# (C) Günter Partosch, 2019/2020
+# (C) Günter Partosch, 2019/2021
 
 # Problem:
 # - Ausgabe des Namens, wenn givenname fehlt
-# - year noch besser extrahieren
-# - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse
+# - year noch besser extrahieren, ggf. aus <copyright ....>
+# - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
 # - bei BibLaTeX: BibTeX-Kürzel aus Namen + Jahr
+# - bei -d: ggf. Verzeichnis anlegen (x)
+# - bei -d: Verzeichnistrenner besser/explizit behandeln (x)
+# - ggf. file.tex, file.bib, ... vor Ausgabe löschen
+
+# History
+# ------------------------------------------------------------------
+# 1.75 2021-05-14 more types for -m
+# 1.76 2021-05-14 clean-up of variables
+# 1.77 2021-05-15 more details in verbose mode for -mt
+# 1.78 2021-05-15 output the call parameters in more details in verbose mode
+# 1.79 2021-05-20 directory separator improved
+# 1.80 2021-05-23 directory name improved
+# 1.81 2021-05-24 directory handling (existance, installation) improved
+# 1.82 2021-05-26 structure of CTAN.pkl adapted
+# 1.83 2021-05-26 output of license information now with full text
+# 1.84 2021-05-26 output and interpretaion of language codes improved
+# 1.85 2021-05-27 correction of a source error in <version .../>
 
 # ------------------------------------------------------------------
 # Usage
 
-# usage: CTANOut.py [-h] [-a] [-V]
-#        [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY]
-#        [-m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}] [-o OUT_FILE] [-s SKIP]
-#        [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
+# usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY]
+#                   [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
+#                   [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.74 (2021-01-20)] convert CTAN XLM package files to LaTeX, RIS, plain,
-#              BibLaTeX, Excel (tab separated)
+# [CTANOut.py; Version: 1.85 (2021-05-27)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
 #   -h, --help            show this help message and exit
-#   -a, --author          show author of the program and exit
-#   -V, --version         Flag: show version of the program and exit
+#   -a, --author          Show author of the program and exit.
+#   -V, --version         Show version of the program and exit.
 #   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
-#                         valid only for '-m BibLaTeX'/'--mode BibLaTeX': type of BibLaTex
-#                         entries to be generated; Default:
+#                         type of BibLaTex entries to be generated [only for -m BibLateX]; Default:
 #   -d DIREC, --directory DIREC
-#                         directory for input and output file; Default: ./
+#                         Directory for input and output files; Default: ./
 #   -k FILTER_KEY, --key FILTER_KEY
-#                         template for output filtering on the base of keys; Default: ^.+$
-#   -m {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel},
-#                         --mode {LaTeX,latex,RIS,plain,BibLaTeX,biblatex,ris,Excel,excel}
-#                         target format; Default: RIS
+#                         Template for output filtering on the base of keys; Default: ^.+$
+#   -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv},
+#                         --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}
+#                         Target format; Default: RIS
 #   -o OUT_FILE, --output OUT_FILE
-#                         generic name for output files (without extensions); Default: all
-#   -s SKIP, --skip SKIP  skip specified CTAN fields; Default: []
+#                         Generic name for output files [without extensions]; Default: all
+#   -s SKIP, --skip SKIP  Skip specified CTAN fields.; Default: []
 #   -t NAME_TEMPLATE, --template NAME_TEMPLATE
-#                         template for package names; Default: ^.+$
-#   -mt, --make_topics    valid only for '-m LaTeX'/'--mode LaTeX':
-#                         generate topic lists (meaning of topics + cross-reference
-#                         (topics/packages, authors/packages);
+#                         Template for package names; Default: ^.+$
+#   -mt, --make_topics    Flag: Generate topic lists (meaning of topics + cross-reference
+#                         (topics/packages, authors/packages) [only for -m LaTeX]);
 #                         Default: False
-#   -stat, --statistics   Flag: print statistics on terminal; Default: False
-#   -v, --verbose         Flag: verbose output; Default: False
+#   -stat, --statistics   Flag: Print statistics on terminal.; Default: False
+#   -v, --verbose         Flag: Output is verbose.; Default: False
 
 # ------------------------------------------------------------------
 # Examples
@@ -55,51 +68,61 @@
 #     RIS is output format (default)
 #     all.ris is output file
 #     no statistics
-#     without verbose output
+#     without verbose output                                        
 #
 # CTANOut -v
 #     as bove
-#     with verbose output (each processed package is shown)
+#     with verbose output (each processed package is shown)             [-v]
 #
 # CTANOut -v -stat
-#     as above
-#     but additionallay with statistics
+#     as above                                                          [-v]
+#     but additionallay with statistics                                 [-stat]
 #
 # CTANOut -m BibLaTeX
-#     BibLaTeX is output format
+#     BibLaTeX is output format                                         [-m]
 #     no statistics
 #     without verbose output
 #
-# CTANOut -m BibLaTeX -b @online -v
-#     as above
-#     but now with verbose output and @online for BibLaTeX type
+# CTANOut -m biblatex -b @online -v
+#     as above                                                          [-m]
+#     but now with verbose output and                                   [-v]
+#     @online for BibLaTeX type                                         [-b]
 #
-# CTANOut -m BibLaTeX -b @online -s [texlive,license,miktex] -v -stat
-#     as above
-#     with statistics
-#     skipped CTAN fields: texlive, license, and miktex
+# CTANOut -m bib -b @online -s [texlive,license,miktex] -v -stat
+#     as above                                                          [-m]
+#                                                                       [-b]
+#     with statistics                                                   [-stat]
+#     skipped CTAN fields: texlive, license, and miktex                 [-s]
 #
 # CTANOut -m LaTeX -mt -v -stat
-#     LaTeX is output format
-#     special topic lists are generated
-#     with statistics and verbose output
+#     LaTeX is output format                                            [-m]
+#     special topic lists are generated                                 [-mt]
+#     with statistics and                                               [-stat]
+#     verbose output                                                    [-v] 
 #
-# CTANOut -m LaTeX -k LaTeX -mt
-#     LaTeX is output format
-#     special topic lists are generated
-#     package names are filtered by key template "LaTeX"
+# CTANOut -m latex -k LaTeX -mt
+#     LaTeX is output format                                            [-m]
+#     special topic lists are generated                                 [-mt]
+#     package names are filtered by key template "LaTeX"                [-k]
 #
-# CTANOut -m LaTeX -t "l3|latex|ltx" -mt -v
-#     processed packages: l3, latex, and ltx
-#     LaTeX is output format
-#     special topic lists are generated
-#     package names are filtered by name template "LaTeX"
+# CTANOut -m tex -t "l3|latex|ltx" -mt -v
+#     processed packages: l3, latex, and ltx                            [-t]
+#     LaTeX is output format                                            [-m]
+#     special topic lists are generated                                 [-mt]
+#     package names are filtered by name template "LaTeX"               [-t]
 #
 # CTANOut -m plain -v -stat -o myfile -s "[texlive,license,miktex]"
-#     plain text is output format
-#     myfile.txt is the name for the output file
-#     skipped CTAN fields: texlive, license, and miktex
-#     with statistics and verbose output
+#     plain text is output format                                       [-m]
+#     myfile.txt is the name for the output file                        [-o]
+#     skipped CTAN fields: texlive, license, and miktex                 [-s]
+#     with statistics and                                               [-stat]
+#     verbose output                                                    [-v]
+
+# ------------------------------------------------------------------
+# Inspected CTAN elements
+
+# also, authorref, caption, contact, copyright, ctan, description, documentation, home, keyval,
+# license, miktex, name, texlive, version (for option -s)
 
 # ------------------------------------------------------------------
 # Messages
@@ -126,22 +149,23 @@
 # ------------------------------------------------------------------
 # Moduls needed
 
-import xml.etree.ElementTree as ET              # XML processing
-import pickle                                   # to read pickle data, time measure
-import time                                     # to get time/date of a file
-import re                                       # regular expression
-import argparse                                 # argument parsing
-import sys                                      # system calls
-import platform                                 # get OS informations
-import os                                       # OS relevant routines
+import xml.etree.ElementTree as ET           # XML processing
+import pickle                                # to read pickle data, time measure
+import time                                  # to get time/date of a file
+import re                                    # regular expression
+import argparse                              # argument parsing
+import sys                                   # system calls
+import platform                              # get OS informations
+import os                                    # OS relevant routines
+from os import path                          # path informations
 
 
 #===================================================================
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.74"
-programdate       = "2021-01-20"
+programversion    = "1.85"
+programdate       = "2021-05-27"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -149,83 +173,96 @@ authoremail       = "Guenter.Partosch@hrz.uni-giessen.de"
 documenttitle     = "The CTAN book -- Packages on CTAN"
 documentsubtitle  = "Collected, prepared and selected with the aid of the program "
 
-operatingsys      = platform.system()           # operating system
-call              = sys.argv                    # actual program call
-calledprogram     = sys.argv[0]                 # name of program in call
+operatingsys      = platform.system()        # operating system
+call              = sys.argv                 # actual program call
+calledprogram     = sys.argv[0]              # name of program in call
 
 # ------------------------------------------------------------------
 # Global settings
 
-ctanUrl           = "https://ctan.org"          # head of a CTAN url
-ctanUrl2          = ctanUrl + "/tex-archive"    # head of another CTAN url
-ctanUrl3          = ctanUrl2 + "/install"       # head of another CTAN url
-ctanUrl4          = ctanUrl + "/pkg/"           # head of another CTAN url
-labelwidth        = len("Documentation: ")      # width of the labels for LaTeX
-actDate           = time.strftime("%Y-%m-%d")   # actual date of program execution
-actTime           = time.strftime("%X")         # actual time of program execution
+ctanUrl           = "https://ctan.org"       # head of a CTAN url
+ctanUrl2          = ctanUrl + "/tex-archive" # head of another CTAN url
+ctanUrl3          = ctanUrl2 + "/install"    # head of another CTAN url
+ctanUrl4          = ctanUrl + "/pkg/"        # head of another CTAN url
+labelwidth        = len("Documentation: ")   # width of the labels for LaTeX
+actDate           = time.strftime("%Y-%m-%d")# actual date of program execution
+actTime           = time.strftime("%X")      # actual time of program execution
 
 pickle_name1      = "CTAN.pkl"
 pickle_name2      = "CTAN2.pkl"
-list_info_files   = True                        # switch for RIS/BibLaTeX: XML_toc is to be proceed
-info_files        = ""                          # for BibLaTeX: collector for info file names
-ext               = ".xml"                      # file name extension for downloaded info files
+list_info_files   = True                     # switch for RIS/BibLaTeX: XML_toc is to be proceed
+info_files        = ""                       # for BibLaTeX: collector for info file names
+ext               = ".xml"                   # file name extension for downloaded info files
 
-maxcaptionlength  = 65                          # for LaTeX: max length for header lines
-fieldwidth        = 10                          # for BibLaTeX: width of the field labels 
-
-if operatingsys == "Windows":
-    direc   = "./"
-else:
-    direc   = "./"
+maxcaptionlength  = 65                       # for LaTeX: max length for header lines
+fieldwidth        = 10                       # for BibLaTeX: width of the field labels 
 
 # ------------------------------------------------------------------
 # Collect infos which cannot be output in another way
 
-notice          = ""                            # collecting infos
-author_str      = ""                            # collecting authors of a package
-year_str        = ""                            # collecting year informations
-version_str     = ""                            # collecting version strings
-counter         = 1                             # counts packages
-left            = 35                            # width of labels in verbose output
+notice          = ""                         # collecting infos
+author_str      = ""                         # collecting authors of a package
+year_str        = ""                         # collecting year informations
+version_str     = ""                         # collecting version strings
+counter         = 1                          # counts packages
+left            = 35                         # width of labels in verbose output
 
 # ------------------------------------------------------------------
 # Texts for argument parsing
 
-author_text     = "show author of the program and exit"
-direc_text      = "directory for input and output file"
-key_text        = "template for output filtering on the base of keys"
-mode_text       = "target format"
-out_file        = "all"
-out_text        = "generic name for output files (without extensions)"
-program_text    = "convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)"
-skip_text       = "skip specified CTAN fields"
-template_text   = "template for package names"
-verbose_text    = "Flag: verbose output"
-statistics_text = "Flag: print statistics on terminal"
-version_text    = "Flag: show version of the program and exit"
+author_text     = "Show author of the program and exit."
+version_text    = "Show version of the program and exit."
 
-btype_text      = "valid only for '-m BibLaTeX'/'--mode BibLaTeX': type of BibLaTex entries  to be generated"
-topics_text     = "valid only for '-m LaTeX'/'--mode LaTeX': generate topic lists (meaning of topics + cross-reference (topics/packages, authors/packages)"
+verbose_text    = "Flag: Output is verbose."
+statistics_text = "Flag: Print statistics on terminal."
+topics_text     = "Flag: Generate topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX])."
+
+btype_text      = "Type of BibLaTex entries to be generated [only for -m BibLateX]"
+direc_text      = "Directory for input and output files"
+key_text        = "Template for output filtering on the base of keys"
+mode_text       = "Target format"
+out_text        = "Generic name for output files [without extensions]"
+program_text    = "Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated]."
+skip_text       = "Skip specified CTAN fields."
+template_text   = "Template for package names"
 
 # ------------------------------------------------------------------
 # Defaults for argument parsing and further processing
 
-authorexists    = False                     # default for a global flag
-btypedefault    = ""                        # default for BibLaTeX entry type
-make_topics     = False                     # default for topics output
-modedefault     = "RIS"                     # default for mode
-name_template   = """^.+$"""                # default for file name template
-out_default     = "all"                     # default for out file
-filter_key      = """^.+$"""                # default for option -k
-skip_default    = "[]"                      # default for option -s
-verbose         = False                     # default for global flag: verbose output
-statistics      = False                     # default for global flag: statistics output
+make_topics_default   = False               # default for topics output (-mt)
+verbose_default       = False               # default for global flag: verbose output (-v)
+statistics_default    = False               # default for global flag: statistics output (-stat)
+btype_default         = ""                  # default for BibLaTeX entry type (-b)
+skip_default          = "[]"                # default for option -s
+mode_default          = "RIS"               # default for option -m
+name_template_default = """^.+$"""          # default for file name template (-t)
+out_default           = "all"               # default for out file
+filter_key_default    = """^.+$"""          # default for filter (-k)
+
+act_direc           = "."                   
+if operatingsys == "Windows":    
+    direc_sep      = "\\"
+else:
+    direc_sep      = "/"
+direc_default      = act_direc + direc_sep  # default for -d (output directory)
+
+make_topics     = None                      # variable for -mt
+verbose         = None                      # variable for -v
+statistics      = None                      # variable for -stat
+btype           = ""                        # variable for -b
+skip            = ""                        # variable for -s
+mode            = ""                        # variable for -m
+name_template   = ""                        # variable for -t
+out_file        = ""                        # variable for -o
+filter_key      = ""                        # variable for -k
+direc           = ""                        # variable for -d
+
 default_text    = "no text"                 # default text for elements without embedded text
-empty           = ""                        # default text when a not embedded text is required but not found
+empty           = ""                        # default text if a not embedded text is required but not found
 userunknown     = "N. N."                   # default text for elements without a correct author
 package_id      = ""                        # ID of a package
-
-name_default    = name_template             # copy of name_template
+authorexists    = False                     # default for a global flag
+name_default    = name_template_default     # copy of name_template_default
 filter_default  = filter_key                # copy of filter_key
 
 # ------------------------------------------------------------------
@@ -249,21 +286,22 @@ s_version       = ""                        # Element version
 # ------------------------------------------------------------------
 # python directories and lists
 
-languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgerian", "bn":"Bengali",
+languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgarian", "bn":"Bengali",
                    "ca":"Catalan", "cs":"Czech", "da":"Danish", "de":"German", "de-de":"German (Germany)",
                    "el":"Greek", "en":"English", "eo":"Esperanto", "en-gb":"British", "es":"Spanish",
                    "es-ve":"Spanish (Venezuela)", "et":"Estonian", "eu":"Basque", "fa":"Farsi",
-                   "fa-ir":"Farsi (Iran)", "fi":"Finnish", "fr":"French", "hr":"Croatian",
+                   "fa-ir":"Farsi (Iran)", "fi":"Finnish", "fr":"French", "hi":"Hindi", "hr":"Croatian",
                    "hu":"Hungarian", "hy":"Armenian", "it":"Italian", "ja":"Japanese",
-                   "ka":"Georgian", "ko":"Korean", "lv":"Latvian", "mn":"Mongolian", "nl":"Dutch",
+                   "ka":"Georgian", "ko":"Korean", "lv":"Latvian", "mn":"Mongolian", "mr":"Marathi", "nl":"Dutch",
                    "nn-no":"Nynorsk", "pl":"Polish", "pt":"Portuguese",
                    "pt-br":"Portuguese (Brazilia)", "ru":"Russian", "sk":"Slovak", "sr":"Serbian",
                    "sr-sp":"Serbian (Serbia)", "th":"Thai", "tr":"Turkish", "uk":"Ukrainian", "vi":"Vietnamese",
-                   "zh":"Chinese"}
-usedTopics      = {}                        # python directory: collects used topics for all packages
-usedPackages    = []                        # python list: collects used packages
-usedAuthors     = {}                        # python directory: collects used authors for all packages
-XML_toc         = {}                        # python directory: 
+                   "zh":"Chinese", "zn-cn":"Chinese (China)", "de,en":"German + English", "zh,en":"Chinese + English",
+                   "mr,hi":"Marathi + Hindi", "en,ja":"English + Japanese"}
+usedTopics      = {}                        # python directory:  collects used topics for all packages
+usedPackages    = []                        # python list:       collects used packages
+usedAuthors     = {}                        # python directory:  collects used authors for all packages
+XML_toc         = {}                        # python dictionary: list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, pure PDF file)
 
 # usedTopics: python directory (unsorted)
 #   each element: <key for topic>:<number>
@@ -294,23 +332,23 @@ parser.add_argument("-b", "--btype",        # Parameter -b/--btype
                     help    = btype_text + "; Default: " + "%(default)s",
                     choices = ["@online", "@software", "@misc", "@ctan", "@www"],
                     dest    = "btype",
-                    default = btypedefault)
+                    default = btype_default)
 
 parser.add_argument("-d", "--directory",    # Parameter -d/--directory
                     help    = direc_text + "; Default: " + "%(default)s",
                     dest    = "direc",
-                    default = direc)
+                    default = direc_default)
 
 parser.add_argument("-k", "--key",          # Parameter -k/--key
                     help    = key_text + "; Default: " + "%(default)s",
                     dest    = "filter_key",
-                    default = filter_key)
+                    default = filter_key_default)
 
 parser.add_argument("-m", "--mode",         # Parameter -m/--mode
                     help    = mode_text + "; Default: " + "%(default)s",
-                    choices = ["LaTeX", "latex", "RIS", "plain", "BibLaTeX", "biblatex", "ris", "Excel", "excel"],
+                    choices = ["LaTeX", "latex", "tex", "RIS", "plain", "txt", "BibLaTeX", "biblatex", "bib", "ris", "Excel", "excel", "tsv"],
                     dest    = "mode",
-                    default = modedefault)
+                    default = mode_default)
 
 parser.add_argument("-o", "--output",       # Parameter -o/--output
                     help    = out_text + "; Default: " + "%(default)s",
@@ -325,22 +363,25 @@ parser.add_argument("-s", "--skip",         # Parameter -s/--skip
 parser.add_argument("-t", "--template",     # Parameter -t/--template
                     help    = template_text + "; Default: " + "%(default)s",
                     dest    = "name_template",
-                    default = name_template)
+                    default = name_template_default)
 
 parser.add_argument("-mt", "--make_topics", # Parameter -mt/--make_topics
                     help    = topics_text + "; Default: " + "%(default)s",
                     action  = "store_true",
-                    default = make_topics)
+                    default = make_topics_default)
 
 parser.add_argument("-stat", "--statistics",# Parameter -stat/--statistics
                     help    = statistics_text + "; Default: " + "%(default)s",
                     action  = "store_true",
-                    default = statistics)
+                    default = statistics_default)
 
 parser.add_argument("-v", "--verbose",      # Parameter -v/--verbose
                     help    = verbose_text + "; Default: " + "%(default)s",
                     action  = "store_true",
-                    default = verbose)
+                    default = verbose_default)
+
+# ------------------------------------------------------------------
+# Getting parsed values
 
 args          = parser.parse_args()
 
@@ -355,18 +396,39 @@ skip          = args.skip                   # Parameter -s
 verbose       = args.verbose                # Parameter -v
 statistics    = args.statistics             # Parameter -stat
 
-if mode == "latex":                         # -m latex in call
+# ------------------------------------------------------------------
+# Resets
+
+if mode in ["latex", "LaTeX", "tex"]:       # -m latex in call
     mode = "LaTeX"                          #   mode is reset
-if mode == "ris":                           # -m ris in call
+if mode in ["ris", "RIS"]:                  # -m ris in call
     mode = "RIS"                            #   mode is reset 
-if mode == "biblatex":                      # -m biblatex in call
+if mode in ["biblatex", "BibLaTeX", "bib"]: # -m biblatex in call
     mode = "BibLaTeX"                       #   mode is reset
-if mode == "excel":                         # -m excel in call
+if mode in ["excel", "Excel", "tsv"]:       # -m excel in call
     mode = "Excel"                          #   mode is reset
+if mode in ["plain", "txt"]:                # -m plain in call
+    mode = "plain"                          #   mode is reset
 if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
     btype = "@www"                          #   btype is reset
 
+# ------------------------------------------------------------------
+# Correct directory name, test directory existence, and/or install directory
+
+direc = direc.strip()                       # correct directory name (-d)
+if direc[len(direc) - 1] != direc_sep:
+    direc += direc_sep
+if not path.exists(direc):
+    try:
+        os.mkdir(direc)
+    except OSError:
+        print ("- Creation of the directory '%s' failed" % direc)
+    else:
+        print ("- Successfully created the directory '%s' " % direc)
+
+# ------------------------------------------------------------------
 # pre-compiled regular expressions
+
 p2            = re.compile(name_template)   # regular expression based on -t
 p3            = re.compile(filter_key)      # regular expression based on -k
 
@@ -433,6 +495,8 @@ DIV      = 12     % 12-strip layout"""
 #   each element: <package key> <tuple with package name and package title>
 # topics: python directory (sorted)
 #   each element: <topics name> <topics title>
+# licenses: python directory (sorted)
+#   each element: <license key> <license title>
 # topicspackage: python directory (unsorted)
 #   each element: <topic key> <list with package names>
 # packagetopics: python directory (sorted)
@@ -442,7 +506,7 @@ DIV      = 12     % 12-strip layout"""
 
 try:                                        # try to open 1st pickle file 
     pickleFile1 = open(direc + pickle_name1, "br")
-    (authors, packages, topics, topicspackage, packagetopics, authorpackages) = pickle.load(pickleFile1)
+    (authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages) = pickle.load(pickleFile1)
     pickleFile1.close()                     #   close file
 except FileNotFoundError:                   # unable to open pickle file
     print("--- pickle file '" * pickle_name1 + "' not found")
@@ -455,53 +519,6 @@ try:                                        # try to open second pickle file
 except FileNotFoundError:                   # unable to open pickle file
     list_info_files = False
     print("--- pickle file '" * pickle_name2 + "' not found; local information files ignored")
-
-# ------------------------------------------------------------------
-# Only for LaTeX:
-# * header of topic lists and topic cross-references
-# * Open the files x.top, x.xref, x.stat, and x.tap
-
-##if mode in ["LaTeX"] and make_topics:
-    # xyz.top
-##    tops = open(direc + args.out_file + ".top", encoding="utf-8", mode="w")
-##    tops.write("% file: " + args.out_file + ".top" + "\n")
-##    tops.write("% date: " + actDate + "\n")
-##    tops.write("% time: " + actTime + "\n")
-##    tops.write("% is called by " + args.out_file + ".tex" + "\n\n")
-##    tops.write(r"\appendix" + "\n")
-##    tops.write(r"\section{Used Topics, Short Explainations}" + "\n\n")
-##    tops.write(r"\raggedright" + "\n")
-##    tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
-
-    # xyz.xref
-##    xref = open(direc + args.out_file + ".xref", encoding="utf-8", mode="w")
-##    xref.write("% file: " + args.out_file + ".xref" + "\n")
-##    xref.write("% date: " + actDate + "\n")
-##    xref.write("% time: " + actTime + "\n")
-##    xref.write("% is called by " + args.out_file + ".tex" + "\n\n")
-##    xref.write(r"\section{Used Topics and related Packages}" + "\n\n")
-##    xref.write(r"\raggedright" + "\n")
-##    xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
-
-    # xyz.tap
-##    tap = open(direc + args.out_file + ".tap", encoding="utf-8", mode="w")
-##    tap.write("% file: " + args.out_file + ".tap" + "\n")
-##    tap.write("% date: " + actDate + "\n")
-##    tap.write("% time: " + actTime + "\n")
-##    tap.write("% is called by " + args.out_file + ".tex" + "\n\n")
-##    tap.write(r"\section{Authors and associated Packages}" + "\n\n")
-##    tap.write(r"\raggedright" + "\n")
-##    tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
-
-    # xyz.stat
-##    stat = open(direc + args.out_file + ".stat", encoding="utf-8", mode="w")
-##    stat.write("% file: " + args.out_file + ".stat" + "\n")
-##    stat.write("% date: " + actDate + "\n")
-##    stat.write("% time: " + actTime + "\n")
-##    stat.write("% is called by " + args.out_file + ".tex" + "\n\n")
-##    stat.write(r"\minisec{Parameters and Statistics}" + "\n\n")
-##    stat.write(r"\raggedright" + "\n")
-##    stat.write(r"\begin{tabular}{lrl}" + "\n")
 
 # ------------------------------------------------------------------
 # First line(s) on output  
@@ -522,13 +539,24 @@ def first_lines():
         tmp_before = tmp
         
     if verbose:
-        print("- program call: CTANOut.py", arguments)
+        print("\n- program call: CTANOut.py")
+        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
+        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.out_file, "(" + out_text + ")"))
+        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", name_template, "(" + template_text + ")"))
+        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))
+        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", filter_key, "(" + key_text + ")"))
+        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + btype_text + ")"))
+        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))
+        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + topics_text + ")"))
+        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
+        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
+        print("\n")
 
-    if verbose and (mode != "LaTeX") and make_topics:       # not LaTeX and -mt/--make_topics
-        print("--- '-mt'/'--make_topics' valid only for '-m LaTeX'/'--mode LaTeX'; therefore ignored")
+    if (mode != "LaTeX") and make_topics:                   # not LaTeX and -mt/--make_topics
+        if verbose: print("--- '-mt'/'--make_topics' valid only for '-m LaTeX'/'--mode LaTeX'; therefore ignored")
 
-    if verbose and (mode != "BibLaTeX") and (btype != ""):  # not BibLaTeX and -b/--btype
-        print("--- '-b'/'--btype' valid only for '-m BibLaTeX'/'--mode BibLaTeX'; therefore ignored")
+    if (mode != "BibLaTeX") and (btype != ""):              # not BibLaTeX and -b/--btype
+        if verbose: print("--- '-b'/'--btype' valid only for '-m BibLaTeX'/'--mode BibLaTeX'; therefore ignored")
 
     if mode in ["LaTeX"]:                                   # LaTeX
         out.write("% file: " + out_file + "\n")
@@ -1365,6 +1393,9 @@ def licenseT(k):                                  # element <license .../>
     date  = k.get("date", "")                     # attribute date
     tmp   = typeT
 
+    if tmp in licenses:
+        tmp   = licenses[tmp]
+    
     if date != "":                                # constructs lincense (date)
         tmp = tmp + " (" + date + ")"
 
@@ -1621,7 +1652,7 @@ def onepackage(s, t):
             print("----- XML file for package '" + s + "' not well-formed")
         return
     if verbose:
-        print("    " + str(counter).ljust(5), "Package:", s.ljust(left), "Mode:", mode.ljust(7), "File:", out_file.ljust(15))
+        print("    " + str(counter).ljust(5), "Package:", s.ljust(left), "Mode:", mode.ljust(7), "File:", direc + out_file.ljust(15))
 
     counter        = counter + 1                  # increment counter
     onePackageRoot = onePackage.getroot()         # get XML root 
@@ -1794,6 +1825,8 @@ def version(k):                                   # element <version .../>
     number = k.get("number", "")                  # attribute number
     date   = k.get("date", "")                    # attribute date
     tmp    = number
+    if mode in ["LaTeX", "BibLaTeX"]:             # for LaTeX/BibLaTeX
+        tmp    = re.sub("_", r"\\_", tmp)         #   correction
 
     if date != "":
         tmp = tmp + " (" + date + ")"             # version with date
@@ -1836,7 +1869,7 @@ def make_tops():
     tops.write(r"\end{labeling}" + "\n")
     tops.close()                                  # close file
     if verbose:
-        print("--- topic list created")
+        print("--- file '" + direc + args.out_file + ".top'", "created: [topic list]")
 
 # ------------------------------------------------------------------
 def make_xref():
@@ -1871,7 +1904,7 @@ def make_xref():
     xref.write(r"\end{labeling}" + "\n")
     xref.close()                                  # close file
     if verbose:
-        print("--- list with topics and related packages (cross-reference list) created")
+        print("--- file '" + direc + args.out_file + ".xref'", "created: [list with topics and related packages (cross-reference list)]")
 
 # ------------------------------------------------------------------
 def make_tap():
@@ -1911,7 +1944,7 @@ def make_tap():
     tap.write(r"\end{labeling}" + "\n")
     tap.close()                                   # close file
     if verbose:
-        print("--- list with authors and related packages (cross-reference list) created")
+        print("--- file '" + direc + args.out_file + ".tap'", "created: [list with authors and related packages (cross-reference list)]")
 
 # ------------------------------------------------------------------
 def make_stat():
@@ -1969,17 +2002,17 @@ def make_stat():
 def make_statistics():
     """Outputs statistics on terminal."""
 
-    l = left
+    l = left + 1
     r = 5
     
     # Statistics on terminal
     print("\nStatistics\n")
     print("target format:".ljust(l + 1), mode)
-    print("output file:".ljust(l + 1), out_file, "\n")
+    print("output file:".ljust(l + 1), direc + out_file, "\n")
     print("number of authors, total on CTAN:".ljust(l),  str(len(authors)).rjust(r))
     print("number of authors, cited here:".ljust(l),   str(len(usedAuthors)).rjust(r))
     print("number of packages, total on CTAN:".ljust(l), str(len(packages)).rjust(r))
-    print("number of packages, described here:".ljust(l),  str(len(usedPackages)).rjust(r))
+    print("number of packages, collected here:".ljust(l),  str(len(usedPackages)).rjust(r))
     print("number of topics, total on CTAN:".ljust(l),   str(len(topics)).rjust(r))
     print("number of topics, used here:".ljust(l),    str(len(usedTopics)).rjust(r))
 
@@ -2067,8 +2100,8 @@ def main():
         endtotal   = time.time()
         endprocess = time.process_time()
         print("--")
-        print("total time: ".ljust(left + 1), round(endtotal-starttotal, 2))
-        print("process time: ".ljust(left + 1), round(endprocess-startprocess, 2))
+        print("total time: ".ljust(left + 2), round(endtotal-starttotal, 2))
+        print("process time: ".ljust(left + 2), round(endprocess-startprocess, 2))
 
   
 #===================================================================
