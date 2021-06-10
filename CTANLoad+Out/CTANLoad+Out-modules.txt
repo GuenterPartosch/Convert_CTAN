@@ -1,0 +1,7 @@
+Modules needed in CTANLoad+Out
+==============================
+import argparse                    # argument parsing
+import sys                         # system calls
+import platform                    # get OS informations
+import subprocess                  # handling of sub-processes
+import re                          # regular expression

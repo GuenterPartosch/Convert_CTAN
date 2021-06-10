@@ -1,0 +1,43 @@
+Usage (CTANLoad+Out)
+====================
+usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}] [-c] [-d DIREC] [-f] [-k FILTER_KEY] [-l]
+                       [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}] [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-s SKIP] [-stat]
+                       [-t TEMPLATE] [-tl TEMPLATE_LOAD] [-to TEMPLATE_OUT] [-V] [-v]
+
+[CTANLoad+Out.py; Version: 1.0 (2021-05-24)] Combine the tasks of CTANLoad [Load XLM and PDF documentation files from CTAN a/o generate some special lists, and
+prepare data for CTANOut] and CTANOut [Convert CTAN XLM package files to some formats].
+
+Optional parameters:
+  -h, --help            show this help message and exit
+  -a, --author          Show author of the program and exit.
+  -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
+                        Type of BibLaTex entries to be generated [valid only for '-m BibLaTeX'/'--mode BibLaTeX']; Default:
+  -c, --check_integrity
+                        Flag: Check the integrity of the 2nd .pkl file.; Default: False
+  -d DIREC, --directory DIREC
+                        Directory for input and output file; Default: .\
+  -f, --download_files  Flag: Download associated documentation files [PDF].; Default: False
+  -k FILTER_KEY, --key FILTER_KEY
+                        Template for output filtering on the base of keys; Default: ^.+$
+  -l, --lists           Flag: Generate some special lists and prepare files for CTANOut.; Default: False
+  -m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}, --mode {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}
+                        Target format; Default: RIS
+  -mo, --make_output    Flag: Generate output [RIS, LaTeX, BibLaTeX, Excel, plain] via CTANOut.; Default: False
+  -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX]).; Default: False
+  -n NUMBER, --number NUMBER
+                        Maximum number of file downloads; Default: 250
+  -o OUTPUT_NAME, --output OUTPUT_NAME
+                        Generic name for output files [without extensions]; Default: all
+  -p, --pdf_output      Flag: Generate PDF output.; Default: False
+  -s SKIP, --skip SKIP  Skip specified CTAN fields.; Default: []
+  -stat, --statistics   Flag: Print statistics on terminal.; Default: False
+  -t TEMPLATE, --template TEMPLATE
+                        Template for package names [in CTANLoad and CTANOut]; Default:
+  -tl TEMPLATE_LOAD, --template_load TEMPLATE_LOAD
+                        Template for package names in CTANLoad; Default:
+  -to TEMPLATE_OUT, --template_out TEMPLATE_OUT
+                        Template for package names in CTANOut; Default:
+  -V, --version         Show version of the program and exit.
+  -v, --verbose         Flag: Output is verbose.; Default: False
+
+
