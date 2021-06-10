@@ -1,9 +1,10 @@
 # Convert_CTAN
 Loads XML and PDF files from CTAN and converts them to some formats (BibLaTeX, LaTeX, RIS, Excel, plain).
 
-## CTANLoad: 
+----------------------------------------------------------------
+## CTANLoad (most important arguments): 
 * loads XML files from CTAN             [-t]
-* loads PDF files from CTAN                   [-f]
+* loads PDF files from CTAN             [-f]
 * checks integrity of doswnloaded files [-c]
 * prepares files for CTANOut            [-l]
 
@@ -11,6 +12,7 @@ Call: [CTANLoad.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/master
 
 Examples for calls: [CTANLoad-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoad/CTANLoad-examples.txt "EXamples for calls")
 
+----------------------------------------------------------------
 ## CTANOut:
 * converts all or a selection of local XML files in one file with a to be specified format (BibLaTeX, LaTeX, RIS, Excel, plain) [-m]
 

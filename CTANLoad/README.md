@@ -18,5 +18,5 @@
 * [CTANLoad-messages.txt](./CTANLoad-messages.txt "messages in CTANLoad"):
    messages in CTANLoad 
 
-* [CTANLoad-modules.txt](.U/CTANLoad-modules.txt "modules used in CTANLoad"):
+* [CTANLoad-modules.txt](./CTANLoad-modules.txt "modules used in CTANLoad"):
    modules used in CTANLoad
