@@ -1,0 +1,17 @@
+Files in CTANLoad
+=================
+
+on CTAN   local file   directory       gen. file  tasks
+--------------------------------------------------------------------------------------------------------
+authors   authors.xml  authors         xyz.loa    list of authors (by argument -l)
+packages  packages.xml packages        xyz.lop    list of packages (by argument -l)
+topics    topics.xml   topics          xyz.lok    list of keys (by argument -l)
+licenses  licenses.xml licenses        xyz.lol    list of licenses (by argument -l)
+
+                       topicspackage   xyz.lpt    list of topics and their packages (by argument -l)
+                       authorpackage   xyz.lap    list of authors and associated packages (by argument -l)
+
+                                       CTAN.pkl   dumped directories authors, packages, topics, topicspackage, packagetopics
+                                       CTAN2.pkl  dumped directory XML_toc: list with download information files
+
+xyz is a generic file name (determinated by die argument -o)

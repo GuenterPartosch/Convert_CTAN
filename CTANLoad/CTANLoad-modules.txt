@@ -12,3 +12,4 @@ import re                          # handle regular expressions
 import random                      # used for random integers
 import time                        # used for random seed
 import os.path                     # operating system relevant routines
+from os import path                # path informations

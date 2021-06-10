@@ -1,7 +1,7 @@
 ﻿Examples (CTAN-Load)
 --------------------
 CTANLoad -h
-- help, show the options
+- help, show the options                                     [-h]
 
 CTANLoad -t "^a.+$" -v
 - load all CTAN XML files with name template "^a.+$"         [-t]

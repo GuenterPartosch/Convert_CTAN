@@ -1,23 +1,29 @@
 ﻿Elements of CTAN XML files
 ==========================
 
-CTAN file 'authors'
--------------------
+CTAN file 'authors' ('authors.xml' on pc)
+-----------------------------------------
 Element <authors> ... </authors>
    sub element <author .../>
      attributes: id, givenname, familyname
 
-CTAN file 'topics'
-------------------
+CTAN file 'topics' ('topics.xml' on pc)
+---------------------------------------
 Element <topics> ... </topics>
    sub element <topic .../>
      Attribute; name, details
 
-CTAN file 'packages'
---------------------
+CTAN file 'packages' ('packages.xml' on pc)
+-------------------------------------------
 Element <packages> ... </packages>
    sub element <package .../>
       attributes: key, name, caption
+
+CTAN file 'licenses' ('licenses.xml' on pc)
+-------------------------------------------
+Element <licenses> ... </licenses>
+   sub element <license .../>
+      attributes: key, name, free
 
 Package descriptions on CTAN
 ----------------------------
