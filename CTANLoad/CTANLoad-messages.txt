@@ -1,5 +1,4 @@
-﻿------------------------------------------------------------------
-Messages (CTAN-Load)
+﻿Messages (CTAN-Load)
 
 Informations
 - authors collected

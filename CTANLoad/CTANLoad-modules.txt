@@ -1,15 +1,14 @@
-﻿# Used modules
-# ------------
-# Imports
+﻿# Imports
 
-import xml.etree.ElementTree as ET # XML processing
-import subprocess                  # sub-processes
-import pickle                      # read/write pickle data
-import platform                    # get OS informations
-import sys                         # system calls
 import argparse                    # parse arguments
-import re                          # handle regular expressions
-import random                      # used for random integers
-import time                        # used for random seed
+import os                          # delete a file on disk, for instance
 import os.path                     # operating system relevant routines
 from os import path                # path informations
+import pickle                      # read/write pickle data
+import platform                    # get OS informations
+import random                      # used for random integers
+import re                          # handle regular expressions
+import subprocess                  # handling of sub-processes
+import sys                         # system calls
+import time                        # used for random seed, time measurement
+import xml.etree.ElementTree as ET # XML processing

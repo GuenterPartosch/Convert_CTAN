@@ -1,24 +1,29 @@
-﻿CTANLoad
-========
-usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME] [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
+usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME]
+                   [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
 
-Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.1.1 (2021-05-26)]
+Loads XLM and PDF documentation files from CTAN a/o generates some special
+lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.2.0
+(2021-06-08)]
 
 Optional parameters:
   -h, --help            show this help message and exit
   -a, --author          Author of the program
   -V, --version         Version of the program
   -d DIREC, --directory DIREC
-                        Directory for output files; Default: .\
+                        OS Directory for output files; Default: .\
   -n NUMBER, --number NUMBER
                         Maximum number of file downloads; Default: 250
   -o OUTPUT_NAME, --output OUTPUT_NAME
                         Generic file name for output files; Default: all
   -t TEMPLATE, --template TEMPLATE
-                        Name template for package XML files to be loaded; Default:
+                        Name template for package XML files to be loaded;
+                        Default:
   -c, --check_integrity
-                        Flag: Check the integrity of the 2nd .pkl file.; Default: False
-  -f, --download_files  Flag: Download associated documentation files [PDF].; Default: False
-  -l, --lists           Flag: Generate some special lists and prepare files for CTANOut.; Default: False
+                        Flag: Check the integrity of the 2nd .pkl file.;
+                        Default: False
+  -f, --download_files  Flag: Download associated documentation files [PDF].;
+                        Default: False
+  -l, --lists           Flag: Generate some special lists and prepare files
+                        for CTANOut.; Default: False
   -stat, --statistics   Flag: Print statistics.; Default: False
   -v, --verbose         Flag: Output is verbose.; Default: False

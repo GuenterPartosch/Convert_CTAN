@@ -17,8 +17,8 @@
 # - Ausgabe von Zeichenketten verbessern
 # - Generierung von CTAN.pkl auch ohne Parameter -l ? ggf. verschieben? (x)
 # - neuer Parameter für die Generierung von CTAN.pkl und CTAN2.pkl ?
-# - gründliche Überarbeitung von -c; Zusammenspiel von PDF_toc and XML_toc
-# - ggf. try: ... except KeyboardInterrupt ?
+# - gründliche Überarbeitung von -c; Zusammenspiel von PDF_toc and XML_toc (x)
+# - ggf. try: ... except KeyboardInterrupt ? oder Thread aus threading
 
 # ------------------------------------------------------------------
 # History
@@ -41,19 +41,20 @@
 # 2.0.15 2021-05-14 clean-up for variables
 # 2.0.16 2021-05-20 directory + separator improved
 # 2.0.17 2021-05-21 more details in verbose mode
-# 2.0.18 2021-05-23 directiry name improved
+# 2.0.18 2021-05-23 directory name improved
 # 2.0.19 2021-05-24 directory handling improved (existance, installation) 
 # 2.1.0  2021-05-26 load licences, make corr. directory and file; expand CTAN.pkl
 # 2.1.1  2021-05-26 correction for not-existing keys in licenses.xml
-# 2.1.2  2021-06-01 smaller improvements in check_integrity
+# 2.1.2  2021-06-07 smaller improvements in check_integrity
+# 2.2.0  2021-06-08 new approach in check_integrity
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
 
 # usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME] [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
 # 
-# Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.1.2
-# (2021-06-01)]
+# Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.2.0
+# (2021-06-08)]
 # 
 # Optional parameters:
 #   -h, --help            show this help message and exit
@@ -78,44 +79,48 @@
 # Messages (CTANLoad)
 
 # Informative messages:
+# - PDF documentation file '<PDF file>' downloaded
+# - XML file '<XML file>' downloaded ('<local file>.xml' on PC)
+# - XML file for package '<package name>' downloaded ('<local file>.xml' on PC)
 # - authors collected
-# - entry 'file' in directory deleted
-# - file 'file' (list of authors and associated packages) generated
-# - file 'file' (list of authors) generated
-# - file 'file' (list of packages) generated
-# - file 'file' (list of topics and associated packages) generated
-# - file 'file' (list of topics) generated
+# - entry '<entry>' in directory deleted
+# - file '<file name>' (list of authors and associated packages) generated
+# - file '<file name>' (list of authors) generated
+# - file '<file name>' (list of licenses) generated
+# - file '<file name>' (list of packages) generated
+# - file '<file name>' (list of topics and associated packages) generated
+# - file '<file name>' (list of topics) generated
 # - integrity check
+# - licenses collected
 # - no error with integrity check
 # - packages collected
 # - packagetopics, topicspackage, authorpackage collected
-# - PDF documentation file 'file' downloaded
-# - pickle file 'CTAN.pkl' written
-# - pickle file 'CTAN2.pkl' cannot be loaded a/o written
-# - pickle file 'CTAN2.pkl' written
+# - pickle file '<pickle file name>' cannot be loaded a/o written
+# - pickle file '<pickle file name>' written
 # - program successfully completed
 # - topics collected
-# - XML file 'file' downloaded
-# - XML file for package 'package' downloaded
+# - unique local file name: '<local file name>'
 #
 # Warnings:
-# - entry 'file' in directory, but file empty or not found
-# - maximum number (n) of downloaded XML+PDF files exceeded
-# - PDF documentation file 'file' not downloaded
-# - PDF file 'file' deleted
-# - XML file 'file' empty or not well-formed
-# - XML file 'file' not downloaded
-# - local XML file for package 'package' empty or not well-formed
-# - XML file for package 'package' not downloaded
-# - local XML file for package 'package' not found
-# - PDF file 'file' without associated XML file
 # - '-f'/'--download_files' valid only together with '-t'/'--template'; therefore ignored
+# - PDF documentation file '<PDF file>' not downloaded
+# - PDF file '<PDF file> in OS deleted
+# - PDF file '<XML file>' without associated XML file
+# - XML file '<XML file>' in OS deleted
+# - XML file 'XML file' not downloaded
+# - XML file for package '<package name>' not downloaded
+# - entry '<entry>' in directory, but OS file is empty
+# - entry '<entry>' in directory, but file not found
+# - local XML file for package '<package name>' empty or not well-formed
+# - local XML file for package '<package name>' not found
+# - maximum number (<number>) of downloaded XML+PDF files exceeded
+# - standard XML file '<XML file>' empty or not well-formed
 #
 # Errors:
+# - XML file '<XML file>' not downloaded 
 # - programm terminated
-# - tried to use the program indirectly
 # - standard XML file 'file' empty or not well-formed 
-# - XML file 'file' not downloaded 
+# - tried to use the program indirectly
 
 # ------------------------------------------------------------------
 # Examples (CTANLoad)
@@ -169,8 +174,8 @@ import xml.etree.ElementTree as ET # XML processing
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.1.2"
-prg_date        = "2021-06-01"
+prg_version     = "2.2.0"
+prg_date        = "2021-06-08"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
@@ -603,7 +608,7 @@ def generate_topicspackage():                                       # Function g
                     print("----- local XML file for package '" + f + "' empty or not well-formed")
             ff.close()
         except FileNotFoundError:                                   # file not downloaded
-            if verbose:
+            if verbose and integrity:
                 print("----- local XML file for package '" + f + "' not found")
     if verbose:
         print("--- packagetopics, topicspackage, authorpackage collected")
@@ -865,50 +870,79 @@ def check_integrity():                                            # Function che
 
     # check_integrity --> generate_pickle2
 
-    global corrected
-    global PDF_toc
+    global corrected                                              # number of corrections
+    global PDF_toc                                                # PDF_toc, structure: PDF_toc[file] = fkey + "-" + onename
 
     if verbose:
         print("--- integrity check")
     load_XML_toc()                                                # load the 2nd pickle file (XML_toc)
-
+                                                                  # XML_toc, structure: XML_toc[href] = (file, fkey, onename)
     noerror = True
-    tmpdict = XML_toc                                             # make a copy
+    
+    tmpdict = {}                                                  # for a copy of XML_toc
+    for f in XML_toc:                                             # make a copy of XML_toc
+        tmpdict[f] = XML_toc[f]
 
 # ..................................................................
     for f in tmpdict:                                             # loop: all entries in a copy of XML_toc
         tmp  = tmpdict[f]
-        dd   = direc + tmp[1] + "-" + tmp[2]
-        tmp2 = os.path.isfile(dd)                                 #    does the file exist?
+        xlfn = direc + tmp[0]                                     #    local file name for current XML file
+        plfn = direc + tmp[1] + "-" + tmp[2]                      #    local file name for current PDF file
+        xex  = os.path.isfile(xlfn)                               #    test: XLM file exists     
+        pex  = os.path.isfile(plfn)                               #    test: PDF file exists
 
-        if tmp2:
-            tmp2 = os.path.getsize(dd) > 0                        #    file exists and is not empty?
-        else:
-            noerror = False
-        tmp3 = dd
-
-        if not tmp2:                                              #    there is an error (file is empty)
-            if verbose:
-                print("----- entry '" + tmp3 + "' (" + tmp[0] + ") in directory, but file empty or not found")
-            if os.path.isfile(tmp3):                              #    file exists
-                os.remove(tmp3)                                   #    delete the associated PDF file
+        if xex:                                                   #    XLM file exists
+            if os.path.getsize(xlfn) == 0:                        #        but file is empty
                 if verbose:
-                    print("----- PDF file '" + tmp3 + "' deleted")
-            del XML_toc[f]
-            if verbose:
-                print("----- entry '" + tmp3 + "' in directory deleted")
-            corrected = corrected + 1
-    
+                    print("----- entry '" + xlfn + "' in directory, but OS file is empty")
+                os.remove(xlfn)                                   #        OS file removed
+                if verbose:
+                    print("----- XML file '" + xlfn + "' in OS deleted")
+                del XML_toc[f]                                    #        entry deleted
+                if verbose:
+                    print("----- entry '" + xlfn + "' in directory deleted")
+                noerror = False                                   #        flag set
+                corrected += 1                                    #        number of corrections increasedtuda-ci.xml
+            else:                                                 #        XML file not empty
+                if os.path.isfile(plfn):                          #            test: PDF file exists
+                    if os.path.getsize(plfn) != 0:
+                        PDF_toc[tmp[1] + "-" + tmp[2]] = tmp[0]   #            generate entry in PDF_toc
+                    else:
+                        if verbose:
+                            print("----- entry '" + plfn + "' (" + tmp[0] + ") in directory, but OS file is empty") 
+                        os.remove(plfn)                           #            OS file removed
+                        if verbose:
+                            print("----- PDF file '" + plfn + "' in OS deleted")
+                        del XML_toc[f]                            #            entry deleted
+                        if verbose:
+                            print("----- entry '" + plfn + "' in directory deleted")
+                        noerror = False                           #            flag set
+                        corrected += 1                            #            number of corrections increased
+                else:
+                    if verbose:
+                        print("----- entry '" + plfn + "' (" + tmp[0] + ") in directory, but PDF file not found")
+                    del XML_toc[f]                                #            entry deleted
+                    if verbose:
+                        print("----- entry '" + plfn + "' in directory deleted")
+                    noerror = False                               #            flag set
+                    corrected += 1                                #            number of corrections increased
+        else:                                                     #     XML file does not exist
+            print("----- entry '" + xlfn + "' in directory, but file not found")
+            del XML_toc[f]                                        #         entry deleted
+            print("----- entry '" + xlfn + "' in directory deleted")
+            noerror = False                                       #         flag set
+            corrected += 1                                        #         number of corrections increased
+            
 # ..................................................................
 # specify values in PDF_toc (via XML_toc)
-    for t in XML_toc:                                             # loop: all members in XML_toc (all XML files)
-        (file, fkey, onename)         = XML_toc[t]                #    get file, fkey, onename
-        PDF_toc[fkey + "-" + onename] = file                      #    generate entry in PDF_toc
+##    for t in XML_toc:                                             # loop: all members in XML_toc (all XML files)
+##        (file, fkey, onename)         = XML_toc[t]                #    get file, fkey, onename
+##        PDF_toc[fkey + "-" + onename] = file                      #    generate entry in PDF_toc
 
 # ..................................................................
 # check actualized PDF_toc; delete a PDF file if necessary
     ok = True
-    for g in PDF_toc:                                             # move through PDF files
+    for g in PDF_toc:                                             # loop: move through PDF files
         if PDF_toc[g] == "":                                      #    no entry: no ass. XML file
             ok = False
             if verbose:
@@ -916,13 +950,13 @@ def check_integrity():                                            # Function che
             if os.path.isfile(g):                                 #    g is file
                 os.remove(g)                                      #    delete the PDF file (if it exists)
                 if verbose:
-                    print("----- PDF file '" + g + "' deleted")
+                    print("----- PDF file '" + g + "' in OS deleted")
 
 # ..................................................................
     if noerror and ok:                                            # there is no error
         if verbose:
             print("----- no error with integrity check")
-    else:                                                         # there is an error
+    else:                                                         # there is any error
         if not noerror:
             generate_pickle2()                                    #    generate a new version of this pickle file
 
