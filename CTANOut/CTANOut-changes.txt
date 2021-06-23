@@ -1,0 +1,13 @@
+Changes (CTANOut)
+=================
+1.75 2021-05-14 more types for -m
+1.76 2021-05-14 clean-up of variables
+1.77 2021-05-15 more details in verbose mode for -mt
+1.78 2021-05-15 output the call parameters in more details in verbose mode
+1.79 2021-05-20 directory separator improved
+1.80 2021-05-23 directory name improved
+1.81 2021-05-24 directory handling (existance, installation) improved
+1.82 2021-05-26 structure of CTAN.pkl adapted
+1.83 2021-05-26 output of license information now with full text
+1.84 2021-05-26 output and interpretaion of language codes improved
+1.85 2021-05-27 correction of a source error in <version .../>

@@ -2,50 +2,55 @@ Examples
 ========
 
 CTANOut
-    RIS is output format (default)                            [default]
-    all.ris is output file                                    [default]
-    no statistics                                             [default]
-    without verbose output                                    [default]
+    RIS is output format (default)
+    all.ris is output file
+    no statistics
+    without verbose output
 
 CTANOut -v
-    as bove                                                   [default]
-    with verbose output (each processed package is shown)     [default]
+    as bove
+    with verbose output (each processed package is shown)             [-v]
 
 CTANOut -v -stat
-    as above
-    but additionally with statistics                          [-v, -stat]
+    as above                                                          [-v]
+    but additionallay with statistics                                 [-stat]
 
 CTANOut -m BibLaTeX
-    BibLaTeX is output format                                 [-m]
-    no statistics                                             [default]
-    without verbose output                                    [default]
+    BibLaTeX is output format                                         [-m]
+    no statistics
+    without verbose output
 
-CTANOut -m BibLaTeX -b @online -v
-    as above
-    but now with verbose output and @online for BibLaTeX type [-v, -b]
+CTANOut -m biblatex -b @online -v
+    as above                                                          [-m]
+    but now with verbose output and                                   [-v]
+    @online for BibLaTeX type                                         [-b]
 
-CTANOut -m BibLaTeX -b @online -s [texlive,license,miktex] -v -stat
-    as above
-    with statistics                                           [-stat]
-    skipped CTAN fields: texlive, license, and miktex         [-s]
+CTANOut -m bib -b @online -s [texlive,license,miktex] -v -stat
+    as above                                                          [-m]
+    @online for BibLaTeX typ                                          [-b]
+    with statistics                                                   [-stat]
+    skipped CTAN fields: texlive, license, and miktex                 [-s]
 
 CTANOut -m LaTeX -mt -v -stat
-    LaTeX is output format                                    [-m}
-    special topic lists are generated                         [-mt]
-    with statistics and verbose output                        [-stat, -v]
+    LaTeX is output format                                            [-m]
+    special topic lists are generated                                 [-mt]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
 
-CTANOut -m LaTeX -k LaTeX -mt
-    LaTeX is output format                                    [-m]
-    special topic lists are generated                         [-mt]
-    package names are filtered by key template "LaTeX"        [-k}
+CTANOut -m latex -k LaTeX -mt
+    LaTeX is output format                                            [-m]
+    special topic lists are generated                                 [-mt]
+    package names are filtered by key template "LaTeX"                [-k]
 
-CTANOut -m LaTeX -t "l3|latex|ltx" -mt -v
-    processed packages: l3, latex, and ltx                    [-t]
-    LaTeX is output format                                    [-m]
-    special topic lists are generated                         [-mt]
+CTANOut -m tex -t "l3|latex|ltx" -mt -v
+    processed packages: l3, latex, and ltx                            [-t]
+    LaTeX is output format                                            [-m]
+    special topic lists are generated                                 [-mt]
+    package names are filtered by name template "LaTeX"               [-t]
 
 CTANOut -m plain -v -stat -o myfile -s "[texlive,license,miktex]"
-    plain text is output format                               [-m]
-    myfile.txt is the name for the output file                [-o]
-    skipped CTAN fields: texlive, license, and miktex         [-s]
-    with statistics and verbose output                        [-stat, -v]
+    plain text is output format                                       [-m]
+    myfile.txt is the name for the output file                        [-o]
+    skipped CTAN fields: texlive, license, and miktex                 [-s]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]

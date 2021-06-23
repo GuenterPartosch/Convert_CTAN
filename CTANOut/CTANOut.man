@@ -1,9 +1,10 @@
 CTANOut
 =======
-usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY]
-                  [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 
-[CTANOut.py; Version: 1.84 (2021-05-26)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY] [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt]
+                  [-stat] [-v]
+
+[CTANOut.py; Version: 1.85 (2021-05-27)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 
 Options:
   -h, --help            show this help message and exit
