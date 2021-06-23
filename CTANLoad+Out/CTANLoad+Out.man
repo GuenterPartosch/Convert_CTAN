@@ -1,11 +1,9 @@
 Usage (CTANLoad+Out)
 ====================
-usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}] [-c] [-d DIREC] [-f] [-k FILTER_KEY] [-l]
-                       [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}] [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-s SKIP] [-stat]
-                       [-t TEMPLATE] [-tl TEMPLATE_LOAD] [-to TEMPLATE_OUT] [-V] [-v]
+usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}] [-c] [-d DIREC] [-f] [-k FILTER_KEY] [-l] [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}] [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME]
+                       [-p] [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD] [-to TEMPLATE_OUT] [-V] [-v]
 
-[CTANLoad+Out.py; Version: 1.0 (2021-05-24)] Combine the tasks of CTANLoad [Load XLM and PDF documentation files from CTAN a/o generate some special lists, and
-prepare data for CTANOut] and CTANOut [Convert CTAN XLM package files to some formats].
+[CTANLoad+Out.py; Version: 1.2 (2021-05-31)] Combine the tasks of CTANLoad [Load XLM and PDF documentation files from CTAN a/o generate some special lists, and prepare data for CTANOut] and CTANOut [Convert CTAN XLM package files to some formats].
 
 Optional parameters:
   -h, --help            show this help message and exit
@@ -36,7 +34,7 @@ Optional parameters:
   -tl TEMPLATE_LOAD, --template_load TEMPLATE_LOAD
                         Template for package names in CTANLoad; Default:
   -to TEMPLATE_OUT, --template_out TEMPLATE_OUT
-                        Template for package names in CTANOut; Default:
+                        Template for package names in CTANOut; Default: ^.+$
   -V, --version         Show version of the program and exit.
   -v, --verbose         Flag: Output is verbose.; Default: False
 
