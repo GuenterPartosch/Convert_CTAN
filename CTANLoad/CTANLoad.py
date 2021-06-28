@@ -7,18 +7,24 @@
 
 # Es fehlen noch  bzw. Probleme:
 # - noch besser unterscheiden zwischen not well-formed und leerer Datei
-# - unterschiedliche Verzeichnisse für XML- und PDF-Dateien?
+# - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
 # - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/
 # - Parameter -m BibLaTeX  mit/ohne -l
 # - zusätzlicher Aufruf-Parameter -k (Laden nach Topics)?
 # - https://ctan.org/xml/2.0/licenses auswerten und für <license .../> nutzen (x)
 # - bei -d: ggf. Verzeichnis anlegen (X)
 # - bei -d: Verzeichnistrenner besser/explizit behandeln (x)
-# - Ausgabe von Zeichenketten verbessern
+# - Ausgabe von Zeichenketten verbessern (x)
 # - Generierung von CTAN.pkl auch ohne Parameter -l ? ggf. verschieben? (x)
-# - neuer Parameter für die Generierung von CTAN.pkl und CTAN2.pkl ?
+# - neuer Parameter für die Generierung von CTAN.pkl und CTAN2.pkl ? -q ?
 # - gründliche Überarbeitung von -c; Zusammenspiel von PDF_toc and XML_toc (x)
-# - ggf. try: ... except KeyboardInterrupt ? oder Thread aus threading
+# - ggf. try: ... except KeyboardInterrupt ? oder Thread aus threading (x)
+# - Aktualisierung der PDF_toc schützen; ggf Thread (x)
+# - noch passendere Meldungen bei Resettings (x)
+# - weitere Resettings der Aufrufparameter (x)
+# - unspecified error noch besser erklären
+# - wenn zu einer XML-Datei schon PDF-Dateien existieren, so sollten diese genommen werden (x)
+# - Änderungen in Kommentaren: Übersicht über Funktionen & in main() (x)
 
 # ------------------------------------------------------------------
 # History
@@ -32,36 +38,45 @@
 # 2.0.6  2020-01-15 time measure
 # 2.0.7  2020-01-24 statistics improved
 # 2.0.8  2020-01-25 minor corrections
-# 2.0.9  2020-06-05 correction in load_documentation file
+# 2.0.9  2020-06-05 correction in load_documentation_file
 # 2.0.10 2020-06-26 enhance verbose output
 # 2.0.11 2020-07-22 first lines of file
 # 2.0.12 2021-04-05 output for option -c enhanced
 # 2.0.13 2021-05-13 output local file name for downladed PDF files in verbose mode
 # 2.0.14 2021-05-13 output the call parameters in more details in verbose mode
 # 2.0.15 2021-05-14 clean-up for variables
-# 2.0.16 2021-05-20 directory + separator improved
+# 2.0.16 2021-05-20 OS directory + separator improved
 # 2.0.17 2021-05-21 more details in verbose mode
-# 2.0.18 2021-05-23 directory name improved
-# 2.0.19 2021-05-24 directory handling improved (existance, installation) 
+# 2.0.18 2021-05-23 OS directory name improved
+# 2.0.19 2021-05-24 OS directory handling improved (existance, installation) 
 # 2.1.0  2021-05-26 load licences, make corr. directory and file; expand CTAN.pkl
 # 2.1.1  2021-05-26 correction for not-existing keys in licenses.xml
 # 2.1.2  2021-06-07 smaller improvements in check_integrity
 # 2.2.0  2021-06-08 new approach in check_integrity
+# 2.3.0  2021-06-09 some funcion calls as threads
+# 2.3.1  2021-06-12 auxiliary function fold: shorten long option values for output
+# 2.3.2  2021-06-14 messages classified: Warnings, Error, Info
+# 2.3.3  2021-06-14 str.format(...) used (if applicable); ellipses used to shorten some texts
+# 2.3.4  2021-06-15 main function new structured
+# 2.3.5  2021-06-18 output (options in program call) enhanced
+# 2.3.6  2021-06-18 new function verify_PDF_files: check actualized PDF_toc; delete a PDF file if necessary
+# 2.3.7  2021-06-19 main function more modularized; new functions call_plain, call_load, call_check
+# 2.3.8  2021-06-22 error corrections and improvements for the handling von PDF_toc and XML_toc
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
 
 # usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME] [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
 # 
-# Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.2.0
-# (2021-06-08)]
+# Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.3.8
+# (2021-06-22)]
 # 
 # Optional parameters:
 #   -h, --help            show this help message and exit
 #   -a, --author          Author of the program
 #   -V, --version         Version of the program
 #   -d DIREC, --directory DIREC
-#                         Directory for output files; Default: ./
+#                         OS Directory for output files; Default: ./
 #   -n NUMBER, --number NUMBER
 #                         Maximum number of file downloads; Default: 250
 #   -o OUTPUT_NAME, --output OUTPUT_NAME
@@ -79,54 +94,91 @@
 # Messages (CTANLoad)
 
 # Informative messages:
-# - PDF documentation file '<PDF file>' downloaded
-# - XML file '<XML file>' downloaded ('<local file>.xml' on PC)
-# - XML file for package '<package name>' downloaded ('<local file>.xml' on PC)
-# - authors collected
-# - entry '<entry>' in directory deleted
-# - file '<file name>' (list of authors and associated packages) generated
-# - file '<file name>' (list of authors) generated
-# - file '<file name>' (list of licenses) generated
-# - file '<file name>' (list of packages) generated
-# - file '<file name>' (list of topics and associated packages) generated
-# - file '<file name>' (list of topics) generated
-# - integrity check
-# - licenses collected
-# - no error with integrity check
-# - packages collected
-# - packagetopics, topicspackage, authorpackage collected
-# - pickle file '<pickle file name>' cannot be loaded a/o written
-# - pickle file '<pickle file name>' written
-# - program successfully completed
-# - topics collected
-# - unique local file name: '<local file name>'
+# - Info: PDF documentation file '<PDF file>' downloaded
+# - Info: XML file '<XML file>' downloaded ('<local file>.xml' on PC)
+# - Info: XML file for package '<package name>' downloaded ('<local file>.xml' on PC)
+# - Info: authors collected
+# - Info: entry '<entry>' in OS directory deleted
+# - Info: file '<file name>' (list of authors and associated packages) generated
+# - Info: file '<file name>' (list of authors) generated
+# - Info: file '<file name>' (list of licenses) generated
+# - Info: file '<file name>' (list of packages) generated
+# - Info: file '<file name>' (list of topics and associated packages) generated
+# - Info: file '<file name>' (list of topics) generated
+# - Info: integrity check
+# - Info: licenses collected
+# - Info: no error with integrity check
+# - Info: packages collected
+# - Info: packagetopics, topicspackage, authorpackage collected
+# - Info: pickle file '<pickle file name>' cannot be loaded a/o written
+# - Info: pickle file '<pickle file name>' written
+# - Info: program successfully completed
+# - Info: Successfully created the OS directory '<directory>'
+# - Info: topics collected
+# - Info: unique local file name: '<local file name>'
 #
 # Warnings:
-# - '-f'/'--download_files' valid only together with '-t'/'--template'; therefore ignored
-# - PDF documentation file '<PDF file>' not downloaded
-# - PDF file '<PDF file> in OS deleted
-# - PDF file '<XML file>' without associated XML file
-# - XML file '<XML file>' in OS deleted
-# - XML file 'XML file' not downloaded
-# - XML file for package '<package name>' not downloaded
-# - entry '<entry>' in directory, but OS file is empty
-# - entry '<entry>' in directory, but file not found
-# - local XML file for package '<package name>' empty or not well-formed
-# - local XML file for package '<package name>' not found
-# - maximum number (<number>) of downloaded XML+PDF files exceeded
-# - standard XML file '<XML file>' empty or not well-formed
+# - Warning: Creation of the OS directory '<directory>' failed
+# - Warning: PDF documentation file '<PDF file>' not downloaded
+# - Warning: PDF file '<PDF file> in OS deleted
+# - Warning: PDF file '<XML file>' without associated XML file
+# - Warning: XML file '<XML file>' in OS deleted
+# - Warning: XML file 'XML file' not downloaded
+# - Warning: XML file for package '<package name>' not downloaded
+# - Warning: entry '<entry>' in dictionary, but OS file is empty
+# - Warning: entry '<entry>' in dictionary, but OS file not found
+# - Warning: local XML file for package '<package name>' empty or not well-formed
+# - Warning: local XML file for package '<package name>' not found
+# - Warning: maximum number (<number>) of downloaded XML+PDF files exceeded
+# - Warning: XML file '<XML file>' empty or not well-formed
+# - Warnung: '<option>' reset to {new value} (due to <reason>)"
 #
 # Errors:
-# - XML file '<XML file>' not downloaded 
-# - programm terminated
-# - standard XML file 'file' empty or not well-formed 
-# - tried to use the program indirectly
+# - Error: programm terminated
+# - Error: standard XML file 'file' empty or not well-formed 
+# - Error: standard XML file '<XML file>' not downloaded 
+# - Error: tried to use the program indirectly
+
+# ------------------------------------------------------------------
+# Functions in CTANLoad.py
+
+# analyze_XML_file(file)   Analyze a XML package file for documentation (PDF) files.
+# call_check()	           Process all necessary steps for a integrity check.
+# call_load()	           Process all steps for a complete ctanout call (without integrity check).
+# call_plain()	           Process all steps for a plain call.
+# check_integrity()	   Check integrity.
+# fold()	           auxiliary function
+# generate_lists()	   Generate xyz.loa (list of authors), xyz.lop (list of packages), xyz.lok (list of topics),
+#                          xyz.lpt (list of topics and associated packages), xyz.lap (list of authors and associated packages), xyz is the specified generic output file name.
+# generate_pickle1()	   pickle dump: actual authors, packages, licenses, topics, topicspackage, packagetopics
+# generate_pickle2()	   pickle dump: actual XML_toc (list with download information files.
+# generate_topicspackage() Generate topicspackage, packagetopics, and authorpackages.
+# get_PDF_files(d)	   List all PDF files in a OS directory.
+# load_XML_files()	   Download XML package files.
+# load_XML_toc()	   Load pickle file 2 (with XML_toc).
+# load_authors()	   Download XML file 'authors'.
+# load_document_file(href, key, name)	Load one information file (PDF).
+# load_licenses()	   Download XML file 'licenses'.
+# load_packages()	   Download XML file 'packages'.
+# load_topics()	           Download XML file 'topics'.
+# main()	           Main function
+# make_statistics()	   Print statistics on terminal.
+# set_PDF_toc()            Fill PDF_toc on the basis of XML_Toc.
 
 # ------------------------------------------------------------------
 # Examples (CTANLoad)
 
 # CTANLoad -h
 # - help, show the options
+#
+# CTANLoad
+# - download authors, topics, packages, licenses; write CTAN.pkl
+# - not verbose and without statistics
+#
+# CTANLoad -v -stat                                            
+# - as above
+# - verbose                                                    [-v]
+# - with statistics                                            [-stat]
 #
 # CTANLoad -t "^a.+$" -v
 # - load all CTAN XML files with name template "^a.+$"         [-t]
@@ -148,7 +200,8 @@
 # - with integrity check                                       [-c]
 # - with statistics                                            [-stat]
 
-# ------------------------------------------------------------------
+
+# ==================================================================
 # Imports
 
 import argparse                    # parse arguments
@@ -163,6 +216,7 @@ import subprocess                  # handling of sub-processes
 import sys                         # system calls
 import time                        # used for random seed, time measurement
 import xml.etree.ElementTree as ET # XML processing
+from threading import Thread       # handling of threads
 
 
 # ==================================================================
@@ -174,8 +228,8 @@ import xml.etree.ElementTree as ET # XML processing
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.2.0"
-prg_date        = "2021-06-08"
+prg_version     = "2.3.8"
+prg_date        = "2021-06-22"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
@@ -215,7 +269,7 @@ if operatingsys == "Windows":
     direc_sep      = "\\"
 else:
     direc_sep      = "/"
-direc_default       = act_direc + direc_sep # default for -d (output directory)
+direc_default       = act_direc + direc_sep # default for -d (output OS directory)
 
 download            = None       # default for option -f    (no PDF download)
 integrity           = None       # default for option -c    (no integrity check)
@@ -232,36 +286,45 @@ verbose             = None       # default for option -n    (output is not verbo
 authorpackages      = {}         # python dictionary: list of authors and their packages
 authors             = {}         # python dictionary: list of authors
 packages            = {}         # python dictionary: list of packages
-licenses            = {}         # python dictionary: list of licenses
+licenses            = {}         # python dictionary: list of licenses  
 packagetopics       = {}         # python dictionary: list of packages and their topics
 topics              = {}         # python dictionary: list of topics
 topicspackage       = {}         # python dictionary: list of topics and their packages
 XML_toc             = {}         # python dictionary: list of PDF files: XML_toc[href]=...PDF file
 PDF_toc             = {}         # python dictionary: list of PDF files: PDF_toc[lfn]=...package file
+all_XML_files       = ()         # list with all XML files
 
 # XML_toc
-#   Structure:                 XML_toc[href] = (file, fkey, onename)
+#   Structure:                 XML_toc[href] = (XML file, key, onename)
 #   generated and changed in:  analyze_XML_file(file), check_integrity()
 #   inspected in:              analyze_XML_file(file), check_integrity()
 #   stored in pickle file:     generate_pickle2()
 #   loaded from pickle file:   load_XML_toc()
 #
 # PDF_toc
-#   Structure:                 PDF_toc[file] = fkey + "-" + onename
+#   Structure:                 PDF_toc[fkey + "-" + onename] = file
 #   generated in:              get_PDF_files(d)
 #   changed in                 analyze_XML_file(file), check_integrity()
 #   inspected in:              check_integrity()
 
+# 1st pickle file:
+#   name:      CTAN.pkl
+#   contains:  authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages
+#
+# 2nd pickle file:
+#   name:      CTAN2.pkl
+#   contains:  XML_toc
+
 # ------------------------------------------------------------------
 # Settings for wget (authors, packages, topics)
 
-ctanUrl             = "https://ctan.org"          # head of a CTAN url
-ctanUrl2            = ctanUrl + "/tex-archive"    # head of another CTAN url
-call1               = "wget https://ctan.org/xml/2.0/"
-call2               = "wget https://ctan.org/xml/2.0/pkg/"
-parameter           = "?no-dtd=true --no-check-certificate -O "
+ctanUrl             = "https://ctan.org"                        # head of a CTAN url
+ctanUrl2            = ctanUrl + "/tex-archive"                  # head of another CTAN url
+call1               = "wget https://ctan.org/xml/2.0/"          # base wget call for authors, packages, ...
+call2               = "wget https://ctan.org/xml/2.0/pkg/"      # base wget call for package files
+parameter           = "?no-dtd=true --no-check-certificate -O " # additional parameter for wget
 
-# ------------------------------------------------------------------
+# ------------------------------------------------------------------ 
 # other settings
 
 pkl_file            = "CTAN.pkl" # name of 1st pickle file
@@ -275,6 +338,8 @@ corrected           = 0          # counter of corrected entries in XML_toc (in t
 ext                 = ".xml"     # file name extension for downloaded XML files
 rndg                = 2          # optional rounding of float numbers
 left                = 35         # width of labels in statistics
+ellipse             = " ..."     # abbreviate texts
+reset_text          = "Info: '{0}' reset to {1} (due to {2})"
 
 random.seed(time.time())         # seed for random number generation
 
@@ -287,7 +352,7 @@ parser = argparse.ArgumentParser(description = program_text + " [" + prg_name + 
                                  "Version: " + prg_version + " (" + prg_date + ")]")
 parser._positionals.title = 'Positional parameters'
 parser._optionals.title   = 'Optional parameters'
-opgroup = parser.add_mutually_exclusive_group()
+##opgroup = parser.add_mutually_exclusive_group()
 
 parser.add_argument("-a", "--author",                      # Parameter -a/--author
                     help    = author_text,
@@ -314,7 +379,7 @@ parser.add_argument("-o", "--output",                      # Parameter -o/--outp
                     dest    = "output_name",
                     default = output_name_default)
 
-opgroup.add_argument("-t", "--template",                   # Parameter -t/--template
+parser.add_argument("-t", "--template",                   # Parameter -t/--template
                     help    = template_text + "; Default: " + "%(default)s",
                     dest    = "template",
                     default = template_default)
@@ -330,7 +395,7 @@ parser.add_argument("-f", "--download_files",              # Parameter -f/--down
                     action  = "store_true",
                     default = download_default)
 
-opgroup.add_argument("-l", "--lists",                      # Parameter -l/--lists
+parser.add_argument("-l", "--lists",                      # Parameter -l/--lists
                     help = lists_text + "; Default: " + "%(default)s",
                     action = "store_true",
                     default = lists_default)
@@ -359,18 +424,18 @@ template     = args.template                               # parameter -t
 verbose      = args.verbose                                # parameter -v
 
 # ------------------------------------------------------------------
-# Correct directory name, test directory existence, and install directory
+# Correct OS directory name, test OS directory existence, and install OS directory
 
-direc = direc.strip()                                      # correct directory name (-d)
+direc = direc.strip()                                      # correct OS directory name (-d)
 if direc[len(direc) - 1] != direc_sep:
     direc += direc_sep
 if not path.exists(direc):
     try:
         os.mkdir(direc)
     except OSError:
-        print ("- Creation of the directory '%s' failed" % direc)
+        print ("- Warning: Creation of the directory '{0}' failed".format(direc))
     else:
-        print ("- Successfully created the directory '%s' " % direc)
+        print ("- Info: Successfully created the directory '{0}' ".format(direc))
 output_name  = direc + args.output_name                    # parameter -d
 
 # ------------------------------------------------------------------
@@ -381,27 +446,42 @@ p3           = re.compile("^[0-9]{10}-.+[.]pdf$")          # regular expression 
 p4           = re.compile("^.+[.]xml$")                    # regular expression for local XML file names
 
 
+#===================================================================
+# Auxiliary function
+
+def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
+    """auxiliary function: shorten long option values for output"""
+    
+    maxlen = 65
+    offset = "\n" + 64 * " "
+    tmp    = s[:]
+    all    = ""
+    while len(tmp) > maxlen:
+        all = all + tmp[0 : maxlen] + offset
+        tmp = tmp[maxlen :]
+    return all + tmp
+
+
 # ==================================================================
 # Functions for main part
 
 # ------------------------------------------------------------------
-def load_authors():                                        # Function load_authors()
-    """Downloads XML file 'authors'."""
+def load_authors():                                        # Function load_authors(): Download XML file 'authors'.
+    """Download XML file 'authors'."""
 
-    global authors                                         # global directory with authors
+    global authors                                         # global Python dictionary with authors
 
     file    = "authors"                                    # file name
     file2   = file + ext                                   # file name (with extension)
     callx   = call1 + file + parameter + direc + file2     # command for Popen
 
-    try:                                                   # loads file 'authors'
+    try:                                                   # load file 'authors'
         # wget https://ctan.org/xml/2.0/authors?no-dtd=true --no-check-certificate -O ./authors.xml
         process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
         process.wait()
 
         if verbose:
-            print("--- XML file '" + file + "' downloaded", "('" + direc + file + ".xml' on PC)")
-
+            print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
         try:
             authorsTree  = ET.parse(file2)                 # parse the XML file 'authors.xml'
             authorsRoot  = authorsTree.getroot()           # get the root
@@ -420,21 +500,21 @@ def load_authors():                                        # Function load_autho
                         fname = child.attrib['familyname'] # attribute familyname
                 authors[key] = (gname, fname)
             if verbose:
-                print("----- authors collected")
+                print("----- Info: authors collected")
         except:                                            # parsing was not successfull
             if verbose:
-                print("--- standard XML file '" + file2 + "' empty or not well-formed")
-            sys.exit("- programm terminated")
+                print("--- Error: standard XML file '{0}' empty or not well-formed".format(file2))
+            sys.exit("- Error: programm terminated")
     except FileNotFoundError:                              # file not downloaded
         if verbose:
-            print("--- XML file '" + file + "' not downloaded")
-        sys.exit("- programm terminated")                  # program terminated
+            print("--- Error: XML file '{0}' not downloaded".format(file))
+        sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def load_packages():                                       # Function load_packages()
-    """Downloads XML file 'packages'."""
+def load_packages():                                       # Function load_packages: Download XML file 'packages'.
+    """Download XML file 'packages'."""
 
-    global packages                                        # global directory with packages
+    global packages                                        # global Python dictionary with packages
 
     file    = "packages"                                   # file name
     file2   = file + ext                                   # file name (with extension)
@@ -445,8 +525,7 @@ def load_packages():                                       # Function load_packa
         process.wait()
 
         if verbose:
-            print("--- XML file '" + file + "' downloaded", "('" + direc + file + ".xml' on PC)")
-
+            print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
         try:                                               # parses 'packages' tree
             packagesTree = ET.parse(file2)                 # parse the XML file 'packages.xml'
             packagesRoot = packagesTree.getroot()          # get the root
@@ -464,21 +543,21 @@ def load_packages():                                       # Function load_packa
                         caption = child.attrib['caption']  # attribute caption
                 packages[key] = (name, caption)
             if verbose:
-                print("----- packages collected")
+                print("----- Info: packages collected")
         except:                                            # parsing was not successfull
             if verbose:
-                print("--- standard XML file '" + file2 + "' empty or not well-formed")
-            sys.exit("--- programm terminated")
+                print("--- Error: standard XML file '{0}' empty or not well-formed".format(file2))
+            sys.exit("--- Error: programm terminated")
     except FileNotFoundError:                              # file not downloaded
         if verbose:
-            print("--- XML file '" + file + "' not downloaded")
-        sys.exit("- programm terminated")                  # program terminated
+            print("--- Error: XML file '" + file + "' not downloaded".format(file))
+        sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def load_topics():                                         # Function load_topics()
-    """Downloads XML file 'topics'."""
+def load_topics():                                         # Function load_topics(): Download XML file 'topics'.
+    """Download XML file 'topics'."""
 
-    global topics                                          # global directory with topics
+    global topics                                          # global Python dictionary with topics
 
     file    = "topics"                                     # file name
     file2   = file + ext                                   # file name (with extension)
@@ -489,8 +568,7 @@ def load_topics():                                         # Function load_topic
         process.wait()
 
         if verbose:
-            print("--- XML file '" + file + "' downloaded", "('" + direc + file + ".xml' on PC)")
-
+            print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
         try:
             topicsTree   = ET.parse(file2)                 # parse the XML file 'topics.xml'
             topicsRoot   = topicsTree.getroot()            # get the root
@@ -506,21 +584,21 @@ def load_topics():                                         # Function load_topic
                         details = child.attrib['details']  # attribute details
                 topics[key] = details
             if verbose:
-                print("----- topics collected")
+                print("----- Info: topics collected")
         except:                                            # parsing was not successfull
             if verbose:
-                print("--- standard XML file '" + file + "' empty or not well-formed")
-            sys.exit("--- programm terminated")
+                print("--- Error: standard XML file '{0}' empty or not well-formed".format(file))
+            sys.exit("--- Error: programm terminated")
     except FileNotFoundError:                              # file not downloaded
         if verbose:
-            print("--- XML file '" + file + "' not downloaded")
-        sys.exit("- programm terminated")                  # program terminated
+            print("--- Error: '{0}' not downloaded".format(file))
+        sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def load_licenses():                                       # Function load_licenses()
-    """Downloads XML file 'licenses'."""
+def load_licenses():                                       # Function load_licenses: Download XML file 'licenses'.
+    """Download XML file 'licenses'."""
 
-    global licenses                                        # global directory with licenses
+    global licenses                                        # global Python dictionary with licenses
 
     file    = "licenses"                                   # file name
     file2   = file + ext                                   # file name (with extension)
@@ -531,8 +609,7 @@ def load_licenses():                                       # Function load_licen
         process.wait()
 
         if verbose:
-            print("--- XML file '" + file + "' downloaded", "('" + direc + file + ".xml' on PC)")
-
+            print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
         try:
             licensesTree   = ET.parse(file2)               # parse the XML file 'topics.xml'
             licensesRoot   = licensesTree.getroot()        # get the root
@@ -553,19 +630,19 @@ def load_licenses():                                       # Function load_licen
             licenses["collection"]  = "Collection"         # correction; not in lincenses.xml
             licenses["digest"]      = "Digest"             # correction; not in lincenses.xml
             if verbose:
-                print("----- licenses collected")
+                print("----- Info: licenses collected")
         except:                                            # parsing was not successfull
             if verbose:
-                print("--- standard XML file '" + file + "' empty or not well-formed")
-            sys.exit("--- programm terminated")
+                print("--- Error: standard XML file '{0}' empty or not well-formed".format(file))
+            sys.exit("--- Error: programm terminated")
     except FileNotFoundError:                              # file not downloaded
         if verbose:
-            print("--- XML file '" + file + "' not downloaded")
-        sys.exit("- programm terminated")                  # program terminated
+            print("--- Error: XML file '{0}' not downloaded".format(file))
+        sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def generate_topicspackage():                                       # Function generate_topicspackage()
-    """Generates topicspackage, packagetopics, and authorpackages."""
+def generate_topicspackage():                                       # Function generate_topicspackage(): Generate topicspackage, packagetopics, and authorpackages.
+    """Generate topicspackage, packagetopics, and authorpackages."""
 
     global topicspackage, packagetopics, authorpackages
 
@@ -575,10 +652,10 @@ def generate_topicspackage():                                       # Function g
             ff = open(fext, encoding="utf-8", mode="r")
 
             try:
-                einPaket     = ET.parse(fext)                       # parse the XML file
-                einPaketRoot = einPaket.getroot()
-                ll           = list(einPaketRoot.iter("keyval"))    # all keyval elements
-                aa           = list(einPaketRoot.iter("authorref")) # all authorref elements
+                onePackage     = ET.parse(fext)                     # parse the XML file
+                onePackageRoot = onePackage.getroot()               # get root
+                ll             = list(onePackageRoot.iter("keyval"))    # all keyval elements
+                aa             = list(onePackageRoot.iter("authorref")) # all authorref elements
 
                 for i in ll:                                        # in keyval: 1 attribute: value
                     key = i.get("value", "")                        # attribute value
@@ -605,63 +682,64 @@ def generate_topicspackage():                                       # Function g
                         authorpackages[key3] = [f]
             except:                                                 # parsing was not successfull
                 if verbose:
-                    print("----- local XML file for package '" + f + "' empty or not well-formed")
+                    print("----- Warning: local XML file for package '{0}' empty or not well-formed".format(f))
             ff.close()
         except FileNotFoundError:                                   # file not downloaded
             if verbose and integrity:
-                print("----- local XML file for package '" + f + "' not found")
+                print("----- Warning: local XML file for package '" + f + "' not found".format(f))
     if verbose:
-        print("--- packagetopics, topicspackage, authorpackage collected")
+        print("--- Info: packagetopics, topicspackage, authorpackage collected")
 
 # ------------------------------------------------------------------
-def load_XML_files():                                               # Function load_XML_files()
-    """Downloads XML package files."""
+def load_XML_files():                                               # Function load_XML_files: Download XML package files.
+    """Download XML package files."""
+
+    # load_XML_file --> analyze_XML_file
 
     global packages, topicspackage, number, counter, pdfcounter
 
     for f in packages:                                              # all packages found in 'packages'
         if p2.match(f) and (counter + pdfcounter < number):         # file name matches template
             counter = counter + 1
-            callx   = call2 + f + parameter + direc + f + ext       # wget https://ctan.org/xml/2.0/pkg/xyz --no-check-certificate -O xyz
+            callx   = call2 + f + parameter + direc + f + ext       # wget https://ctan.org/xml/2.0/pkg/xyz --no-check-certificate -O xyz.xml
 
             try:                                                    # try to download the XML file (packages)
                 process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
                 process.wait()
 
                 if verbose:
-                    print("----- XML file for package '" + f + "' downloaded", "('" + direc + f + ".xml' on PC)")
-                if download:
-                    analyze_XML_file(f + ext)                       # if download is set: analyze the associated XML file
+                    print("----- Info: XML file for package '{0}' downloaded ('{1}.xml' on PC)".format(f, direc + f))
+                analyze_XML_file(f + ext)                           # if download is set: analyze the associated XML file
             except FileNotFoundError:                               # download was not successfull
                 if verbose:
-                    print("----- XML file for package '" + f + "' not downloaded")
+                    print("----- Warning: XML file for package '{0}' not downloaded".format(f))
 
-    if counter + pdfcounter >= number:
+    if counter + pdfcounter >= number:                              # limit for downloaded files
         if verbose:
-            print("--- maximum number (" + str(counter + pdfcounter) + ") of downloaded XML+PDF files exceeded")
+            print("--- Warning: maximum number ({0}) of downloaded XML+PDF files exceeded".format(str(counter + pdfcounter)))
 
 # ------------------------------------------------------------------
-def analyze_XML_file(file):                                        # Function analyze_XML_file(file)
-    """Analyzes a XML package file for documentation (PDF) files."""
+def analyze_XML_file(file):                                        # Function analyze_XML_file(file): Analyze a XML package file for documentation (PDF) files.
+    """Analyze a XML package file for documentation (PDF) files."""
 
     # analyze_XML_file --> load_document_file
 
-    global XML_toc                                                 # global directory
-    global PDF_toc
+    global XML_toc                                                 # global Pythondirectory
+    global PDF_toc                                                 # global Pythondirectory for PDF files
 
     error = False
 
     try:                                                           # try to open and parse a XML file
-        f            = open(file, encoding="utf-8", mode="r")      # open the XML file
-        einPaket     = ET.parse(f)                                 # parse the XML file
-        einPaketRoot = einPaket.getroot()                          # get root
+        f              = open(file, encoding="utf-8", mode="r")    # open the XML file
+        onePackage     = ET.parse(f)                               # parse the XML file
+        onePackageRoot = onePackage.getroot()                      # get root
     except:                                                        # parsing not successfull
         if verbose:
-            print("------- local XML file for package '" + file + "' empty or not well-formed")
+            print("------- Warning: local XML file for package '{0}' empty or not well-formed".format(file))
         error = True
 
     if not error:
-        ll           = list(einPaketRoot.iter("documentation"))    # all documentation elements = all documentation childs
+        ll           = list(onePackageRoot.iter("documentation"))  # all documentation elements == all documentation childs
 
         for g in ll:                                               # loop: all documentation childs
             href = g.get("href", "")                               # href attribute
@@ -674,13 +752,14 @@ def analyze_XML_file(file):                                        # Function an
                     onename       = fnames[len(fnames) - 1]        # get the file name
                     fkey          = str(random.randint(1000000000, 9999999999)) # construct a random file name
                     XML_toc[href] = (file, fkey, onename)          # store this new file name
-                if load_document_file(href2, fkey, onename):       # load the PDF document
-                    PDF_toc[file] = fkey + "-" + onename
+                if download:
+                    if load_document_file(href2, fkey, onename):   # load the PDF document
+                        PDF_toc[fkey + "-" + onename] = file
         f.close()                                                  # close the analyzed XML file
 
 # ------------------------------------------------------------------
-def load_document_file(href, key, name):                           # Function load_document_file(href, key, name)
-    """Loads one information file (PDF)."""
+def load_document_file(href, key, name):                           # Function load_document_file(href, key, name): Load one information file (PDF).
+    """Load one information file (PDF)."""
     
     # to be improved
 
@@ -696,26 +775,26 @@ def load_document_file(href, key, name):                           # Function lo
         outs, errs = process.communicate(timeout=50)               # wait?
         if "ERROR" in errs:                                        # "ERROR" found in errs
             if verbose:
-                print("------- PDF documentation file '" + name + "' not downloaded")
+                print("------- Warning: PDF documentation file '{0}' not downloaded".format(name))
             pdfctrerr = pdfctrerr + 1
         else:
             if verbose:
-                print("------- PDF documentation file '" + name + "' downloaded")
-                print("------- unique local file name:", "'" + direc + key + "-" + name + "'")
+                print("------- Info: PDF documentation file '{0}' downloaded".format(name))
+                print("------- Info: unique local file name: '{0}'".format(direc + key + "-" + name))
             pdfcounter = pdfcounter + 1                            # number of downloaded PDF files incremented
             noterror = True
     except:                                                        # download was not successfull
         process.kill()                                             # kill the process
         outs, errs = process.communicate()                         # output and error messages
         if verbose:
-            print("------- PDF documentation file '" + name + "' not downloaded")
+            print("------- Warning: PDF documentation file '{0}' not downloaded".format(name))
     return noterror
 
 # ------------------------------------------------------------------
-def load_XML_toc():                                                # Function load_XML_toc()
-    """Loads pickle file with XML_toc."""
+def load_XML_toc():                                                # Function load_XML_toc(): Load pickle file 2 (which contains XML_toc).
+    """Load pickle file 2 (with XML_toc)."""
 
-    global XML_toc                                                 # global directory
+    global XML_toc                                                 # global Python dictionary
 
     try:
         pickleFile2 = open(direc + pkl_file2, "br")                # open the pickle file
@@ -725,8 +804,10 @@ def load_XML_toc():                                                # Function lo
         pass                                                       # do nothing
 
 # ------------------------------------------------------------------
-def generate_lists():                                              # Function generate_lists()
-    """Generates some special files (with lists).:
+def generate_lists():                                              # Function generate_lists: Generate some special files (with lists).:
+                                                                   # xyz.loa (list of authors), xyz.lop (list of packages), xyz.lok (list of topics),
+                                                                   # xyz.lpt (list of topics and associated packages)
+    """Generate some special files (with lists).:
        xyz.loa (list of authors)
        xyz.lop (list of packages)
        xyz.lok (list of topics)
@@ -735,7 +816,7 @@ def generate_lists():                                              # Function ge
        xyz is the specified generic output file name."""
 
     # .................................................
-    # generates xyz.loa file (list of authors)
+    # generate xyz.loa file (list of authors)
 
     loa_file = output_name + ".loa"
 
@@ -744,11 +825,11 @@ def generate_lists():                                              # Function ge
         loa.write(str(authors[f]) + "\n")
 
     if verbose:
-        print("--- file '" + loa_file + "' (list of authors) generated")
+        print("--- Info: file '" + loa_file + "' (list of authors) generated")
     loa.close()                                                   # close xyz.loa file
 
     # .................................................
-    # generates xyz.lop file (list of packages)
+    # generate xyz.lop file (list of packages)
 
     lop_file = output_name + ".lop"
 
@@ -757,11 +838,11 @@ def generate_lists():                                              # Function ge
         lop.write(str(packages[f]) + "\n")
 
     if verbose:
-        print("--- file '" + lop_file + "' (list of packages) generated")
+        print("--- Info: file '" + lop_file + "' (list of packages) generated")
     lop.close()                                                   # close xyz.lop file
 
     # .................................................
-    # generates xyz.lok file (list of topics)
+    # generate xyz.lok file (list of topics)
 
     lok_file = output_name + ".lok"
 
@@ -770,11 +851,11 @@ def generate_lists():                                              # Function ge
         lok.write("('" + f + "', '" + str(topics[f]) + "')\n")
 
     if verbose:
-        print("--- file '" + lok_file + "' (list of topics) generated")
+        print("--- Info: file '" + lok_file + "' (list of topics) generated")
     lok.close()                                                   # close xyz.lok file
 
     # .................................................
-    # generates xyz.lol file (list of licenses)
+    # generate xyz.lol file (list of licenses)
 
     lol_file = output_name + ".lol"
 
@@ -783,11 +864,11 @@ def generate_lists():                                              # Function ge
         lol.write("('" + f + "', '" + str(licenses[f]) + "')\n")
 
     if verbose:
-        print("--- file '" + lol_file + "' (list of licenses) generated")
+        print("--- Info: file '" + lol_file + "' (list of licenses) generated")
     lol.close()                                                   # close xyz.lol file
 
     # .................................................
-    # generates xyz.lpt file (list of topics and associated packages)
+    # generate xyz.lpt file (list of topics and associated packages)
 
     lpt_file = output_name + ".lpt"
 
@@ -796,11 +877,11 @@ def generate_lists():                                              # Function ge
         lpt.write("('" + f + "', " + str(topicspackage[f]) + ")\n")
 
     if verbose:
-        print("--- file '" + lpt_file + "' (list of topics and associated packages) generated")
+        print("--- Info: file '" + lpt_file + "' (list of topics and associated packages) generated")
     lpt.close()                                                   # close xyz.lpt file
 
     # .................................................
-    # generates xyz.lap file (list of authors and associated packages)
+    # generate xyz.lap file (list of authors and associated packages)
 
     lap_file = output_name + ".lap"
 
@@ -809,33 +890,33 @@ def generate_lists():                                              # Function ge
         lap.write("('" + str(f) + "', " + str(authorpackages[f]) + ")\n")
 
     if verbose:
-        print("--- file '" + lap_file + "' (list of authors and associated packages) generated")
+        print("--- Info: file '" + lap_file + "' (list of authors and associated packages) generated")
     lap.close()                                                   # close xyz.lap file
 
 # ------------------------------------------------------------------
-def generate_pickle1():                                           # Function generate_pickle1()
-    """pickle dump:
-    needs actual authors, packages, licenses, topics, topicspackage, packagetopics"""
+def generate_pickle1():                                           # Function generate_pickle1: pickle dump: actual authors, packages, licenses, topics, topicspackage, packagetopics
+    """pickle dump: 
+    actual authors, packages, licenses, topics, topicspackage, packagetopics"""
 
-    # authors: directory (sorted)
+    # authors: Python dictionary (sorted)
     #   each element: [author key] <tuple with givenname and familyname>
     #
-    # packages: directory (sorted)
+    # packages: Python dictionary (sorted)
     #   each element: [package key] <tuple with package name and package title>
     #
-    # licenses: directory (sorted)
+    # licenses: Python dictionary (sorted)
     #   each element: [license key] <license title>
     #
-    # topics: directory (sorted)
+    # topics: Python dictionary (sorted)
     #   each element: [topics name] <topics title>
     #
-    # topicspackage: directory (unsorted)
+    # topicspackage: Python dictionary (unsorted)
     #   each element: [topic key] <list with package names>
     #
-    # packagetopics: directory (sorted)
+    # packagetopics: Python dictionary (sorted)
     #   each element: [topic key] <list with package names>
     #
-    # authorpackages: directory (unsorted)
+    # authorpackages: Python dictionary (unsorted)
     #   each element: [author key] <list with package names>
 
     pickle_name1  = direc + pkl_file                              # path of the pickle file
@@ -844,10 +925,10 @@ def generate_pickle1():                                           # Function gen
     pickle.dump(pickle_data1, pickle_file1)                       # dump the data
     pickle_file1.close()                                          # close the file
     if verbose:
-        print("--- pickle file '" + pickle_name1 + "' written")
+        print("--- Info: pickle file '{0}' written".format(pickle_name1))
 
 # ------------------------------------------------------------------
-def generate_pickle2():                                           # Function generate_pickle2()
+def generate_pickle2():                                           # Function generate_pickle2: pickle dump: actual XML_toc (list with download information files.
     """pickle dump:
     needs actual XML_toc
     XML_toc       : list with download information files"""
@@ -859,22 +940,47 @@ def generate_pickle2():                                           # Function gen
         pickle.dump(pickle_data2, pickle_file2)                   # dump the data
         pickle_file2.close()                                      # close the file
         if verbose:
-            print("--- pickle file '" + pickle_name2 + "' written")
+            print("--- Info: pickle file '{0}' written".format(pickle_name2))
     except:                                                       # not successfull
         if verbose:
-            print("--- pickle file '" + pickle_name2 + "' cannot be loaded a/o written")
+            print("--- Warning: pickle file '{0}' cannot be loaded a/o written".format(pickle_name2))
 
 # ------------------------------------------------------------------
-def check_integrity():                                            # Function check_integrity()
-    """Checks integrity."""
+def verify_PDF_files():                                           # Fujnction verify_PDF_files: check actualized PDF_toc; delete a PDF file if necessary
+    """Check actualized PDF_toc; delete a PDF file if necessary."""
+    
+    global ok
+    global PDF_toc
+    global corrected
+    
+    ok = True
+    for g in PDF_toc:                                             # loop: move through PDF files
+        if PDF_toc[g] == "":                                      #    no entry: no ass. XML file
+            ok = False
+            if verbose:
+                print("----- Warning: PDF file '{0}' without associated XML file".format(g))
+            if os.path.isfile(g):                                 #    g is file
+                os.remove(g)                                      #         delete the PDF file (if it exists)
+                corrected += 1                                    #         number of corrections increased
+                if verbose:
+                    print("----- Warning: PDF file '{0}' in OS deleted".format(g))
+        else:
+            pass
+            
+# ------------------------------------------------------------------
+def check_integrity(always=False):                                # Function check_integrity(): Check integrity.
+    """Check integrity."""
 
     # check_integrity --> generate_pickle2
+    # check_integrity --> verify_PDF_files
 
     global corrected                                              # number of corrections
     global PDF_toc                                                # PDF_toc, structure: PDF_toc[file] = fkey + "-" + onename
+    global noerror
+    global ok
 
     if verbose:
-        print("--- integrity check")
+        print("--- Info: integrity check")
     load_XML_toc()                                                # load the 2nd pickle file (XML_toc)
                                                                   # XML_toc, structure: XML_toc[href] = (file, fkey, onename)
     noerror = True
@@ -894,13 +1000,13 @@ def check_integrity():                                            # Function che
         if xex:                                                   #    XLM file exists
             if os.path.getsize(xlfn) == 0:                        #        but file is empty
                 if verbose:
-                    print("----- entry '" + xlfn + "' in directory, but OS file is empty")
+                    print("----- Warning: entry '{0}' in dictionary, but OS file is empty".format(xlfn))
                 os.remove(xlfn)                                   #        OS file removed
                 if verbose:
-                    print("----- XML file '" + xlfn + "' in OS deleted")
+                    print("----- Warning: XML file '{0}' in OS deleted".format(xlfn))
                 del XML_toc[f]                                    #        entry deleted
                 if verbose:
-                    print("----- entry '" + xlfn + "' in directory deleted")
+                    print("----- Warning: entry '{0}' in dictionary deleted".format(xlfn))
                 noerror = False                                   #        flag set
                 corrected += 1                                    #        number of corrections increasedtuda-ci.xml
             else:                                                 #        XML file not empty
@@ -909,60 +1015,48 @@ def check_integrity():                                            # Function che
                         PDF_toc[tmp[1] + "-" + tmp[2]] = tmp[0]   #            generate entry in PDF_toc
                     else:
                         if verbose:
-                            print("----- entry '" + plfn + "' (" + tmp[0] + ") in directory, but OS file is empty") 
+                            print("----- Warning: entry '{0}' ({1}) in dictionary, but OS file is empty".format(plfn, tmp[0]))
                         os.remove(plfn)                           #            OS file removed
                         if verbose:
-                            print("----- PDF file '" + plfn + "' in OS deleted")
+                            print("----- Warning: PDF file '{0}' in OS deleted".format(plfn))
                         del XML_toc[f]                            #            entry deleted
                         if verbose:
-                            print("----- entry '" + plfn + "' in directory deleted")
+                            print("----- Warning: entry '{0}' in dictionary deleted".format(plfn))
                         noerror = False                           #            flag set
                         corrected += 1                            #            number of corrections increased
                 else:
                     if verbose:
-                        print("----- entry '" + plfn + "' (" + tmp[0] + ") in directory, but PDF file not found")
+                        print("----- Warning: entry '{0}' ({1}) in dictionary, but PDF file not found".format(plfn, tmp[0]))
                     del XML_toc[f]                                #            entry deleted
                     if verbose:
-                        print("----- entry '" + plfn + "' in directory deleted")
+                        print("----- Warning: entry '{0}' in dictionary deleted".format(plfn))
                     noerror = False                               #            flag set
                     corrected += 1                                #            number of corrections increased
         else:                                                     #     XML file does not exist
-            print("----- entry '" + xlfn + "' in directory, but file not found")
+            print("----- Warning: entry '{0}' in dictionary, but OS file not found".format(xlfn))
             del XML_toc[f]                                        #         entry deleted
-            print("----- entry '" + xlfn + "' in directory deleted")
-            noerror = False                                       #         flag set
+            print("----- Warning: entry '{0}' in dictionary deleted".format(xlfn))
+            noerror   = False                                     #         flag set
             corrected += 1                                        #         number of corrections increased
             
-# ..................................................................
-# specify values in PDF_toc (via XML_toc)
-##    for t in XML_toc:                                             # loop: all members in XML_toc (all XML files)
-##        (file, fkey, onename)         = XML_toc[t]                #    get file, fkey, onename
-##        PDF_toc[fkey + "-" + onename] = file                      #    generate entry in PDF_toc
-
-# ..................................................................
-# check actualized PDF_toc; delete a PDF file if necessary
-    ok = True
-    for g in PDF_toc:                                             # loop: move through PDF files
-        if PDF_toc[g] == "":                                      #    no entry: no ass. XML file
-            ok = False
-            if verbose:
-                print("----- PDF file '" + g + "' without associated XML file")
-            if os.path.isfile(g):                                 #    g is file
-                os.remove(g)                                      #    delete the PDF file (if it exists)
-                if verbose:
-                    print("----- PDF file '" + g + "' in OS deleted")
+    thr5 = Thread(target=verify_PDF_files)                        # check actualized PDF_toc; delete a PDF file if necessary
+    thr5.start()
+    thr5.join()
 
 # ..................................................................
     if noerror and ok:                                            # there is no error
         if verbose:
-            print("----- no error with integrity check")
-    else:                                                         # there is any error
-        if not noerror:
-            generate_pickle2()                                    #    generate a new version of this pickle file
+            print("----- Info: no error with integrity check")
+    elif not noerror or always:
+        thr2 = Thread(target=generate_pickle2)                    #    generate a new version of the 2nd pickle file (via thread)
+        thr2.start()
+        thr2.join()
+    else:
+        print("***unspecified error")
 
 # ------------------------------------------------------------------
-def make_statistics():                                            # Function make_statistics()
-    """Prints statistics on terminal."""
+def make_statistics():                                            # Function make_statistics(): Print statistics on terminal.
+    """Print statistics on terminal."""
 
     l         = left
     r         = 5
@@ -988,8 +1082,8 @@ def make_statistics():                                            # Function mak
         print("number of corrected entries:".ljust(l), str(corrected).rjust(r), "(in the actual session)")
 
 # ------------------------------------------------------------------
-def get_PDF_files(d):                                             # Function get_PDF_files(d)
-    """Lists all PDF files in a OS directory.
+def get_PDF_files(d):                                             # Function get_PDF_files(d): List all PDF files in a specified OS directory.
+    """List all PDF files in a specified OS directory.
 
     d: directory"""
 
@@ -1003,82 +1097,206 @@ def get_PDF_files(d):                                             # Function get
     PDF_toc = tmp2
 
 # ------------------------------------------------------------------
-def main():                                                       # Function main()
-    """Main Function"""
+def get_XML_files(d):                                             # Function get_XML_files(d)
+    """List all XML files in the OS directory d"""
+    global  all_XML_files
 
-    # main --> get PDF_files
-    # main --> load_XML_toc
-    # main --> load_topics
-    # main --> load_authors
-    # main --> load_licenses
-    # main --> load_packages
-    # main --> load_XML_files
-    # main --> generate_pickle2
-    # main --> generate_topicspackage
-    # main --> generate_lists
-    # main --> generate_pickle1
-    # main --> check_integrity
-    # main --> make_statistics
+# ------------------------------------------------------------------
+def set_PDF_toc():                                                # set_PDF_toc: Fill PDF_toc on the basis of XML_Toc.
+    """Fill PDF_toc on the basis of XML_Toc."""
+    
+    global PDF_toc
+    global XML_toc
+    
+    for f in XML_toc:
+        (xlfn, fkey, plfn) = XML_toc[f]
+        if os.path.exists(direc + xlfn) and os.path.exists(direc + fkey + "-" + plfn):
+            PDF_toc[fkey + "-" + plfn] = xlfn
+        else:
+            pass
+
+# ------------------------------------------------------------------
+def call_plain():                                                 # Function call_plain: Process all steps for a plain call.
+    """Process all steps for a plain call."""
+
+    # call_check --> get_PDF_files
+    # call_check --> load_topics
+    # call_check --> load_authors
+    # call_check --> load_licenses
+    # call_check --> load_packages
+    # call_check --> genea´rate_Topicspackage
+    # call_check --> generate_pickle1
+    
+    global PDF_toc
+    global authors
+    global licenses
+    global packages
+    global topics
+    global topicspackage, packagetopics, authorpackages
+    
+    get_PDF_files(direc)
+    load_topics()                                                 # load the file topics.xml
+    load_authors()                                                # load the file authors.xml
+    load_licenses()                                               # load the file licenses.xml
+    load_packages()                                               # load the file packages.xml
+    generate_topicspackage()                                      # generates topicspackage, ...
+    thr3 = Thread(target=generate_pickle1)                        # dumps authors, packages, topics, licenses, topicspackage, packagetopics (via thread)
+    thr3.start()
+    thr3.join()
+
+# ------------------------------------------------------------------
+def call_load():                                                  # Function call_load: Process all steps for a complete ctanout call (without integrity check).
+    """Process all steps for a complete ctanout call (withoutb integrity check)."""
+
+    # call_check --> get_PDF_files
+    # call_check --> load_topics
+    # call_check --> load_authors
+    # call_check --> load_licenses
+    # call_check --> load_packages
+    # call_check --> load_XML_toc
+    # call_check --> set_PDF_toc
+    # call_check --> Load_XML_files
+    # call_check --> generate_pickle2
 
     global PDF_toc
-    global download
-
-    starttotal  = time.time()                                     # begin of time measure
-    startprocess= time.process_time()
-     
-    if verbose:                                                   # output on terminal
-        print("\n- program call: CTANLoad.py")
-        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
-        if ("-n" in call) or ("--number" in call):          print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))
-        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))
-        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", template, "(" + template_text + ")"))
-        if ("-c" in call) or ("--check_integrity" in call): print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))
-        if ("-f" in call) or ("--download_files" in call):  print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))
-        if ("-l" in call) or ("--lists" in call):           print("  {0:5} {1:55}".format("-l", "(" + lists_text + ")"))
-        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
-        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
-        print("\n")
-
+    global XML_toc
+    global authors
+    global licenses
+    global packages
+    global topics
+    global topicspackage, number, counter, pdfcounter
+    
     get_PDF_files(direc)
-
-    load        = (template != "")                                # package files are to be loaded
-    make_lists  = (not load) and lists                            # special list files are to be generated
-
-    tmp         = ""
-
-    if (template == template_default) and download:               # test  template <-->  download
-        if verbose:
-            print("--- '-f'/'--download_files' valid only together with '-t'/'--template'; therefore ignored")
-        download = False
-
-    if download:                                                  # load the directory XML_toc
-        load_XML_toc()
+    load_XML_toc()
+    set_PDF_toc()
 
     load_topics()                                                 # load the file topics.xml
     load_authors()                                                # load the file authors.xml
     load_licenses()                                               # load the file licenses.xml
     load_packages()                                               # load the file packages.xml
 
-    if load:                                                      # if package files are to be loaded
-        load_XML_files()                                          #     load and processe all XML files in series
-        generate_pickle2()                                        #     dump XML_toc
+    load_XML_files()                                              # load and processe all XML files in series
+    thr1 = Thread(target=generate_pickle2)                        # dump XML_toc via pickle file via thread
+    thr1.start()
+    thr1.join()
 
+# ------------------------------------------------------------------
+def call_check():                                                 # Function call_check: Process all necessary steps for a integrity check.
+    """Process all necessary steps for a integrity check."""
+
+    # call_check --> get_PDF_files
+    # call_check --> load_topics
+    # call_check --> load_authors
+    # call_check --> load_licenses
+    # call_check --> load_packages
+    # call_check --> generate_topicspackage
+    # call_check --> generate_pickle1
+    # call_check --> generate_lists
+    # call_check --> check_integrity
+
+    global PDF_toc
+    global XML_toc
+    global authors
+    global licenses
+    global packages
+    global topics
+    global topicspackage, number, counter, pdfcounter
+
+    get_PDF_files(direc)
+    load_topics()                                                 # load the file topics.xml
+    load_authors()                                                # load the file authors.xml
+    load_licenses()                                               # load the file licenses.xml
+    load_packages()                                               # load the file packages.xml
     generate_topicspackage()                                      # generates topicspackage, ...
-    generate_pickle1()                                            # dumps authors, packages, topics, licenses, topicspackage, packagetopics
-
-    if make_lists:                                                # if lists are to be generated
-        generate_lists()                                          #     generates x.loa, x.lop, x.lok, x.lol, x.lpt, x.lap
+    thr3 = Thread(target=generate_pickle1)                        # dumps authors, packages, topics, licenses, topicspackage, packagetopics
+    thr3.start()
+    thr3.join()
+   
+    if lists:                                                     # if lists are to be generated
+        generate_lists()                                          #     generate x.loa, x.lop, x.lok, x.lol, x.lpt, x.lap
 
     if integrity:                                                 # if the integrity is to be checked
         check_integrity()                                         #     when indicated: remove files or entries
 
-    if verbose:
-        print("- program successfully completed")
+# ------------------------------------------------------------------
+def main():                                                       # Function main(): Main Function
+    """Main Function"""
 
-    if statistics:                                                # if statistics are to be output
+    # main --> call_plain
+    # main --> call_check
+    # main --> call_load
+    # main --> make_statistics
+
+    global PDF_toc
+    global download
+    global lists
+    global integrity
+    global number
+    global template
+
+    starttotal  = time.time()                                         # begin of time measure
+    startprocess= time.process_time()
+    reset_text  = "- Warnung: '{0}' reset to {1} (due to {2})"
+
+    load  = (number != number_default) or (template != template_default) or download       # if -n, -f, -t is set
+    check = (not load) and ((lists != lists_default) or (integrity != integrity_default))  # if not load) and -l or -c is set
+    plain = (not load) and (not check)                                                     # if not load and not check
+    
+    if verbose:
+        print("- Info: program call:", call)
+
+    if load:                                                          # load mode
+        if (lists != lists_default):                                  #     -l reset
+            lists = False
+            if verbose:
+                print(reset_text.format("-l",False,"'-n' or '-t' or '-f'"))                                                      
+        if (integrity != integrity_default):                          #     -c reset
+            integrity = False
+            if verbose:
+                print(reset_text.format("-c",False,"'-n' or '-t' or '-f'"))
+    if check:                                                         # check mode
+        if (number != number_default):                                #     -n reset
+            number = number_default
+            if verbose:
+                print(reset_text.format("-n","'-l " + str(number_default) + "'", "'-l' or '-c'"))
+        if (template != template_default):                            #     -t reset
+            template = template_default
+            if verbose:
+                print(reset_text.format("-t","'-t empty'", "'-l' or '-c'"))
+        if (download != download_default):                            #     -f reset
+            download = download_default
+            if verbose:
+                print(reset_text.format("-f",False, "'-l' or '-c'"))
+
+    if verbose:                                                       # output on terminal (options in call)
+        print("\n- Info: program call (with more details): CTANLoad.py")    
+        if (template != template_default):                print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))
+        if (download != download_default):                print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))
+        if (lists != lists_default):                      print("  {0:5} {1:55}".format("-l", "(" + (lists_text + ")")[0:50] + ellipse))
+        if (verbose != verbose_default):                  print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
+        if (verbose != verbose_default):                  print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
+        if (direc != direc_default):                      print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
+        if (number != number_default):                    print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))
+        if (output_name != direc + output_name_default):  print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))
+        if (template != template_default):                print("  {0:5} {2:55} {1}".format("-t", fold(template), "(" + template_text + ")"))
+        print("\n")
+
+    if plain:                                                         # Process all steps for a plain call.
+        call_plain()
+    elif load:                                                        # Process all steps for a complete ctanout call (withoutb integrity check).
+        call_load()
+    elif check:                                                       # Process all necessary steps for a integrity check.
+        call_check()
+    else:
+        pass
+
+    if verbose:
+        print("- Info: program successfully completed")
+
+    if statistics:                                                    # if statistics are to be output
         make_statistics()
 
-        endtotal   = time.time()                                  # end of time measure
+        endtotal   = time.time()                                      # end of time measure
         endprocess = time.process_time()
         print("--")
         print("total time: ".ljust(left + 1), round(endtotal-starttotal, rndg))
@@ -1094,4 +1312,4 @@ if __name__ == "__main__":
     main()
 else:
     if verbose:
-        print("- tried to use the program indirectly")
+        print("- Error: tried to use the program indirectly")

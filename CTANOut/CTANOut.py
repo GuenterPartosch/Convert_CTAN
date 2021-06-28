@@ -5,7 +5,7 @@
 # CTANOut.py
 # (C) Günter Partosch, 2019/2021
 
-# Problem:
+# Probleme/Ideen:
 # - Ausgabe des Namens, wenn givenname fehlt
 # - year noch besser extrahieren, ggf. aus <copyright ....>
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
@@ -13,6 +13,11 @@
 # - bei -d: ggf. Verzeichnis anlegen (x)
 # - bei -d: Verzeichnistrenner besser/explizit behandeln (x)
 # - ggf. file.tex, file.bib, ... vor Ausgabe löschen
+# - Umbruch bei der Darstellung von Aufrufparameter (x)
+# - -b und -mt behandeln wie bei CTANLoad+Out (x)
+# - einheitliche Fehlermeldungen dazu (x)
+# - kann Zeitstempel bei XML/PDF-Dateien genutzt werden?
+# - in N1: auch bei Copyright links einrücken (x)
 
 # History
 # ------------------------------------------------------------------
@@ -26,7 +31,43 @@
 # 1.82 2021-05-26 structure of CTAN.pkl adapted
 # 1.83 2021-05-26 output of license information now with full text
 # 1.84 2021-05-26 output and interpretaion of language codes improved
-# 1.85 2021-05-27 correction of a source error in <version .../>
+# 1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
+# 1.86 2021-06-12 auxiliary function fold: shorten long option values for output
+# 1.87 2021-06-12 messages classified: Warnings, Error, Info
+# 1.88 2021-06-13 string method str.format used (if applicable)
+# 1.89 2021-06-18 some tiny improvements for output
+# 1.90 2021-06-22 misc. smaller corrections
+
+# ------------------------------------------------------------------
+# Inspected CTAN elements
+
+# also, authorref, caption, contact, copyright, ctan, description, documentation, home, keyval,
+# license, miktex, name, texlive, version
+# (useful for specifying a value for the -s option)
+#
+# for example: -s "[description, version]"
+
+# ------------------------------------------------------------------
+# Messages
+
+# Fatal Error
+# + Error:  'CTAN.pkl' not found
+
+# Information
+# + Info: list with authors and related packages (cross-reference list) created
+# + Info: list with topics and related packages (cross-reference list) created
+# + Info: packages processed
+# + Info: program call: CTANOut.py
+# + Info: program successfully completed
+# + Info: statistics written
+# + Info: topic list created
+
+# Warnings
+# + Warning: 'option value' changed to 'option+value' (due to 'option')"
+# + Warning: XML file for package 'package' not found
+# + Warning: key 'key' not found
+# + Warning: no correct XML file for any specified package found
+
 
 # ------------------------------------------------------------------
 # Usage
@@ -35,7 +76,7 @@
 #                   [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
 #                   [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.85 (2021-05-27)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+# [CTANOut.py; Version: 1.90 (2021-06-22)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
 #   -h, --help            show this help message and exit
@@ -118,40 +159,13 @@
 #     with statistics and                                               [-stat]
 #     verbose output                                                    [-v]
 
-# ------------------------------------------------------------------
-# Inspected CTAN elements
 
-# also, authorref, caption, contact, copyright, ctan, description, documentation, home, keyval,
-# license, miktex, name, texlive, version (for option -s)
-
-# ------------------------------------------------------------------
-# Messages
-
-# Fatal Error
-# + pickle file 'CTAN.pkl' not found
-
-# Information
-# + list with authors and related packages (cross-reference list) created
-# + list with topics and related packages (cross-reference list) created
-# + packages processed
-# + program call: CTANOut.py
-# + program successfully completed
-# + statistics written
-# + topic list created
-
-# Warnings
-# + '-mt'/'--make_topics' valid only for '-m LaTeX'/'--mode LaTeX'; therefore ignored
-# + '-b'/'--btype' valid only for '-m BibLaTeX'/'--mode BibLaTeX'; therefore ignored
-# + XML file for package 'package' not found
-# + key 'key' not found
-# + no correct XML file for any specified package found
-
-# ------------------------------------------------------------------
+#===================================================================
 # Moduls needed
 
 import xml.etree.ElementTree as ET           # XML processing
-import pickle                                # to read pickle data, time measure
-import time                                  # to get time/date of a file
+import pickle                                # read pickle data, time measure
+import time                                  # get time/date of a file
 import re                                    # regular expression
 import argparse                              # argument parsing
 import sys                                   # system calls
@@ -164,8 +178,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.85"
-programdate       = "2021-05-27"
+programversion    = "1.90"
+programdate       = "2021-06-22"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -239,12 +253,12 @@ name_template_default = """^.+$"""          # default for file name template (-t
 out_default           = "all"               # default for out file
 filter_key_default    = """^.+$"""          # default for filter (-k)
 
-act_direc           = "."                   
+act_direc       = "."                       # actual OS dirtectory
 if operatingsys == "Windows":    
     direc_sep      = "\\"
 else:
     direc_sep      = "/"
-direc_default      = act_direc + direc_sep  # default for -d (output directory)
+direc_default   = act_direc + direc_sep     # default for -d (output directory)
 
 make_topics     = None                      # variable for -mt
 verbose         = None                      # variable for -v
@@ -257,13 +271,17 @@ out_file        = ""                        # variable for -o
 filter_key      = ""                        # variable for -k
 direc           = ""                        # variable for -d
 
+name_default    = name_template_default     # copy of name_template_default
+filter_default  = filter_key                # copy of filter_key
+
 default_text    = "no text"                 # default text for elements without embedded text
 empty           = ""                        # default text if a not embedded text is required but not found
 userunknown     = "N. N."                   # default text for elements without a correct author
+ellipse         = " ..."
 package_id      = ""                        # ID of a package
 authorexists    = False                     # default for a global flag
-name_default    = name_template_default     # copy of name_template_default
-filter_default  = filter_key                # copy of filter_key
+
+err_mode        = "- Warning: '{0} {1}' changed to '{2}' (due to '{3}')" 
 
 # ------------------------------------------------------------------
 # Strings for Excel output
@@ -298,16 +316,16 @@ languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgarian", 
                    "sr-sp":"Serbian (Serbia)", "th":"Thai", "tr":"Turkish", "uk":"Ukrainian", "vi":"Vietnamese",
                    "zh":"Chinese", "zn-cn":"Chinese (China)", "de,en":"German + English", "zh,en":"Chinese + English",
                    "mr,hi":"Marathi + Hindi", "en,ja":"English + Japanese"}
-usedTopics      = {}                        # python directory:  collects used topics for all packages
+usedTopics      = {}                        # Python dictionary:  collects used topics for all packages
 usedPackages    = []                        # python list:       collects used packages
-usedAuthors     = {}                        # python directory:  collects used authors for all packages
+usedAuthors     = {}                        # Python dictionary:  collects used authors for all packages
 XML_toc         = {}                        # python dictionary: list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, pure PDF file)
 
-# usedTopics: python directory (unsorted)
+# usedTopics: Python dictionary (unsorted)
 #   each element: <key for topic>:<number>
 # usedPackages: python list
 #   each element: <package name>
-# usedAuthors: python directory (unsorted)
+# usedAuthors: Python dictionary (unsorted)
 #   each element: <key for author>:<tuple with givenname and familyname>
 
 
@@ -397,7 +415,7 @@ verbose       = args.verbose                # Parameter -v
 statistics    = args.statistics             # Parameter -stat
 
 # ------------------------------------------------------------------
-# Resets
+# Resettings and settings
 
 if mode in ["latex", "LaTeX", "tex"]:       # -m latex in call
     mode = "LaTeX"                          #   mode is reset
@@ -409,8 +427,18 @@ if mode in ["excel", "Excel", "tsv"]:       # -m excel in call
     mode = "Excel"                          #   mode is reset
 if mode in ["plain", "txt"]:                # -m plain in call
     mode = "plain"                          #   mode is reset
-if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
+if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: if btype is set
     btype = "@www"                          #   btype is reset
+
+if (btype != btype_default) and (mode != "BibLaTeX"): 
+    if verbose:
+        print(err_mode.format('-m', mode, '-m BibLaTeX', '-b')) # "- Warning: '{0} {1}' changed to '{2}' (due to '{3}')"
+    mode = "BibLaTeX"                       # mode is set to BibLaTeX if -b is given
+
+if (make_topics != make_topics_default) and (mode != "LaTeX"):
+    if verbose:
+        print(err_mode.format('-m', mode, '-m LaTeX', '-mt'))
+    mode = "LaTeX"                          # mode is set to LaTeX if -mt is given
 
 # ------------------------------------------------------------------
 # Correct directory name, test directory existence, and/or install directory
@@ -418,13 +446,13 @@ if (btype == "") and (mode == "BibLaTeX"):  # for BibLaTeX: btype is set
 direc = direc.strip()                       # correct directory name (-d)
 if direc[len(direc) - 1] != direc_sep:
     direc += direc_sep
-if not path.exists(direc):
+if not path.exists(direc):                  # make OS directory, if necessary 
     try:
         os.mkdir(direc)
     except OSError:
-        print ("- Creation of the directory '%s' failed" % direc)
+        print ("- Warning: Creation of the directory '{0}' failed".format(direc))
     else:
-        print ("- Successfully created the directory '%s' " % direc)
+        print ("- Info: Successfully created the directory '{0}' ".format(direc))
 
 # ------------------------------------------------------------------
 # pre-compiled regular expressions
@@ -463,6 +491,7 @@ parskip  = half,  % half parskip
 index    = totoc, % index in TOC
 headings = small, % small headers
 DIV      = 12     % 12-strip layout"""
+    
     usepkg  = """
 \\usepackage[english]{babel}             % Language support
 \\usepackage{fontspec}                   % font specification
@@ -471,12 +500,14 @@ DIV      = 12     % 12-strip layout"""
 \\usepackage[colorlinks=true]{hyperref}  % hypertext structures\n
 \\newcommand{\inp}[1]{\\IfFileExists{#1}{\\input{#1}}{}}\n
 \\makeindex\n"""
+    
     title        = """
 \\title{""" + documenttitle + """}
 \\subtitle{""" + documentsubtitle + "\\texttt{" + programname + """}}
 \\author{""" + documentauthor + """}
 \\date{\\today}\n"""
-    header       = "\n\\begin{document}\n" + "\\pagestyle{headings}\n" + "\\maketitle\n" + r"\inp{" + args.out_file + ".stat}\n" + "\\newpage\n"
+    
+    header       = "\n\\begin{{document}}\n \\pagestyle{{headings}}\n \\maketitle\n \\inp{{{0}.stat}}\n \\newpage\n".format(args.out_file)
     trailer      = ""
     if make_topics:                          # -mt is specified
         trailer = trailer + "\n\\newpage\n\\appendix"   
@@ -485,23 +516,26 @@ DIV      = 12     % 12-strip layout"""
         trailer = trailer + "\n\\inp{" + args.out_file + ".tap}"
     trailer = trailer + "\n\\printindex\n\\end{document}\n"
 
-# ------------------------------------------------------------------
-# Pickle-Load
-# Get the structures authors, packages, topics, topicspackage, authorpackages (generated by CTANLoad.py)
 
-# authors: python directory (sorted)
+#===================================================================
+# Pickle load
+
+# 1st pickle file:
+# Get the structures authors, packages, topics, topicspackage, authorpackages (generated by CTANLoad.py)
+#
+# authors: Python dictionary (sorted)
 #   each element: <author key> <tuple with givenname and familyname> 
-# packages: python directory (sorted)
+# packages: Python dictionary (sorted)
 #   each element: <package key> <tuple with package name and package title>
-# topics: python directory (sorted)
+# topics: Python dictionary (sorted)
 #   each element: <topics name> <topics title>
-# licenses: python directory (sorted)
+# licenses: Python dictionary (sorted)
 #   each element: <license key> <license title>
-# topicspackage: python directory (unsorted)
+# topicspackage: Python dictionary (unsorted)
 #   each element: <topic key> <list with package names>
-# packagetopics: python directory (sorted)
+# packagetopics: Python dictionary (sorted)
 #   each element: <topic key> <list with package names>
-# authorpackages: python directory (unsorted)
+# authorpackages: Python dictionary (unsorted)
 #   each element: <author key> <list with package names>
 
 try:                                        # try to open 1st pickle file 
@@ -509,8 +543,12 @@ try:                                        # try to open 1st pickle file
     (authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages) = pickle.load(pickleFile1)
     pickleFile1.close()                     #   close file
 except FileNotFoundError:                   # unable to open pickle file
-    print("--- pickle file '" * pickle_name1 + "' not found")
-    sys.exit("- program is terminated")
+    print("--- Error: pickle file '{0}' not found".format(pickle_name1))
+    sys.exit("- Error: program is terminated")
+
+# ------------------------------------------------------------------
+# 2nd pickle file:
+# get XML_toc (generated by CTANLoad.py)
 
 try:                                        # try to open second pickle file
     pickleFile2 = open(direc + pickle_name2, "br")
@@ -518,159 +556,57 @@ try:                                        # try to open second pickle file
     pickleFile2.close()                     #   close file
 except FileNotFoundError:                   # unable to open pickle file
     list_info_files = False
-    print("--- pickle file '" * pickle_name2 + "' not found; local information files ignored")
-
-# ------------------------------------------------------------------
-# First line(s) on output  
-
-def first_lines():
-    """creates the first lines of output"""
+    print("--- Warning: pickle file '{0}' not found; local information files ignored".format(pickle_name2))
     
-    arguments   = ""
-    tmp         = ""
-    tmp_before  = ""
-    e_parameter = ["-t","-k","--template","--key"]
-     
-    for f in range(1,len(call)):
-        tmp = call[f]
-        if tmp_before in e_parameter:
-            tmp = '"' + tmp + '"'
-        arguments = arguments + tmp + " "
-        tmp_before = tmp
-        
-    if verbose:
-        print("\n- program call: CTANOut.py")
-        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
-        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.out_file, "(" + out_text + ")"))
-        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", name_template, "(" + template_text + ")"))
-        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))
-        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", filter_key, "(" + key_text + ")"))
-        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + btype_text + ")"))
-        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))
-        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + topics_text + ")"))
-        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
-        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
-        print("\n")
-
-    if (mode != "LaTeX") and make_topics:                   # not LaTeX and -mt/--make_topics
-        if verbose: print("--- '-mt'/'--make_topics' valid only for '-m LaTeX'/'--mode LaTeX'; therefore ignored")
-
-    if (mode != "BibLaTeX") and (btype != ""):              # not BibLaTeX and -b/--btype
-        if verbose: print("--- '-b'/'--btype' valid only for '-m BibLaTeX'/'--mode BibLaTeX'; therefore ignored")
-
-    if mode in ["LaTeX"]:                                   # LaTeX
-        out.write("% file: " + out_file + "\n")
-        out.write("% date: " + actDate + "\n")
-        out.write("% time: " + actTime + "\n\n")
-        out.write("% generated by " + programname + " (version: "  + programversion + " of " + programdate + ")\n\n")
-        out.write("% program call             : " + programname    + " " + arguments + "\n")
-        out.write("% mode                     : " + mode           + "\n")
-        out.write("% skipped CTAN fields      : " + skip           + "\n")
-        if name_template != "":
-            out.write("% filtered by name template: '"             + name_template + "'\n")
-        if filter_key != "":
-            out.write("% filtered by key template : '"             + filter_key + "'\n")
-        out.write("\n% ---------------------------------------")
-        out.write("\n% to be compiled with XeLaTeX or LuaLaTeX")
-        out.write("\n% ---------------------------------------\n")
-        out.write("\n" + r"\documentclass[" + classoptions + "\n]{scrartcl}\n")
-        out.write(usepkg)
-        out.write(title)
-        out.write(header)
-    elif mode in ["BibLaTeX"]:                               # BibLaTeX
-        out.write("% generated by " + programname + " (version: "  + programversion + " of " + programdate + ")\n")
-        out.write("% File                     : " + out_file + "\n")
-        out.write("% Mode                     : " + mode + "\n")
-        out.write("% Date                     : " + actDate + "\n")
-        out.write("% Time                     : " + actTime + "\n\n")
-        out.write("% Program Call             : " + programname + " " + arguments + "\n")
-        out.write("% skipped CTAN fields      : " + skip + "\n")
-        out.write("% type of BibLaTeX entries : " + btype          + "\n") 
-        if name_template != "":
-            out.write("% filtered by name template: " + name_template + "\n")
-        if filter_key != "":
-            out.write("% filtered by key template : " + filter_key + "\n")
-        out.write("\n% actual mapping CTAN --> BibLaTeX\n")
-        out.write("% alias         --> note\n")
-        out.write("% also          --> related\n")
-        out.write("% authorref     --> author\n")
-        out.write("% caption       --> subtitle\n")
-        out.write("% contact       --> note\n")
-        out.write("% copyright     --> usera, year\n")
-        out.write("% ctan          --> url, urldate\n")
-        out.write("% description   --> abstract\n")
-        out.write("% documentation --> note, file (if applicable)\n")
-        out.write("% home          --> note, usere\n")
-        out.write("% install       --> note, userf\n")
-        out.write("% keyval        --> keywords\n")
-        out.write("% license       --> note, userb\n")
-        out.write("% miktex        --> note, userc\n")
-        out.write("% name          --> title\n")
-        out.write("% texlive       --> note, userd\n")
-        out.write("% version       --> version, date\n\n")
-        out.write("% a) The BibLaTeX field note is used for collecting the following CTAN items:\n")
-        out.write("%    alias, contact, documentation, home, install, license, miktex, texlive\n")
-        out.write("% b) The program uses the optional BibLaTeX fields usera, userb, userc, userd, usere, userf\n")
-        out.write("\n% -------------------------------------")
-        out.write("\n% to be compiled by XeLaTeX or LuaLaTeX")
-        out.write("\n% -------------------------------------\n")
-    elif mode in ["plain"]:                                  # plain
-        out.write(documenttitle.center(80) + "\n" + (documentsubtitle + programname).center(80) + "\n\n")
-        out.write("generated by " + programname + " (version: "  + programversion + " of " + programdate + ")\n")
-        out.write("file                     : " + out_file + "; mode: " + mode + "; date: " + actDate + "; time: " + actTime + "\n")
-        out.write("program call             : " + "CTAN-out.py " + arguments + "\n")
-        out.write("skipped CTAN fields      : " + skip + "\n")
-        if name_template != "":
-            out.write("filtered by name template: " + name_template + "\n")
-        if filter_key != "":
-            out.write("filtered by key template : " + filter_key + "\n")
-    elif mode in ["RIS"]:                                    # RIS
-        pass                                                 #   for RIS do nothing
-    elif mode in ["Excel"]:                                  # Excel
-        out.write("id")
-        for f in ["caption", "authorref", "version", "license", "contact", "copyright", "CTAN",
-                  "documentation", "home", "install", "keyval", "mikTeX", "TeXLive", "also"]:
-            out.write("\t" + f)
-        out.write("\n")
 
 #===================================================================
-# Functions
+# Functions in CTANOut.py
 
+# TeXchars(s)        prepare characters for LaTeX/BibLaTeX
 # alias(k)           element <alias .../>
 # also(k)            element <also .../>
 # authorref(k)       element <authorref .../>
 # caption(k)         element <caption> ... </caption>
-# contact(k)         element <contact ...>
+# contact(k)         element <contact ...>    
 # copyrightT(k)      element <copyright .../>
 # ctan(k, t)         element <ctan .../>
 # description(k)     element <description ...> ... </description>
 # documentation(k)   element <documentation ../.>
 # entry(k, t)        elemend <entry ... </entry>
+# first_lines()      Analyze the first lines of each package XML file and output some lines.
+# fold(s)            auxiliary function: shorten long option values for output
 # home(k)            element <home .../>
 # install(k)         element <install .../>
 # keyval(k)          element <keyval .../>
 # leading(k)         first lines of one package
 # li(k)              element <li> ... </li>
 # licenseT(k)        element <license .../>
+# main()             main function
+# make_stat()        generate statistics file (xyz.stat for -m LaTeX a/o -m BibLaTeX).
+# make_statistics()  generate general statitics part (-stat) on terminal
+# make_tap()         generate xyz.tap
+# make_tops()        generate xyz.top
+# make_xref()        generate xyz.xref
 # miktex(k)          element <miktex .../>
+# mod_TeXchars(s)    prepare characters for LaTeX/BibLaTeX in a paragraph
 # mod_a(k)           element <a ...> ... </a>
-# xref(k)            element <xref ...> ... </xref>
 # mod_b(k)           element <b> ... </b>
 # mod_backslash(s)   special processing of \ in the source text
 # mod_br(k)          element <br/>
 # mod_em(k)          element <em> ... </em>
 # mod_i(k)           element <i> ... </i>
 # mod_pre(k)         element <pre> ... </pre>
-# mod_TeXchars(s)    prepare characters for LaTeX/BibLaTeX in a paragraph
 # mod_tt(k)          element <tt> ... </tt>
+# mod_xref(k)        element <xref ...> ... </xref>
 # name(k)            element <name> ... </name>
 # onepackage(s, t)   open a file with the package description and initialize XML processing
 # p(k)               element <p> ... </p>
-# TeXchars(s)        prepare characters for LaTeX/BibLaTeX
+# process_packages() general loop
 # texlive(k)         element <texlive .../>
 # trailing(k, t)     last lines of a package part
 # ul(k)              element <ul> ... </ul>
 # version(k)         element <version .../>
+# xref(k)            element <xref ...> ... </xref>
 
 # main --> first_lines
 # main --> make_stat
@@ -726,8 +662,128 @@ def first_lines():
 # p --> mod_xref
 
 # ------------------------------------------------------------------
+def fold(s):                                                # auxiliary function: shorten long option values for output
+    """auxiliary function: shorten long option values for output"""
+    
+    maxlen = 65
+    offset = "\n" + 64 * " "
+    tmp    = s[:]
+    all    = ""
+    while len(tmp) > maxlen:
+        all = all + tmp[0 : maxlen] + offset
+        tmp = tmp[maxlen :]
+
+# ------------------------------------------------------------------
+def first_lines():                                          # create the first lines of output.
+    """create the first lines of output"""
+    
+    arguments   = ""
+    tmp         = ""
+    tmp_before  = ""
+    e_parameter = ["-t","-k","--template","--key", "-s", "--skip"]
+     
+    for f in range(1,len(call)):
+        tmp = call[f]
+        if tmp_before in e_parameter:
+            tmp = '"' + tmp + '"'
+        arguments = arguments + tmp + " "
+        tmp_before = tmp
+
+    if verbose:
+        print("- Program call:", programname, arguments)
+        
+    if verbose:                                             # header for terminal output
+        print("\n- program call (with details): CTANOut.py")
+        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + (topics_text + ")")[0:50] + ellipse))
+        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
+        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
+        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
+        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))
+        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.out_file, "(" + out_text + ")"))
+        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + (btype_text + ")")[0:50] + ellipse))
+        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(filter_key), "(" + key_text + ")"))
+        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))
+        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(name_template), "(" + template_text + ")"))
+        print("\n")
+
+    if mode in ["LaTeX"]:                                   # LaTeX
+        out.write("% file: {0}\n\n".format(out_file))
+        out.write("% date: {0}\n".format(actDate))
+        out.write("% time: {0}\n\n".format(actTime))
+        out.write("% generated by {0} (version: {1} of {2})\n\n".format(programname, programversion, programdate))
+        out.write("% program call             : {0} {1}\n".format(programname, arguments))
+        out.write("% mode                     : {0}\n".format(mode))
+        out.write("% skipped CTAN fields      : {0}\n".format(skip))
+        if name_template != "":
+            out.write("% filtered by name template: '{0}'\n".format(name_template))
+        if filter_key != "":
+            out.write("% filtered by key template : '{0}'\n".format(filter_key))
+        out.write("\n% ---------------------------------------")
+        out.write("\n% to be compiled with XeLaTeX or LuaLaTeX")
+        out.write("\n% ---------------------------------------\n")
+        out.write("\n\\documentclass[{0}\n]{{scrartcl}}\n".format(classoptions))
+        out.write(usepkg)
+        out.write(title)
+        out.write(header)
+    elif mode in ["BibLaTeX"]:                               # BibLaTeX
+        out.write("% generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
+        out.write("% File                     : {0}\n".format(out_file))
+        out.write("% Mode                     : {0}\n".format(mode))
+        out.write("% Date                     : {0}\n".format(actDate))
+        out.write("% Time                     : {0}\n\n".format(actTime))
+        out.write("% Program Call             : {0} {1}\n".format(programname, arguments))
+        out.write("% skipped CTAN fields      : {0}\n".format(skip))
+        out.write("% type of BibLaTeX entries : {0}\n".format(btype))
+        if name_template != "":
+            out.write("% filtered by name template: {0}\n".format(name_template))
+        if filter_key != "":
+            out.write("% filtered by key template : {0}\n".format(filter_key))
+        out.write("\n% actual mapping CTAN --> BibLaTeX\n")
+        out.write("% alias         --> note\n")
+        out.write("% also          --> related\n")
+        out.write("% authorref     --> author\n")
+        out.write("% caption       --> subtitle\n")
+        out.write("% contact       --> note\n")
+        out.write("% copyright     --> usera, year\n")
+        out.write("% ctan          --> url, urldate\n")
+        out.write("% description   --> abstract\n")
+        out.write("% documentation --> note, file (if applicable)\n")
+        out.write("% home          --> note, usere\n")
+        out.write("% install       --> note, userf\n")
+        out.write("% keyval        --> keywords\n")
+        out.write("% license       --> note, userb\n")
+        out.write("% miktex        --> note, userc\n")
+        out.write("% name          --> title\n")
+        out.write("% texlive       --> note, userd\n")
+        out.write("% version       --> version, date\n\n")
+        out.write("% a) The BibLaTeX field note is used for collecting the following CTAN items:\n")
+        out.write("%    alias, contact, documentation, home, install, license, miktex, texlive\n")
+        out.write("% b) The program uses the optional BibLaTeX fields usera, userb, userc, userd, usere, userf\n")
+        out.write("\n% -------------------------------------")
+        out.write("\n% to be compiled by XeLaTeX or LuaLaTeX")
+        out.write("\n% -------------------------------------\n")
+    elif mode in ["plain"]:                                  # plain
+        out.write(documenttitle.center(80) + "\n" + (documentsubtitle + programname).center(80) + "\n\n")
+        out.write("generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
+        out.write("file                     : {0}; mode: {1}; date: {2}; time: {3}\n".format(out_file, mode, actDate, actTime))
+        out.write("program call             : CTAN-out.py {0}\n".format(arguments))
+        out.write("skipped CTAN fields      : {0}\n".format(skip))
+        if name_template != "":
+            out.write("filtered by name template: {0}\n".format(name_template))
+        if filter_key != "":
+            out.write("filtered by key template : {0}\n".format(filter_key))
+    elif mode in ["RIS"]:                                    # RIS
+        pass                                                 #   for RIS do nothing
+    elif mode in ["Excel"]:                                  # Excel; write head of table
+        out.write("id")
+        for f in ["caption", "authorref", "version", "license", "contact", "copyright", "CTAN",
+                  "documentation", "home", "install", "keyval", "mikTeX", "TeXLive", "also"]:
+            out.write("\t" + f)
+        out.write("\n")
+
+# ------------------------------------------------------------------
 def alias(k):                                     # element <alias .../>
-    """processes the alias element."""
+    """Process the alias element."""
 
     global notice
 
@@ -740,8 +796,8 @@ def alias(k):                                     # element <alias .../>
 
     if mode in ["LaTeX"]:                         # LaTeX
         out.write(r"\item[Alias] " + r"\texttt{" + tmp + "}\n")
-        out.write(r"\index{Package!" + tmp + " (alias for " + package_id + ")}\n")
-        out.write(r"\index{Alias!" + tmp + " (for " + package_id + ")}\n")
+        out.write("\\index{{Package!{0} (alias for {1})}}\n".format(tmp, package_id))
+        out.write("\\index{{Alias!{0} (for {1})}}\n".format(tmp, package_id))
     elif mode in ["plain"]:                       # plain
         out.write("\n" + "Alias: ".ljust(labelwidth) + tmp)
     elif mode in ["BibLaTeX"]:
@@ -754,7 +810,7 @@ def alias(k):                                     # element <alias .../>
 
 # ------------------------------------------------------------------
 def also(k):                                      # element <also .../>
-    """Processes the also element."""
+    """Process the also element."""
 
     # also --> TeXchars
     
@@ -767,7 +823,7 @@ def also(k):                                      # element <also .../>
         if refid in packages:
             tmp1   = TeXchars(packages[refid][0])
             tmp2   = TeXchars(packages[refid][1])
-            out.write(r"\item[see also] see section~\ref{pkg:" + refid2 + r"} on page~\pageref{pkg:" + refid2 + r"}: (\texttt{" + tmp1 + "} -- " + tmp2 + ")\n")
+            out.write("\\item[see also] see section~\\ref{{pkg:{0}}} on page~\\pageref{{pkg:{1}}}: (\\texttt{{{2}}} -- {3})\n".format(refid2, refid2, tmp1, tmp2))
     elif mode in ["plain"]:                       # plain
         if refid in packages:
             out.write("\n" + "see also: ".ljust(labelwidth) + refid + " (" + packages[refid][0] + " -- " + packages[refid][1] + ")")
@@ -785,7 +841,7 @@ def also(k):                                      # element <also .../>
 
 # ------------------------------------------------------------------
 def authorref(k):                                 # element <authorref .../>
-    """Processes the authorref element, constructs the complete name and usedAuthors entry."""
+    """Process the authorref element, constructs the complete name and usedAuthors entry."""
     
     global authorexists                           # flag
     global s_authorref                            # string for Excel
@@ -821,8 +877,8 @@ def authorref(k):                                 # element <authorref .../>
         tmp = tmp + " (not active)"
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[Author] " + tmp + "\n")
-        out.write(r"\index{Author!" + tmp2 + "}\n")
+        out.write("\\item[Author]{0}\n".format(tmp))
+        out.write("\\index{{Author!{0}}}\n".format(tmp2)) ######
     elif mode in ["RIS"]:                         # RIS
         out.write("AU  - " + tmp2 + "\n")
     elif mode in ["plain"]:                       # plain
@@ -839,7 +895,7 @@ def authorref(k):                                 # element <authorref .../>
 
 # ------------------------------------------------------------------
 def caption(k):                                   # element <caption>...</caption>
-    """Processes the caption element."""
+    """Process the caption element."""
 
     # caption --> TeXchars
     
@@ -853,7 +909,7 @@ def caption(k):                                   # element <caption>...</captio
     if mode in ["LaTeX"]:                         # LaTeX
         tmp = TeXchars(tmp)
         tmp = re.sub("#", "\\#", tmp)
-        out.write(r"\item[Caption] " + tmp + "\n")
+        out.write("\\item[Caption] {0}\n".format(tmp))
     elif mode in ["plain"]:                       # plain
         out.write("\n" + "Caption: ".ljust(labelwidth) + tmp)
     elif mode in ["RIS"]:                         # RIS
@@ -867,7 +923,7 @@ def caption(k):                                   # element <caption>...</captio
 
 # ------------------------------------------------------------------
 def contact(k):                                   # element <contact .../>
-    """Processes the contact element."""
+    """Process the contact element."""
     
     global notice
     global s_contact                              # string for Excel
@@ -876,8 +932,8 @@ def contact(k):                                   # element <contact .../>
     href  = k.get("href", "")                     # attribute href
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[Contact] \textit{" + typeT + r"}: \url{" + href + "}\n")
-        out.write(r"\index{Contact!" + typeT + "}\n")
+        out.write("\\item[Contact] \\textit{{{0}}}: \\url{{{1}}}\n".format(typeT, href))
+        out.write("\\index{{Contact!{0}}}\n".format(typeT))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "Contact: " + typeT + ": " + href + ";\n"
 ##        out.write("L1  - " + href + "\n")
@@ -896,7 +952,7 @@ def contact(k):                                   # element <contact .../>
 
 # ------------------------------------------------------------------
 def copyrightT(k):                                # element <copyright .../>
-    """Processes the copyright element."""
+    """Process the copyright element."""
 
     # copyrighT --> TeXchars
     
@@ -915,10 +971,10 @@ def copyrightT(k):                                # element <copyright .../>
     if mode in ["LaTeX"]:                         # LaTeX
         tmp = re.sub("_", r"\\_", tmp)
         tmp = TeXchars(tmp)
-        out.write(r"\item[Copyright] " + tmp + "\n")
+        out.write("\\item[Copyright] {0}\n".format(tmp))
     elif mode in ["RIS"]:                         # RIS
-        out.write("PY  - " + year + "\n")
-        notice += "Copyright: " + tmp + ";\n"
+        out.write("PY  - {0}\n".format(year))
+        notice += " " * (fieldwidth + 2) + "Copyright: " + tmp + ";\n"
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
         tmp = re.sub("_", r"\\_", tmp)
         tmp = TeXchars(tmp)
@@ -935,7 +991,7 @@ def copyrightT(k):                                # element <copyright .../>
 
 # ------------------------------------------------------------------
 def ctan(k, t):                                   # element <ctan .../>
-    """Processes the ctan element."""
+    """Process the ctan element."""
     
     global s_ctan                                 # string for Excel
     global notice
@@ -944,7 +1000,7 @@ def ctan(k, t):                                   # element <ctan .../>
     file = k.get("file", "")                      # attribute file
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[on CTAN] " + r"\url{" + ctanUrl2 + path + "}\n")
+        out.write("\\item[on CTAN] \\url{{{0}}}\n".format(ctanUrl2 + path))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "on CTAN: " + ctanUrl2 + path + "\n"
     elif mode in ["plain"]:                       # plain
@@ -957,7 +1013,7 @@ def ctan(k, t):                                   # element <ctan .../>
 
 # ------------------------------------------------------------------
 def description(k):                               # element <description ...> ... </description>
-    """Processes the description element."""
+    """Process the description element."""
 
     # description --> p
     # description --> ul
@@ -970,11 +1026,11 @@ def description(k):                               # element <description ...> ..
         languagex = ""
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[Description]" + languagex)
+        out.write("\\item[Description]{0}".format(languagex))
         if languagex != "":
-            out.write(r"\index{Language in description/documentation!" + languagex + "}\n")
+            out.write("\\index{{Language in description/documentation!{0}}}\n".format(languagex))
     elif mode in ["RIS"]:                         # RIS
-        out.write("AB  - " + languagex + "\n")
+        out.write("AB  - {0}\n".format(languagex))
     elif mode in ["plain"]:                       # plain
         out.write("\nDescription:".ljust(labelwidth) + languagex)
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -993,7 +1049,7 @@ def description(k):                               # element <description ...> ..
 
 # ------------------------------------------------------------------
 def documentation(k):                             # element <documentation .../>
-    """Processes the documentation element."""
+    """Process the documentation element."""
 
     # documentation --> TeXchars
     
@@ -1020,19 +1076,19 @@ def documentation(k):                             # element <documentation .../>
     if mode in ["LaTeX"]:                         # LaTeX
         details = TeXchars(details)
         if languagex != "":
-            out.write(r"\index{Language in description/documentation!" + languagecodes[language] + "}\n")
+            out.write("\\index{{Language in description/documentation!{0}}}\n".format(languagecodes[language]))
         if p == None:                             #   no language found in details
-            out.write(r"\item[Documentation]" + languagex + r" \textit{" + details + "}: " + r"\url{" + href2 + "}\n")
+            out.write("\\item[Documentation]{0} \\textit{{{1}}}: \\url{{{2}}}\n".format(languagex, details, href2))
         else:
-            out.write(r"\index{Language in description/documentation!" + p.group() + "}\n")
-            out.write(r"\item[Documentation]" + r" \textit{" + details + "}: " + r"\url{" + href2 + "}\n")
+            out.write("\\index{{Language in description/documentation!{0}}}\n".format(p.group()))
+            out.write("\\item[Documentation] \\textit{{{0}}}: \\url{{{1}}}\n".format(details, href2))
     elif mode in ["RIS"]:                         # RIS
         if list_info_files:
             if href in XML_toc:
                 tmp    = XML_toc[href]
                 one_if = tmp[1] + "-" + tmp[2]    #   one info file
                 fx     = os.path.abspath(one_if)
-                out.write("L1  - " + fx + "\n")
+                out.write("L1  - {0}\n".format(fx))
         if p == None:                             #   no language found in details
             notice += " " * (fieldwidth + 2) + "Documentation" + languagex + ": " + details + ": " + href2 + "; \n"
         else:
@@ -1048,9 +1104,9 @@ def documentation(k):                             # element <documentation .../>
                 else:
                     info_files += ";" + one_if
         if p == None:                             #   no language found in details
-            tmp = "Documentation" + languagex + ": " + details + ": " + href2 + "; \n"
+            tmp = "Documentation{0}: {1}: {2}; \n".format(languagex, details, href2)
         else:
-            tmp = "Documentation" + ": " + details + ": " + href2 + "; \n"
+            tmp = "Documentation: {0}: {1}; \n".format(details, href2)
         if notice != "":                          #   accumulate notice string
             notice += " " * (fieldwidth + 2) + tmp
         else:
@@ -1073,7 +1129,7 @@ def documentation(k):                             # element <documentation .../>
 
 # -----------------------------------------------------------------
 def entry(k, t):                                  # element <entry ...>...</entry>
-    """Processes the main element entry."""
+    """Process the main element entry."""
 
     # entry --> leading
     # entry --> description
@@ -1177,7 +1233,7 @@ def entry(k, t):                                  # element <entry ...>...</entr
 
 # ------------------------------------------------------------------
 def home(k):                                      # element <home .../>
-    """Processes the home element."""
+    """Process the home element."""
     
     global notice                                 # string for RIS/BibLaTeX
     global s_home                                 # string for Excel
@@ -1185,7 +1241,7 @@ def home(k):                                      # element <home .../>
     href = k.get("href", "")                      # attribute href
 
     if mode in ["LaTeX"]:                         # LaTeX 
-        out.write(r"\item[Home page] " + r"\url{" + href + "}\n")
+        out.write("\\item[Home page] \\url{{{0}}}\n".format(href))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "Home page: " + href + "; \n"
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -1198,7 +1254,7 @@ def home(k):                                      # element <home .../>
 
 # ------------------------------------------------------------------
 def install(k):                                   # element <install .../>
-    """Processes the install element."""
+    """Process the install element."""
     
     global notice                                 # string for RIS/BibLaTeX
     global s_install                              # string for Excel
@@ -1206,7 +1262,7 @@ def install(k):                                   # element <install .../>
     path = k.get("path", "")                      # attribute path
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[Installation] " + r"\url{" + ctanUrl3 + path + "}\n")
+        out.write("\\item[Installation] \\url{{{0}}}\n".format(ctanUrl3 + path))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "Installation: " + ctanUrl3 + path + "; \n"
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -1219,7 +1275,7 @@ def install(k):                                   # element <install .../>
 
 # ------------------------------------------------------------------
 def keyval(k):                                    # element <keyval .../>
-    """Processes the keyval element."""
+    """Process the keyval element."""
 
     # keyval --> TeXchars
     
@@ -1237,10 +1293,10 @@ def keyval(k):                                    # element <keyval .../>
 
     if mode in ["LaTeX"]:                         # LaTeX
         tmp = TeXchars(tmp)
-        out.write(r"\item[Keyword] " + r"\texttt{" + value + "} (" + tmp + ")\n")
-        out.write(r"\index{Topic!" + value + "}\n")
+        out.write("\\item[Keyword] \\texttt{{{0}}} ({1})\n".format(value, tmp))
+        out.write("\\index{{Topic!{0}}}\n".format(value))
     elif mode in ["RIS"]:                         # RIS
-        out.write("KW  - " + value + "\n")
+        out.write("KW  - {0}\n".format(value))
     elif mode in ["plain"]:                       # plain
         out.write("\n" + "Key: ".ljust(labelwidth) + value + " (" + topics[value] + ")")
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -1253,7 +1309,7 @@ def keyval(k):                                    # element <keyval .../>
 
 # ------------------------------------------------------------------
 def leading(k):                                   # first lines of one package
-    """Analyzes the first lines of each package XML file and outputs some lines."""
+    """Analyze the first lines of each package XML file and output some lines."""
 
     # leading --> TeXchars
     
@@ -1336,19 +1392,19 @@ def leading(k):                                   # first lines of one package
         xname2   = re.sub("_", "-", xname)
         out.write("\n%" + 80*"-")
         tmp = r"\texttt{" + xname1 + "} -- "
-        out.write("\n" + r"\section[" + tmp + xcaption2 + "]{" + tmp + xcaption + r"}\label{pkg:" + xname2 + "}\n")
-        out.write(r"\index{Package!" + xname1 + "}\n\n")
-        out.write(r"\begin{labeling}{Documentation}" + "\n")
+        out.write("\n\\section[{0}{1}]{{{2}{3}}}\\label{{pkg:{4}}}\n".format(tmp, xcaption2, tmp, xcaption, xname2))
+        out.write("\\index{{Package!{0}}}\n\n".format(xname1))
+        out.write("\\begin{labeling}{Documentation}\n")
     elif mode in ["RIS"]:                                     # RIS
         out.write("\nTY  - COMP" + "\n")
-        out.write("T1  - " + xname + "\n")
-        out.write("T4  - " + xcaption + "\n")
+        out.write("T1  - {0}\n".format(xname))
+        out.write("T4  - {0}\n".format(xcaption))
     elif mode in ["plain"]:                                   # plain
         tmp = xname + " -- " + xcaption
         out.write("\n\n\n" + tmp)
         out.write("\n" + len(tmp) * "-")
     elif mode in ["BibLaTeX"]:                                # BibLaTeX
-        out.write("\n" + btype + "{" + xname + ",\n")
+        out.write("\n{0}{{{1},\n".format(btype, xname))
         out.write("author".ljust(fieldwidth) + "= {" + author_string + "},\n")
     elif mode in ["Excel"]:                                   # Excel
         pass                                                  #   for Excel do nothing
@@ -1356,7 +1412,7 @@ def leading(k):                                   # first lines of one package
 
 # ------------------------------------------------------------------
 def li(k):                                        # element <li>...</li>
-    """Processes the li element."""
+    """Process the li element."""
 
     # li --> mod_TeXchars
 
@@ -1373,7 +1429,7 @@ def li(k):                                        # element <li>...</li>
         tmptext = mod_TeXchars(tmptext)
 
     if mode in ["LaTeX"]:                         # LaTeX
-        tmptext = r"\item " + tmptext + "\n"
+        tmptext = "\\item {0}\n".format(tmptext)
         out.write(tmptext)
     elif mode in ["Excel", "RIS", "plain", "BibLaTeX"]:
                                                   # BibLaTeX / RIS / plain / Excel
@@ -1384,7 +1440,7 @@ def li(k):                                        # element <li>...</li>
 
 # ------------------------------------------------------------------
 def licenseT(k):                                  # element <license .../>
-    """Processes the license element."""
+    """Process the license element."""
     
     global notice                                 # string for RIS/BibLaTeX
     global s_license                              # string for Excel
@@ -1397,18 +1453,18 @@ def licenseT(k):                                  # element <license .../>
         tmp   = licenses[tmp]
     
     if date != "":                                # constructs lincense (date)
-        tmp = tmp + " (" + date + ")"
+        tmp = "{0} (1)".format(tmp, date)
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[License] " + tmp + "\n")
-        out.write(r"\index{License!" + tmp + "}\n")
+        out.write("\\item[License] {0}\n".format(tmp))
+        out.write("\\index{{License!{0}}}\n".format(tmp))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "License: " + tmp + "; \n"
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
         if notice != "":
             notice += " " * (fieldwidth + 2) + "License: " + tmp + "; \n"
         else:
-            notice = "License: " + tmp + "; \n"
+            notice = "License: {0}; \n".format(tmp)
         out.write("userb".ljust(fieldwidth) + "= {" + tmp + "},\n")
     elif mode in ["plain"]:                       # plain
         out.write("\n" + "License: ".ljust(labelwidth) + tmp)
@@ -1417,7 +1473,7 @@ def licenseT(k):                                  # element <license .../>
 
 # ------------------------------------------------------------------
 def miktex(k):                                    # element <miktex .../>
-    """Processes the miktex element."""
+    """Process the miktex element."""
 
     # miktex --> TeXchars
     
@@ -1428,7 +1484,7 @@ def miktex(k):                                    # element <miktex .../>
 
     if mode in ["LaTeX"]:                         # LaTeX
         tmp = TeXchars(location)
-        out.write(r"\item[on Mik\TeX] " + r"\texttt{" + tmp + "}\n")
+        out.write("\\item[on Mik\TeX] \\texttt{{{0}}}\n".format(tmp))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "on MikTeX: " + location + "; \n"
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -1442,7 +1498,7 @@ def miktex(k):                                    # element <miktex .../>
 
 # ------------------------------------------------------------------
 def mod_a(k):                                     # element <a ...> ... </a>
-    """Processes the a element."""
+    """Process the a element."""
     
     ll = list(k.iter("a"))                        # fetches all a elements; ##1: {; ##2: }
 
@@ -1460,15 +1516,16 @@ def mod_a(k):                                     # element <a ...> ... </a>
             
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
             i.text = re.sub("_", "-", i.text)     #   change embedded text
-            i.text = "§§3href§§1" + tmp2 + "§§2§§1" + i.text + "§§2"
+            i.text = "§§3href§§1{0}§§2§§1{1}§§2".format(tmp2, i.text)
         elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = i.text + " (" + tmp2 + ")"   #   change embedded text
+            i.text = "{0} ({1})".format(i.text, tmp2)
+                                                  #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excek do nothing
 
 # ------------------------------------------------------------------
 def mod_xref(k):                                  # element <xref ...> ... </xref>
-    """Processes the xref element."""
+    """Process the xref element."""
     
     # Now the element xref is used for inline-links, not a.
     
@@ -1483,37 +1540,38 @@ def mod_xref(k):                                  # element <xref ...> ... </xre
             
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
             i.text = re.sub("_", "-", i.text)     #   change embedded text
-            i.text = "§§3href§§1" + tmp2 + "§§2§§1" + i.text + "§§2"
+            i.text = "§§3href§§1{0}§§2§§1{1}§§2".format(tmp2, i.text)
         elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = i.text + " (" + tmp2 + ")"   #   change embedded text
+            i.text = "{0} {1})".format(i.text, tmp2)
+                                                  #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
 def mod_b(k):                                     # element <b>...</b>
-    """Processes the b element."""
+    """Process the b element."""
     
     ll = list(k.iter("b"))                        # fetches all b elements
 
     for i in ll:                                  # loop: all b elements
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-            i.text = "§§3textbf§§1" + i.text + "§§2"
+            i.text = "§§3textbf§§1{0}§§2".format(i.text)
                                                   # change embedded text
         elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = "''" + i.text + "''"         #   change embedded text
+            i.text = "''{0}''".format(i.text)     #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
 def mod_backslash(s):                             # special processing von \ in the source text
-    """Corrects \. """
+    """special processing von \ in the source text"""
     
     res = re.sub(r"\\", r"§§3textbackslash ",s)
     return res
 
 # ------------------------------------------------------------------
 def mod_br(k):                                    # element <br/>
-    """Processes the br element."""
+    """Process the br element."""
     
     ll = list(k.iter("br"))                       # fetches all b elements
 
@@ -1527,50 +1585,52 @@ def mod_br(k):                                    # element <br/>
 
 # ------------------------------------------------------------------
 def mod_em(k):                                    # element <em>...</em>
-    """Processes the em element."""
+    """Process the em element."""
     
     ll = list(k.iter("em"))                       # fetch all em elements
 
     for i in ll:                                  # loop: all em elements
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-            i.text = "§§3emph§§1" + i.text + "§§2"#   change embedded text
+            i.text = "§§3emph§§1{0}§§2".format(i.text)
+                                                  #   change embedded text
         elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = "'" + i.text + "'"           #   change embedded text
+            i.text = "'{0}'".format(i.text)       #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
 def mod_i(k):                                     # element <i>...</i>
-    """Processes the i element."""
+    """Process the i element."""
     
     ll = list(k.iter("i"))                        # fetch all i elements
 
     for i in ll:                                  # loop: all i elements
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-            i.text = "§§3emph§§1" + i.text + "§§2"#   change embedded text 
+            i.text = "§§3emph§§1{0}§§2".format(i.text)
+                                                  #   change embedded text
         elif mode in ["RIS", "plain"]:            # RIS / plaindef onepackage
-            i.text = "'" + i.text + "'"           #   change embedded text
+            i.text = "'{0}'".format(i.text)       #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
 def mod_pre(k):                                   # element <pre>...</pre>
-    """Processses the pre element."""
+    """Process the pre element."""
     
     ll = list(k.iter("pre"))                      # fetch all i elements
 
     for i in ll:                                  # all: all pre elements
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-            i.text = "\n§§3begin§§1verbatim§§2\n" + i.text + "\n§§3end§§1verbatim§§2\n"
+            i.text = "\n§§3begin§§1verbatim§§2\n{0}\n§§3end§§1verbatim§§2\n".format(i.text)
                                                   # change embedded text
         elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = "\n" + i.text + "\n"         #   change embedded text
+            i.text = "\n{0}\n".format(i.text)     #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
 def mod_TeXchars(s):                              # prepares characters for LaTeX/BibLaTeX in a paragraph
-    """Prepares characters for LaTeX/BibLaTeX in a paragraph."""
+    """Prepare characters for LaTeX/BibLaTeX in a paragraph."""
 
     # mod_TeXchars --> mod_backslash
     
@@ -1585,7 +1645,6 @@ def mod_TeXchars(s):                              # prepares characters for LaTe
     tmp = re.sub("_", "§§3_", tmp)                # change _
     tmp = re.sub("≥", "$>=$", tmp)                # change ≥
     tmp = re.sub("≤", "$<=$", tmp)                # change ≤
-##    tmp = re.sub("&", "§§3&", tmp)       # <=======
     tmp = re.sub(r"\^", r"§§3textasciicircum ", tmp) # change ^
     tmp = re.sub("§§1", "{", tmp)                 # re-change {
     tmp = re.sub("§§2", "}", tmp)                 # re-change }
@@ -1595,7 +1654,7 @@ def mod_TeXchars(s):                              # prepares characters for LaTe
 
 # ------------------------------------------------------------------
 def mod_tt(k):                                    # element <tt>...</tt>
-    """Processes the tt element."""
+    """Process the tt element."""
 
     ll = list(k.iter("tt"))                       # fetch all tt elements
 
@@ -1603,15 +1662,16 @@ def mod_tt(k):                                    # element <tt>...</tt>
         tmp = i.text                              #   get embedded text
         
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-            i.text = "§§3texttt§§1" + tmp + "§§2" #   change embedded text
+            i.text = "§§3texttt§§1{0}§§2".format(tmp)
+                                                  #   change embedded text
         elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = "'" + tmp + "'"              #   change embedded text
+            i.text = "'{0}'".format(tmp)          #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
 def name(k):                                      # element <name>...</name>
-    """Processes the name element."""
+    """Process the name element."""
 
     # name --> TeXchars
     
@@ -1624,7 +1684,7 @@ def name(k):                                      # element <name>...</name>
 
     if mode in ["LaTeX"]:                         # LaTeX
         tmp = TeXchars(tmp)
-        out.write(r"\item[Name] \texttt{" + tmp + "}\n")
+        out.write("\\item[Name] \\texttt{{{0}}}\n".format(tmp))
     elif mode in ["plain"]:                       # plain
         out.write("\n" + "Name: ".ljust(labelwidth) + tmp)
     elif mode in ["RIS"]:                         # RIS
@@ -1649,7 +1709,7 @@ def onepackage(s, t):
         onePackage     = ET.parse(s + ext)        # parse XML file
     except:                                       # not successfull
         if verbose:
-            print("----- XML file for package '" + s + "' not well-formed")
+            print("----- Warning: XML file for package '{0}' not well-formed".format(s))
         return
     if verbose:
         print("    " + str(counter).ljust(5), "Package:", s.ljust(left), "Mode:", mode.ljust(7), "File:", direc + out_file.ljust(15))
@@ -1660,7 +1720,7 @@ def onepackage(s, t):
 
 # ------------------------------------------------------------------
 def p(k):                                         # element <p> ... </p>
-    """Processes the p element."""
+    """Process the p element."""
 
     # p --> mod_pre
     # p --> mod_br
@@ -1708,6 +1768,8 @@ def p(k):                                         # element <p> ... </p>
 
 # ------------------------------------------------------------------
 def TeXchars(s):                                   # prepares characters for LaTeX/BibLaTeX
+    """prepares characters for LaTeX/BibLaTeX"""
+    
     tmp = s
     tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
     tmp = re.sub("_", r"\\_", tmp)
@@ -1718,7 +1780,7 @@ def TeXchars(s):                                   # prepares characters for LaT
 
 # ------------------------------------------------------------------
 def texlive(k):                                   # element <texlive .../>
-    """Processes the texlive element."""
+    """Process the texlive element."""
 
     # texlive --> TeXchars
     
@@ -1729,7 +1791,7 @@ def texlive(k):                                   # element <texlive .../>
 
     if mode in ["LaTeX"]:                         # LaTeX
         tmp = TeXchars(location)
-        out.write(r"\item[on \TeX Live] " + r"\texttt{" + tmp + "}\n")
+        out.write("\\item[on \\TeX Live] \\texttt{{{0}}}\n".format(tmp))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "on TeXLive: " + location + ";\n"
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -1743,7 +1805,7 @@ def texlive(k):                                   # element <texlive .../>
 
 # ------------------------------------------------------------------
 def trailing(k, t):                               # last lines for the actual package
-    """Completes the actual package."""
+    """Complete the actual package."""
     
     global notice                                 # string for RIS/BibLaTeX + initialize
     global info_files
@@ -1762,10 +1824,10 @@ def trailing(k, t):                               # last lines for the actual pa
         out.write(r"\end{labeling}" + "\n")
     elif mode in ["RIS"]:                         # RIS
         if not authorexists:
-            out.write("AU  - " + userunknown + "\n")
+            out.write("AU  - {0}\n".format(userunknown))
         out.write("N1  - \n")                     # or U3
         out.write(notice + "\n")                  # or U3
-        out.write("Y3  - " + t + "\n")
+        out.write("Y3  - {0}\n".format(t))
         out.write("ER  -\n\n")
     elif mode in ["plain"]:                       # plain
         pass                                      #   for plain do nothing
@@ -1790,7 +1852,7 @@ def trailing(k, t):                               # last lines for the actual pa
 
 # ------------------------------------------------------------------
 def ul(k):                                        # element <ul>...</ul>
-    """Processes the ul element."""
+    """Process the ul element."""
 
     # ul --> li
 
@@ -1816,7 +1878,7 @@ def ul(k):                                        # element <ul>...</ul>
 
 # ------------------------------------------------------------------
 def version(k):                                   # element <version .../>
-    """Processes the version element."""
+    """Process the version element."""
     
     global notice                                 # string for RIS
     global version_str
@@ -1833,7 +1895,7 @@ def version(k):                                   # element <version .../>
     version_str = tmp
 
     if mode in ["LaTeX"]:                         # LaTeX
-        out.write(r"\item[Version] " + tmp + "\n")
+        out.write("\\item[Version] {0}\n".format(tmp))
     elif mode =="RIS":                            # RIS
         notice += " " * (fieldwidth + 2) + "Version: " + tmp + "; \n"
     elif mode in ["plain"]:                       # plain
@@ -1846,50 +1908,49 @@ def version(k):                                   # element <version .../>
         s_version = tmp
 
 # ------------------------------------------------------------------
-def make_tops():
-    """Outputs the tops (.top) file."""
+def make_tops():                                  # Generate the tops (xyz.top) file.
+    """Generate the tops (xyz.top) file."""
     
     # Topic list
     tops = open(direc + args.out_file + ".top", encoding="utf-8", mode="w")
-    tops.write("% file: " + args.out_file + ".top" + "\n")
-    tops.write("% date: " + actDate + "\n")
-    tops.write("% time: " + actTime + "\n")
-    tops.write("% is called by " + args.out_file + ".tex" + "\n\n")
+    tops.write("% file: {0}.top\n".format(args.out_file))
+    tops.write("% date: {0}\n".format(actDate))
+    tops.write("% time: {0}\n".format(actTime))
+    tops.write("% is called by {0}.tex\n\n".format(args.out_file))
+    
     tops.write(r"\appendix" + "\n")
     tops.write(r"\section{Used Topics, Short Explainations}" + "\n\n")
     tops.write(r"\raggedright" + "\n")
     tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
-
+  
     for f in topics:
         if f in usedTopics:
             tmp = topics[f]
             tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
-            tops.write(r"\item[\texttt{" + f + "}] " + tmp)
-            tops.write(r"\index{Topic!" + f + "}\n")
+            tops.write("\\item[\\texttt{{{0}}}] {1}".format(f, tmp))
+            tops.write("\\index{{Topic!{0}}}\n".format(f))
     tops.write(r"\end{labeling}" + "\n")
     tops.close()                                  # close file
     if verbose:
-        print("--- file '" + direc + args.out_file + ".top'", "created: [topic list]")
+        print("--- Info: file '{0}.top' created: [topic list]".format(direc + args.out_file))
 
 # ------------------------------------------------------------------
-def make_xref():
-    """Outputs the xref (.xref) file."""
+def make_xref():                                  # Generate the xref (xyz.xref) file.
+    """Generate the xref (xyz.xref) file."""
     
     # Topics/Packages cross-reference
     xref = open(direc + args.out_file + ".xref", encoding="utf-8", mode="w")
-    xref.write("% file: " + args.out_file + ".xref" + "\n")
-    xref.write("% date: " + actDate + "\n")
-    xref.write("% time: " + actTime + "\n")
-    xref.write("% is called by " + args.out_file + ".tex" + "\n\n")
+    xref.write("% file: {0}.xref\n".format(args.out_file))
+    xref.write("% date: {0}\n".format(actDate))
+    xref.write("% time: {0}\n".format(actTime))
+    xref.write("% is called by '{0}.tex'\n\n".format(args.out_file))
     xref.write(r"\section{Used Topics and related Packages}" + "\n\n")
     xref.write(r"\raggedright" + "\n")
     xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
-
     xref.write("\n")
     for f in topics:                              # loop: all topics
         if f in usedTopics:                       # topic is used?
-            xref.write(r"\item[\texttt{" + f + "}] ")
-            xref.write(r"\index{Topic!" + f + "}")
+            xref.write("\\item \\index{{Topic!{0}}}".format(f))
             tmp1 = topicspackage[f]               # get the packages for this topic
             package_nr = 0
             for ff in tmp1:                       # loop: all packages with this topic
@@ -1899,24 +1960,24 @@ def make_xref():
             for ff in tmp1:                       # loop: all packages with this topic
                 if ff in usedPackages:            #    package is used?
                     ff = re.sub("_", "-", ff)
-                    xref.write(r"\texttt{" + ff + "} " + r"(\ref{pkg:" + ff + "}); ")
+                    xref.write("\\texttt{{{0}}} (\\ref{{pkg:{1}}}); ".format(ff, ff))
             xref.write("\n")
     xref.write(r"\end{labeling}" + "\n")
     xref.close()                                  # close file
     if verbose:
-        print("--- file '" + direc + args.out_file + ".xref'", "created: [list with topics and related packages (cross-reference list)]")
+        print("--- Info: file '{0}.xref' created: [list with topics and related packages (cross-reference list)]".format(direc + args.out_file))
 
 # ------------------------------------------------------------------
-def make_tap():
-    """Outputs the tap (.tap) file."""
+def make_tap():                                   # Generate the tap (xyz.tap) file.
+    """Generate the tap (xyz.tap) file."""
     
     # Authors/Packages cross-reference
     
     tap = open(direc + args.out_file + ".tap", encoding="utf-8", mode="w")
-    tap.write("% file: " + args.out_file + ".tap" + "\n")
-    tap.write("% date: " + actDate + "\n")
-    tap.write("% time: " + actTime + "\n")
-    tap.write("% is called by " + args.out_file + ".tex" + "\n\n")
+    tap.write("% file: '{0}.tap'\n".format(args.out_file))
+    tap.write("% date: {0}\n".format(actDate))
+    tap.write("% time: {0}\n".format(actTime))
+    tap.write("% is called by '{0}.tex'\n\n".format(args.out_file))
     tap.write(r"\section{Authors and associated Packages}" + "\n\n")
     tap.write(r"\raggedright" + "\n")
     tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
@@ -1928,8 +1989,8 @@ def make_tap():
                 tmp2 = authors[f][1] + ", " + authors[f][0]
             else:
                 tmp2 = authors[f][0]
-            tap.write(r"\item[" + tmp2 + "] ")
-            tap.write(r"\index{Author!" + tmp2 + "}")
+            tap.write("\\item[{0}] ".format(tmp2))
+            tap.write("\\index{{Author!{0}}}".format(tmp2))
             tmp1 = authorpackages[f]
             package_no = 0
             for ff in tmp1:
@@ -1939,28 +2000,29 @@ def make_tap():
             for ff in tmp1:
                 if ff in usedPackages:
                     ff = re.sub("_", "-", ff)
-                    tap.write(r"\texttt{" + ff + "} " + r"(\ref{pkg:" + ff + "}); ")
+                    tap.write("\\texttt{{{0}}}  (\\ref{{pkg:{0}}}); ".format(ff, ff))
             tap.write("\n")
     tap.write(r"\end{labeling}" + "\n")
     tap.close()                                   # close file
     if verbose:
-        print("--- file '" + direc + args.out_file + ".tap'", "created: [list with authors and related packages (cross-reference list)]")
+        print("--- Info: file '{0}.tap' created: [list with authors and related packages (cross-reference list)]".format(direc + args.out_file))
 
 # ------------------------------------------------------------------
-def make_stat():
-    """Outputs statistics in the stat (.stat) file."""
+def make_stat():                                  # Generate statistics in the stat (xyz.stat) file.
+    """Generate statistics in the stat (xyz.stat) file."""
     
-    # writstatistics in the stat (.stat) file
+    # write statistics in the stat (.stat) file
 
     text1 = ""
     text2 = ""
     text3 = ""
     
     stat = open(direc + args.out_file + ".stat", encoding="utf-8", mode="w")
-    stat.write("% file: " + args.out_file + ".stat" + "\n")
-    stat.write("% date: " + actDate + "\n")
-    stat.write("% time: " + actTime + "\n")
-    stat.write("% is called by " + args.out_file + ".tex" + "\n\n")
+    stat.write("% file: '{0}.stat'\n".format(args.out_file))
+    stat.write("% date: {0}\n".format(actDate))
+    stat.write("% time: {0}\n".format(actTime))
+    stat.write("% is called by '{0}.tex'\n\n".format(args.out_file))
+    
     stat.write(r"\minisec{Parameters and Statistics}" + "\n\n")
     stat.write(r"\raggedright" + "\n")
     stat.write(r"\begin{tabular}{lrl}" + "\n")
@@ -1996,11 +2058,11 @@ def make_stat():
                " + list with authors and related packages (cross-reference list)}\n")
     stat.close()                                  # close statistics file 
     if verbose:
-        print("--- statistics written")
+        print("--- Info: statistics written")
 
 # ------------------------------------------------------------------
-def make_statistics():
-    """Outputs statistics on terminal."""
+def make_statistics():                            # Generate statistics on terminal.
+    """Generate statistics on terminal."""
 
     l = left + 1
     r = 5
@@ -2017,7 +2079,7 @@ def make_statistics():
     print("number of topics, used here:".ljust(l),    str(len(usedTopics)).rjust(r))
 
 # ------------------------------------------------------------------
-def process_packages():
+def process_packages():                          # Global loop
     """Global loop"""
 
     # process_packages --> onepackage
@@ -2042,21 +2104,21 @@ def process_packages():
                 ff.close()                       # loaded XML file closed
         except FileNotFoundError:                # specified XML file not found
             if verbose:
-                print("----- XML file for package '" + f + "' not found")
+                print("----- Warning: XML file for package '{0}' not found".format(f))
 
     if not keyexist:                             # no package found with the specified topic(s)
         if verbose:
-            print("----- key '" + key + "' not found")
+            print("----- Warning: key '{0}' not found".format(key))
 
     if counter <= 1:                             # no specified package found <=== error1
         if verbose:
-            print("----- no correct XML file for any specified package found")
+            print("----- Warning: no correct XML file for any specified package found")
 
     if verbose:
-        print("--- packages processed")
+        print("--- Info: packages processed")
 
 # ------------------------------------------------------------------
-def main():
+def main():                                      # Main function
     """Main function"""
 
     # main --> first_lines
@@ -2074,13 +2136,13 @@ def main():
     process_packages()        # process all packages
 
     # ------------------------------------------------------------------
-    # Generates topic list, topics and their packages (cross-reference), finish
+    # Generate topic list, topics and their packages (cross-reference), finish
     #
     if mode in ["LaTeX"] and make_topics: 
         make_tops()           # Topic list
         make_xref()           # Topics/Packages cross-reference
         make_tap()            # Authors/Packages cross-reference
-        make_stat()           # Statistics on file
+        make_stat()           # Statistics file (xyz.stat)
 
     # ------------------------------------------------------------------
     # The end
@@ -2089,7 +2151,7 @@ def main():
         out.write(trailer)    # output trailer
     out.close()               # close file
     if verbose:
-        print("- program successfully completed")
+        print("- Info: program successfully completed")
 
     # ------------------------------------------------------------------
     # Statistics on terminal

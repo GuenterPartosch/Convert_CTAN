@@ -5,31 +5,44 @@
 # CTANLoad+Out.py
 # (C) Günter Partosch, 2021
 
-# History:
-# 2021-05-01: 0.1: start
-# 2021-05-04: 0.9: first working version
-# 2021-05-24: 1.0: program completed
-# 2021-05-28: 1.1: compilation enabled
-# 2021-05-31: 1.2: some improvements (calls, compilation)
-
 # Problems/Plans:
-# * -b nur für -m bib zulassen
-# * -mt nur für -m latex zulassen
+# * -b nur für -m bib zulassen (x)
+# * -mt nur für -m latex zulassen (x)
 # + für ctanout anderer Default für -t (x)
 # + anderes Trennzeichen für Compilation und Makeindex (x)
 # + prüfen, ob ctanload -l -c aufgerufen werden muss (wenn CTANOut folgt)
 # + ist -c gefährlich?
+# + Umbruch bei der Darstellung von Aufrufparameter (x)
+# ' Fehler bei protokollausgabe -m (x)
+# + Köpfe für CTANLoad und CTANout doppelt (x)
+# + Resettings mit CTANLoad und CTANOut abgleichen
+# + bei Warnings für Optionsänderung: Grund mitangeben
 
 # ------------------------------------------------------------------
-# Moduls needed
+# History:
 
-import argparse                    # argument parsing
-import sys                         # system calls
-import platform                    # get OS informations
-import subprocess                  # handling of sub-processes
-import re                          # regular expression
+# 0.1 2021-05-01 start
+# 0.9 2021-05-04 first working version
+# 1.0 2021-05-24 program completed
+# 1.1 2021-05-28 compilation enabled
+# 1.2 2021-05-31 some improvements (calls, compilation)
+# 1.3 2021-06-12 auxiliary function fold: shorten long option values for output
+# 1.4 2021-06-20 some smaller errors/deficiencies corrected
+# 1.5 2021-06-23 error coprrection
 
 # ------------------------------------------------------------------
+# functions in CTANLoad+Out.py
+
+# def func_call_check():
+# def func_call_compile():
+# def func_call_load():
+# def func_call_output():
+# def head():
+# def main():
+# def fold(s):
+
+
+#===================================================================
 # Usage
 #
 # usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}] [-c] [-d DIREC] [-f] [-k FILTER_KEY] [-l]
@@ -37,7 +50,7 @@ import re                          # regular expression
 #                        [-n NUMBER] [-o OUTPUT_NAME] [-p] [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
 #                        [-to TEMPLATE_OUT] [-V] [-v]
 # 
-# [CTANLoad+Out.py; Version: 1.2 (2021-05-31)] Combine the tasks of CTANLoad (Load XLM and PDF documentation files from
+# [CTANLoad+Out.py; Version: 1.5 (2021-06-23)] Combine the tasks of CTANLoad (Load XLM and PDF documentation files from
 # CTAN a/o generate some special lists, and prepare data for CTANOut) and CTANOut (Convert CTAN XLM package files to some formats)
 # 
 # Optional parameters:
@@ -78,11 +91,21 @@ import re                          # regular expression
 
 
 #===================================================================
+# Moduls needed
+
+import argparse                    # argument parsing
+import sys                         # system calls
+import platform                    # get OS informations
+import subprocess                  # handling of sub-processes
+import re                          # regular expression
+
+
+#===================================================================
 # Settings
 
 programname       = "CTANLoad+Out.py"
-programversion    = "1.2"
-programdate       = "2021-05-31"
+programversion    = "1.5"
+programdate       = "2021-06-23"
 programauthor     = "Günter Partosch"
 authoremail       = "Guenter.Partosch@hrz.uni-giessen.de"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -94,20 +117,21 @@ latex_processor   = "xelatex"
 index_processor   = "makeindex"
 empty             = ""
 space             = " "
+ellipse           = " ..."
 call_check        = empty
 call_load         = empty
 call_output       = empty
 call_compile      = empty
 call_index        = empty
 
-err_mode          = "Warning: '{0} {1}' changed to '{2}'\n"
+err_mode          = "+ Warning: '{0} {1}' changed to '{2} (due to {3})'\n"
 
 # ------------------------------------------------------------------
 # Texts for argument parsing and help
 
 author_text        = "Show author of the program and exit."
 btype_text         = "Type of BibLaTex entries to be generated [valid only for '-m BibLaTeX'/'--mode BibLaTeX']"
-direc_text         = "Directory for input and output file"
+direc_text         = "OS Directory for input and output file"
 key_text           = "Template for output filtering on the base of keys"
 mode_text          = "Target format"
 number_text        = "Maximum number of file downloads"
@@ -157,7 +181,7 @@ if operatingsys == "Windows":
 else:
     direc_sep      = "/"
     
-direc_default        = act_direc + direc_sep # default for -d (output directory)
+direc_default        = act_direc + direc_sep # default for -d (OS output directory)
 
 
 #===================================================================
@@ -296,7 +320,7 @@ verbose         = args.verbose                # Parameter -v
 # ------------------------------------------------------------------
 # Correct direc
 
-direc = direc.strip()                         # correct directory name (-d)
+direc = direc.strip()                         # correct OS directory name (-d)
 if direc[len(direc) - 1] != direc_sep:
     direc += direc_sep
     
@@ -326,32 +350,33 @@ if direc[len(direc) - 1] != direc_sep:
 # -v     x     x     x      -
 # -V     x     x     x      -
 
-if mode in ["LaTeX", "latex", "tex"]:
-    mode = "latex"
-elif mode in ["BibLaTeX", "biolatex", "bib"]:
-    mode = "biblatex"
-elif mode in ["Excel", "excel", "tsv"]:
-    mode = "excel"
-elif mode in ["RIS", "ris"]:
-    mode = "ris"
-elif mode in ["plain", "txt"]:
+if mode in ["LaTeX", "latex", "tex"]:                          # LaTeX, latex, tex --> LaTeX
+    mode = "LaTeX"
+elif mode in ["BibLaTeX", "biolatex", "bib"]:                  # BibLaTeX, biblatex, bib --> BibLaTeX
+    mode = "BibLaTeX"
+elif mode in ["Excel", "excel", "tsv"]:                        # Excel, excel, tsv --> Excel
+    mode = "Excel"
+elif mode in ["RIS", "ris"]:                                   # RIS, ris --> RIS
+    mode = "RIS"
+elif mode in ["plain", "txt"]:                                 # plain, txt --> plain
     mode = "plain"
 else:
     pass
 
-if ("-p" in call) or ("-mt" in call):
+if ("-p" in call) or ("-mt" in call):                          # reset -m to LaTeX, if -p or -mt is set
     if mode != "latex":
         if verbose:
-            print(err_mode.format('-m', mode, '-m latex'))
-    call.append("-m");
-    mode = "latex"
-if "-b" in call:
+            print(err_mode.format('-m', mode, '-m latex', "'-mt'/'-p'"))
+    call.append("-m")
+    call.append("LaTeX")
+    mode = "LaTeX"
+if "-b" in call:                                               # reset -m to BibLaTeX, if -b is set
     if mode != "biblatex":
         if verbose:
-            print(err_mode.format('-m', mode, '-m biblatex'))
+            print(err_mode.format('-m', mode, '-m biblatex', "'-b'"))
     call.append("-m");
-    mode = "biblatex"
-    
+    mode = "BibLaTeX"
+   
 # ------------------------------------------------------------------
 # set load, check, compile and output
 
@@ -360,7 +385,7 @@ callx       = set(call[1:])
 set_load    = {'-f', '-n', '--download_files', '--number', '-t', '--template', '-tl', '--template_load'}
 set_check   = {'-l', '-c', '--lists', '--check_integrity'}
 set_output  = {'-b', '-k', '-m', '-mt', '-p', '-s', '--btype', '--key', '--mode', '--make_topics', '--pdf_output', '--skip', 
-               '-t', '--template', '-mo', 'make_output', '-to', '--template_out'}
+               '-mo', 'make_output', '-to', '--template_out'}
 set_compile = {'-p', '--pdf_output'}
 
 load        = callx & set_load    != empty_set
@@ -478,24 +503,24 @@ def head():
     print("+ CTANLoad+Out")
     print("+ Call:", call)
     if verbose:
-        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + btype_text + ")"))             # -b
-        if ("-c" in call) or ("--check_integrity" in call): print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))                    # -c
-        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))             # -d
-        if ("-f" in call) or ("--download_files" in call):  print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))                     # -f
-        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", filter_key, "(" + key_text + ")"))          # -k
-        if ("-l" in call) or ("--lists" in call):           print("  {0:5} {1:55}".format("-l", "(" + lists_text + ")"))                        # -l 
-        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))               # -m
-        if ("-mo" in call) or ("--make_output" in call):    print("  {0:5} {1:55}".format("-mo", "(" + make_output_text + ")"))                 # -mo
-        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + topics_text + ")"))                      # -mt
-        if ("-n" in call) or ("--number" in call):          print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))           # -n
-        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")")) # -o
-        if ("-p" in call) or ("--pdf_output" in call):      print("  {0:5} {1:55}".format("-p", "(" + pdf_text + ")"))                          # -p
-        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))               # -s
-        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))                # -stat
-        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", template, "(" + template_text + ")"))       # -t
-        if ("-tl" in call) or ("--template_load" in call):  print("  {0:5} {2:55} {1}".format("-tl", template_load, "(" + template_load_text + ")"))  # -tl
-        if ("-to" in call) or ("--template_out" in call):   print("  {0:5} {2:55} {1}".format("-to", template_out, "(" + template_out_text + ")"))    # -to
-        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))                      # -v
+        if ("-c" in call) or ("--check_integrity" in call): print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))                         # -c
+        if ("-f" in call) or ("--download_files" in call):  print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))                          # -f
+        if ("-l" in call) or ("--lists" in call):           print("  {0:5} {1:55}".format("-l", "(" + lists_text + ")"))                             # -l 
+        if ("-mo" in call) or ("--make_output" in call):    print("  {0:5} {1:55}".format("-mo", "(" + (make_output_text + ")")[0:50] + ellipse))    # -mo
+        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + (topics_text + ")")[0:50] + ellipse))         # -mt
+        if ("-p" in call) or ("--pdf_output" in call):      print("  {0:5} {1:55}".format("-p", "(" + pdf_text + ")"))                               # -p
+        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))                     # -stat
+        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))                           # -v
+        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + btype_text + ")"))                  # -b
+        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))                  # -d
+        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))                    # -m
+        if ("-n" in call) or ("--number" in call):          print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))                # -n
+        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))      # -o
+        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(filter_key), "(" + key_text + ")"))         # -k
+        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))                    # -s
+        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(template), "(" + template_text + ")"))      # -t
+        if ("-tl" in call) or ("--template_load" in call):  print("  {0:5} {2:55} {1}".format("-tl", template_load, "(" + template_load_text + ")")) # -tl
+        if ("-to" in call) or ("--template_out" in call):   print("  {0:5} {2:55} {1}".format("-to", template_out, "(" + template_out_text + ")"))   # -to
         print("\n")
 
         if load:    print("+ CTANLoad to be executed")
@@ -504,13 +529,31 @@ def head():
         if compile: print("+ XeLaTeX and MakeIndex to be executed")
         print("\n")
 
-# ------------------------------------------------------------------
+
+#===================================================================
+# Auxiliary function
+
+def fold(s):
+    """auxikliary function: shorten long option value text for output"""
+    maxlen = 65
+    offset = "\n" + 64 * " "
+    tmp    = s[:]
+    all    = ""
+    while len(tmp) > maxlen:
+        all = all + tmp[0 : maxlen] + offset
+        tmp = tmp[maxlen :]
+    return all + tmp
+
+
+#===================================================================
+# Functions
+
 def func_call_load():
     """CTANLoad is processed."""
 
     print("-" * 80)
     print("+ CTANLoad")
-    print("+ Call:", call_load[1:])
+##    print("+ Call:", call_load[1:])
     try:                                                  
         process_load      = subprocess.run(call_load, capture_output=True, encoding="utf8", universal_newlines=True)
         load_message      = process_load.stdout
@@ -520,8 +563,8 @@ def func_call_load():
             print(load_errormessage)
             sys.exit()
         else:
+            print(load_message)
             if verbose:
-                print(load_message)
                 print("+ OK")
     except:
         print("+ Error in CTANLoad")
@@ -533,7 +576,7 @@ def func_call_check():
 
     print("-" * 80)
     print("+ CTANLoad, check")
-    print("+ Call:", call_check[1:])
+##    print("+ Call:", call_check[1:])
     try:                                                  
         process_check      = subprocess.Popen(call_check, stderr=subprocess.PIPE, stdout=subprocess.PIPE, encoding="utf8", universal_newlines=True)
         check_errormessage = process_check.stderr.read()
@@ -543,8 +586,8 @@ def func_call_check():
             print(check_errormessage)
             sys.exit()
         else:
+            print(check_message)
             if verbose:
-                print(check_message)
                 print("+ OK")
         process_check.communicate()
     except:
@@ -557,7 +600,7 @@ def func_call_output():
     
     print("-" * 80)
     print("+ CTANOut")
-    print("+ Call:", call_output[1:])
+##    print("+ Call:", call_output[1:])
     try:                                                  
         process_output      = subprocess.run(call_output, capture_output=True, encoding="utf8", universal_newlines=True)
         output_errormessage = process_output.stderr
@@ -567,8 +610,8 @@ def func_call_output():
             print(output_errormessage)
             sys.exit()
         else:
+            print(output_message)
             if verbose:
-                print(output_message)
                 print("+ OK")
     except:
         print("+ Error in CTANOut")
@@ -631,13 +674,6 @@ def func_call_compile():
         process_index      = subprocess.run(call_index, capture_output=True, encoding="utf8", universal_newlines=True)
         index_errormessage = process_index.stderr
         index_message      = process_index.stdout
-##        if len(index_errormessage) > 0:
-##            print("+ Error:")
-##            print(index_errormessage)
-##            sys.exit()
-##        else:
-##            print(index_message)
-##            print("+ OK")
     except:
         print("+ Error in makeindex")
         sys.exit()

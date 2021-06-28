@@ -1,28 +1,34 @@
-CTANOut
-=======
+usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan,@www}]
+                  [-d DIREC] [-k FILTER_KEY]
+                  [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
+                  [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat]
+                  [-v]
 
-usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY] [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt]
-                  [-stat] [-v]
-
-[CTANOut.py; Version: 1.85 (2021-05-27)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+[CTANOut.py; Version: 1.90 (2021-06-22)] Convert CTAN XLM package files to
+LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 
 Options:
   -h, --help            show this help message and exit
   -a, --author          Show author of the program and exit.
   -V, --version         Show version of the program and exit.
   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
-                        Type of BibLaTex entries to be generated [only for -m BibLateX]; Default:
+                        Type of BibLaTex entries to be generated [only for -m
+                        BibLateX]; Default:
   -d DIREC, --directory DIREC
                         Directory for input and output files; Default: .\
   -k FILTER_KEY, --key FILTER_KEY
-                        Template for output filtering on the base of keys; Default: ^.+$
+                        Template for output filtering on the base of keys;
+                        Default: ^.+$
   -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}, --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}
                         Target format; Default: RIS
   -o OUT_FILE, --output OUT_FILE
-                        Generic name for output files [without extensions]; Default: all
+                        Generic name for output files [without extensions];
+                        Default: all
   -s SKIP, --skip SKIP  Skip specified CTAN fields.; Default: []
   -t NAME_TEMPLATE, --template NAME_TEMPLATE
                         Template for package names; Default: ^.+$
-  -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX]).; Default: False
+  -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-
+                        reference (topics/packages, authors/packages); only
+                        for -m LaTeX]).; Default: False
   -stat, --statistics   Flag: Print statistics on terminal.; Default: False
   -v, --verbose         Flag: Output is verbose.; Default: False

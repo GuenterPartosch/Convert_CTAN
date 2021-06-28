@@ -10,4 +10,9 @@ Changes (CTANOut)
 1.82 2021-05-26 structure of CTAN.pkl adapted
 1.83 2021-05-26 output of license information now with full text
 1.84 2021-05-26 output and interpretaion of language codes improved
-1.85 2021-05-27 correction of a source error in <version .../>
+1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
+1.86 2021-06-12 auxiliary function fold: shorten long option values for output
+1.87 2021-06-12 messages classified: Warnings, Error, Info
+1.88 2021-06-13 string method str.format used (if applicable)
+1.89 2021-06-18 some tiny improvements for output
+1.90 2021-06-22 misc. smaller corrections

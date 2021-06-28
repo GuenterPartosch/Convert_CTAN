@@ -2,8 +2,8 @@ usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME]
                    [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
 
 Loads XLM and PDF documentation files from CTAN a/o generates some special
-lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.2.0
-(2021-06-08)]
+lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.3.8
+(2021-06-22)]
 
 Optional parameters:
   -h, --help            show this help message and exit

@@ -2,6 +2,10 @@ wget
 ====
 
 Both programs, CTANLoad and CTANOut.py, use wget for downloading. 
-The best is to use GNU wget (https://www.gnu.org/software/wget/ for some platforms)
+The best way is to use GNU wget (https://www.gnu.org/software/wget/ for some platforms)
 
 wget has to be installed in the current folder or in the path.
+
+Note:
+There is a Python script with the name wget, too. 
+But there is no chance to use it in an equivalent way like the GNU product.
