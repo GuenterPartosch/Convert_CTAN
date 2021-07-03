@@ -7,4 +7,6 @@ Changes (CTANLoad+Out)
 1.2 2021-05-31 some improvements (calls, compilation)
 1.3 2021-06-12 auxiliary function fold: shorten long option values for output
 1.4 2021-06-20 some smaller errors/deficiencies corrected
-1.5 2021-06-23 error coprrection
+1.5 2021-06-23 error correction
+1.6 2021-06-24 adaption for the CTANLoad option -r
+1.7 2021-06-25 some new handling of subprocesses

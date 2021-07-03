@@ -1,0 +1,88 @@
+Examples (CTANLoad+Out)
+=======================
+CTANLoad+Out -r
+  + regeneration of the 2 pickle files                                                                   [-r]
+  + a lot of new PDF files
+  + results in CTAN.pkl and CTAN2.pkl
+  + without statistics
+  + not verbose
+
+CTANLoad+Out -r -v -stat
+  + regeneration of the 2 pickle files                                                                   [-r]
+  + a lot of new PDF files
+  + results in CTAN.pkl and CTAN2.pkl
+  + with statistics                                                                                      [-stat]
+  + verbose                                                                                              [-v]
+
+CTANLoad+Out -l
+  + CTAN.pkl rewritten
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten                                       [-l]
+  + without statistics
+  + not verbose
+
+CTANLoad+Out -l -v -stat
+  + CTAN.pkl rewritten
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten                                       [-l]
+  + with statistics
+  + verbose                                                                                              [-v]
+
+CTANLoad+Out -mt -p
+  + no XML/PDF file from CTAN is downloaded
+  + 1st step: all XML/PDF files in the current directory are processed
+  + output format is LaTeX (implicitely)                                                                 [-mt]
+  + temporary output file is all.tex
+  + all.top,  all.xref, all.tap are generated (will be included in all.tex)                              [-mt]
+  + 2nd step: all.tex is completely compiled                                                             [-p]
+  + output file is all.pdf
+  + without statistics
+  + not verbose
+
+CTANLoad+Out -mt -m latex -p -v -stat
+  + no XML/PDF file from CTAN is downloaded
+  + 1st step: all XML files in the current directory are processed
+  + output format is LaTeX                                                                               [-m]
+  + temporary output file is all.tex
+  + all.top,  all.xref, all.tap are generated (will be included in all.tex)                              [-mt]
+  + 2nd step: all.tex is completely compiled                                                             [-p]
+  + output file is all.pdf
+  + with statistics                                                                                      [-stat]
+  + verbose                                                                                              [-v]
+
+CTANLoad+Out -to latex -m bib -v -stat
+  + no XML/PDF file from CTAN is downloaded
+  + all XML fies in the current directory which match the name template "latex" are processed            [-to]
+  + output format is BibLaTeX
+  + output file is all.bib                                                                               [-m]
+  + with statistics                                                                                      [-stat]
+  + verbose                                                                                              [-v]
+
+CTANLoad+Out -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
+  + 1st step: XML file with the name template "latex|ltx|l3|lt3" are downloaded from CTAN                [-t]
+  + associated PDF files are downloaded, too                                                             [-f]
+  + 2nd step: all XML files in the current directory which match the name template "latex|ltx|l3|lt3" are processed [-t]
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)                               [-mt]
+  + output format is LaTeX                                                                               [-m]
+  + output file is all.tex
+  + with statistics                                                                                      [-stat]
+  + verbose                                                                                              [-v]
+
+CTANLoad+Out -t pgf -l -c -mt -p -v -stat
+  + 1st step: XML file with the name template "pgf" are downloaded from CTAN
+  + 2nd step:   + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten                           [-l]
+  + a consistency check is done                                                                          [-c]
+  + 3rd step:  all XML files in the current directory which match the name template "pgf3" are processed [-t]
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)                               [-mt]
+  + output format is LaTeX (implicitely)                                                                 [-mtz]
+  + temporary output file is all.tex
+  + 4th step: all.tex is completely compiled                                                             [-p]
+  + output file is all.pdf
+  + with statistics                                                                                      [-stat]
+  + verbose                                                                                              [-v]
+
+CTANLoad+Out -k latex -m txt -v
+  + no XML/PDF file from CTAN is downloaded
+  + all XML files in the current directory which match the topic template "latex" are processed
+  + output format is plain
+  + output file is all.txt
+  + without statistics
+  + verbose                                                                                              [-v]

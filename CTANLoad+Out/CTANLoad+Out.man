@@ -1,11 +1,11 @@
 usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
                        [-c] [-d DIREC] [-f] [-k FILTER_KEY] [-l]
                        [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}]
-                       [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-s SKIP]
-                       [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
+                       [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-r]
+                       [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
                        [-to TEMPLATE_OUT] [-V] [-v]
 
-[CTANLoad+Out.py; Version: 1.5 (2021-06-23)] Combine the tasks of CTANLoad
+[CTANLoad+Out.py; Version: 1.8 (2021-06-25)] Combine the tasks of CTANLoad
 [Load XLM and PDF documentation files from CTAN a/o generate some special
 lists, and prepare data for CTANOut] and CTANOut [Convert CTAN XLM package
 files to some formats].
@@ -41,6 +41,8 @@ Optional parameters:
                         Generic name for output files [without extensions];
                         Default: all
   -p, --pdf_output      Flag: Generate PDF output.; Default: False
+  -r, --regenerate_pickle_files
+                        Flag: Regenerate the two pickle files.; Default: False
   -s SKIP, --skip SKIP  Skip specified CTAN fields.; Default: []
   -stat, --statistics   Flag: Print statistics on terminal.; Default: False
   -t TEMPLATE, --template TEMPLATE

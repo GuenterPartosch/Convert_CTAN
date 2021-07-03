@@ -1,5 +1,5 @@
-Modules needed in CTANLoad+Out
-==============================
+Modules (CTANLoad+Out)
+======================
 import argparse                    # argument parsing
 import sys                         # system calls
 import platform                    # get OS informations
