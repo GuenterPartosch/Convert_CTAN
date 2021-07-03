@@ -1,29 +1,30 @@
-usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME]
-                   [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
+usage: CTANLoad.py [-h] [-a] [-c] [-d DIREC] [-f] [-l] [-n NUMBER]
+                   [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat] [-v] [-V]
 
-Loads XLM and PDF documentation files from CTAN a/o generates some special
-lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.3.8
-(2021-06-22)]
+Load XLM and PDF documentation files from CTAN a/o generate some special
+lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.4.2 (2021-06-26)]
 
 Optional parameters:
   -h, --help            show this help message and exit
   -a, --author          Author of the program
-  -V, --version         Version of the program
-  -d DIREC, --directory DIREC
-                        OS Directory for output files; Default: .\
-  -n NUMBER, --number NUMBER
-                        Maximum number of file downloads; Default: 250
-  -o OUTPUT_NAME, --output OUTPUT_NAME
-                        Generic file name for output files; Default: all
-  -t TEMPLATE, --template TEMPLATE
-                        Name template for package XML files to be loaded;
-                        Default:
   -c, --check_integrity
                         Flag: Check the integrity of the 2nd .pkl file.;
                         Default: False
+  -d DIREC, --directory DIREC
+                        OS Directory for output files; Default: .\
   -f, --download_files  Flag: Download associated documentation files [PDF].;
                         Default: False
   -l, --lists           Flag: Generate some special lists and prepare files
                         for CTANOut.; Default: False
+  -n NUMBER, --number NUMBER
+                        Maximum number of file downloads; Default: 250
+  -o OUTPUT_NAME, --output OUTPUT_NAME
+                        Generic file name for output files; Default: all
+  -r, --regenerate_pickle_files
+                        Flag: Regenerate the two pickle files.; Default: False
+  -t TEMPLATE, --template TEMPLATE
+                        Name template for package XML files to be loaded;
+                        Default:
   -stat, --statistics   Flag: Print statistics.; Default: False
   -v, --verbose         Flag: Output is verbose.; Default: False
+  -V, --version         Version of the program

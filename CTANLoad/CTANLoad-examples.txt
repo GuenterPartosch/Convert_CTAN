@@ -1,20 +1,23 @@
-﻿Examples (CTAN-Load)
---------------------
+Examples (CTANLoad)
+===================
 CTANLoad -h
-- help, show the options                                     [-h]
+- help, show the options
+
+CTANLoad
+- download authors, topics, packages, licenses; write CTAN.pkl
+- not verbose and without statistics
+
+CTANLoad -v -stat                                            
+- as above
+- verbose                                                    [-v]
+- with statistics                                            [-stat]
 
 CTANLoad -t "^a.+$" -v
 - load all CTAN XML files with name template "^a.+$"         [-t]
 - verbose output                                             [-v]
 
-CTANLoad -t "graphicx|pstricks" -v -f -stat
-- load the XML files for 'graphicx' and 'pstricks'           [-t]
-- load the associated information files (PDF)                [-f]
-- verbose output                                             [-v]
-- with statistics                                            [-stat]
-
 CTANLoad -f -n 300 -t "^l3" -v
-- verbose output                                             [-v]
+- verbose output [-v]
 - load all CTAN XML files with the name template "^l3$"      [-t]
 - load the associated information files (PDF)                [-f]
 - maximum number of download files                           [-n]
@@ -26,5 +29,10 @@ CTANLoad -v -l
 CTANLoad -v -l -c -stat
 - generate some special lists, and prepare files for CTANOut [-l]
 - verbose output                                             [-v]
+- with integrity check                                       [-c]
+- with statistics                                            [-stat]
+
+CTANLoad -v -stat -r
+- Regenerate the two pickle files                            [-r]
 - with integrity check                                       [-c]
 - with statistics                                            [-stat]

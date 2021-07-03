@@ -6,25 +6,26 @@
 # (C) Günter Partosch, 2019/2021
 
 # Es fehlen noch  bzw. Probleme:
-# - noch besser unterscheiden zwischen not well-formed und leerer Datei
+# - noch besser unterscheiden zwischen not well-formed und leerer Datei (x)
 # - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
-# - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/
-# - Parameter -m BibLaTeX  mit/ohne -l
-# - zusätzlicher Aufruf-Parameter -k (Laden nach Topics)?
+# - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/ (geht eigentlich nicht)(-)
+# - zusätzlicher Aufruf-Parameter -k (Laden nach Topics)? all.lpt ausswerten oder topicspackage
 # - https://ctan.org/xml/2.0/licenses auswerten und für <license .../> nutzen (x)
 # - bei -d: ggf. Verzeichnis anlegen (X)
 # - bei -d: Verzeichnistrenner besser/explizit behandeln (x)
 # - Ausgabe von Zeichenketten verbessern (x)
 # - Generierung von CTAN.pkl auch ohne Parameter -l ? ggf. verschieben? (x)
-# - neuer Parameter für die Generierung von CTAN.pkl und CTAN2.pkl ? -q ?
+# - neuer Parameter für die Generierung von CTAN.pkl und CTAN2.pkl ? -q ? (-r x)
 # - gründliche Überarbeitung von -c; Zusammenspiel von PDF_toc and XML_toc (x)
 # - ggf. try: ... except KeyboardInterrupt ? oder Thread aus threading (x)
 # - Aktualisierung der PDF_toc schützen; ggf Thread (x)
 # - noch passendere Meldungen bei Resettings (x)
 # - weitere Resettings der Aufrufparameter (x)
-# - unspecified error noch besser erklären
+# - unspecified error noch besser erklären oder auflösen (x)
 # - wenn zu einer XML-Datei schon PDF-Dateien existieren, so sollten diese genommen werden (x)
 # - Änderungen in Kommentaren: Übersicht über Funktionen & in main() (x)
+# - bei -r: vorhandene PDF-Datei überschreiben? (doppelte datei nachträglich löschen)(x)
+# - CTANLoad.man, CTANLoad-examples.txt, CTANLoad-changes.txt und CTANLoad-messages.txt neu machen (x)
 
 # ------------------------------------------------------------------
 # History
@@ -62,14 +63,17 @@
 # 2.3.6  2021-06-18 new function verify_PDF_files: check actualized PDF_toc; delete a PDF file if necessary
 # 2.3.7  2021-06-19 main function more modularized; new functions call_plain, call_load, call_check
 # 2.3.8  2021-06-22 error corrections and improvements for the handling von PDF_toc and XML_toc
+# 2.4.0  2021-06-23 regeneration of pickle file enabled: new option -r; new functions regenerate_pickle_files and get_XML_files
+# 2.4.1  2021-06-24 error handling in the check_integrity context changed
+# 2.4.2  2021-06-26 handling of -r changed
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
 
 # usage: CTANLoad.py [-h] [-a] [-V] [-d DIREC] [-n NUMBER] [-o OUTPUT_NAME] [-t TEMPLATE] [-c] [-f] [-l] [-stat] [-v]
 # 
-# Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.3.8
-# (2021-06-22)]
+# Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.4.2
+# (2021-06-26)]
 # 
 # Optional parameters:
 #   -h, --help            show this help message and exit
@@ -95,6 +99,8 @@
 
 # Informative messages:
 # - Info: PDF documentation file '<PDF file>' downloaded
+# - Info: Regeneration of '<pickle file>'
+# - Info: Successfully created the OS directory '<directory>'
 # - Info: XML file '<XML file>' downloaded ('<local file>.xml' on PC)
 # - Info: XML file for package '<package name>' downloaded ('<local file>.xml' on PC)
 # - Info: authors collected
@@ -107,21 +113,21 @@
 # - Info: file '<file name>' (list of topics) generated
 # - Info: integrity check
 # - Info: licenses collected
+# - Info: local XML file '<XML file'
 # - Info: no error with integrity check
 # - Info: packages collected
 # - Info: packagetopics, topicspackage, authorpackage collected
-# - Info: pickle file '<pickle file name>' cannot be loaded a/o written
 # - Info: pickle file '<pickle file name>' written
 # - Info: program successfully completed
-# - Info: Successfully created the OS directory '<directory>'
 # - Info: topics collected
-# - Info: unique local file name: '<local file name>'
+# - Info: unique local file name: '<local file name>'   
 #
 # Warnings:
 # - Warning: Creation of the OS directory '<directory>' failed
 # - Warning: PDF documentation file '<PDF file>' not downloaded
 # - Warning: PDF file '<PDF file> in OS deleted
 # - Warning: PDF file '<XML file>' without associated XML file
+# - Warning: XML file '<XML file>' empty or not well-formed
 # - Warning: XML file '<XML file>' in OS deleted
 # - Warning: XML file 'XML file' not downloaded
 # - Warning: XML file for package '<package name>' not downloaded
@@ -130,7 +136,7 @@
 # - Warning: local XML file for package '<package name>' empty or not well-formed
 # - Warning: local XML file for package '<package name>' not found
 # - Warning: maximum number (<number>) of downloaded XML+PDF files exceeded
-# - Warning: XML file '<XML file>' empty or not well-formed
+# - Warning: pickle file '<pickle file name>' cannot be loaded a/o written
 # - Warnung: '<option>' reset to {new value} (due to <reason>)"
 #
 # Errors:
@@ -154,15 +160,17 @@
 # generate_pickle2()	   pickle dump: actual XML_toc (list with download information files.
 # generate_topicspackage() Generate topicspackage, packagetopics, and authorpackages.
 # get_PDF_files(d)	   List all PDF files in a OS directory.
+# get_XML_files(d)         List all XML files in the OS directory d.
 # load_XML_files()	   Download XML package files.
 # load_XML_toc()	   Load pickle file 2 (with XML_toc).
 # load_authors()	   Download XML file 'authors'.
-# load_document_file(href, key, name)	Load one information file (PDF).
+# load_document_file(...)  Load one information file (PDF).
 # load_licenses()	   Download XML file 'licenses'.
 # load_packages()	   Download XML file 'packages'.
 # load_topics()	           Download XML file 'topics'.
 # main()	           Main function
 # make_statistics()	   Print statistics on terminal.
+# regenerate_pickle_files() Regenerate corrupted pickle files.
 # set_PDF_toc()            Fill PDF_toc on the basis of XML_Toc.
 
 # ------------------------------------------------------------------
@@ -199,7 +207,11 @@
 # - verbose output                                             [-v]
 # - with integrity check                                       [-c]
 # - with statistics                                            [-stat]
-
+#
+# CTANLoad -v -stat -r
+# - Regenerate the two pickle files                            [-r]
+# - with integrity check                                       [-c]
+# - with statistics                                            [-stat]
 
 # ==================================================================
 # Imports
@@ -228,8 +240,8 @@ from threading import Thread       # handling of threads
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.3.8"
-prg_date        = "2021-06-22"
+prg_version     = "2.4.2"
+prg_date        = "2021-06-26"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
@@ -244,13 +256,14 @@ template_text       = "Name template for package XML files to be loaded"
 output_text         = "Generic file name for output files"
 number_text         = "Maximum number of file downloads"
 direc_text          = "OS Directory for output files"
-program_text        = "Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut"
+program_text        = "Load XLM and PDF documentation files from CTAN a/o generate some special lists, and prepare data for CTANOut"
 
 verbose_text        = "Flag: Output is verbose."
 download_text       = "Flag: Download associated documentation files [PDF]."
 lists_text          = "Flag: Generate some special lists and prepare files for CTANOut."
 statistics_text     = "Flag: Print statistics."
 integrity_text      = "Flag: Check the integrity of the 2nd .pkl file."
+regenerate_text     = "Flag: Regenerate the two pickle files."
 
 # ------------------------------------------------------------------
 # Defaults/variables for argparse
@@ -263,6 +276,7 @@ output_name_default = "all"      # default for option -o    (generic file name)
 statistics_default  = False      # default for option -stat (no statistics output)
 template_default    = ""         # default for option -t    (name template for file loading)
 verbose_default     = False      # default for option -n    (output is not verbose)
+regenerate_default  = False      # default for option -r    (no regeneration)
 
 act_direc           = "."        
 if operatingsys == "Windows":    
@@ -339,7 +353,9 @@ ext                 = ".xml"     # file name extension for downloaded XML files
 rndg                = 2          # optional rounding of float numbers
 left                = 35         # width of labels in statistics
 ellipse             = " ..."     # abbreviate texts
+
 reset_text          = "Info: '{0}' reset to {1} (due to {2})"
+exclusion           = ["authors.xml", "topics.xml", "packages.xml", "licenses.xml"]
 
 random.seed(time.time())         # seed for random number generation
 
@@ -359,16 +375,24 @@ parser.add_argument("-a", "--author",                      # Parameter -a/--auth
                     action  = 'version',
                     version = prg_author + " (" + prg_email + ", " + prg_inst + ")")
 
-parser.add_argument("-V", "--version",                     # Parameter -V/--version
-                    help    = version_text,
-                    action  = 'version',
-                    version = '%(prog)s ' + prg_version + " (" + prg_date + ")")
+parser.add_argument("-c", "--check_integrity",             # Parameter -c/--check_integrity
+                    help    = integrity_text + "; Default: " + "%(default)s",
+##                    help    = argparse.SUPPRESS,
+                    action  = "store_true",
+                    default = integrity_default)
 
 parser.add_argument("-d", "--directory",                   # Parameter -d/--directory
                     help    = direc_text + "; Default: " + "%(default)s",
                     dest    = "direc",
                     default = direc_default)
-
+parser.add_argument("-f", "--download_files",              # Parameter -f/--download_files
+                    help    = download_text + "; Default: " + "%(default)s",
+                    action  = "store_true",
+                    default = download_default)
+parser.add_argument("-l", "--lists",                      # Parameter -l/--lists
+                    help    = lists_text + "; Default: " + "%(default)s",
+                    action  = "store_true",
+                    default = lists_default)
 parser.add_argument("-n", "--number",                      # Parameter -n/--number
                     help    = number_text + "; Default: " + "%(default)s",
                     dest    = "number",
@@ -379,26 +403,15 @@ parser.add_argument("-o", "--output",                      # Parameter -o/--outp
                     dest    = "output_name",
                     default = output_name_default)
 
+parser.add_argument("-r", "--regenerate_pickle_files",     # Parameter -r/--regenerate_pickle_files
+                    help    = regenerate_text + "; Default: " + "%(default)s",
+                    action  = "store_true",
+                    default = regenerate_default)
+
 parser.add_argument("-t", "--template",                   # Parameter -t/--template
                     help    = template_text + "; Default: " + "%(default)s",
                     dest    = "template",
                     default = template_default)
-
-parser.add_argument("-c", "--check_integrity",             # Parameter -c/--check_integrity
-                    help    = integrity_text + "; Default: " + "%(default)s",
-##                    help    = argparse.SUPPRESS,
-                    action  = "store_true",
-                    default = integrity_default)
-
-parser.add_argument("-f", "--download_files",              # Parameter -f/--download_files
-                    help    = download_text + "; Default: " + "%(default)s",
-                    action  = "store_true",
-                    default = download_default)
-
-parser.add_argument("-l", "--lists",                      # Parameter -l/--lists
-                    help = lists_text + "; Default: " + "%(default)s",
-                    action = "store_true",
-                    default = lists_default)
 
 parser.add_argument("-stat", "--statistics",               # Parameter -stat/--statistics
                     help    = statistics_text + "; Default: " + "%(default)s",
@@ -406,9 +419,14 @@ parser.add_argument("-stat", "--statistics",               # Parameter -stat/--s
                     default = statistics_default)
 
 parser.add_argument("-v", "--verbose",                     # Parameter -v/--verbose
-                    help = verbose_text + "; Default: " + "%(default)s",
-                    action = "store_true",
+                    help    = verbose_text + "; Default: " + "%(default)s",
+                    action  = "store_true",
                     default = verbose_default)
+
+parser.add_argument("-V", "--version",                     # Parameter -V/--version
+                    help    = version_text,
+                    action  = 'version',
+                    version = '%(prog)s ' + prg_version + " (" + prg_date + ")")
 
 # ------------------------------------------------------------------
 # Getting parsed values
@@ -422,6 +440,7 @@ number       = int(args.number)                            # parameter -n
 statistics   = args.statistics                             # Parameter -stat
 template     = args.template                               # parameter -t
 verbose      = args.verbose                                # parameter -v
+regenerate   = args.regenerate_pickle_files                # parameter -r
 
 # ------------------------------------------------------------------
 # Correct OS directory name, test OS directory existence, and install OS directory
@@ -946,7 +965,7 @@ def generate_pickle2():                                           # Function gen
             print("--- Warning: pickle file '{0}' cannot be loaded a/o written".format(pickle_name2))
 
 # ------------------------------------------------------------------
-def verify_PDF_files():                                           # Fujnction verify_PDF_files: check actualized PDF_toc; delete a PDF file if necessary
+def verify_PDF_files():                                           # Function verify_PDF_files: check actualized PDF_toc; delete a PDF file if necessary
     """Check actualized PDF_toc; delete a PDF file if necessary."""
     
     global ok
@@ -1044,15 +1063,13 @@ def check_integrity(always=False):                                # Function che
     thr5.join()
 
 # ..................................................................
-    if noerror and ok:                                            # there is no error
+    if noerror and ok and (not always):                                            # there is no error
         if verbose:
             print("----- Info: no error with integrity check")
-    elif not noerror or always:
+    else:
         thr2 = Thread(target=generate_pickle2)                    #    generate a new version of the 2nd pickle file (via thread)
         thr2.start()
         thr2.join()
-    else:
-        print("***unspecified error")
 
 # ------------------------------------------------------------------
 def make_statistics():                                            # Function make_statistics(): Print statistics on terminal.
@@ -1099,11 +1116,18 @@ def get_PDF_files(d):                                             # Function get
 # ------------------------------------------------------------------
 def get_XML_files(d):                                             # Function get_XML_files(d)
     """List all XML files in the OS directory d"""
-    global  all_XML_files
+
+    tmp  = os.listdir(d)                                          # get OS directory list
+    tmp2 = []
+    
+    for f in tmp:
+        if p4.match(f) and not f in exclusion:
+            tmp2.append(f)
+    return tmp2
 
 # ------------------------------------------------------------------
 def set_PDF_toc():                                                # set_PDF_toc: Fill PDF_toc on the basis of XML_Toc.
-    """Fill PDF_toc on the basis of XML_Toc."""
+    """Fill PDF_toc on the basis of XML_toc."""
     
     global PDF_toc
     global XML_toc
@@ -1115,6 +1139,57 @@ def set_PDF_toc():                                                # set_PDF_toc:
         else:
             pass
 
+# ------------------------------------------------------------------
+def regenerate_pickle_files():
+    """Regenerate corrupted pickle files."""
+
+    global XML_toc, PDF_toc
+    global authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages
+
+    # generate_pickle_files --> get_PDF_files
+    # generate_pickle_files --> load_authors
+    # generate_pickle_files --> load_packages
+    # generate_pickle_files --> load_topics
+    # generate_pickle_files --> load_licenses
+    # generate_pickle_files --> generate_topicspackage
+    # generate_pickle_files --> analyze_XML_file
+    # generate_pickle_files --> generate_pickle2
+    # generate_pickle_files --> generate_pickle1
+    
+# .................................................................
+# Regeneration of CTAN2.pkl
+# CTAN2.pkl needs XML_toc
+    
+    if verbose:
+        print("--- Info: Regeneration of '{0}'".format(direc + pkl_file2))
+        
+    get_PDF_files(direc)
+    load_authors()                                                # load authors
+    load_packages()                                               # load packages
+    load_topics()                                                 # load topics
+    load_licenses()                                               # load licenses
+    generate_topicspackage()                                      # generate topicspackage, packagetopics, authorpackages
+    
+    for f in get_XML_files(direc):
+        if verbose:
+            print("----- Info: local XML file '{0}'".format(direc + f))
+        analyze_XML_file(f)
+
+    thr1 = Thread(target=generate_pickle2)                        # dump XML_toc info CTAN2.pkl
+    thr1.start()
+    thr1.join()
+    
+# .................................................................
+# Regeneration of CTAN1.pkl
+# CTAN2.pkl needs authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages
+
+    if verbose:
+        print("--- Info: Regeneration of '{0}'".format(direc + pkl_file))
+    
+    thr2 = Thread(target=generate_pickle1)                        # dump authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages into CTAN1.pkl
+    thr2.start()
+    thr2.join()
+    
 # ------------------------------------------------------------------
 def call_plain():                                                 # Function call_plain: Process all steps for a plain call.
     """Process all steps for a plain call."""
@@ -1200,7 +1275,7 @@ def call_check():                                                 # Function cal
     global licenses
     global packages
     global topics
-    global topicspackage, number, counter, pdfcounter
+    global topicspackage, packagetopics, number, counter, pdfcounter
 
     get_PDF_files(direc)
     load_topics()                                                 # load the file topics.xml
@@ -1233,14 +1308,16 @@ def main():                                                       # Function mai
     global integrity
     global number
     global template
+    global regenerate
 
     starttotal  = time.time()                                         # begin of time measure
     startprocess= time.process_time()
-    reset_text  = "- Warnung: '{0}' reset to {1} (due to {2})"
+    reset_text  = "- Warning: '{0}' reset to {1} (due to {2})"
 
-    load  = (number != number_default) or (template != template_default) or download       # if -n, -f, -t is set
-    check = (not load) and ((lists != lists_default) or (integrity != integrity_default))  # if not load) and -l or -c is set
-    plain = (not load) and (not check)                                                     # if not load and not check
+    load      = (template != template_default)                                                 # load 
+    check     = (not load) and ((lists != lists_default) or (integrity != integrity_default))  # check
+    newpickle = (not load) and (not check) and (regenerate != regenerate_default)              # newpickle
+    plain     = (not load) and (not check) and (not newpickle)                                 # plain
     
     if verbose:
         print("- Info: program call:", call)
@@ -1254,26 +1331,35 @@ def main():                                                       # Function mai
             integrity = False
             if verbose:
                 print(reset_text.format("-c",False,"'-n' or '-t' or '-f'"))
+        if (regenerate != regenerate_default):                        #     -r reset
+            regenerate = False
+            if verbose:
+                print(reset_text.format("-r",False,"'-n' or '-t' or '-f'"))
+
     if check:                                                         # check mode
-        if (number != number_default):                                #     -n reset
-            number = number_default
+        if (regenerate != regenerate_default):                        #     -r reset
+            regenerate = False
             if verbose:
-                print(reset_text.format("-n","'-l " + str(number_default) + "'", "'-l' or '-c'"))
-        if (template != template_default):                            #     -t reset
-            template = template_default
+                print(reset_text.format("-r",False,"'-l' or '-c'"))
+
+    if newpickle:                                                     # newpickle mode
+        if number == number_default:
+            number  = 3000                                            #     -n reset
             if verbose:
-                print(reset_text.format("-t","'-t empty'", "'-l' or '-c'"))
-        if (download != download_default):                            #     -f reset
-            download = download_default
+                print(reset_text.format("-n",3000,"'-r'"))
+        if download == download_default:
+            download = True                                           #     -f reset
             if verbose:
-                print(reset_text.format("-f",False, "'-l' or '-c'"))
+                print(reset_text.format("-f",True,"'-r'"))
+        
 
     if verbose:                                                       # output on terminal (options in call)
         print("\n- Info: program call (with more details): CTANLoad.py")    
-        if (template != template_default):                print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))
         if (download != download_default):                print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))
         if (lists != lists_default):                      print("  {0:5} {1:55}".format("-l", "(" + (lists_text + ")")[0:50] + ellipse))
-        if (verbose != verbose_default):                  print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
+        if (regenerate != regenerate_default):            print("  {0:5} {1:55}".format("-r", "(" + regenerate_text + ")"))
+        if (statistics != statistics_default):            print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
+        if (integrity != integrity_default):              print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))
         if (verbose != verbose_default):                  print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
         if (direc != direc_default):                      print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
         if (number != number_default):                    print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))
@@ -1287,6 +1373,9 @@ def main():                                                       # Function mai
         call_load()
     elif check:                                                       # Process all necessary steps for a integrity check.
         call_check()
+    elif newpickle:                                                   # Regenerate the two pickle files.
+        regenerate_pickle_files()
+        check_integrity(always=True)
     else:
         pass
 
