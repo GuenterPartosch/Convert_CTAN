@@ -16,3 +16,4 @@ Changes (CTANOut)
 1.88 2021-06-13 string method str.format used (if applicable)
 1.89 2021-06-18 some tiny improvements for output
 1.90 2021-06-22 misc. smaller corrections
+1.91 2021-06-24 add. smaller corrections

@@ -14,7 +14,7 @@
 # - bei -d: Verzeichnistrenner besser/explizit behandeln (x)
 # - ggf. file.tex, file.bib, ... vor Ausgabe löschen
 # - Umbruch bei der Darstellung von Aufrufparameter (x)
-# - -b und -mt behandeln wie bei CTANLoad+Out (x)
+# - Optionen -b und -mt behandeln wie bei CTANLoad+Out (x)
 # - einheitliche Fehlermeldungen dazu (x)
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden?
 # - in N1: auch bei Copyright links einrücken (x)
@@ -37,6 +37,7 @@
 # 1.88 2021-06-13 string method str.format used (if applicable)
 # 1.89 2021-06-18 some tiny improvements for output
 # 1.90 2021-06-22 misc. smaller corrections
+# 1.91 2021-06-24 add. smaller corrections
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -51,23 +52,24 @@
 # Messages
 
 # Fatal Error
-# + Error:  'CTAN.pkl' not found
+# Error: pickle file '<pickle file>' not found
 
 # Information
-# + Info: list with authors and related packages (cross-reference list) created
-# + Info: list with topics and related packages (cross-reference list) created
-# + Info: packages processed
-# + Info: program call: CTANOut.py
-# + Info: program successfully completed
-# + Info: statistics written
-# + Info: topic list created
+# Info: program successfully completed
+# Info: statistics written
+# Info: file 'xyz.tap' created: [list with authors and related packages (cross-reference list)]
+# Info: file 'xyz.top' created: [topic list]
+# Info: file 'xyz.xref' created: [list with topics and related packages (cross-reference list)]
+# Info: packages processed
+# Info: program successfully completed
+# Info: statistics written
 
 # Warnings
-# + Warning: 'option value' changed to 'option+value' (due to 'option')"
-# + Warning: XML file for package 'package' not found
-# + Warning: key 'key' not found
-# + Warning: no correct XML file for any specified package found
-
+# Warning: 'option value' changed to 'option+value' (due to 'option')"
+# Warning: XML file for package '<package>' not found
+# Warning: XML file for package '<package>' not well-formed
+# Warning: key '<key>' not found
+# Warning: no correct XML file for any specified package found
 
 # ------------------------------------------------------------------
 # Usage
@@ -76,7 +78,7 @@
 #                   [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
 #                   [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
 # 
-# [CTANOut.py; Version: 1.90 (2021-06-22)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+# [CTANOut.py; Version: 1.91 (2021-06-24)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
 #   -h, --help            show this help message and exit
@@ -127,11 +129,11 @@
 # CTANOut -m biblatex -b @online -v
 #     as above                                                          [-m]
 #     but now with verbose output and                                   [-v]
-#     @online for BibLaTeX type                                         [-b]
+#     @online as BibLaTeX type                                          [-b]
 #
 # CTANOut -m bib -b @online -s [texlive,license,miktex] -v -stat
 #     as above                                                          [-m]
-#                                                                       [-b]
+#     @online as BibLaTeX type                                          [-b]
 #     with statistics                                                   [-stat]
 #     skipped CTAN fields: texlive, license, and miktex                 [-s]
 #
@@ -144,10 +146,10 @@
 # CTANOut -m latex -k LaTeX -mt
 #     LaTeX is output format                                            [-m]
 #     special topic lists are generated                                 [-mt]
-#     package names are filtered by key template "LaTeX"                [-k]
+#     packages are filtered by key template "LaTeX"                     [-k]
 #
 # CTANOut -m tex -t "l3|latex|ltx" -mt -v
-#     processed packages: l3, latex, and ltx                            [-t]
+#     packages with the name template "l3|latex|ltx"                    [-t]
 #     LaTeX is output format                                            [-m]
 #     special topic lists are generated                                 [-mt]
 #     package names are filtered by name template "LaTeX"               [-t]
@@ -161,7 +163,7 @@
 
 
 #===================================================================
-# Moduls needed
+# Modules needed
 
 import xml.etree.ElementTree as ET           # XML processing
 import pickle                                # read pickle data, time measure
@@ -178,8 +180,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.90"
-programdate       = "2021-06-22"
+programversion    = "1.91"
+programdate       = "2021-06-24"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -212,7 +214,7 @@ maxcaptionlength  = 65                       # for LaTeX: max length for header 
 fieldwidth        = 10                       # for BibLaTeX: width of the field labels 
 
 # ------------------------------------------------------------------
-# Collect infos which cannot be output in another way
+# Collect infos for elements which cannot be output in another way
 
 notice          = ""                         # collecting infos
 author_str      = ""                         # collecting authors of a package
@@ -302,7 +304,7 @@ s_texlive       = ""                        # Element texlive
 s_version       = ""                        # Element version
 
 # ------------------------------------------------------------------
-# python directories and lists
+# python dictionaries and lists
 
 languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgarian", "bn":"Bengali",
                    "ca":"Catalan", "cs":"Czech", "da":"Danish", "de":"German", "de-de":"German (Germany)",
@@ -317,9 +319,9 @@ languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgarian", 
                    "zh":"Chinese", "zn-cn":"Chinese (China)", "de,en":"German + English", "zh,en":"Chinese + English",
                    "mr,hi":"Marathi + Hindi", "en,ja":"English + Japanese"}
 usedTopics      = {}                        # Python dictionary:  collects used topics for all packages
-usedPackages    = []                        # python list:       collects used packages
+usedPackages    = []                        # python list:        collects used packages
 usedAuthors     = {}                        # Python dictionary:  collects used authors for all packages
-XML_toc         = {}                        # python dictionary: list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, pure PDF file)
+XML_toc         = {}                        # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)
 
 # usedTopics: Python dictionary (unsorted)
 #   each element: <key for topic>:<number>
@@ -340,11 +342,6 @@ parser.add_argument("-a", "--author",       # Parameter -a/--author
                     help    = author_text,
                     action  = 'version',
                     version = programauthor + " (" + authoremail + ", " + authorinstitution + ")")
-
-parser.add_argument("-V", "--version",      # Parameter -V/--version
-                    help    = version_text,
-                    action  = 'version',
-                    version = '%(prog)s ' + programversion + " (" + programdate + ")")
 
 parser.add_argument("-b", "--btype",        # Parameter -b/--btype
                     help    = btype_text + "; Default: " + "%(default)s",
@@ -368,6 +365,11 @@ parser.add_argument("-m", "--mode",         # Parameter -m/--mode
                     dest    = "mode",
                     default = mode_default)
 
+parser.add_argument("-mt", "--make_topics", # Parameter -mt/--make_topics
+                    help    = topics_text + "; Default: " + "%(default)s",
+                    action  = "store_true",
+                    default = make_topics_default)
+
 parser.add_argument("-o", "--output",       # Parameter -o/--output
                     help    = out_text + "; Default: " + "%(default)s",
                     dest    = "out_file",
@@ -383,11 +385,6 @@ parser.add_argument("-t", "--template",     # Parameter -t/--template
                     dest    = "name_template",
                     default = name_template_default)
 
-parser.add_argument("-mt", "--make_topics", # Parameter -mt/--make_topics
-                    help    = topics_text + "; Default: " + "%(default)s",
-                    action  = "store_true",
-                    default = make_topics_default)
-
 parser.add_argument("-stat", "--statistics",# Parameter -stat/--statistics
                     help    = statistics_text + "; Default: " + "%(default)s",
                     action  = "store_true",
@@ -397,6 +394,11 @@ parser.add_argument("-v", "--verbose",      # Parameter -v/--verbose
                     help    = verbose_text + "; Default: " + "%(default)s",
                     action  = "store_true",
                     default = verbose_default)
+
+parser.add_argument("-V", "--version",      # Parameter -V/--version
+                    help    = version_text,
+                    action  = 'version',
+                    version = '%(prog)s ' + programversion + " (" + programdate + ")")
 
 # ------------------------------------------------------------------
 # Getting parsed values
@@ -450,9 +452,9 @@ if not path.exists(direc):                  # make OS directory, if necessary
     try:
         os.mkdir(direc)
     except OSError:
-        print ("- Warning: Creation of the directory '{0}' failed".format(direc))
+        print ("- Warning: Creation of the OS directory '{0}' failed".format(direc))
     else:
-        print ("- Info: Successfully created the directory '{0}' ".format(direc))
+        print ("- Info: Successfully created OS the directory '{0}' ".format(direc))
 
 # ------------------------------------------------------------------
 # pre-compiled regular expressions
@@ -672,9 +674,10 @@ def fold(s):                                                # auxiliary function
     while len(tmp) > maxlen:
         all = all + tmp[0 : maxlen] + offset
         tmp = tmp[maxlen :]
+    return all + tmp
 
 # ------------------------------------------------------------------
-def first_lines():                                          # create the first lines of output.
+def first_lines():                                          # function: create the first lines of output.
     """create the first lines of output"""
     
     arguments   = ""
@@ -782,7 +785,7 @@ def first_lines():                                          # create the first l
         out.write("\n")
 
 # ------------------------------------------------------------------
-def alias(k):                                     # element <alias .../>
+def alias(k):                                     # function: element <alias .../>
     """Process the alias element."""
 
     global notice
@@ -809,7 +812,7 @@ def alias(k):                                     # element <alias .../>
         pass                                      #   for Excel, BibLaTeX, RIS do nothing
 
 # ------------------------------------------------------------------
-def also(k):                                      # element <also .../>
+def also(k):                                      # function: element <also .../>
     """Process the also element."""
 
     # also --> TeXchars
@@ -840,8 +843,8 @@ def also(k):                                      # element <also .../>
                 s_also = refid
 
 # ------------------------------------------------------------------
-def authorref(k):                                 # element <authorref .../>
-    """Process the authorref element, constructs the complete name and usedAuthors entry."""
+def authorref(k):                                 # function: element <authorref .../>
+    """Process the authorref element, construct the complete name and usedAuthors entry."""
     
     global authorexists                           # flag
     global s_authorref                            # string for Excel
@@ -894,7 +897,7 @@ def authorref(k):                                 # element <authorref .../>
     authorexists = True
 
 # ------------------------------------------------------------------
-def caption(k):                                   # element <caption>...</caption>
+def caption(k):                                   # function: element <caption>...</caption>
     """Process the caption element."""
 
     # caption --> TeXchars
@@ -922,7 +925,7 @@ def caption(k):                                   # element <caption>...</captio
         s_caption = tmp
 
 # ------------------------------------------------------------------
-def contact(k):                                   # element <contact .../>
+def contact(k):                                   # function: element <contact .../>
     """Process the contact element."""
     
     global notice
@@ -951,7 +954,7 @@ def contact(k):                                   # element <contact .../>
             s_contact = typeT + ": " + href
 
 # ------------------------------------------------------------------
-def copyrightT(k):                                # element <copyright .../>
+def copyrightT(k):                                # function: element <copyright .../>
     """Process the copyright element."""
 
     # copyrighT --> TeXchars
@@ -990,7 +993,7 @@ def copyrightT(k):                                # element <copyright .../>
             s_copyright = tmp
 
 # ------------------------------------------------------------------
-def ctan(k, t):                                   # element <ctan .../>
+def ctan(k, t):                                   # function: element <ctan .../>
     """Process the ctan element."""
     
     global s_ctan                                 # string for Excel
@@ -1012,7 +1015,7 @@ def ctan(k, t):                                   # element <ctan .../>
         s_ctan = ctanUrl2 + path
 
 # ------------------------------------------------------------------
-def description(k):                               # element <description ...> ... </description>
+def description(k):                               # function: element <description ...> ... </description>
     """Process the description element."""
 
     # description --> p
@@ -1048,7 +1051,7 @@ def description(k):                               # element <description ...> ..
         out.write("},\n")
 
 # ------------------------------------------------------------------
-def documentation(k):                             # element <documentation .../>
+def documentation(k):                             # function: element <documentation .../>
     """Process the documentation element."""
 
     # documentation --> TeXchars
@@ -1128,7 +1131,7 @@ def documentation(k):                             # element <documentation .../>
             s_documentation = details + ": " + href2
 
 # -----------------------------------------------------------------
-def entry(k, t):                                  # element <entry ...>...</entry>
+def entry(k, t):                                  # function: element <entry ...>...</entry>
     """Process the main element entry."""
 
     # entry --> leading
@@ -1155,7 +1158,7 @@ def entry(k, t):                                  # element <entry ...>...</entr
     global s_id, s_also, s_authorref, s_contact, s_copyright, s_ctan, s_documentation, s_home, s_home, s_home
     global s_install, s_keyval, s_license, s_miktex, s_texlive, s_version
 
-    if mode in ["Excel"]:                         # initializes strings for Excel
+    if mode in ["Excel"]:                         # initialize strings for Excel
         s_id            = k.get("id", "")         # attribute id
         s_contact       = ""
         s_home          = ""
@@ -1176,7 +1179,7 @@ def entry(k, t):                                  # element <entry ...>...</entr
     leading(k)
     package_id = k.get("id", "")
 
-    for child in k:                               # calls the sub-elements
+    for child in k:                               # call the sub-elements
         if child.tag == "description":            # description
             if mode != "Excel":                   #   not for Excel
                 if not child.tag in skip:
@@ -1232,7 +1235,7 @@ def entry(k, t):                                  # element <entry ...>...</entr
     trailing(k, t)
 
 # ------------------------------------------------------------------
-def home(k):                                      # element <home .../>
+def home(k):                                      # function: element <home .../>
     """Process the home element."""
     
     global notice                                 # string for RIS/BibLaTeX
@@ -1253,7 +1256,7 @@ def home(k):                                      # element <home .../>
         s_home = href
 
 # ------------------------------------------------------------------
-def install(k):                                   # element <install .../>
+def install(k):                                   # function: element <install .../>
     """Process the install element."""
     
     global notice                                 # string for RIS/BibLaTeX
@@ -1274,7 +1277,7 @@ def install(k):                                   # element <install .../>
         s_install = ctanUrl3 + path
 
 # ------------------------------------------------------------------
-def keyval(k):                                    # element <keyval .../>
+def keyval(k):                                    # function: element <keyval .../>
     """Process the keyval element."""
 
     # keyval --> TeXchars
@@ -1308,16 +1311,16 @@ def keyval(k):                                    # element <keyval .../>
             s_keyval = value
 
 # ------------------------------------------------------------------
-def leading(k):                                   # first lines of one package
-    """Analyze the first lines of each package XML file and output some lines."""
+def leading(k):                                               # function: first lines of one package
+    """Analyze the first lines of each package XML file and print out some lines."""
 
     # leading --> TeXchars
     
-    global authorexists                           # flag
+    global authorexists                                       # flag
 
-    xname = k.get("id", "")                       # attribute id
+    xname = k.get("id", "")                                   # attribute id
 
-    allauthors  = []                              # initialize some variables
+    allauthors  = []                                          # initialize some variables
     year        = ""
     year_string = ""
     authorexists= False
@@ -1411,7 +1414,7 @@ def leading(k):                                   # first lines of one package
     authorexists = False
 
 # ------------------------------------------------------------------
-def li(k):                                        # element <li>...</li>
+def li(k):                                        # function: element <li>...</li>
     """Process the li element."""
 
     # li --> mod_TeXchars
@@ -1439,7 +1442,7 @@ def li(k):                                        # element <li>...</li>
         out.write(tmptext)
 
 # ------------------------------------------------------------------
-def licenseT(k):                                  # element <license .../>
+def licenseT(k):                                  # function: element <license .../>
     """Process the license element."""
     
     global notice                                 # string for RIS/BibLaTeX
@@ -1472,7 +1475,7 @@ def licenseT(k):                                  # element <license .../>
         s_license = tmp
 
 # ------------------------------------------------------------------
-def miktex(k):                                    # element <miktex .../>
+def miktex(k):                                    # function: element <miktex .../>
     """Process the miktex element."""
 
     # miktex --> TeXchars
@@ -1497,7 +1500,7 @@ def miktex(k):                                    # element <miktex .../>
         s_miktex = location
 
 # ------------------------------------------------------------------
-def mod_a(k):                                     # element <a ...> ... </a>
+def mod_a(k):                                     # function: element <a ...> ... </a>
     """Process the a element."""
     
     ll = list(k.iter("a"))                        # fetches all a elements; ##1: {; ##2: }
@@ -1524,7 +1527,7 @@ def mod_a(k):                                     # element <a ...> ... </a>
             pass                                  #   for Excek do nothing
 
 # ------------------------------------------------------------------
-def mod_xref(k):                                  # element <xref ...> ... </xref>
+def mod_xref(k):                                  # function: element <xref ...> ... </xref>
     """Process the xref element."""
     
     # Now the element xref is used for inline-links, not a.
@@ -1548,10 +1551,10 @@ def mod_xref(k):                                  # element <xref ...> ... </xre
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_b(k):                                     # element <b>...</b>
+def mod_b(k):                                     # function: element <b>...</b>
     """Process the b element."""
     
-    ll = list(k.iter("b"))                        # fetches all b elements
+    ll = list(k.iter("b"))                        # fetch all b elements
 
     for i in ll:                                  # loop: all b elements
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
@@ -1563,17 +1566,17 @@ def mod_b(k):                                     # element <b>...</b>
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_backslash(s):                             # special processing von \ in the source text
+def mod_backslash(s):                             # function: special processing von \ in the source text
     """special processing von \ in the source text"""
     
     res = re.sub(r"\\", r"§§3textbackslash ",s)
     return res
 
 # ------------------------------------------------------------------
-def mod_br(k):                                    # element <br/>
+def mod_br(k):                                    # function: element <br/>
     """Process the br element."""
     
-    ll = list(k.iter("br"))                       # fetches all b elements
+    ll = list(k.iter("br"))                       # fetch all b elements
 
     for i in ll:                                  # loop: all br elements
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
@@ -1584,7 +1587,7 @@ def mod_br(k):                                    # element <br/>
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_em(k):                                    # element <em>...</em>
+def mod_em(k):                                    # function: element <em>...</em>
     """Process the em element."""
     
     ll = list(k.iter("em"))                       # fetch all em elements
@@ -1599,7 +1602,7 @@ def mod_em(k):                                    # element <em>...</em>
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_i(k):                                     # element <i>...</i>
+def mod_i(k):                                     # function: element <i>...</i>
     """Process the i element."""
     
     ll = list(k.iter("i"))                        # fetch all i elements
@@ -1614,7 +1617,7 @@ def mod_i(k):                                     # element <i>...</i>
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_pre(k):                                   # element <pre>...</pre>
+def mod_pre(k):                                   # function: element <pre>...</pre>
     """Process the pre element."""
     
     ll = list(k.iter("pre"))                      # fetch all i elements
@@ -1629,7 +1632,7 @@ def mod_pre(k):                                   # element <pre>...</pre>
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_TeXchars(s):                              # prepares characters for LaTeX/BibLaTeX in a paragraph
+def mod_TeXchars(s):                              # function: prepare characters for LaTeX/BibLaTeX in a paragraph
     """Prepare characters for LaTeX/BibLaTeX in a paragraph."""
 
     # mod_TeXchars --> mod_backslash
@@ -1653,7 +1656,7 @@ def mod_TeXchars(s):                              # prepares characters for LaTe
     return tmp
 
 # ------------------------------------------------------------------
-def mod_tt(k):                                    # element <tt>...</tt>
+def mod_tt(k):                                    # function: element <tt>...</tt>
     """Process the tt element."""
 
     ll = list(k.iter("tt"))                       # fetch all tt elements
@@ -1670,7 +1673,7 @@ def mod_tt(k):                                    # element <tt>...</tt>
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def name(k):                                      # element <name>...</name>
+def name(k):                                      # function: element <name>...</name>
     """Process the name element."""
 
     # name --> TeXchars
@@ -1696,7 +1699,7 @@ def name(k):                                      # element <name>...</name>
         s_name = k.text                           #   embedded text
 
 # ------------------------------------------------------------------
-def onepackage(s, t):
+def onepackage(s, t):                             # function: load a package XML file and start parsing
     """Load a package XML file and start parsing."""
 
     # onepackage --> entry
@@ -1719,7 +1722,7 @@ def onepackage(s, t):
     entry(onePackageRoot, t)                      # begin with entry element
 
 # ------------------------------------------------------------------
-def p(k):                                         # element <p> ... </p>
+def p(k):                                         # function: element <p> ... </p>
     """Process the p element."""
 
     # p --> mod_pre
@@ -1767,7 +1770,7 @@ def p(k):                                         # element <p> ... </p>
         out.write(tmptext)
 
 # ------------------------------------------------------------------
-def TeXchars(s):                                   # prepares characters for LaTeX/BibLaTeX
+def TeXchars(s):                                   # function: prepare characters for LaTeX/BibLaTeX
     """prepares characters for LaTeX/BibLaTeX"""
     
     tmp = s
@@ -1779,7 +1782,7 @@ def TeXchars(s):                                   # prepares characters for LaT
     return tmp
 
 # ------------------------------------------------------------------
-def texlive(k):                                   # element <texlive .../>
+def texlive(k):                                   # function: element <texlive .../>
     """Process the texlive element."""
 
     # texlive --> TeXchars
@@ -1804,7 +1807,7 @@ def texlive(k):                                   # element <texlive .../>
         s_texlive = location
 
 # ------------------------------------------------------------------
-def trailing(k, t):                               # last lines for the actual package
+def trailing(k, t):                               # function: last lines for the actual package
     """Complete the actual package."""
     
     global notice                                 # string for RIS/BibLaTeX + initialize
@@ -1814,11 +1817,11 @@ def trailing(k, t):                               # last lines for the actual pa
 
     kw = []                                       # keywords
 
-    for child in k:                               # fetches and collects the keywords of a package
+    for child in k:                               # fetch and collect the keywords of a package
         if child.tag == "keyval":                 #   element keyval
             value = child.get("value", "")        #   attribute value
             kw.append(value + "; ")
-    kw2 = "".join(kw)                             # collects all keywords in one string
+    kw2 = "".join(kw)                             # collect all keywords in one string
 
     if mode in ["LaTeX"]:                         # LaTeX
         out.write(r"\end{labeling}" + "\n")
@@ -1851,7 +1854,7 @@ def trailing(k, t):                               # last lines for the actual pa
     authorexists= False
 
 # ------------------------------------------------------------------
-def ul(k):                                        # element <ul>...</ul>
+def ul(k):                                        # function: element <ul>...</ul>
     """Process the ul element."""
 
     # ul --> li
@@ -1877,7 +1880,7 @@ def ul(k):                                        # element <ul>...</ul>
         pass                                      #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def version(k):                                   # element <version .../>
+def version(k):                                   # function: element <version .../>
     """Process the version element."""
     
     global notice                                 # string for RIS
@@ -1908,7 +1911,7 @@ def version(k):                                   # element <version .../>
         s_version = tmp
 
 # ------------------------------------------------------------------
-def make_tops():                                  # Generate the tops (xyz.top) file.
+def make_tops():                                  # function: Generate the tops (xyz.top) file.
     """Generate the tops (xyz.top) file."""
     
     # Topic list
@@ -1935,7 +1938,7 @@ def make_tops():                                  # Generate the tops (xyz.top) 
         print("--- Info: file '{0}.top' created: [topic list]".format(direc + args.out_file))
 
 # ------------------------------------------------------------------
-def make_xref():                                  # Generate the xref (xyz.xref) file.
+def make_xref():                                  # function: Generate the xref (xyz.xref) file.
     """Generate the xref (xyz.xref) file."""
     
     # Topics/Packages cross-reference
@@ -1968,7 +1971,7 @@ def make_xref():                                  # Generate the xref (xyz.xref)
         print("--- Info: file '{0}.xref' created: [list with topics and related packages (cross-reference list)]".format(direc + args.out_file))
 
 # ------------------------------------------------------------------
-def make_tap():                                   # Generate the tap (xyz.tap) file.
+def make_tap():                                   # function: Generate the tap (xyz.tap) file.
     """Generate the tap (xyz.tap) file."""
     
     # Authors/Packages cross-reference
@@ -2008,7 +2011,7 @@ def make_tap():                                   # Generate the tap (xyz.tap) f
         print("--- Info: file '{0}.tap' created: [list with authors and related packages (cross-reference list)]".format(direc + args.out_file))
 
 # ------------------------------------------------------------------
-def make_stat():                                  # Generate statistics in the stat (xyz.stat) file.
+def make_stat():                                  # function: Generate statistics in the stat (xyz.stat) file.
     """Generate statistics in the stat (xyz.stat) file."""
     
     # write statistics in the stat (.stat) file
@@ -2061,7 +2064,7 @@ def make_stat():                                  # Generate statistics in the s
         print("--- Info: statistics written")
 
 # ------------------------------------------------------------------
-def make_statistics():                            # Generate statistics on terminal.
+def make_statistics():                            # function: Generate statistics on terminal.
     """Generate statistics on terminal."""
 
     l = left + 1
@@ -2079,7 +2082,7 @@ def make_statistics():                            # Generate statistics on termi
     print("number of topics, used here:".ljust(l),    str(len(usedTopics)).rjust(r))
 
 # ------------------------------------------------------------------
-def process_packages():                          # Global loop
+def process_packages():                          # function: Global loop
     """Global loop"""
 
     # process_packages --> onepackage
@@ -2118,7 +2121,7 @@ def process_packages():                          # Global loop
         print("--- Info: packages processed")
 
 # ------------------------------------------------------------------
-def main():                                      # Main function
+def main():                    # function: Main function
     """Main function"""
 
     # main --> first_lines
