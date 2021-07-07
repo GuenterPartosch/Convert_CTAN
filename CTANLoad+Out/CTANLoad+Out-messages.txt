@@ -1,9 +1,16 @@
 Messages (CTANLoad+Out)
 =======================
-* Error: Error in <step>
-* Info: <step> OK
-* Info: Call: <call>
-* Info: <step>  to be executed
-* Info: <step>
-* Info: more information in '<log file>'
-* Info: result in '<file>'
+Fatal error:
+Error: Error in <step>
+
+Information:
+Info: <step> OK
+Info: Call: <call>
+Info: <step> to be executed
+Info: <step>
+Info: more information in '<log file>'
+Info: result in '<file>'
+
+Warning:
+Warning: LaTeX file '<file>' does not exist
+Warning: LaTeX file '<file>' removed

@@ -5,3 +5,5 @@ import sys                         # system calls
 import platform                    # get OS informations
 import subprocess                  # handling of sub-processes
 import re                          # regular expression
+import os                          # delete a file on disk, for instance
+from os import path                # path informations

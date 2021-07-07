@@ -1,88 +1,145 @@
 Examples (CTANLoad+Out)
 =======================
 CTANLoad+Out -r
-  + regeneration of the 2 pickle files                                                                   [-r]
+  + regeneration of the 2 pickle files                                           [-r]
   + a lot of new PDF files
   + results in CTAN.pkl and CTAN2.pkl
   + without statistics
   + not verbose
 
 CTANLoad+Out -r -v -stat
-  + regeneration of the 2 pickle files                                                                   [-r]
+  + regeneration of the 2 pickle files                                           [-r]
   + a lot of new PDF files
   + results in CTAN.pkl and CTAN2.pkl
-  + with statistics                                                                                      [-stat]
-  + verbose                                                                                              [-v]
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
 
 CTANLoad+Out -l
   + CTAN.pkl rewritten
-  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten                                       [-l]
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten               [-l]
   + without statistics
   + not verbose
 
 CTANLoad+Out -l -v -stat
   + CTAN.pkl rewritten
-  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten                                       [-l]
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten               [-l]
   + with statistics
-  + verbose                                                                                              [-v]
+  + verbose                                                                      [-v]
 
 CTANLoad+Out -mt -p
   + no XML/PDF file from CTAN is downloaded
-  + 1st step: all XML/PDF files in the current directory are processed
-  + output format is LaTeX (implicitely)                                                                 [-mt]
+  + 1st step:
+  + all XML/PDF files in the current directory are processed
+  + output format is LaTeX (implicitely)                                         [-mt]
   + temporary output file is all.tex
-  + all.top,  all.xref, all.tap are generated (will be included in all.tex)                              [-mt]
-  + 2nd step: all.tex is completely compiled                                                             [-p]
+  + all.top,  all.xref, all.tap are generated (will be included in all.tex)      [-mt]
+  + 2nd step:
+  + all.tex is completely compiled                                     [-p]
   + output file is all.pdf
   + without statistics
   + not verbose
 
 CTANLoad+Out -mt -m latex -p -v -stat
   + no XML/PDF file from CTAN is downloaded
-  + 1st step: all XML files in the current directory are processed
-  + output format is LaTeX                                                                               [-m]
+  + 1st step:
+  + all XML files in the current directory are processed
+  + output format is LaTeX                                                       [-m]
   + temporary output file is all.tex
-  + all.top,  all.xref, all.tap are generated (will be included in all.tex)                              [-mt]
-  + 2nd step: all.tex is completely compiled                                                             [-p]
+  + all.top,  all.xref, all.tap are generated (will be included in all.tex)      [-mt]
+  + 2nd step:
+  + all.tex is completely compiled                                               [-p]
   + output file is all.pdf
-  + with statistics                                                                                      [-stat]
-  + verbose                                                                                              [-v]
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
 
 CTANLoad+Out -to latex -m bib -v -stat
   + no XML/PDF file from CTAN is downloaded
-  + all XML fies in the current directory which match the name template "latex" are processed            [-to]
+  + all local XML fies which match the name template "latex" are processed       [-to]
   + output format is BibLaTeX
-  + output file is all.bib                                                                               [-m]
-  + with statistics                                                                                      [-stat]
-  + verbose                                                                                              [-v]
+  + output file is all.bib                                                       [-m]
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
 
 CTANLoad+Out -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
-  + 1st step: XML file with the name template "latex|ltx|l3|lt3" are downloaded from CTAN                [-t]
-  + associated PDF files are downloaded, too                                                             [-f]
-  + 2nd step: all XML files in the current directory which match the name template "latex|ltx|l3|lt3" are processed [-t]
-  + all.top, all.xref, all.tap are generated (will be included in all.tex)                               [-mt]
-  + output format is LaTeX                                                                               [-m]
+  + 1st step:
+  + XML file with the name template "latex|ltx|l3|lt3" are downloaded from CTAN        [-t]
+  + associated PDF files are downloaded, too                                           [-f]
+  + 2nd step:
+  + all local XML files which match the name template "latex|ltx|l3|lt3" are processed [-t]
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)             [-mt]
+  + output format is LaTeX                                                             [-m]
   + output file is all.tex
-  + with statistics                                                                                      [-stat]
-  + verbose                                                                                              [-v]
+  + with statistics                                                                    [-stat]
+  + verbose                                                                            [-v]
 
 CTANLoad+Out -t pgf -l -c -mt -p -v -stat
-  + 1st step: XML file with the name template "pgf" are downloaded from CTAN
-  + 2nd step:   + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten                           [-l]
-  + a consistency check is done                                                                          [-c]
-  + 3rd step:  all XML files in the current directory which match the name template "pgf3" are processed [-t]
-  + all.top, all.xref, all.tap are generated (will be included in all.tex)                               [-mt]
-  + output format is LaTeX (implicitely)                                                                 [-mtz]
+  + 1st step:
+  + XML file with the name template "pgf" are downloaded from CTAN              [-t]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten              [-l]
+  + a consistency check is done                                                 [-c]
+  + 3rd step:
+  + all local XML files wwith the template "pgf" are processed                  [-t]
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
+  + output format is LaTeX (implicitely)
   + temporary output file is all.tex
-  + 4th step: all.tex is completely compiled                                                             [-p]
+  + 4th step:
+  + all.tex is completely compiled                                              [-p]
   + output file is all.pdf
-  + with statistics                                                                                      [-stat]
-  + verbose                                                                                              [-v]
+  + with statistics                                                             [-stat]
+  + verbose                                                                     [-v]
 
 CTANLoad+Out -k latex -m txt -v
-  + no XML/PDF file from CTAN is downloaded
-  + all XML files in the current directory which match the topic template "latex" are processed
-  + output format is plain
+  + 1st step:
+  + download all XML packages which match the topic "latex"                     [-k]
+  + 2nd step:
+  + all local XML files with the topic "latex" are processed                    [-k]
+  + output format is plain                                                      [-m]
   + output file is all.txt
   + without statistics
-  + verbose                                                                                              [-v]
+  + verbose                                                                     [-v]
+
+CTANLoad+Out -k latex -f -v -stat -mt -p
+  + 1st step:
+  + download all XML packages which match the topic "LaTeX"                     [-k]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + process all local XML files with the topic "latex"                          [-k]
+  + output format is LaTeX (implicitely)
+  + temporary output file is all.tex
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
+  + 3th step:
+  + all.tex is completely compiled                                              [-p]
+  + output file is all.pdf
+  + verbose                                                                     [-v]
+  + with statistics                                                             [-stat]
+
+CTANLoad+Out -k chinese -t "^zh" -f -v -stat
+  + 1st step:
+  + download all XML packages which match the topic "chinese"                   [-k]
+  + load only CTAN XML files with the name template "^zh"                       [-t]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + process all local XML packages which match the topic "chinese"              [-k]
+  + process only local XML files with the name template "^zh"                   [-t]
+  + output format is RIS (default)
+  + output file is all.ris
+  + verbose                                                                     [-v]
+  + with statistics                                                             [-stat]
+
+CTANLoad+Out -ko latex -m bib -v
+  + process all XML files in the current directory with the topic "latex"       [-ko]
+  + output format is BibLaTeX                                                   [-m]
+  + output file is all.bib
+  + verbose                                                                     [-v]
+  + without statistics
+
+Regular expressions
+-------------------
+The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
+such as
+
+-k latex                matches all topic names which contain "latex"
+-t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
+-t "^.+$"               matches all file names
+-t "^{a-b]"             matches all file names which begin with letters a-b                                                                                        [-v]
