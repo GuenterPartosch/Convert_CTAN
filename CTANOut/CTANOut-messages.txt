@@ -1,21 +1,21 @@
-Messages
-========
-
+Messages (CTANOut)
+==================
 Fatal Error
-+ pickle file 'CTAN.pkl' not found
+Error: pickle file '<pickle file>' not found
 
 Information
-+ list with authors and related packages (cross-reference list) created
-+ list with topics and related packages (cross-reference list) created
-+ packages processed
-+ program call: CTANOut.py
-+ program successfully completed
-+ statistics written
-+ topic list created
+Info: program successfully completed
+Info: statistics written
+Info: file 'xyz.tap' created: [list with authors and related packages (cross-reference list)]
+Info: file 'xyz.top' created: [topic list]
+Info: file 'xyz.xref' created: [list with topics and related packages (cross-reference list)]
+Info: packages processed
+Info: program successfully completed
+Info: statistics written
 
 Warnings
-+ '-mt'/'--make_topics' valid only for '-m LaTeX'/'--mode LaTeX'; therefore ignored
-+ '-b'/'--btype' valid only for '-m BibLaTeX'/'--mode BibLaTeX'; therefore ignored
-+ XML file for package 'package' not found
-+ key 'key' not found
-+ no correct XML file for any specified package found
+Warning: 'option value' changed to 'option+value' (due to 'option')"
+Warning: XML file for package '<package>' not found
+Warning: XML file for package '<package>' not well-formed
+Warning: key '<key>' not found
+Warning: no correct XML file for any specified package found

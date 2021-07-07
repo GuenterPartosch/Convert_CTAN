@@ -1,8 +1,8 @@
-Modules needed
-==============
+Modules (CTANOut)
+=================
 import xml.etree.ElementTree as ET           # XML processing
-import pickle                                # to read pickle data, time measure
-import time                                  # to get time/date of a file
+import pickle                                # read pickle data, time measure
+import time                                  # get time/date of a file
 import re                                    # regular expression
 import argparse                              # argument parsing
 import sys                                   # system calls

@@ -12,23 +12,23 @@ Options:
   -a, --author          Show author of the program and exit.
   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
                         Type of BibLaTex entries to be generated [only for -m
-                        BibLateX]; Default:
+                        BibLateX] - Default:
   -d DIREC, --directory DIREC
-                        Directory for input and output files; Default: .\
+                        Directory for input and output files - Default: .\
   -k FILTER_KEY, --key FILTER_KEY
-                        Template for output filtering on the base of keys;
+                        Template for output filtering on the base of keys -
                         Default: ^.+$
   -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}, --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}
-                        Target format; Default: RIS
+                        Target format - Default: RIS
   -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-
                         reference (topics/packages, authors/packages); only
-                        for -m LaTeX]).; Default: False
+                        for -m LaTeX]). - Default: False
   -o OUT_FILE, --output OUT_FILE
-                        Generic name for output files [without extensions];
+                        Generic name for output files [without extensions] -
                         Default: all
-  -s SKIP, --skip SKIP  Skip specified CTAN fields.; Default: []
+  -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
   -t NAME_TEMPLATE, --template NAME_TEMPLATE
-                        Template for package names; Default: ^.+$
-  -stat, --statistics   Flag: Print statistics on terminal.; Default: False
-  -v, --verbose         Flag: Output is verbose.; Default: False
+                        Template for package names - Default: ^.+$
+  -stat, --statistics   Flag: Print statistics on terminal. - Default: False
+  -v, --verbose         Flag: Output is verbose. - Default: False
   -V, --version         Show version of the program and exit.

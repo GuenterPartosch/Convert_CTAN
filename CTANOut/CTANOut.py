@@ -10,14 +10,9 @@
 # - year noch besser extrahieren, ggf. aus <copyright ....>
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
 # - bei BibLaTeX: BibTeX-Kürzel aus Namen + Jahr
-# - bei -d: ggf. Verzeichnis anlegen (x)
-# - bei -d: Verzeichnistrenner besser/explizit behandeln (x)
 # - ggf. file.tex, file.bib, ... vor Ausgabe löschen
-# - Umbruch bei der Darstellung von Aufrufparameter (x)
-# - Optionen -b und -mt behandeln wie bei CTANLoad+Out (x)
-# - einheitliche Fehlermeldungen dazu (x)
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden?
-# - in N1: auch bei Copyright links einrücken (x)
+# - Löschen von Dateien noch überprüfen
 
 # History
 # ------------------------------------------------------------------
@@ -37,14 +32,14 @@
 # 1.88 2021-06-13 string method str.format used (if applicable)
 # 1.89 2021-06-18 some tiny improvements for output
 # 1.90 2021-06-22 misc. smaller corrections
-# 1.91 2021-06-24 add. smaller corrections
+# 1.91 2021-06-24 additional minor corrections
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
 
 # also, authorref, caption, contact, copyright, ctan, description, documentation, home, keyval,
 # license, miktex, name, texlive, version
-# (useful for specifying a value for the -s option)
+# (useful for specifying a value list for the -s option)
 #
 # for example: -s "[description, version]"
 
@@ -73,36 +68,41 @@
 
 # ------------------------------------------------------------------
 # Usage
-
-# usage: CTANOut.py [-h] [-a] [-V] [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC] [-k FILTER_KEY]
+#
+# Usage: CTANOut.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
+#                   [-d DIREC] [-k FILTER_KEY]
 #                   [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
-#                   [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-mt] [-stat] [-v]
+#                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
+#                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.91 (2021-06-24)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+# [CTANOut.py; Version: 1.91 (2021-06-24)] Convert CTAN XLM package files to
+# LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
 #   -h, --help            show this help message and exit
 #   -a, --author          Show author of the program and exit.
-#   -V, --version         Show version of the program and exit.
 #   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
-#                         type of BibLaTex entries to be generated [only for -m BibLateX]; Default:
+#                         Type of BibLaTex entries to be generated [only for -m
+#                         BibLateX] - Default:
 #   -d DIREC, --directory DIREC
-#                         Directory for input and output files; Default: ./
+#                         Directory for input and output files - Default: .\
 #   -k FILTER_KEY, --key FILTER_KEY
-#                         Template for output filtering on the base of keys; Default: ^.+$
-#   -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv},
-#                         --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}
-#                         Target format; Default: RIS
+#                         Template for output filtering on the base of keys -
+#                         Default: ^.+$
+#   -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}, --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}
+#                         Target format - Default: RIS
+#   -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-
+#                         reference (topics/packages, authors/packages); only
+#                         for -m LaTeX]). - Default: False
 #   -o OUT_FILE, --output OUT_FILE
-#                         Generic name for output files [without extensions]; Default: all
-#   -s SKIP, --skip SKIP  Skip specified CTAN fields.; Default: []
+#                         Generic name for output files [without extensions] -
+#                         Default: all
+#   -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
 #   -t NAME_TEMPLATE, --template NAME_TEMPLATE
-#                         Template for package names; Default: ^.+$
-#   -mt, --make_topics    Flag: Generate topic lists (meaning of topics + cross-reference
-#                         (topics/packages, authors/packages) [only for -m LaTeX]);
-#                         Default: False
-#   -stat, --statistics   Flag: Print statistics on terminal.; Default: False
-#   -v, --verbose         Flag: Output is verbose.; Default: False
+#                         Template for package names - Default: ^.+$
+#   -stat, --statistics   Flag: Print statistics on terminal. - Default: False
+#   -v, --verbose         Flag: Output is verbose. - Default: False
+#   -V, --version         Show version of the program and exit.
 
 # ------------------------------------------------------------------
 # Examples
@@ -160,6 +160,16 @@
 #     skipped CTAN fields: texlive, license, and miktex                 [-s]
 #     with statistics and                                               [-stat]
 #     verbose output                                                    [-v]
+
+# Regular expressions
+# -------------------
+# The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
+# such as
+#
+# -k latex                matches all topic names which contain "latex"
+# -t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
+# -t "^.+$"               matches all file names
+# -t "^{a-b]"             matches all file names which begin with letters a-b
 
 
 #===================================================================
@@ -344,54 +354,54 @@ parser.add_argument("-a", "--author",       # Parameter -a/--author
                     version = programauthor + " (" + authoremail + ", " + authorinstitution + ")")
 
 parser.add_argument("-b", "--btype",        # Parameter -b/--btype
-                    help    = btype_text + "; Default: " + "%(default)s",
+                    help    = btype_text + " - Default: " + "%(default)s",
                     choices = ["@online", "@software", "@misc", "@ctan", "@www"],
                     dest    = "btype",
                     default = btype_default)
 
 parser.add_argument("-d", "--directory",    # Parameter -d/--directory
-                    help    = direc_text + "; Default: " + "%(default)s",
+                    help    = direc_text + " - Default: " + "%(default)s",
                     dest    = "direc",
                     default = direc_default)
 
 parser.add_argument("-k", "--key",          # Parameter -k/--key
-                    help    = key_text + "; Default: " + "%(default)s",
+                    help    = key_text + " - Default: " + "%(default)s",
                     dest    = "filter_key",
                     default = filter_key_default)
 
 parser.add_argument("-m", "--mode",         # Parameter -m/--mode
-                    help    = mode_text + "; Default: " + "%(default)s",
+                    help    = mode_text + " - Default: " + "%(default)s",
                     choices = ["LaTeX", "latex", "tex", "RIS", "plain", "txt", "BibLaTeX", "biblatex", "bib", "ris", "Excel", "excel", "tsv"],
                     dest    = "mode",
                     default = mode_default)
 
 parser.add_argument("-mt", "--make_topics", # Parameter -mt/--make_topics
-                    help    = topics_text + "; Default: " + "%(default)s",
+                    help    = topics_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = make_topics_default)
 
 parser.add_argument("-o", "--output",       # Parameter -o/--output
-                    help    = out_text + "; Default: " + "%(default)s",
+                    help    = out_text + " - Default: " + "%(default)s",
                     dest    = "out_file",
                     default = out_default)
 
 parser.add_argument("-s", "--skip",         # Parameter -s/--skip
-                    help    = skip_text + "; Default: " + "%(default)s",
+                    help    = skip_text + " - Default: " + "%(default)s",
                     dest    = "skip",
                     default = skip_default)
 
 parser.add_argument("-t", "--template",     # Parameter -t/--template
-                    help    = template_text + "; Default: " + "%(default)s",
+                    help    = template_text + " - Default: " + "%(default)s",
                     dest    = "name_template",
                     default = name_template_default)
 
 parser.add_argument("-stat", "--statistics",# Parameter -stat/--statistics
-                    help    = statistics_text + "; Default: " + "%(default)s",
+                    help    = statistics_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = statistics_default)
 
 parser.add_argument("-v", "--verbose",      # Parameter -v/--verbose
-                    help    = verbose_text + "; Default: " + "%(default)s",
+                    help    = verbose_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = verbose_default)
 
@@ -1538,7 +1548,7 @@ def mod_xref(k):                                  # function: element <xref ...>
         tmp  = i.attrib["refid"]                  # attribute refid
         tmp2 = ctanUrl4 + tmp
         
-        if i.text == None:                        # no embedded textdef onepackage
+        if i.text == None:                        # no embedded textdef 
             i.text = tmp                          #   get embedded text
             
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
@@ -1611,7 +1621,7 @@ def mod_i(k):                                     # function: element <i>...</i>
         if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
             i.text = "§§3emph§§1{0}§§2".format(i.text)
                                                   #   change embedded text
-        elif mode in ["RIS", "plain"]:            # RIS / plaindef onepackage
+        elif mode in ["RIS", "plain"]:            # RIS / plaindef 
             i.text = "'{0}'".format(i.text)       #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
