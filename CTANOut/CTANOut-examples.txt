@@ -4,7 +4,7 @@ CTANOut
     RIS is output format (default)
     all.ris is output file
     no statistics
-    without verbose output                                        
+    without verbose output
 
 CTANOut -v
     as bove
@@ -34,7 +34,7 @@ CTANOut -m LaTeX -mt -v -stat
     LaTeX is output format                                            [-m]
     special topic lists are generated                                 [-mt]
     with statistics and                                               [-stat]
-    verbose output                                                    [-v] 
+    verbose output                                                    [-v]
 
 CTANOut -m latex -k LaTeX -mt
     LaTeX is output format                                            [-m]
@@ -53,3 +53,13 @@ CTANOut -m plain -v -stat -o myfile -s "[texlive,license,miktex]"
     skipped CTAN fields: texlive, license, and miktex                 [-s]
     with statistics and                                               [-stat]
     verbose output                                                    [-v]
+
+Regular expressions
+-------------------
+The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
+such as
+
+-k latex                matches all topic names which contain "latex"
+-t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
+-t "^.+$"               matches all file names
+-t "^{a-b]"             matches all file names which begin with letters a-b

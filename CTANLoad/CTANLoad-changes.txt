@@ -36,3 +36,5 @@ Changes (CTANLoad.py)
 2.4.0  2021-06-23 regeneration of pickle file enabled: new option -r; new functions regenerate_pickle_files and get_XML_files
 2.4.1  2021-06-24 error handling in the check_integrity context changed
 2.4.2  2021-06-26 handling of -r changed
+2.5.0  2021-06-30 add. option -k; add. function get_CTAN_lpt (needs CTAN.lpt)
+2.5.1  2021-07-01 minor corrections

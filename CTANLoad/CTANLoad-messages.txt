@@ -1,35 +1,49 @@
-﻿Messages (CTAN-Load)
+Messages (CTANLoad)
+===================
+Informative messages:
+- Info: PDF documentation file '<PDF file>' downloaded
+- Info: Regeneration of '<pickle file>'
+- Info: Successfully created the OS directory '<directory>'
+- Info: XML file '<XML file>' downloaded ('<local file>.xml' on PC)
+- Info: XML file for package '<package name>' downloaded ('<local file>.xml' on PC)
+- Info: authors collected
+- Info: entry '<entry>' in OS directory deleted
+- Info: file '<file name>' (list of authors and associated packages) generated
+- Info: file '<file name>' (list of authors) generated
+- Info: file '<file name>' (list of licenses) generated
+- Info: file '<file name>' (list of packages) generated
+- Info: file '<file name>' (list of topics and associated packages) generated
+- Info: file '<file name>' (list of topics) generated
+- Info: integrity check
+- Info: licenses collected
+- Info: local XML file '<XML file'
+- Info: no error with integrity check
+- Info: packages collected
+- Info: packagetopics, topicspackage, authorpackage collected
+- Info: pickle file '<pickle file name>' written
+- Info: program successfully completed
+- Info: topics collected
+- Info: unique local file name: '<local file name>'
 
-Informations
-- authors collected
-- file 'xyz.lap' (list of authors and associated packages) generated
-- file 'xyz.loa' (list of authors) generated
-- file 'xyz.lok' (list of topics) generated
-- file 'xyz.lop' (list of packages) generated
-- file 'xyz.lpt' (list of topics and associated packages) generated
-- integrity check
-- maximum number (n) +  of downloaded XML files exceeded
-- no error with integrity check
-- packages collected
-- packagetopics, topicspackage, authorpackage collected
-- PDF documentation file 'file' downloaded
-- pickle file 'xyz.pkl' written
-- program successfully completed
-- topics collected
-- XML file 'file' downloaded
-- XML file for package 'file' downloaded
+Warnings:
+- Warning: Creation of the OS directory '<directory>' failed
+- Warning: PDF documentation file '<PDF file>' not downloaded
+- Warning: PDF file '<PDF file> in OS deleted
+- Warning: PDF file '<XML file>' without associated XML file
+- Warning: XML file '<XML file>' empty or not well-formed
+- Warning: XML file '<XML file>' in OS deleted
+- Warning: XML file for package '<package name>' not downloaded
+- Warning: entry '<entry>' in dictionary, but OS file is empty
+- Warning: entry '<entry>' in dictionary, but OS file not found
+- Warning: local XML file for package '<package name>' empty or not well-formed
+- Warning: local XML file for package '<package name>' not found
+- Warning: maximum number (<number>) of downloaded XML+PDF files exceeded
+- Warning: pickle file '<pickle file name>' cannot be loaded a/o written
+- Warnung: '<option>' reset to {new value} (due to <reason>)"
 
-Warnings
-- PDF documentation file 'file' not downloaded
-- PDF file 'file' in directory deleted
-- PDF file 'file' in directory, but empty or not found
-- pickle file 'xyz.pkl' cannot be loaded a/o written
-- XML file 'file' not downloaded
-- XML file 'file' empty or not well-formed
-- XML file for package 'file' empty or not well-formed
-- XML file for package 'file' not downloaded
-- XML file for package 'file' not found
-
-Error messages
-- tried to use the program indirectly
-- programm terminated
+Errors:
+- Error: programm terminated
+- Error: standard XML file 'file' empty or not well-formed
+- Error: standard XML file '<XML file>' not downloaded
+- Error: tried to use the program indirectly
+- Error: local file '<file>' not loaded
