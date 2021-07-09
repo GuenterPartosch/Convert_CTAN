@@ -12,4 +12,7 @@ Changes (CTANLoad+Out)
 1.7  2021-06-25 some new handling of subprocesses
 1.8  2021-06-25 transfer of options to CTANLoad (Regeneration) improved; handling of -r improved
 1.9  2021-07-01 adaption of the option -k (CTANLoad); new options -ko and -kl
-1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove some temporary LaTeX files
+1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove specified temporary LaTeX files
+1.11 2021-07-05 function fold restructured
+1.12 2021-07-06 new error message: tried to use the program indirectly
+1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced

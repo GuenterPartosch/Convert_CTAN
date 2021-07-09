@@ -8,22 +8,13 @@
 # Problems/Plans:
 # + -b nur für -m bib zulassen (x)
 # + -mt nur für -m latex zulassen (x)
-# + für ctanout anderer Default für -t (x)
-# + anderes Trennzeichen für Compilation und Makeindex (x)
 # + prüfen, ob ctanload -l -c aufgerufen werden muss (wenn CTANOut folgt)
 # + ist -c gefährlich?
-# + Umbruch bei der Darstellung von Aufrufparameter (x)
-# ' Fehler bei protokollausgabe -m (x)
-# + Köpfe für CTANLoad und CTANout doppelt (x)
-# + Resettings mit CTANLoad und CTANOut abgleichen (x)
-# + bei Warnings für Optionsänderung: Grund mitangeben (x)
 # + auch bei ctanout: ggf. all.tex vor Generierung löschen?
 # + bei -p vorher überprüfen, ob all.tex existiert; ggf alle anderen LateX-Hilfsdateien vorher löschen (all.aux, all.ind, all.idx)
-# + Usage neu machen; für alle drei Manpages neu machen (x)
-# + zusätzliche Beispiele für -k/-kl/-ko (x)
-# + Löschen von Dateien noch überprüfen
-# + noch Beispiele für -k (x)
-# + .man, usage, -changes, -examples, -files, -messages, -modules (x)
+# + Löschen von Dateien noch überprüfen (x)
+# + fold schlauer gestalten (x)
+# + noch Fehler: -m bib -p
 
 # ------------------------------------------------------------------
 # History:
@@ -41,12 +32,16 @@
 # 1.8  2021-06-25 transfer of options to CTANLoad (Regeneration) improved; handling of -r improved
 # 1.9  2021-07-01 adaption of the option -k (CTANLoad); new options -ko and -kl
 # 1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove specified temporary LaTeX files
+# 1.11 2021-07-05 function fold restructured
+# 1.12 2021-07-06 new error message: tried to use the program indirectly
+# 1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced
 
 # ------------------------------------------------------------------
 # Messages (CTANLoad+Out)
 # 
 # Fatal error:
 # Error: Error in <step>
+# Error: tried to use the program indirectly
 #
 # Information:
 # Info: <step> OK
@@ -59,6 +54,7 @@
 # Warning:
 # Warning: LaTeX file '<file>' does not exist
 # Warning: LaTeX file '<file>' removed
+# Warning: file '<file>' removed
  
 # ------------------------------------------------------------------
 # Functions in CTANLoad+Out.py
@@ -224,6 +220,7 @@
 #===================================================================
 # Usage
 # =====
+
 # usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
 #                        [-c] [-d DIREC] [-f] [-k KEY] [-kl KEY_LOAD]
 #                        [-ko KEY_OUT] [-l]
@@ -232,7 +229,7 @@
 #                        [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
 #                        [-to TEMPLATE_OUT] [-V] [-v]
 # 
-# [CTANLoad+Out.py; Version: 1.9 (2021-07-01)] Combines the tasks of CTANLoad
+# [CTANLoad+Out.py; Version: 1.13 (2021-07-07)] Combines the tasks of CTANLoad
 # [Load XLM and PDF documentation files from CTAN a/o generates some special
 # lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
 # files to some formats].
@@ -247,7 +244,7 @@
 #                         Flag: Check the integrity of the 2nd .pkl file. -
 #                         Default: False
 #   -d DIREC, --directory DIREC
-#                         OS Directory for input and output file - Default: .\
+#                         OS Directory for input and output files - Default: .\
 #   -f, --download_files  Flag: Download associated documentation files [PDF]. -
 #                         Default: False
 #   -k KEY, --key KEY     Template for topic names [in CTANLoad and CTANOut] -
@@ -258,8 +255,7 @@
 #                         Template for topic names [in CTANOut] - Default: ^.+$
 #   -l, --lists           Flag: Generate some special lists and prepare files
 #                         for CTANOut. - Default: False
-#   -m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel},
-#   --mode {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}
+#   -m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}, --mode {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}
 #                         Target format - Default: RIS
 #   -mo, --make_output    Flag: Generate output [RIS, LaTeX, BibLaTeX, Excel,
 #                         plain] via CTANOut. - Default: False
@@ -286,7 +282,7 @@
 #                         Template for package names in CTANOut - Default: ^.+$
 #   -V, --version         Show version of the program and exit.
 #   -v, --verbose         Flag: Output is verbose. - Default: False
-
+# 
 
 #===================================================================
 # Moduls needed
@@ -304,8 +300,8 @@ from os import path                # path informations
 # Settings
 
 programname       = "CTANLoad+Out.py"
-programversion    = "1.9"
-programdate       = "2021-07-01"
+programversion    = "1.13"
+programdate       = "2021-07-07"
 programauthor     = "Günter Partosch"
 authoremail       = "Guenter.Partosch@hrz.uni-giessen.de"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -323,9 +319,11 @@ call_load         = empty
 call_output       = empty
 call_compile      = empty
 call_index        = empty
+delete_temporary_file  = True
 
 err_mode          = "+ Warning: '{0} {1}' changed to '{2} (due to {3})'\n"
-latex_files       = [".aux", ".ilg", ".log", ".idx", ".ind", ".tex", ".pdf"]
+latex_files       = [".aux", ".bib", ".ilg", ".log", ".idx", ".ind", ".out", ".tex", ".pdf"]
+other_files       = [".ris", ".bib", ".txt", ".tsv"]
 
 # ------------------------------------------------------------------
 # Texts for argument parsing and help
@@ -774,8 +772,8 @@ def head():                                                                     
     """Show the given options."""
     
     print("* Info: CTANLoad+Out")
-    print("* Info: Call:", call)
     if verbose:
+        print("* Info: Call:", call)
         if ("-c" in call) or ("--check_integrity" in call): print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))                         # -c
         if ("-f" in call) or ("--download_files" in call):  print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))                          # -f
         if ("-l" in call) or ("--lists" in call):           print("  {0:5} {1:55}".format("-l", "(" + (lists_text + ")")[0:50] + ellipse))           # -l 
@@ -810,32 +808,62 @@ def head():                                                                     
 #===================================================================
 # Auxiliary function
 
-def fold(s):                                                                    # function fold: auxiliary function: shorten long option value text for output
-    """auxiliary function: shorten long option value text for output"""
+##def fold(s):                                                                    # function fold: auxiliary function: shorten long option value text for output
+##    """auxiliary function: shorten long option value text for output"""
+##    
+##    maxlen = 65
+##    offset = "\n" + 64 * " "
+##    tmp    = s[:]
+##    all    = ""
+##    while len(tmp) > maxlen:
+##        all = all + tmp[0 : maxlen] + offset
+##        tmp = tmp[maxlen :]
+##    return all + tmp
+def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
+    """auxiliary function: shorten long option values for output"""
     
-    maxlen = 65
-    offset = "\n" + 64 * " "
-    tmp    = s[:]
-    all    = ""
-    while len(tmp) > maxlen:
-        all = all + tmp[0 : maxlen] + offset
-        tmp = tmp[maxlen :]
-    return all + tmp
+    offset = 64 * " "
+    maxlen = 70
+    sep    = "|"
+    parts  = s.split(sep)
+    line   = ""
+    out    = ""
+    for f in range(0,len(parts) ):
+        if f != len(parts) - 1:
+            line = line + parts[f] + sep
+        else:
+            line = line + parts[f]
+        if len(line) >= maxlen:
+            out = out +line+ "\n" + offset
+            line = ""
+    out = out + line            
+    return out
 
 # ------------------------------------------------------------------
 def remove_LaTeX_file(t):                                                       # auxiliary function: remove named LaTeX file.
     """auxiliary function: remove named LaTeX file."""
     
-    if t in latex_files:
-##        print("*** remove_LaTeX_file t1", t)
-        if path.exists(args.output_name + t):
-            os.remove(args.output_name + t)
-##            print("*** remove_LaTeX_file nach remove", t)
-            if verbose:
-                print("* Warning: LaTeX file '{}' removed".format(args.output_name + t))
-        else:
-            pass
-##            print("*** remove_LaTeX_file t2", t)
+    if delete_temporary_file:
+        if t in latex_files:
+            if path.exists(args.output_name + t):
+                os.remove(args.output_name + t)
+                if verbose:
+                    print("* Warning: LaTeX file '{}' removed".format(args.output_name + t))
+            else:
+                pass
+
+# ------------------------------------------------------------------
+def remove_other_file(t):                                                       # auxiliary function: remove named LaTeX file.
+    """auxiliary function: remove named other file."""
+
+    if delete_temporary_file:
+        if t in other_files:
+            if path.exists(args.output_name + t):
+                os.remove(args.output_name + t)
+                if verbose:
+                    print("* Warning: file '{}' removed".format(args.output_name + t))
+            else:
+                pass
 
 
 #===================================================================
@@ -858,8 +886,6 @@ def func_call_load():                                                           
             sys.exit()
         else:
             print(load_message)
-##            if verbose:
-##                print("* Info: CTANLoad (Load) OK")
     except:
         if verbose:
             print("* Error: Error in CTANLoad (Load)")
@@ -900,8 +926,6 @@ def func_call_regeneration():                                                   
             sys.exit()
         else:
             print(regeneration_message)
-##            if verbose:
-##                print("* Info: CTANLoad (Regeneration) OK")
     except:
         if verbose:
             print("* Error: Error in CTANLoad (Regeneration)")
@@ -915,6 +939,18 @@ def func_call_output():                                                         
 
     print("-" * 80)
     print("* Info: CTANOut")
+    if mode == "BibLaTeX":
+        remove_other_file(".bib")
+    elif mode == "LaTeX":
+        remove_LaTeX_file(".tex")
+    elif mode == "RIS":
+        remove_other_file(".ris")
+    elif mode == "plain":
+        remove_other_file(".txt")
+    elif mode == "Excel":
+        remove_other_file(".tsv")
+    else:
+        pass
 
     try:                                                  
         process_output      = subprocess.run(call_output, capture_output=True, encoding="utf8", universal_newlines=True)
@@ -926,8 +962,6 @@ def func_call_output():                                                         
             sys.exit()
         else:
             print(output_message)
-##            if verbose:
-##                print("* Info: CTANOut OK")
     except:
         if verbose:
             print("* Error: Error in CTANOut")
@@ -941,10 +975,11 @@ def func_call_compile():                                                        
 
     print("-" * 80)
     print("* Info: Compilation")
-    for e in [".aux", ".idx", ".ind", ".log", ".ilg"]:
+    for e in [".aux", ".idx", ".ind", ".log", ".ilg", ".pdf", ".out"]:
         remove_LaTeX_file(e)
     print("* Info: XeLaTeX")
-    print("* Info: Call:", call_compile)
+    if verbose:
+        print("* Info: Call:", call_compile)
 
     try:                                                  
         process_compile1      = subprocess.run(call_compile, capture_output=True, encoding="utf8", universal_newlines=True)
@@ -967,7 +1002,8 @@ def func_call_compile():                                                        
 # ...................................................................
     print("." * 80)
     print("* Info: XeLaTeX")
-    print("* Info: Call:", call_compile)
+    if verbose:
+        print("* Info: Call:", call_compile)
 
     try:                                                  
         process_compile2      = subprocess.run(call_compile, capture_output=True, encoding="utf8", universal_newlines=True)
@@ -990,7 +1026,8 @@ def func_call_compile():                                                        
 # ...................................................................
     print("." * 80)
     print("* Info: Makeindex")
-    print("* Info: Call:", call_index)
+    if verbose:
+        print("* Info: Call:", call_index)
 
     try:                                                  
         process_index      = subprocess.run(call_index, capture_output=True, encoding="utf8", universal_newlines=True)
@@ -1007,7 +1044,8 @@ def func_call_compile():                                                        
 # ...................................................................
     print("." * 80)
     print("* Info: XeLaTeX")
-    print("* Info: Call:", call_compile)
+    if verbose:
+        print("* Info: Call:", call_compile)
 
     try:                                                  
         process_compile3      = subprocess.run(call_compile, capture_output=True, encoding="utf8", universal_newlines=True)
@@ -1029,7 +1067,7 @@ def func_call_compile():                                                        
         sys.exit()
 
 # ...................................................................
-    for e in [".aux", ".idx", ".ind"]:
+    for e in [".aux", ".idx", ".ind", ".out"]:
         remove_LaTeX_file(e)
     
 # ------------------------------------------------------------------
@@ -1059,3 +1097,6 @@ def main():                                                                     
 
 if __name__ == "__main__":
     main()
+else:
+    if verbose:
+        print("- Error: tried to use the program indirectly")

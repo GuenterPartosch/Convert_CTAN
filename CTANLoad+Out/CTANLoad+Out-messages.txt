@@ -2,6 +2,7 @@ Messages (CTANLoad+Out)
 =======================
 Fatal error:
 Error: Error in <step>
+Error: tried to use the program indirectly
 
 Information:
 Info: <step> OK
@@ -14,3 +15,4 @@ Info: result in '<file>'
 Warning:
 Warning: LaTeX file '<file>' does not exist
 Warning: LaTeX file '<file>' removed
+Warning: file '<file>' removed
