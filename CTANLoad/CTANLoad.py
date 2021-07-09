@@ -8,12 +8,12 @@
 # Es fehlen noch  bzw. Probleme:
 # - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
 # - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/ (geht eigentlich nicht)(-)
-# - noch Beispiele für -k (x)
-# - .man, usage, -changes, -examples, -files, -messages, -modules (x)
+# - fold schlauer gestalten (x)
+# - mit CTAN.pkl neu machen? funktioniert noch nicht? (x)
 
 # ------------------------------------------------------------------
 # History
-
+#
 # 2.0.0  2019-10-01 completely revised
 # 2.0.1  2019-10-03 smaller changes: messages + command parsing
 # 2.0.2  2019-10-04 smaller changes: messages
@@ -52,16 +52,19 @@
 # 2.4.2  2021-06-26 handling of -r changed
 # 2.5.0  2021-06-30 add. option -k; add. function get_CTAN_lpt (needs CTAN.lpt)
 # 2.5.1  2021-07-01 minor corrections
+# 2.5.2  2021-07-05 function fold restructured
+# 2.5.3  2021-07-06 pickle file 1 is generated, too
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
 #
+
 # usage: CTANLoad.py [-h] [-a] [-c] [-d DIREC] [-f] [-l] [-k KEY_TEMPLATE]
 #                    [-n NUMBER] [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat]
 #                    [-v] [-V]
 # 
 # Load XLM and PDF documentation files from CTAN a/o generate some special
-# lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.5.1 (2021-07-01)]
+# lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.5.3 (2021-07-06)]
 # 
 # Optional parameters:
 #   -h, --help            show this help message and exit
@@ -91,10 +94,10 @@
 #   -stat, --statistics   Flag: Print statistics. - Default: False
 #   -v, --verbose         Flag: Output is verbose. - Default: False
 #   -V, --version         Version of the program
-
+# 
 # ------------------------------------------------------------------
 # Messages (CTANLoad)
-
+#
 # Informative messages:
 # - Info: PDF documentation file '<PDF file>' downloaded
 # - Info: Regeneration of '<pickle file>'
@@ -145,7 +148,7 @@
 
 # ------------------------------------------------------------------
 # Functions in CTANLoad.py
-
+#
 # analyze_XML_file(file)   Analyze a XML package file for documentation (PDF) files.
 # call_check()	           Process all necessary steps for a integrity check.
 # call_load()	           Process all steps for a complete ctanout call (without integrity check).
@@ -155,7 +158,7 @@
 # generate_lists()	   Generate xyz.loa (list of authors), xyz.lop (list of packages), xyz.lok (list of topics),
 #                          xyz.lpt (list of topics and associated packages), xyz.lap (list of authors and associated packages), xyz is the specified generic output file name.
 # generate_pickle1()	   pickle dump: actual authors, packages, licenses, topics, topicspackage, packagetopics
-# generate_pickle2()	   pickle dump: actual XML_toc (list with download information files.
+# generate_pickle2()	   pickle dump: actual XML_toc (list with download information files).
 # generate_topicspackage() Generate topicspackage, packagetopics, and authorpackages.
 # get_CTAN_lpt()           Load CTAN.lpt and analyze
 # get_PDF_files(d)	   List all PDF files in a OS directory.
@@ -262,8 +265,8 @@ from threading import Thread       # handling of threads
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.5.1"
-prg_date        = "2021-07-01"
+prg_version     = "2.5.3"
+prg_date        = "2021-07-06"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
@@ -394,7 +397,6 @@ parser = argparse.ArgumentParser(description = program_text + " [" + prg_name + 
                                  "Version: " + prg_version + " (" + prg_date + ")]")
 parser._positionals.title = 'Positional parameters'
 parser._optionals.title   = 'Optional parameters'
-##opgroup = parser.add_mutually_exclusive_group()
 
 parser.add_argument("-a", "--author",                      # Parameter -a/--author
                     help    = author_text,
@@ -503,17 +505,36 @@ p5           = re.compile(key_template)                    # regular expression 
 #===================================================================
 # Auxiliary function
 
+##def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
+##    """auxiliary function: shorten long option values for output"""
+##    
+##    maxlen = 65
+##    offset = "\n" + 64 * " "
+##    tmp    = s[:]
+##    all    = ""
+##    while len(tmp) > maxlen:
+##        all = all + tmp[0 : maxlen] + offset
+##        tmp = tmp[maxlen :]
+##    return all + tmp
 def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
     """auxiliary function: shorten long option values for output"""
     
-    maxlen = 65
-    offset = "\n" + 64 * " "
-    tmp    = s[:]
-    all    = ""
-    while len(tmp) > maxlen:
-        all = all + tmp[0 : maxlen] + offset
-        tmp = tmp[maxlen :]
-    return all + tmp
+    offset = 64 * " "
+    maxlen = 70
+    sep    = "|"
+    parts  = s.split(sep)
+    line   = ""
+    out    = ""
+    for f in range(0, len(parts)):
+        if f != len(parts) - 1:
+            line = line + parts[f] + sep
+        else:
+            line = line + parts[f]
+        if len(line) >= maxlen:
+            out = out +line+ "\n" + offset
+            line = ""
+    out = out + line            
+    return out
 
 
 # ==================================================================
@@ -634,7 +655,11 @@ def call_load():                                                  # Function cal
     thr1 = Thread(target=generate_pickle2)                        # dump XML_toc via pickle file via thread
     thr1.start()
     thr1.join()
-
+    generate_topicspackage()                                      # generates topicspackage, ...
+    thr2 = Thread(target=generate_pickle1)                        # dump some lists to pickle file
+    thr2.start()
+    thr2.join()
+    
 # ------------------------------------------------------------------
 def call_plain():                                                 # Function call_plain: Process all steps for a plain call.
     """Process all steps for a plain call."""
