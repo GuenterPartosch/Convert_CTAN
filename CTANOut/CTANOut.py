@@ -7,12 +7,14 @@
 
 # Probleme/Ideen:
 # - Ausgabe des Namens, wenn givenname fehlt
-# - year noch besser extrahieren, ggf. aus <copyright ....>
+# - year noch besser extrahieren, ggf. aus <copyright year=....> oder <version date=...>
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
 # - bei BibLaTeX: BibTeX-Kürzel aus Namen + Jahr
 # - ggf. file.tex, file.bib, ... vor Ausgabe löschen
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden?
 # - Löschen von Dateien noch überprüfen
+# - fold schlauer gestalten (x)
+# - neue Fehlermeldung (tried to use the program indirectly) in changeliste eintragen (x)
 
 # History
 # ------------------------------------------------------------------
@@ -33,6 +35,7 @@
 # 1.89 2021-06-18 some tiny improvements for output
 # 1.90 2021-06-22 misc. smaller corrections
 # 1.91 2021-06-24 additional minor corrections
+# 1.82 2021-07-05 function fold restructured
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -48,6 +51,7 @@
 
 # Fatal Error
 # Error: pickle file '<pickle file>' not found
+# Error: tried to use the program indirectly
 
 # Information
 # Info: program successfully completed
@@ -69,13 +73,13 @@
 # ------------------------------------------------------------------
 # Usage
 #
-# Usage: CTANOut.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
+# usage: CTANOut.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
 #                   [-d DIREC] [-k FILTER_KEY]
 #                   [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
 #                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
 #                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.91 (2021-06-24)] Convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.92 (2021-07-05)] Convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
@@ -190,8 +194,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.91"
-programdate       = "2021-06-24"
+programversion    = "1.92"
+programdate       = "2021-07-05"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -674,17 +678,36 @@ except FileNotFoundError:                   # unable to open pickle file
 # p --> mod_xref
 
 # ------------------------------------------------------------------
-def fold(s):                                                # auxiliary function: shorten long option values for output
+##def fold(s):                                             # auxiliary function: shorten long option values for output
+##    """auxiliary function: shorten long option values for output"""
+##    
+##    maxlen = 65
+##    offset = "\n" + 64 * " "
+##    tmp    = s[:]
+##    all    = ""
+##    while len(tmp) > maxlen:
+##        all = all + tmp[0 : maxlen] + offset
+##        tmp = tmp[maxlen :]
+##    return all + tmp
+def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
     """auxiliary function: shorten long option values for output"""
     
-    maxlen = 65
-    offset = "\n" + 64 * " "
-    tmp    = s[:]
-    all    = ""
-    while len(tmp) > maxlen:
-        all = all + tmp[0 : maxlen] + offset
-        tmp = tmp[maxlen :]
-    return all + tmp
+    offset = 64 * " "
+    maxlen = 70
+    sep    = "|"
+    parts  = s.split(sep)
+    line   = ""
+    out    = ""
+    for f in range(0,len(parts) ):
+        if f != len(parts) - 1:
+            line = line + parts[f] + sep
+        else:
+            line = line + parts[f]
+        if len(line) >= maxlen:
+            out = out +line+ "\n" + offset
+            line = ""
+    out = out + line            
+    return out
 
 # ------------------------------------------------------------------
 def first_lines():                                          # function: create the first lines of output.
@@ -848,7 +871,7 @@ def also(k):                                      # function: element <also .../
     elif mode in ["Excel"]:                       # Excel
         if refid in packages:
             if s_also != "":
-                s_also += "; " + refid                # accumulate s_also string 
+                s_also += "; " + refid            # accumulate s_also string 
             else:
                 s_also = refid
 
@@ -949,7 +972,6 @@ def contact(k):                                   # function: element <contact .
         out.write("\\index{{Contact!{0}}}\n".format(typeT))
     elif mode in ["RIS"]:                         # RIS
         notice += " " * (fieldwidth + 2) + "Contact: " + typeT + ": " + href + ";\n"
-##        out.write("L1  - " + href + "\n")
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
         if notice != "":                          # accumulate notice string
             notice += " " * (fieldwidth + 2) + "Contact: " + typeT + ": " + href + ";\n"
@@ -991,7 +1013,7 @@ def copyrightT(k):                                # function: element <copyright
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
         tmp = re.sub("_", r"\\_", tmp)
         tmp = TeXchars(tmp)
-        notice += "Copyright: " + tmp + ";\n" # accumulate notice string
+        notice += "Copyright: " + tmp + ";\n"     # accumulate notice string
         out.write("usera".ljust(fieldwidth) + "= {" + tmp + "},\n")
         out.write("year".ljust(fieldwidth) + "= {" + year + "},\n")
     elif mode in ["plain"]:                       # plain
@@ -2184,3 +2206,6 @@ def main():                    # function: Main function
 
 if __name__ == "__main__":
     main()
+else:
+    if verbose:
+        print("- Error: tried to use the program indirectly")

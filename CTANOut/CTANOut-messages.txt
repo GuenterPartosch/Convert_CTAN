@@ -2,6 +2,7 @@ Messages (CTANOut)
 ==================
 Fatal Error
 Error: pickle file '<pickle file>' not found
+Error: tried to use the program indirectly
 
 Information
 Info: program successfully completed

@@ -17,3 +17,4 @@ Changes (CTANOut)
 1.89 2021-06-18 some tiny improvements for output
 1.90 2021-06-22 misc. smaller corrections
 1.91 2021-06-24 add. smaller corrections
+1.92 2021-07-05 function fold restructured
