@@ -4,7 +4,7 @@ usage: CTANOut.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
                   [-v] [-V]
 
-[CTANOut.py; Version: 1.91 (2021-06-24)] Convert CTAN XLM package files to
+[CTANOut.py; Version: 1.93 (2021-07-09)] Convert CTAN XLM package files to
 LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 
 Options:

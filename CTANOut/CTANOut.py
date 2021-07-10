@@ -6,10 +6,10 @@
 # (C) Günter Partosch, 2019/2021
 
 # Probleme/Ideen:
-# - Ausgabe des Namens, wenn givenname fehlt
-# - year noch besser extrahieren, ggf. aus <copyright year=....> oder <version date=...>
+# - Ausgabe des Namens, wenn givenname fehlt (x)
+# - year noch besser extrahieren, ggf. aus <copyright year=....> oder <version date=...> (x)
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
-# - bei BibLaTeX: BibTeX-Kürzel aus Namen + Jahr
+# - bei BibLaTeX: BibTeX-Kürzel aus Namen + Jahr; z.B. in leading() oder copyright() 
 # - ggf. file.tex, file.bib, ... vor Ausgabe löschen
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden?
 # - Löschen von Dateien noch überprüfen
@@ -36,6 +36,7 @@
 # 1.90 2021-06-22 misc. smaller corrections
 # 1.91 2021-06-24 additional minor corrections
 # 1.82 2021-07-05 function fold restructured
+# 1.93 2021-07-09 construct a unique author year string for BibLaTeX; two new auxiliary functions
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -79,13 +80,13 @@
 #                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
 #                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.92 (2021-07-05)] Convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.93 (2021-07-09)] Convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
 #   -h, --help            show this help message and exit
 #   -a, --author          Show author of the program and exit.
-#   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
+#   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}                                                                                                                      \r
 #                         Type of BibLaTex entries to be generated [only for -m
 #                         BibLateX] - Default:
 #   -d DIREC, --directory DIREC
@@ -107,7 +108,7 @@
 #   -stat, --statistics   Flag: Print statistics on terminal. - Default: False
 #   -v, --verbose         Flag: Output is verbose. - Default: False
 #   -V, --version         Show version of the program and exit.
-
+ 
 # ------------------------------------------------------------------
 # Examples
 
@@ -191,11 +192,118 @@ from os import path                          # path informations
 
 
 #===================================================================
+# Functions in CTANOut.py
+
+# TeXchars(s)        prepare characters for LaTeX/BibLaTeX
+# alias(k)           element <alias .../>
+# also(k)            element <also .../>
+# authorref(k)       element <authorref .../>
+# caption(k)         element <caption> ... </caption>
+# contact(k)         element <contact ...>    
+# copyrightT(k)      element <copyright .../>
+# ctan(k, t)         element <ctan .../>
+# description(k)     element <description ...> ... </description>
+# documentation(k)   element <documentation ../.>
+# entry(k, t)        elemend <entry ... </entry>
+# first_lines()      Analyze the first lines of each package XML file and output some lines.
+# fold(s)            auxiliary function: shorten long option values for output
+# get_authoryear(a,y) auxiliary function: construct a unique authoryear string (for BibLaTeX)
+# get_year(s)        auxiliary function: get the most recent year in string s (only for BibLaTeX)
+# home(k)            element <home .../>
+# install(k)         element <install .../>
+# keyval(k)          element <keyval .../>
+# leading(k)         first lines of one package
+# li(k)              element <li> ... </li>
+# licenseT(k)        element <license .../>
+# main()             main function
+# make_stat()        generate statistics file (xyz.stat for -m LaTeX a/o -m BibLaTeX).
+# make_statistics()  generate general statitics part (-stat) on terminal
+# make_tap()         generate xyz.tap
+# make_tops()        generate xyz.top
+# make_xref()        generate xyz.xref
+# miktex(k)          element <miktex .../>
+# mod_TeXchars(s)    prepare characters for LaTeX/BibLaTeX in a paragraph
+# mod_a(k)           element <a ...> ... </a>
+# mod_b(k)           element <b> ... </b>
+# mod_backslash(s)   special processing of \ in the source text
+# mod_br(k)          element <br/>
+# mod_em(k)          element <em> ... </em>
+# mod_i(k)           element <i> ... </i>
+# mod_pre(k)         element <pre> ... </pre>
+# mod_tt(k)          element <tt> ... </tt>
+# mod_xref(k)        element <xref ...> ... </xref>
+# name(k)            element <name> ... </name>
+# onepackage(s, t)   open a file with the package description and initialize XML processing
+# p(k)               element <p> ... </p>
+# process_packages() general loop
+# texlive(k)         element <texlive .../>
+# trailing(k, t)     last lines of a package part
+# ul(k)              element <ul> ... </ul>
+# version(k)         element <version .../>
+# xref(k)            element <xref ...> ... </xref>
+
+# main --> first_lines
+# main --> make_stat
+# main --> make_statistics
+# main --> make_tap
+# main --> make_tops
+# main --> make_xref
+# main --> process_packages
+#          process_packages --> onepackage
+#                               onepackage --> entry
+#                                              entry --> alias
+#                                              entry --> also	
+#                                                        also          --> TeXchars
+#                                              entry --> authorref
+#                                              entry --> caption
+#                                                        caption       --> TeXchars
+#                                              entry --> contact
+#                                              entry --> copyrightT
+#                                                        copyrighT     --> TeXchars
+#                                              entry --> ctan
+#                                              entry --> description
+#                                                        description   --> p
+#                                                        description   --> ul
+#                                              entry --> documentation
+#                                                        documentation --> TeXchars
+#                                              entry --> home
+#                                              entry --> install
+#                                              entry --> keyval
+#                                                        keyval        --> TeXchars
+#                                              entry --> leading
+#                                                        leading       --> TeXchars
+#                                                        leading       --> getyear
+#                                                        leading       --> get_authoryear
+#                                              entry --> licenseT
+#                                              entry --> miktex
+#                                                        miktex        --> TeXchars
+#                                              entry --> name
+#                                                        name          --> TeXchars
+#                                              entry --> texlive
+#                                                        texlive       --> TeXchars
+#                                              entry --> trailing
+#                                              entry --> version
+
+# ul --> li
+# li --> mod_TeXchars
+# p  --> mod_TeXchars
+#        mod_TeXchars --> mod_backslash
+# p --> mod_a
+# p --> mod_b
+# p --> mod_br
+# p --> mod_em
+# p --> mod_i
+# p --> mod_pre
+# p --> mod_tt
+# p --> mod_xref
+
+
+#===================================================================
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.92"
-programdate       = "2021-07-05"
+programversion    = "1.93"
+programdate       = "2021-07-09"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -220,7 +328,7 @@ actTime           = time.strftime("%X")      # actual time of program execution
 
 pickle_name1      = "CTAN.pkl"
 pickle_name2      = "CTAN2.pkl"
-list_info_files   = True                     # switch for RIS/BibLaTeX: XML_toc is to be proceed
+list_info_files   = True                     # switch for RIS/BibLaTeX: XML_toc is to be proceeded
 info_files        = ""                       # for BibLaTeX: collector for info file names
 ext               = ".xml"                   # file name extension for downloaded info files
 
@@ -332,17 +440,19 @@ languagecodes   = {"ar":"Arabic", "ar-dz":"Arabic (Algeria)", "bg":"Bulgarian", 
                    "sr-sp":"Serbian (Serbia)", "th":"Thai", "tr":"Turkish", "uk":"Ukrainian", "vi":"Vietnamese",
                    "zh":"Chinese", "zn-cn":"Chinese (China)", "de,en":"German + English", "zh,en":"Chinese + English",
                    "mr,hi":"Marathi + Hindi", "en,ja":"English + Japanese"}
-usedTopics      = {}                        # Python dictionary:  collects used topics for all packages
-usedPackages    = []                        # python list:        collects used packages
-usedAuthors     = {}                        # Python dictionary:  collects used authors for all packages
-XML_toc         = {}                        # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)
 
+usedTopics      = {}                        # Python dictionary:  collect used topics for all packages
+usedPackages    = []                        # python list:        collect used packages
+usedAuthors     = {}                        # Python dictionary:  collect used authors for all packages
 # usedTopics: Python dictionary (unsorted)
 #   each element: <key for topic>:<number>
 # usedPackages: python list
 #   each element: <package name>
 # usedAuthors: Python dictionary (unsorted)
 #   each element: <key for author>:<tuple with givenname and familyname>
+
+XML_toc         = {}                        # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)
+allauthoryears  = {}                        # python dictionary:  collect author name / year pairs
 
 
 #===================================================================
@@ -475,6 +585,7 @@ if not path.exists(direc):                  # make OS directory, if necessary
 
 p2            = re.compile(name_template)   # regular expression based on -t
 p3            = re.compile(filter_key)      # regular expression based on -k
+p4            = re.compile("[- |.,a-z]")
 
 
 #===================================================================
@@ -575,120 +686,10 @@ except FileNotFoundError:                   # unable to open pickle file
     print("--- Warning: pickle file '{0}' not found; local information files ignored".format(pickle_name2))
     
 
-#===================================================================
-# Functions in CTANOut.py
-
-# TeXchars(s)        prepare characters for LaTeX/BibLaTeX
-# alias(k)           element <alias .../>
-# also(k)            element <also .../>
-# authorref(k)       element <authorref .../>
-# caption(k)         element <caption> ... </caption>
-# contact(k)         element <contact ...>    
-# copyrightT(k)      element <copyright .../>
-# ctan(k, t)         element <ctan .../>
-# description(k)     element <description ...> ... </description>
-# documentation(k)   element <documentation ../.>
-# entry(k, t)        elemend <entry ... </entry>
-# first_lines()      Analyze the first lines of each package XML file and output some lines.
-# fold(s)            auxiliary function: shorten long option values for output
-# home(k)            element <home .../>
-# install(k)         element <install .../>
-# keyval(k)          element <keyval .../>
-# leading(k)         first lines of one package
-# li(k)              element <li> ... </li>
-# licenseT(k)        element <license .../>
-# main()             main function
-# make_stat()        generate statistics file (xyz.stat for -m LaTeX a/o -m BibLaTeX).
-# make_statistics()  generate general statitics part (-stat) on terminal
-# make_tap()         generate xyz.tap
-# make_tops()        generate xyz.top
-# make_xref()        generate xyz.xref
-# miktex(k)          element <miktex .../>
-# mod_TeXchars(s)    prepare characters for LaTeX/BibLaTeX in a paragraph
-# mod_a(k)           element <a ...> ... </a>
-# mod_b(k)           element <b> ... </b>
-# mod_backslash(s)   special processing of \ in the source text
-# mod_br(k)          element <br/>
-# mod_em(k)          element <em> ... </em>
-# mod_i(k)           element <i> ... </i>
-# mod_pre(k)         element <pre> ... </pre>
-# mod_tt(k)          element <tt> ... </tt>
-# mod_xref(k)        element <xref ...> ... </xref>
-# name(k)            element <name> ... </name>
-# onepackage(s, t)   open a file with the package description and initialize XML processing
-# p(k)               element <p> ... </p>
-# process_packages() general loop
-# texlive(k)         element <texlive .../>
-# trailing(k, t)     last lines of a package part
-# ul(k)              element <ul> ... </ul>
-# version(k)         element <version .../>
-# xref(k)            element <xref ...> ... </xref>
-
-# main --> first_lines
-# main --> make_stat
-# main --> make_statistics
-# main --> make_tap
-# main --> make_tops
-# main --> make_xref
-# main --> process_packages
-#          process_packages --> onepackage
-#                               onepackage --> entry
-#                                              entry --> alias
-#                                              entry --> also	
-#                                                        also          --> TeXchars
-#                                              entry --> authorref
-#                                              entry --> caption
-#                                                        caption       --> TeXchars
-#                                              entry --> contact
-#                                              entry --> copyrightT
-#                                                        copyrighT     --> TeXchars
-#                                              entry --> ctan
-#                                              entry --> description
-#                                                        description   --> p
-#                                                        description   --> ul
-#                                              entry --> documentation
-#                                                        documentation --> TeXchars
-#                                              entry --> home
-#                                              entry --> install
-#                                              entry --> keyval
-#                                                        keyval        --> TeXchars
-#                                              entry --> leading
-#                                                        leading       --> TeXchars
-#                                              entry --> licenseT
-#                                              entry --> miktex
-#                                                        miktex        --> TeXchars
-#                                              entry --> name
-#                                                        name          --> TeXchars
-#                                              entry --> texlive
-#                                                        texlive       --> TeXchars
-#                                              entry --> trailing
-#                                              entry --> version
-
-# ul --> li
-# li --> mod_TeXchars
-# p  --> mod_TeXchars
-#        mod_TeXchars --> mod_backslash
-# p --> mod_a
-# p --> mod_b
-# p --> mod_br
-# p --> mod_em
-# p --> mod_i
-# p --> mod_pre
-# p --> mod_tt
-# p --> mod_xref
+# ======================================================================
+# auxiliary functions
 
 # ------------------------------------------------------------------
-##def fold(s):                                             # auxiliary function: shorten long option values for output
-##    """auxiliary function: shorten long option values for output"""
-##    
-##    maxlen = 65
-##    offset = "\n" + 64 * " "
-##    tmp    = s[:]
-##    all    = ""
-##    while len(tmp) > maxlen:
-##        all = all + tmp[0 : maxlen] + offset
-##        tmp = tmp[maxlen :]
-##    return all + tmp
 def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
     """auxiliary function: shorten long option values for output"""
     
@@ -710,112 +711,127 @@ def fold(s):                                               # function fold: auxi
     return out
 
 # ------------------------------------------------------------------
-def first_lines():                                          # function: create the first lines of output.
-    """create the first lines of output"""
+def get_authoryear(a, y):
+    """auxiliary function: construct a unique authoryear string (for BibLaTeX)
+    perform some changes according to the BibLaTeX rules
+
+    a: tuple author (name, givenname)
+    y: int year"""
+
+    global allauthoryears
     
-    arguments   = ""
-    tmp         = ""
-    tmp_before  = ""
-    e_parameter = ["-t","-k","--template","--key", "-s", "--skip"]
-     
-    for f in range(1,len(call)):
-        tmp = call[f]
-        if tmp_before in e_parameter:
-            tmp = '"' + tmp + '"'
-        arguments = arguments + tmp + " "
-        tmp_before = tmp
-
-    if verbose:
-        print("- Program call:", programname, arguments)
+    (name, givenname) = a
+    if (name == "") and (givenname != ""):                       # if name ist not given
+        name = givenname
         
-    if verbose:                                             # header for terminal output
-        print("\n- program call (with details): CTANOut.py")
-        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + (topics_text + ")")[0:50] + ellipse))
-        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
-        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
-        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
-        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))
-        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.out_file, "(" + out_text + ")"))
-        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + (btype_text + ")")[0:50] + ellipse))
-        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(filter_key), "(" + key_text + ")"))
-        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))
-        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(name_template), "(" + template_text + ")"))
-        print("\n")
+    name = re.sub("工作室", "", name)                             # some changes  —
+    name = re.sub("Jr", "", name)
+    name = re.sub("[-., /'—]", "", name)
+    name = re.sub("Ø", "O", name)
+    name = re.sub("ß", "ss", name)
+    name = re.sub("Á", "A", name)
+    name = re.sub("à", "a", name)
+    name = re.sub("á", "a", name)
+    name = re.sub("ä", "ae", name)
+    name = re.sub("ç", "c", name)
+    name = re.sub("è", "e", name)
+    name = re.sub("é", "e", name)
+    name = re.sub("ì", "i", name)
+    name = re.sub("í", "i", name)
+    name = re.sub("ñ", "n", name)
+    name = re.sub("ò", "o", name)
+    name = re.sub("ó", "o", name)
+    name = re.sub("õ", "o", name)
+    name = re.sub("ö", "oe", name)
+    name = re.sub("ø", "o", name)
+    name = re.sub("ù", "u", name)
+    name = re.sub("ú", "u", name)
+    name = re.sub("ü", "ue", name)
+    name = re.sub("ý", "y", name)
+    name = re.sub("ć", "c", name)
+    name = re.sub("č", "c", name)
+    name = re.sub("ř", "r", name)
+    name = re.sub("š", "s", name)
+    name = re.sub("Ž", "Z", name)
+    tmp  = name + str(y)                                         # construct an author year string
+    if not (tmp in allauthoryears):                              # store it in a dictionary
+        allauthoryears[tmp] = ord("a") - 1
+    else:
+        tmp2  = allauthoryears[tmp]                               # append a small letter (the next in the alphabet)
+        tmp2 += 1
+        allauthoryears[tmp] = tmp2
+        if tmp2 <= 122: 
+            tmp = name + str(y) + "." + chr(tmp2)
+        else:
+            remain = (tmp2 - 97) % 26 + 1
+            times  = (tmp2 - 97) // 26
+            tmp    = name + str(y) + "." + chr(times + 96) + chr(remain + 96)
+    return tmp
 
-    if mode in ["LaTeX"]:                                   # LaTeX
-        out.write("% file: {0}\n\n".format(out_file))
-        out.write("% date: {0}\n".format(actDate))
-        out.write("% time: {0}\n\n".format(actTime))
-        out.write("% generated by {0} (version: {1} of {2})\n\n".format(programname, programversion, programdate))
-        out.write("% program call             : {0} {1}\n".format(programname, arguments))
-        out.write("% mode                     : {0}\n".format(mode))
-        out.write("% skipped CTAN fields      : {0}\n".format(skip))
-        if name_template != "":
-            out.write("% filtered by name template: '{0}'\n".format(name_template))
-        if filter_key != "":
-            out.write("% filtered by key template : '{0}'\n".format(filter_key))
-        out.write("\n% ---------------------------------------")
-        out.write("\n% to be compiled with XeLaTeX or LuaLaTeX")
-        out.write("\n% ---------------------------------------\n")
-        out.write("\n\\documentclass[{0}\n]{{scrartcl}}\n".format(classoptions))
-        out.write(usepkg)
-        out.write(title)
-        out.write(header)
-    elif mode in ["BibLaTeX"]:                               # BibLaTeX
-        out.write("% generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
-        out.write("% File                     : {0}\n".format(out_file))
-        out.write("% Mode                     : {0}\n".format(mode))
-        out.write("% Date                     : {0}\n".format(actDate))
-        out.write("% Time                     : {0}\n\n".format(actTime))
-        out.write("% Program Call             : {0} {1}\n".format(programname, arguments))
-        out.write("% skipped CTAN fields      : {0}\n".format(skip))
-        out.write("% type of BibLaTeX entries : {0}\n".format(btype))
-        if name_template != "":
-            out.write("% filtered by name template: {0}\n".format(name_template))
-        if filter_key != "":
-            out.write("% filtered by key template : {0}\n".format(filter_key))
-        out.write("\n% actual mapping CTAN --> BibLaTeX\n")
-        out.write("% alias         --> note\n")
-        out.write("% also          --> related\n")
-        out.write("% authorref     --> author\n")
-        out.write("% caption       --> subtitle\n")
-        out.write("% contact       --> note\n")
-        out.write("% copyright     --> usera, year\n")
-        out.write("% ctan          --> url, urldate\n")
-        out.write("% description   --> abstract\n")
-        out.write("% documentation --> note, file (if applicable)\n")
-        out.write("% home          --> note, usere\n")
-        out.write("% install       --> note, userf\n")
-        out.write("% keyval        --> keywords\n")
-        out.write("% license       --> note, userb\n")
-        out.write("% miktex        --> note, userc\n")
-        out.write("% name          --> title\n")
-        out.write("% texlive       --> note, userd\n")
-        out.write("% version       --> version, date\n\n")
-        out.write("% a) The BibLaTeX field note is used for collecting the following CTAN items:\n")
-        out.write("%    alias, contact, documentation, home, install, license, miktex, texlive\n")
-        out.write("% b) The program uses the optional BibLaTeX fields usera, userb, userc, userd, usere, userf\n")
-        out.write("\n% -------------------------------------")
-        out.write("\n% to be compiled by XeLaTeX or LuaLaTeX")
-        out.write("\n% -------------------------------------\n")
-    elif mode in ["plain"]:                                  # plain
-        out.write(documenttitle.center(80) + "\n" + (documentsubtitle + programname).center(80) + "\n\n")
-        out.write("generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
-        out.write("file                     : {0}; mode: {1}; date: {2}; time: {3}\n".format(out_file, mode, actDate, actTime))
-        out.write("program call             : CTAN-out.py {0}\n".format(arguments))
-        out.write("skipped CTAN fields      : {0}\n".format(skip))
-        if name_template != "":
-            out.write("filtered by name template: {0}\n".format(name_template))
-        if filter_key != "":
-            out.write("filtered by key template : {0}\n".format(filter_key))
-    elif mode in ["RIS"]:                                    # RIS
-        pass                                                 #   for RIS do nothing
-    elif mode in ["Excel"]:                                  # Excel; write head of table
-        out.write("id")
-        for f in ["caption", "authorref", "version", "license", "contact", "copyright", "CTAN",
-                  "documentation", "home", "install", "keyval", "mikTeX", "TeXLive", "also"]:
-            out.write("\t" + f)
-        out.write("\n")
+# ------------------------------------------------------------------
+def get_year(s):
+    """auxiliary function: get the most recent year in string s (only for BibLaTeX)
+    include decimal numbers in the intervall [1980, 2050]
+
+    s: string"""
+    
+    nn    = p4.split(s)                                          # split the given strin according p4
+    years = []
+    for i in nn:                                                 # loop over all elements
+        if i.isdecimal():                                        # element is decimal
+            if (1980 <= int(i)) and (int(i) <= 2050):            # element is in [1980, 2050]
+                years.append(int(i))                             # element is collected
+    if len(years) >= 1:
+        return max(years)                                        # maximum is calculated
+    else:
+        return None
+    
+# ------------------------------------------------------------------
+def mod_backslash(s):                             # function: special processing von \ in the source text
+    """special processing von \ in the source text"""
+    
+    res = re.sub(r"\\", r"§§3textbackslash ",s)
+    return res
+
+# ------------------------------------------------------------------
+def mod_TeXchars(s):                              # function: prepare characters for LaTeX/BibLaTeX in a paragraph
+    """Prepare characters for LaTeX/BibLaTeX in a paragraph."""
+
+    # mod_TeXchars --> mod_backslash
+    
+    tmp = s
+    tmp = mod_backslash(tmp)                      # change \
+    tmp = re.sub("[\[]", "[", tmp)                # change [
+    tmp = re.sub("#", "§§3#", tmp)                # change #
+    tmp = re.sub("}", "§§3} ", tmp)               # change }
+    tmp = re.sub("{", "§§3{ ", tmp)               # change {
+    tmp = re.sub(r"[\$]", "§§3$", tmp)            # change $
+    tmp = re.sub("%", "§§3%", tmp)                # change %
+    tmp = re.sub("_", "§§3_", tmp)                # change _
+    tmp = re.sub("≥", "$>=$", tmp)                # change ≥
+    tmp = re.sub("≤", "$<=$", tmp)                # change ≤
+    tmp = re.sub(r"\^", r"§§3textasciicircum ", tmp) # change ^
+    tmp = re.sub("§§1", "{", tmp)                 # re-change {
+    tmp = re.sub("§§2", "}", tmp)                 # re-change }
+    tmp = re.sub("§§3", r"\\", tmp)               # re-change \
+    tmp = re.sub("&", r"{\\&}", tmp)              # change &
+    return tmp
+
+# ------------------------------------------------------------------
+def TeXchars(s):                                   # function: prepare characters for LaTeX/BibLaTeX
+    """prepares characters for LaTeX/BibLaTeX"""
+    
+    tmp = s
+    tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
+    tmp = re.sub("_", r"\\_", tmp)
+    tmp = re.sub("&", r"{\\&}", tmp)
+    tmp = re.sub(r"[\^]", r"\\textasciicircum ", tmp)
+    tmp = re.sub("[$]", r"\\$", tmp)
+    return tmp
+
+
+# ==================================================================
+# main functions
 
 # ------------------------------------------------------------------
 def alias(k):                                     # function: element <alias .../>
@@ -1267,6 +1283,114 @@ def entry(k, t):                                  # function: element <entry ...
     trailing(k, t)
 
 # ------------------------------------------------------------------
+def first_lines():                                          # function: create the first lines of output.
+    """create the first lines of output"""
+    
+    arguments   = ""
+    tmp         = ""
+    tmp_before  = ""
+    e_parameter = ["-t","-k","--template","--key", "-s", "--skip"]
+     
+    for f in range(1,len(call)):
+        tmp = call[f]
+        if tmp_before in e_parameter:
+            tmp = '"' + tmp + '"'
+        arguments = arguments + tmp + " "
+        tmp_before = tmp
+
+    if verbose:
+        print("- Program call:", programname, arguments)
+        
+    if verbose:                                             # header for terminal output
+        print("\n- program call (with details): CTANOut.py")
+        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + (topics_text + ")")[0:50] + ellipse))
+        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
+        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
+        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
+        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))
+        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.out_file, "(" + out_text + ")"))
+        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + (btype_text + ")")[0:50] + ellipse))
+        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(filter_key), "(" + key_text + ")"))
+        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))
+        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(name_template), "(" + template_text + ")"))
+        print("\n")
+
+    if mode in ["LaTeX"]:                                   # LaTeX
+        out.write("% file: {0}\n\n".format(out_file))
+        out.write("% date: {0}\n".format(actDate))
+        out.write("% time: {0}\n\n".format(actTime))
+        out.write("% generated by {0} (version: {1} of {2})\n\n".format(programname, programversion, programdate))
+        out.write("% program call             : {0} {1}\n".format(programname, arguments))
+        out.write("% mode                     : {0}\n".format(mode))
+        out.write("% skipped CTAN fields      : {0}\n".format(skip))
+        if name_template != "":
+            out.write("% filtered by name template: '{0}'\n".format(name_template))
+        if filter_key != "":
+            out.write("% filtered by key template : '{0}'\n".format(filter_key))
+        out.write("\n% ---------------------------------------")
+        out.write("\n% to be compiled with XeLaTeX or LuaLaTeX")
+        out.write("\n% ---------------------------------------\n")
+        out.write("\n\\documentclass[{0}\n]{{scrartcl}}\n".format(classoptions))
+        out.write(usepkg)
+        out.write(title)
+        out.write(header)
+    elif mode in ["BibLaTeX"]:                               # BibLaTeX
+        out.write("% generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
+        out.write("% File                     : {0}\n".format(out_file))
+        out.write("% Mode                     : {0}\n".format(mode))
+        out.write("% Date                     : {0}\n".format(actDate))
+        out.write("% Time                     : {0}\n\n".format(actTime))
+        out.write("% Program Call             : {0} {1}\n".format(programname, arguments))
+        out.write("% skipped CTAN fields      : {0}\n".format(skip))
+        out.write("% type of BibLaTeX entries : {0}\n".format(btype))
+        if name_template != "":
+            out.write("% filtered by name template: {0}\n".format(name_template))
+        if filter_key != "":
+            out.write("% filtered by key template : {0}\n".format(filter_key))
+        out.write("\n% actual mapping CTAN --> BibLaTeX\n")
+        out.write("% alias         --> note\n")
+        out.write("% also          --> related\n")
+        out.write("% authorref     --> author\n")
+        out.write("% caption       --> subtitle\n")
+        out.write("% contact       --> note\n")
+        out.write("% copyright     --> usera, year\n")
+        out.write("% ctan          --> url, urldate\n")
+        out.write("% description   --> abstract\n")
+        out.write("% documentation --> note, file (if applicable)\n")
+        out.write("% home          --> note, usere\n")
+        out.write("% install       --> note, userf\n")
+        out.write("% keyval        --> keywords\n")
+        out.write("% license       --> note, userb\n")
+        out.write("% miktex        --> note, userc\n")
+        out.write("% name          --> title\n")
+        out.write("% texlive       --> note, userd\n")
+        out.write("% version       --> version, date\n\n")
+        out.write("% a) The BibLaTeX field note is used for collecting the following CTAN items:\n")
+        out.write("%    alias, contact, documentation, home, install, license, miktex, texlive\n")
+        out.write("% b) The program uses the optional BibLaTeX fields usera, userb, userc, userd, usere, userf\n")
+        out.write("\n% -------------------------------------")
+        out.write("\n% to be compiled by XeLaTeX or LuaLaTeX")
+        out.write("\n% -------------------------------------\n")
+    elif mode in ["plain"]:                                  # plain
+        out.write(documenttitle.center(80) + "\n" + (documentsubtitle + programname).center(80) + "\n\n")
+        out.write("generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
+        out.write("file                     : {0}; mode: {1}; date: {2}; time: {3}\n".format(out_file, mode, actDate, actTime))
+        out.write("program call             : CTAN-out.py {0}\n".format(arguments))
+        out.write("skipped CTAN fields      : {0}\n".format(skip))
+        if name_template != "":
+            out.write("filtered by name template: {0}\n".format(name_template))
+        if filter_key != "":
+            out.write("filtered by key template : {0}\n".format(filter_key))
+    elif mode in ["RIS"]:                                    # RIS
+        pass                                                 #   for RIS do nothing
+    elif mode in ["Excel"]:                                  # Excel; write head of table
+        out.write("id")
+        for f in ["caption", "authorref", "version", "license", "contact", "copyright", "CTAN",
+                  "documentation", "home", "install", "keyval", "mikTeX", "TeXLive", "also"]:
+            out.write("\t" + f)
+        out.write("\n")
+
+# ------------------------------------------------------------------
 def home(k):                                      # function: element <home .../>
     """Process the home element."""
     
@@ -1347,6 +1471,8 @@ def leading(k):                                               # function: first 
     """Analyze the first lines of each package XML file and print out some lines."""
 
     # leading --> TeXchars
+    # leading --> get_year
+    # leading --> get_authoryear
     
     global authorexists                                       # flag
 
@@ -1356,6 +1482,9 @@ def leading(k):                                               # function: first 
     year        = ""
     year_string = ""
     authorexists= False
+    date        = ""
+    year        = ""
+    date_year_strings = ""
     
     usedPackages.append(xname)
 
@@ -1388,13 +1517,32 @@ def leading(k):                                               # function: first 
         if child.tag == "version":                            # get version
             number    = child.get("number", "")               # attribute number
             date      = child.get("date", "")                 # attribute date
+            date_year_strings += "|" + date
             if date != "":
-                number += " (" + date + ")"
+               number += " (" + date + ")"
             if number != "":
                 xcaption += "; version " + number
 
+        if child.tag == "copyright":
+            owner    = child.get("owner", "")                 # attribute owner
+            year     = child.get("year", "--")                # attribute year
+            date_year_strings += "|" + year
+
+    if mode == "BibLaTeX":
+        if len(allauthors) > 0:
+            first_author = allauthors[0]
+        else:
+            first_author = None
+        if (date != "") or (year != "--"):
+            tmp5 = get_year(date_year_strings)
+            if (tmp5 != None) and (first_author != None):
+                xname = get_authoryear(first_author, tmp5)
+            elif (tmp5 == None) and (first_author != None):
+                tmp5 = ""
+                xname = get_authoryear(first_author, tmp5)
+
     if mode in ["BibLaTeX"]:                                  # BibLaTeX
-        allauthors2 = []                                      # generate author string for the actual package
+        allauthors2 = []                                      # generate author string for the current package
         for f in allauthors:
             f = list(f)
             
@@ -1404,7 +1552,7 @@ def leading(k):                                               # function: first 
                 f[1] = "{" + f[1] + "}"
                 
             if (f[0] != "") and (f[1] != ""):
-                oneauthor = f[0] + ", " + f[1]
+                 oneauthor = f[0] + ", " + f[1]
             elif (f[0] != "") and (f[1] == ""):
                 oneauthor = f[0]
             else:
@@ -1507,6 +1655,225 @@ def licenseT(k):                                  # function: element <license .
         s_license = tmp
 
 # ------------------------------------------------------------------
+def main():                    # function: Main function
+    """Main function"""
+
+    # main --> first_lines
+    # main --> process_packages
+    # main --> make_tops
+    # main --> make_xref
+    # main --> make_tap
+    # main --> make_stat
+    # main --> make_statistics
+
+    starttotal   = time.time()
+    startprocess = time.process_time()
+    
+    first_lines()             # first lines of output
+    process_packages()        # process all packages
+
+    # ------------------------------------------------------------------
+    # Generate topic list, topics and their packages (cross-reference), finish
+    #
+    if mode in ["LaTeX"] and make_topics: 
+        make_tops()           # Topic list
+        make_xref()           # Topics/Packages cross-reference
+        make_tap()            # Authors/Packages cross-reference
+        make_stat()           # Statistics file (xyz.stat)
+
+    # ------------------------------------------------------------------
+    # The end
+    #
+    if mode in ["LaTeX"]:     # LaTeX
+        out.write(trailer)    # output trailer
+    out.close()               # close file
+    if verbose:
+        print("- Info: program successfully completed")
+
+    # ------------------------------------------------------------------
+    # Statistics on terminal
+    #
+    if statistics:            # flag -stat is set
+        make_statistics()     # output statistics on terminal
+        
+        endtotal   = time.time()
+        endprocess = time.process_time()
+        print("--")
+        print("total time: ".ljust(left + 2), round(endtotal-starttotal, 2))
+        print("process time: ".ljust(left + 2), round(endprocess-startprocess, 2))
+
+# ------------------------------------------------------------------
+def make_stat():                                  # function: Generate statistics in the stat (xyz.stat) file.
+    """Generate statistics in the stat (xyz.stat) file."""
+    
+    # write statistics in the stat (.stat) file
+
+    text1 = ""
+    text2 = ""
+    text3 = ""
+    
+    stat = open(direc + args.out_file + ".stat", encoding="utf-8", mode="w")
+    stat.write("% file: '{0}.stat'\n".format(args.out_file))
+    stat.write("% date: {0}\n".format(actDate))
+    stat.write("% time: {0}\n".format(actTime))
+    stat.write("% is called by '{0}.tex'\n\n".format(args.out_file))
+    
+    stat.write(r"\minisec{Parameters and Statistics}" + "\n\n")
+    stat.write(r"\raggedright" + "\n")
+    stat.write(r"\begin{tabular}{lrl}" + "\n")
+
+    stat.write("\n")
+    stat.write("program name "                   + r"& \verb§" + str(programname) + r"§\\" + "\n")
+    stat.write("program version "                + r"&" + programversion + " (" + programdate + r")\\"  "\n")
+    stat.write("program author "                 + r"&" + programauthor + r"\\\\"  "\n\n")
+
+    stat.write("date of program execution "      + r"&" + actDate + r"\\"  "\n")
+    stat.write("time of program execution "      + r"&" + actTime + r"\\\\"  "\n")
+    
+    stat.write("mode "                           + r"& \verb§" + mode + r"§\\" + "\n")
+    if name_template == name_default:
+        text1 = "(all packages = default)"
+    stat.write("template for package names "     + r"& \verb§" + name_template + r"§ & " + text1 + r"\\" + "\n")
+    if filter_key == filter_default:
+        text2 = "(all topics = default)"
+    stat.write("template for topics "            + r"& \verb§" + filter_key + r"§ & " + text2 + r"\\" + "\n")
+    stat.write("special lists used\\footnotemark{} "        + r"&" + str(make_topics) + r"\\" + "\n")
+    if skip == skip_default:
+        text3 = "(no skipped fields = default)"
+    stat.write("skipped CTAN fields "            + r"& \verb§" + skip + r"§ & " + text3 + r"\\\\" + "\n")
+    
+    stat.write("number of authors, total on CTAN "    + r"&" + str(len(authors)).rjust(6) + r"\\" + "\n")
+    stat.write("number of authors, cited here "       + r"&" + str(len(usedAuthors)).rjust(6)  + r"\\" + "\n")
+    stat.write("number of packages, total on CTAN "   + r"&" + str(len(packages)).rjust(6)  + r"\\" + "\n")
+    stat.write("number of packages, described here "  + r"&" + str(len(usedPackages)).rjust(6)  + r"\\" + "\n")
+    stat.write("number of topics, total on CTAN "     + r"&" + str(len(topics)).rjust(6)  + r"\\" + "\n")
+    stat.write("number of topics, used here "         + r"&" + str(len(usedTopics)).rjust(6)  + r"\\" + "\n")
+    stat.write(r"\end{tabular}" + "\n")
+    stat.write("\\footnotetext{special lists: topic list + list with topics and related packages (cross-reference list)" +
+               " + list with authors and related packages (cross-reference list)}\n")
+    stat.close()                                  # close statistics file 
+    if verbose:
+        print("--- Info: statistics written")
+
+# ------------------------------------------------------------------
+def make_statistics():                            # function: Generate statistics on terminal.
+    """Generate statistics on terminal."""
+
+    l = left + 1
+    r = 5
+    
+    # Statistics on terminal
+    print("\nStatistics\n")
+    print("target format:".ljust(l + 1), mode)
+    print("output file:".ljust(l + 1), direc + out_file, "\n")
+    print("number of authors, total on CTAN:".ljust(l),  str(len(authors)).rjust(r))
+    print("number of authors, cited here:".ljust(l),   str(len(usedAuthors)).rjust(r))
+    print("number of packages, total on CTAN:".ljust(l), str(len(packages)).rjust(r))
+    print("number of packages, collected here:".ljust(l),  str(len(usedPackages)).rjust(r))
+    print("number of topics, total on CTAN:".ljust(l),   str(len(topics)).rjust(r))
+    print("number of topics, used here:".ljust(l),    str(len(usedTopics)).rjust(r))
+
+# ------------------------------------------------------------------
+def make_tap():                                   # function: Generate the tap (xyz.tap) file.
+    """Generate the tap (xyz.tap) file."""
+    
+    # Authors/Packages cross-reference
+    
+    tap = open(direc + args.out_file + ".tap", encoding="utf-8", mode="w")
+    tap.write("% file: '{0}.tap'\n".format(args.out_file))
+    tap.write("% date: {0}\n".format(actDate))
+    tap.write("% time: {0}\n".format(actTime))
+    tap.write("% is called by '{0}.tex'\n\n".format(args.out_file))
+    tap.write(r"\section{Authors and associated Packages}" + "\n\n")
+    tap.write(r"\raggedright" + "\n")
+    tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
+
+    tap.write("\n")
+    for f in authors:
+        if f in usedAuthors:
+            if authors[f][1] != "":
+                tmp2 = authors[f][1] + ", " + authors[f][0]
+            else:
+                tmp2 = authors[f][0]
+            tap.write("\\item[{0}] ".format(tmp2))
+            tap.write("\\index{{Author!{0}}}".format(tmp2))
+            tmp1 = authorpackages[f]
+            package_no = 0
+            for ff in tmp1:
+                if ff in usedPackages:
+                    package_no += 1
+            tap.write(str(package_no) + " package(s): ")
+            for ff in tmp1:
+                if ff in usedPackages:
+                    ff = re.sub("_", "-", ff)
+                    tap.write("\\texttt{{{0}}}  (\\ref{{pkg:{0}}}); ".format(ff, ff))
+            tap.write("\n")
+    tap.write(r"\end{labeling}" + "\n")
+    tap.close()                                   # close file
+    if verbose:
+        print("--- Info: file '{0}.tap' created: [list with authors and related packages (cross-reference list)]".format(direc + args.out_file))
+
+# ------------------------------------------------------------------
+def make_tops():                                  # function: Generate the tops (xyz.top) file.
+    """Generate the tops (xyz.top) file."""
+    
+    # Topic list
+    tops = open(direc + args.out_file + ".top", encoding="utf-8", mode="w")
+    tops.write("% file: {0}.top\n".format(args.out_file))
+    tops.write("% date: {0}\n".format(actDate))
+    tops.write("% time: {0}\n".format(actTime))
+    tops.write("% is called by {0}.tex\n\n".format(args.out_file))
+    
+    tops.write(r"\appendix" + "\n")
+    tops.write(r"\section{Used Topics, Short Explainations}" + "\n\n")
+    tops.write(r"\raggedright" + "\n")
+    tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
+  
+    for f in topics:
+        if f in usedTopics:
+            tmp = topics[f]
+            tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
+            tops.write("\\item[\\texttt{{{0}}}] {1}".format(f, tmp))
+            tops.write("\\index{{Topic!{0}}}\n".format(f))
+    tops.write(r"\end{labeling}" + "\n")
+    tops.close()                                  # close file
+    if verbose:
+        print("--- Info: file '{0}.top' created: [topic list]".format(direc + args.out_file))
+
+# ------------------------------------------------------------------
+def make_xref():                                  # function: Generate the xref (xyz.xref) file.
+    """Generate the xref (xyz.xref) file."""
+    
+    # Topics/Packages cross-reference
+    xref = open(direc + args.out_file + ".xref", encoding="utf-8", mode="w")
+    xref.write("% file: {0}.xref\n".format(args.out_file))
+    xref.write("% date: {0}\n".format(actDate))
+    xref.write("% time: {0}\n".format(actTime))
+    xref.write("% is called by '{0}.tex'\n\n".format(args.out_file))
+    xref.write(r"\section{Used Topics and related Packages}" + "\n\n")
+    xref.write(r"\raggedright" + "\n")
+    xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
+    xref.write("\n")
+    for f in topics:                              # loop: all topics
+        if f in usedTopics:                       # topic is used?
+            xref.write("\\item \\index{{Topic!{0}}}".format(f))
+            tmp1 = topicspackage[f]               # get the packages for this topic
+            package_nr = 0
+            for ff in tmp1:                       # loop: all packages with this topic
+                if ff in usedPackages:            #    package is used?
+                    package_nr += 1               #    count the packages
+            xref.write(str(package_nr) + " package(s): ")
+            for ff in tmp1:                       # loop: all packages with this topic
+                if ff in usedPackages:            #    package is used?
+                    ff = re.sub("_", "-", ff)
+                    xref.write("\\texttt{{{0}}} (\\ref{{pkg:{1}}}); ".format(ff, ff))
+            xref.write("\n")
+    xref.write(r"\end{labeling}" + "\n")
+    xref.close()                                  # close file
+    if verbose:
+        print("--- Info: file '{0}.xref' created: [list with topics and related packages (cross-reference list)]".format(direc + args.out_file))
+
+# ------------------------------------------------------------------
 def miktex(k):                                    # function: element <miktex .../>
     """Process the miktex element."""
 
@@ -1559,30 +1926,6 @@ def mod_a(k):                                     # function: element <a ...> ..
             pass                                  #   for Excek do nothing
 
 # ------------------------------------------------------------------
-def mod_xref(k):                                  # function: element <xref ...> ... </xref>
-    """Process the xref element."""
-    
-    # Now the element xref is used for inline-links, not a.
-    
-    ll = list(k.iter("xref"))                     # fetch all xref elements; ##1: {; ##2: }
-
-    for i in ll:
-        tmp  = i.attrib["refid"]                  # attribute refid
-        tmp2 = ctanUrl4 + tmp
-        
-        if i.text == None:                        # no embedded textdef 
-            i.text = tmp                          #   get embedded text
-            
-        if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-            i.text = re.sub("_", "-", i.text)     #   change embedded text
-            i.text = "§§3href§§1{0}§§2§§1{1}§§2".format(tmp2, i.text)
-        elif mode in ["RIS", "plain"]:            # RIS / plain
-            i.text = "{0} {1})".format(i.text, tmp2)
-                                                  #   change embedded text
-        elif mode in ["Excel"]:                   # Excel
-            pass                                  #   for Excel do nothing
-
-# ------------------------------------------------------------------
 def mod_b(k):                                     # function: element <b>...</b>
     """Process the b element."""
     
@@ -1596,13 +1939,6 @@ def mod_b(k):                                     # function: element <b>...</b>
             i.text = "''{0}''".format(i.text)     #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
-
-# ------------------------------------------------------------------
-def mod_backslash(s):                             # function: special processing von \ in the source text
-    """special processing von \ in the source text"""
-    
-    res = re.sub(r"\\", r"§§3textbackslash ",s)
-    return res
 
 # ------------------------------------------------------------------
 def mod_br(k):                                    # function: element <br/>
@@ -1664,30 +2000,6 @@ def mod_pre(k):                                   # function: element <pre>...</
             pass                                  #   for Excel do nothing
 
 # ------------------------------------------------------------------
-def mod_TeXchars(s):                              # function: prepare characters for LaTeX/BibLaTeX in a paragraph
-    """Prepare characters for LaTeX/BibLaTeX in a paragraph."""
-
-    # mod_TeXchars --> mod_backslash
-    
-    tmp = s
-    tmp = mod_backslash(tmp)                      # change \
-    tmp = re.sub("[\[]", "[", tmp)                # change [
-    tmp = re.sub("#", "§§3#", tmp)                # change #
-    tmp = re.sub("}", "§§3} ", tmp)               # change }
-    tmp = re.sub("{", "§§3{ ", tmp)               # change {
-    tmp = re.sub(r"[\$]", "§§3$", tmp)            # change $
-    tmp = re.sub("%", "§§3%", tmp)                # change %
-    tmp = re.sub("_", "§§3_", tmp)                # change _
-    tmp = re.sub("≥", "$>=$", tmp)                # change ≥
-    tmp = re.sub("≤", "$<=$", tmp)                # change ≤
-    tmp = re.sub(r"\^", r"§§3textasciicircum ", tmp) # change ^
-    tmp = re.sub("§§1", "{", tmp)                 # re-change {
-    tmp = re.sub("§§2", "}", tmp)                 # re-change }
-    tmp = re.sub("§§3", r"\\", tmp)               # re-change \
-    tmp = re.sub("&", r"{\\&}", tmp)              # change &
-    return tmp
-
-# ------------------------------------------------------------------
 def mod_tt(k):                                    # function: element <tt>...</tt>
     """Process the tt element."""
 
@@ -1701,6 +2013,30 @@ def mod_tt(k):                                    # function: element <tt>...</t
                                                   #   change embedded text
         elif mode in ["RIS", "plain"]:            # RIS / plain
             i.text = "'{0}'".format(tmp)          #   change embedded text
+        elif mode in ["Excel"]:                   # Excel
+            pass                                  #   for Excel do nothing
+
+# ------------------------------------------------------------------
+def mod_xref(k):                                  # function: element <xref ...> ... </xref>
+    """Process the xref element."""
+    
+    # Now the element xref is used for inline-links, not a.
+    
+    ll = list(k.iter("xref"))                     # fetch all xref elements; ##1: {; ##2: }
+
+    for i in ll:
+        tmp  = i.attrib["refid"]                  # attribute refid
+        tmp2 = ctanUrl4 + tmp
+        
+        if i.text == None:                        # no embedded textdef 
+            i.text = tmp                          #   get embedded text
+            
+        if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
+            i.text = re.sub("_", "-", i.text)     #   change embedded text
+            i.text = "§§3href§§1{0}§§2§§1{1}§§2".format(tmp2, i.text)
+        elif mode in ["RIS", "plain"]:            # RIS / plain
+            i.text = "{0} {1})".format(i.text, tmp2)
+                                                  #   change embedded text
         elif mode in ["Excel"]:                   # Excel
             pass                                  #   for Excel do nothing
 
@@ -1802,16 +2138,43 @@ def p(k):                                         # function: element <p> ... </
         out.write(tmptext)
 
 # ------------------------------------------------------------------
-def TeXchars(s):                                   # function: prepare characters for LaTeX/BibLaTeX
-    """prepares characters for LaTeX/BibLaTeX"""
+def process_packages():                          # function: Global loop
+    """Global loop"""
+
+    # process_packages --> onepackage
     
-    tmp = s
-    tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
-    tmp = re.sub("_", r"\\_", tmp)
-    tmp = re.sub("&", r"{\\&}", tmp)
-    tmp = re.sub(r"[\^]", r"\\textasciicircum ", tmp)
-    tmp = re.sub("[$]", r"\\$", tmp)
-    return tmp
+    key      = filter_key
+    keyexist = False
+
+    for f in packages:                           # all XML files in loop
+        fext   = f + ext                         # XML file name (with extension)
+        haskey = False
+        if f in packagetopics:
+            tmptopic = packagetopics[f]
+            for g in tmptopic:                   
+                haskey = haskey or p3.match(g)
+        keyexist = keyexist or haskey
+
+        try:
+            if p2.match(f) and haskey:           # 
+                ff       = open(direc + fext, encoding="utf-8", mode="r")
+                mod_time = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(fext)))
+                onepackage(f, mod_time)          # process loaded XML file 
+                ff.close()                       # loaded XML file closed
+        except FileNotFoundError:                # specified XML file not found
+            if verbose:
+                print("----- Warning: XML file for package '{0}' not found".format(f))
+
+    if not keyexist:                             # no package found with the specified topic(s)
+        if verbose:
+            print("----- Warning: key '{0}' not found".format(key))
+
+    if counter <= 1:                             # no specified package found <=== error1
+        if verbose:
+            print("----- Warning: no correct XML file for any specified package found")
+
+    if verbose:
+        print("--- Info: packages processed")
 
 # ------------------------------------------------------------------
 def texlive(k):                                   # function: element <texlive .../>
@@ -1941,264 +2304,6 @@ def version(k):                                   # function: element <version .
             out.write("date".ljust(fieldwidth) + "= {" + date + "},\n")
     elif mode in ["Excel"]:                       # Excel
         s_version = tmp
-
-# ------------------------------------------------------------------
-def make_tops():                                  # function: Generate the tops (xyz.top) file.
-    """Generate the tops (xyz.top) file."""
-    
-    # Topic list
-    tops = open(direc + args.out_file + ".top", encoding="utf-8", mode="w")
-    tops.write("% file: {0}.top\n".format(args.out_file))
-    tops.write("% date: {0}\n".format(actDate))
-    tops.write("% time: {0}\n".format(actTime))
-    tops.write("% is called by {0}.tex\n\n".format(args.out_file))
-    
-    tops.write(r"\appendix" + "\n")
-    tops.write(r"\section{Used Topics, Short Explainations}" + "\n\n")
-    tops.write(r"\raggedright" + "\n")
-    tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
-  
-    for f in topics:
-        if f in usedTopics:
-            tmp = topics[f]
-            tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
-            tops.write("\\item[\\texttt{{{0}}}] {1}".format(f, tmp))
-            tops.write("\\index{{Topic!{0}}}\n".format(f))
-    tops.write(r"\end{labeling}" + "\n")
-    tops.close()                                  # close file
-    if verbose:
-        print("--- Info: file '{0}.top' created: [topic list]".format(direc + args.out_file))
-
-# ------------------------------------------------------------------
-def make_xref():                                  # function: Generate the xref (xyz.xref) file.
-    """Generate the xref (xyz.xref) file."""
-    
-    # Topics/Packages cross-reference
-    xref = open(direc + args.out_file + ".xref", encoding="utf-8", mode="w")
-    xref.write("% file: {0}.xref\n".format(args.out_file))
-    xref.write("% date: {0}\n".format(actDate))
-    xref.write("% time: {0}\n".format(actTime))
-    xref.write("% is called by '{0}.tex'\n\n".format(args.out_file))
-    xref.write(r"\section{Used Topics and related Packages}" + "\n\n")
-    xref.write(r"\raggedright" + "\n")
-    xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
-    xref.write("\n")
-    for f in topics:                              # loop: all topics
-        if f in usedTopics:                       # topic is used?
-            xref.write("\\item \\index{{Topic!{0}}}".format(f))
-            tmp1 = topicspackage[f]               # get the packages for this topic
-            package_nr = 0
-            for ff in tmp1:                       # loop: all packages with this topic
-                if ff in usedPackages:            #    package is used?
-                    package_nr += 1               #    count the packages
-            xref.write(str(package_nr) + " package(s): ")
-            for ff in tmp1:                       # loop: all packages with this topic
-                if ff in usedPackages:            #    package is used?
-                    ff = re.sub("_", "-", ff)
-                    xref.write("\\texttt{{{0}}} (\\ref{{pkg:{1}}}); ".format(ff, ff))
-            xref.write("\n")
-    xref.write(r"\end{labeling}" + "\n")
-    xref.close()                                  # close file
-    if verbose:
-        print("--- Info: file '{0}.xref' created: [list with topics and related packages (cross-reference list)]".format(direc + args.out_file))
-
-# ------------------------------------------------------------------
-def make_tap():                                   # function: Generate the tap (xyz.tap) file.
-    """Generate the tap (xyz.tap) file."""
-    
-    # Authors/Packages cross-reference
-    
-    tap = open(direc + args.out_file + ".tap", encoding="utf-8", mode="w")
-    tap.write("% file: '{0}.tap'\n".format(args.out_file))
-    tap.write("% date: {0}\n".format(actDate))
-    tap.write("% time: {0}\n".format(actTime))
-    tap.write("% is called by '{0}.tex'\n\n".format(args.out_file))
-    tap.write(r"\section{Authors and associated Packages}" + "\n\n")
-    tap.write(r"\raggedright" + "\n")
-    tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
-
-    tap.write("\n")
-    for f in authors:
-        if f in usedAuthors:
-            if authors[f][1] != "":
-                tmp2 = authors[f][1] + ", " + authors[f][0]
-            else:
-                tmp2 = authors[f][0]
-            tap.write("\\item[{0}] ".format(tmp2))
-            tap.write("\\index{{Author!{0}}}".format(tmp2))
-            tmp1 = authorpackages[f]
-            package_no = 0
-            for ff in tmp1:
-                if ff in usedPackages:
-                    package_no += 1
-            tap.write(str(package_no) + " package(s): ")
-            for ff in tmp1:
-                if ff in usedPackages:
-                    ff = re.sub("_", "-", ff)
-                    tap.write("\\texttt{{{0}}}  (\\ref{{pkg:{0}}}); ".format(ff, ff))
-            tap.write("\n")
-    tap.write(r"\end{labeling}" + "\n")
-    tap.close()                                   # close file
-    if verbose:
-        print("--- Info: file '{0}.tap' created: [list with authors and related packages (cross-reference list)]".format(direc + args.out_file))
-
-# ------------------------------------------------------------------
-def make_stat():                                  # function: Generate statistics in the stat (xyz.stat) file.
-    """Generate statistics in the stat (xyz.stat) file."""
-    
-    # write statistics in the stat (.stat) file
-
-    text1 = ""
-    text2 = ""
-    text3 = ""
-    
-    stat = open(direc + args.out_file + ".stat", encoding="utf-8", mode="w")
-    stat.write("% file: '{0}.stat'\n".format(args.out_file))
-    stat.write("% date: {0}\n".format(actDate))
-    stat.write("% time: {0}\n".format(actTime))
-    stat.write("% is called by '{0}.tex'\n\n".format(args.out_file))
-    
-    stat.write(r"\minisec{Parameters and Statistics}" + "\n\n")
-    stat.write(r"\raggedright" + "\n")
-    stat.write(r"\begin{tabular}{lrl}" + "\n")
-
-    stat.write("\n")
-    stat.write("program name "                   + r"& \verb§" + str(programname) + r"§\\" + "\n")
-    stat.write("program version "                + r"&" + programversion + " (" + programdate + r")\\"  "\n")
-    stat.write("program author "                 + r"&" + programauthor + r"\\\\"  "\n\n")
-
-    stat.write("date of program execution "      + r"&" + actDate + r"\\"  "\n")
-    stat.write("time of program execution "      + r"&" + actTime + r"\\\\"  "\n")
-    
-    stat.write("mode "                           + r"& \verb§" + mode + r"§\\" + "\n")
-    if name_template == name_default:
-        text1 = "(all packages = default)"
-    stat.write("template for package names "     + r"& \verb§" + name_template + r"§ & " + text1 + r"\\" + "\n")
-    if filter_key == filter_default:
-        text2 = "(all topics = default)"
-    stat.write("template for topics "            + r"& \verb§" + filter_key + r"§ & " + text2 + r"\\" + "\n")
-    stat.write("special lists used\\footnotemark{} "        + r"&" + str(make_topics) + r"\\" + "\n")
-    if skip == skip_default:
-        text3 = "(no skipped fields = default)"
-    stat.write("skipped CTAN fields "            + r"& \verb§" + skip + r"§ & " + text3 + r"\\\\" + "\n")
-    
-    stat.write("number of authors, total on CTAN "    + r"&" + str(len(authors)).rjust(6) + r"\\" + "\n")
-    stat.write("number of authors, cited here "       + r"&" + str(len(usedAuthors)).rjust(6)  + r"\\" + "\n")
-    stat.write("number of packages, total on CTAN "   + r"&" + str(len(packages)).rjust(6)  + r"\\" + "\n")
-    stat.write("number of packages, described here "  + r"&" + str(len(usedPackages)).rjust(6)  + r"\\" + "\n")
-    stat.write("number of topics, total on CTAN "     + r"&" + str(len(topics)).rjust(6)  + r"\\" + "\n")
-    stat.write("number of topics, used here "         + r"&" + str(len(usedTopics)).rjust(6)  + r"\\" + "\n")
-    stat.write(r"\end{tabular}" + "\n")
-    stat.write("\\footnotetext{special lists: topic list + list with topics and related packages (cross-reference list)" +
-               " + list with authors and related packages (cross-reference list)}\n")
-    stat.close()                                  # close statistics file 
-    if verbose:
-        print("--- Info: statistics written")
-
-# ------------------------------------------------------------------
-def make_statistics():                            # function: Generate statistics on terminal.
-    """Generate statistics on terminal."""
-
-    l = left + 1
-    r = 5
-    
-    # Statistics on terminal
-    print("\nStatistics\n")
-    print("target format:".ljust(l + 1), mode)
-    print("output file:".ljust(l + 1), direc + out_file, "\n")
-    print("number of authors, total on CTAN:".ljust(l),  str(len(authors)).rjust(r))
-    print("number of authors, cited here:".ljust(l),   str(len(usedAuthors)).rjust(r))
-    print("number of packages, total on CTAN:".ljust(l), str(len(packages)).rjust(r))
-    print("number of packages, collected here:".ljust(l),  str(len(usedPackages)).rjust(r))
-    print("number of topics, total on CTAN:".ljust(l),   str(len(topics)).rjust(r))
-    print("number of topics, used here:".ljust(l),    str(len(usedTopics)).rjust(r))
-
-# ------------------------------------------------------------------
-def process_packages():                          # function: Global loop
-    """Global loop"""
-
-    # process_packages --> onepackage
-    
-    key      = filter_key
-    keyexist = False
-
-    for f in packages:                           # all XML files in loop
-        fext   = f + ext                         # XML file name (with extension)
-        haskey = False
-        if f in packagetopics:
-            tmptopic = packagetopics[f]
-            for g in tmptopic:                   
-                haskey = haskey or p3.match(g)
-        keyexist = keyexist or haskey
-
-        try:
-            if p2.match(f) and haskey:           # 
-                ff       = open(direc + fext, encoding="utf-8", mode="r")
-                mod_time = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(fext)))
-                onepackage(f, mod_time)          # process loaded XML file 
-                ff.close()                       # loaded XML file closed
-        except FileNotFoundError:                # specified XML file not found
-            if verbose:
-                print("----- Warning: XML file for package '{0}' not found".format(f))
-
-    if not keyexist:                             # no package found with the specified topic(s)
-        if verbose:
-            print("----- Warning: key '{0}' not found".format(key))
-
-    if counter <= 1:                             # no specified package found <=== error1
-        if verbose:
-            print("----- Warning: no correct XML file for any specified package found")
-
-    if verbose:
-        print("--- Info: packages processed")
-
-# ------------------------------------------------------------------
-def main():                    # function: Main function
-    """Main function"""
-
-    # main --> first_lines
-    # main --> process_packages
-    # main --> make_tops
-    # main --> make_xref
-    # main --> make_tap
-    # main --> make_stat
-    # main --> make_statistics
-
-    starttotal   = time.time()
-    startprocess = time.process_time()
-    
-    first_lines()             # first lines of output
-    process_packages()        # process all packages
-
-    # ------------------------------------------------------------------
-    # Generate topic list, topics and their packages (cross-reference), finish
-    #
-    if mode in ["LaTeX"] and make_topics: 
-        make_tops()           # Topic list
-        make_xref()           # Topics/Packages cross-reference
-        make_tap()            # Authors/Packages cross-reference
-        make_stat()           # Statistics file (xyz.stat)
-
-    # ------------------------------------------------------------------
-    # The end
-    #
-    if mode in ["LaTeX"]:     # LaTeX
-        out.write(trailer)    # output trailer
-    out.close()               # close file
-    if verbose:
-        print("- Info: program successfully completed")
-
-    # ------------------------------------------------------------------
-    # Statistics on terminal
-    #
-    if statistics:            # flag -stat is set
-        make_statistics()     # output statistics on terminal
-        
-        endtotal   = time.time()
-        endprocess = time.process_time()
-        print("--")
-        print("total time: ".ljust(left + 2), round(endtotal-starttotal, 2))
-        print("process time: ".ljust(left + 2), round(endprocess-startprocess, 2))
 
   
 #===================================================================
