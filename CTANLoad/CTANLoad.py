@@ -8,8 +8,11 @@
 # Es fehlen noch  bzw. Probleme:
 # - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
 # - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/ (geht eigentlich nicht)(-)
-# - fold schlauer gestalten (x)
+# - Auswahl auch nach Autor? CTAN.lap oder authorpackages; for f in authorpackages: print(authors[f][1], authorpackages[f])
 # - mit CTAN.pkl neu machen? funktioniert noch nicht? (x)
+# - Zusammenspiel von -A / -k / -t (z.B. für -A Knuth und -k collection) (x)
+# - zusammenspiel von -t/-k/-A am besten wie bei CTANOut
+# - Fehler bei -r; rs wird jedesmal CTAN.pkl neu gemacht (?)
 
 # ------------------------------------------------------------------
 # History
@@ -54,21 +57,26 @@
 # 2.5.1  2021-07-01 minor corrections
 # 2.5.2  2021-07-05 function fold restructured
 # 2.5.3  2021-07-06 pickle file 1 is generated, too
+# 2.6.0  2021-07-11 search of packages with author name template; new option -A; new function get_CTAN_lap (needs CTAN.lap)
+# 2.6.1  2021-07-12 some corrections in the handling of -t / -k and -A
+# 2.6.2  2021-07-15 more corrections in the handling of -t / -k and -A
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
 #
 
-# usage: CTANLoad.py [-h] [-a] [-c] [-d DIREC] [-f] [-l] [-k KEY_TEMPLATE]
-#                    [-n NUMBER] [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat]
-#                    [-v] [-V]
+# usage: CTANLoad.py [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l]
+#                    [-k KEY_TEMPLATE] [-n NUMBER] [-o OUTPUT_NAME] [-r]
+#                    [-t TEMPLATE] [-stat] [-v] [-V]
 # 
 # Load XLM and PDF documentation files from CTAN a/o generate some special
-# lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.5.3 (2021-07-06)]
+# lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.6.1 (2021-07-12)]
 # 
 # Optional parameters:
 #   -h, --help            show this help message and exit
 #   -a, --author          Author of the program
+#   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
+#                         Name template for authors - Default:
 #   -c, --check_integrity
 #                         Flag: Check the integrity of the 2nd .pkl file. -
 #                         Default: False
@@ -94,7 +102,7 @@
 #   -stat, --statistics   Flag: Print statistics. - Default: False
 #   -v, --verbose         Flag: Output is verbose. - Default: False
 #   -V, --version         Version of the program
-# 
+#  
 # ------------------------------------------------------------------
 # Messages (CTANLoad)
 #
@@ -161,6 +169,7 @@
 # generate_pickle2()	   pickle dump: actual XML_toc (list with download information files).
 # generate_topicspackage() Generate topicspackage, packagetopics, and authorpackages.
 # get_CTAN_lpt()           Load CTAN.lpt and analyze
+# get_CTAN_lap()           Load CTAN.lap and analyze
 # get_PDF_files(d)	   List all PDF files in a OS directory.
 # get_XML_files(d)         List all XML files in the OS directory d.
 # dload_XML_files()	   Download XML package files.
@@ -216,15 +225,33 @@
 # - with statistics                                            [-stat]
 #
 # CTANLoad -k latex -f -v -stat
-# - download all XML packages which match the topic LaTeX      [-k]
+# - download all CTAN packages which match the topic "latex"   [-k]
 # - load the associated information files (PDF)                [-f]
 # - verbose                                                    [-v]
 # - with statistics                                            [-stat]
 #
 # CTANLoad -k chinese -t "^zh" -f -v -stat
-# - download all XML packages which match the topic chinese    [-k]
-# - load only CTAN XML files with the name template "^zh"      [-t]
+# - download all CTAN packages which match the topic "chinese" [-k]
+# - download only CTAN XML files with the name template "^zh"  [-t]
 # - load the associated information files (PDF)                [-f]
+# - verbose                                                    [-v]
+# - with statistics                                            [-stat]
+#
+# CTANLoad -A Knuth -v -stat
+# - download all XML packages with the author template "Knuth" [-A] 
+# - verbose                                                    [-v]
+# - with statistics                                            [-stat]
+#
+# CTANLoad -A Knuth -k collection -stat
+# - download all XML packages with the author template "Knuth" [-A]
+# - download only packages with the topic template "collection"[-k]
+# - verbose                                                    [-v]
+# - with statistics                                            [-stat]
+#
+# CTANLoad -A Knuth -k collection -f -v -stat -t knuth
+# - download all XML packages with the author template "Knuth" [-A] 
+# - download only packages with the topic template "collection"[-k]
+# - download only packages with the name template "knuth"      [-t]  
 # - verbose                                                    [-v]
 # - with statistics                                            [-stat]
 
@@ -265,8 +292,8 @@ from threading import Thread       # handling of threads
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.5.3"
-prg_date        = "2021-07-06"
+prg_version     = "2.6.2"
+prg_date        = "2021-07-15"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
@@ -275,35 +302,37 @@ call            = sys.argv
 # ------------------------------------------------------------------
 # Texts for argparse and help
 
-author_text         = "Author of the program"
-version_text        = "Version of the program"
-template_text       = "Name template for package XML files to be loaded"
-key_template_text   = "Key template for package XML files to be loaded"
-output_text         = "Generic file name for output files"
-number_text         = "Maximum number of file downloads"
-direc_text          = "OS Directory for output files"
-program_text        = "Load XLM and PDF documentation files from CTAN a/o generate some special lists, and prepare data for CTANOut"
+author_text          = "Author of the program"
+author_template_text = "Name template for authors"
+version_text         = "Version of the program"
+template_text        = "Name template for package XML files to be loaded"
+key_template_text    = "Key template for package XML files to be loaded"
+output_text          = "Generic file name for output files"
+number_text          = "Maximum number of file downloads"
+direc_text           = "OS Directory for output files"
+program_text         = "Load XLM and PDF documentation files from CTAN a/o generate some special lists, and prepare data for CTANOut"
 
-verbose_text        = "Flag: Output is verbose."
-download_text       = "Flag: Download associated documentation files [PDF]."
-lists_text          = "Flag: Generate some special lists and prepare files for CTANOut."
-statistics_text     = "Flag: Print statistics."
-integrity_text      = "Flag: Check the integrity of the 2nd .pkl file."
-regenerate_text     = "Flag: Regenerate the two pickle files."
+verbose_text         = "Flag: Output is verbose."
+download_text        = "Flag: Download associated documentation files [PDF]."
+lists_text           = "Flag: Generate some special lists and prepare files for CTANOut."
+statistics_text      = "Flag: Print statistics."
+integrity_text       = "Flag: Check the integrity of the 2nd .pkl file."
+regenerate_text      = "Flag: Regenerate the two pickle files."
 
-# ------------------------------------------------------------------
+# -----------------------------------------------------------------    
 # Defaults/variables for argparse
 
-download_default    = False      # default for option -f    (no PDF download)
-integrity_default   = False      # default for option -c    (no integrity check)
-lists_default       = False      # default for option -n    (special lists are not generated)
-number_default      = 250        # default for option -n    (maximum number of files to be loaded)
-output_name_default = "all"      # default for option -o    (generic file name)
-statistics_default  = False      # default for option -stat (no statistics output)
-template_default    = ""         # default for option -t    (name template for file loading)
-key_template_default= ""         # default for option -k    (key template for file loading)
-verbose_default     = False      # default for option -n    (output is not verbose)
-regenerate_default  = False      # default for option -r    (no regeneration)
+download_default        = False      # default for option -f    (no PDF download)
+integrity_default       = False      # default for option -c    (no integrity check)
+lists_default           = False      # default for option -n    (special lists are not generated)
+number_default          = 250        # default for option -n    (maximum number of files to be loaded)
+output_name_default     = "all"      # default for option -o    (generic file name)
+statistics_default      = False      # default for option -stat (no statistics output)
+template_default        = ""         # default for option -t    (name template for file loading)
+author_template_default = ""         # default for option -A    (author name template)
+key_template_default    = ""         # default for option -k    (key template for file loading)
+verbose_default         = False      # default for option -n    (output is not verbose)
+regenerate_default      = False      # default for option -r    (no regeneration)
 
 act_direc           = "."        
 if operatingsys == "Windows":    
@@ -312,30 +341,32 @@ else:
     direc_sep      = "/"
 direc_default       = act_direc + direc_sep # default for -d (output OS directory)
 
-download            = None       # default for option -f    (no PDF download)
-integrity           = None       # default for option -c    (no integrity check)
-lists               = None       # default for option -n    (special lists are not generated)
-number              = 0          # default for option -n    (maximum number of files to be loaded)
-output_name         = ""         # default for option -o    (generic file name)
-statistics          = None       # default for option -stat (no statistics output)
-template            = ""         # default for option -t    (name template for file loading)
-verbose             = None       # default for option -n    (output is not verbose)
+download            = None       # option -f    (no PDF download)
+integrity           = None       # option -c    (no integrity check)
+lists               = None       # option -n    (special lists are not generated)
+number              = 0          # option -n    (maximum number of files to be loaded)
+output_name         = ""         # option -o    (generic file name)
+statistics          = None       # option -stat (no statistics output)
+template            = ""         # option -t    (name template for file loading)
+author_template     = ""         # option -A    (author name tzemplate)
+key_template        = ""         # option -k    (key template) 
+verbose             = None       # option -n    (output is not verbose)
 
 # ------------------------------------------------------------------
 # Dictionaries
 
-authorpackages      = {}         # python dictionary: list of authors and their packages
-authors             = {}         # python dictionary: list of authors
-packages            = {}         # python dictionary: list of packages
-licenses            = {}         # python dictionary: list of licenses  
-packagetopics       = {}         # python dictionary: list of packages and their topics
-topics              = {}         # python dictionary: list of topics
-topicspackage       = {}         # python dictionary: list of topics and their packages
-XML_toc             = {}         # python dictionary: list of PDF files: XML_toc[href]=...PDF file
-PDF_toc             = {}         # python dictionary: list of PDF files: PDF_toc[lfn]=...package file
-all_XML_files       = ()         # list with all XML files
-selected_packages   = set()      # python dictionary: list of packages with selected topics
-
+authorpackages        = {}       # python dictionary: list of authors and their packages
+authors               = {}       # python dictionary: list of authors
+packages              = {}       # python dictionary: list of packages
+licenses              = {}       # python dictionary: list of licenses  
+packagetopics         = {}       # python dictionary: list of packages and their topics
+topics                = {}       # python dictionary: list of topics
+topicspackage         = {}       # python dictionary: list of topics and their packages
+XML_toc               = {}       # python dictionary: list of PDF files: XML_toc[href]=...PDF file
+PDF_toc               = {}       # python dictionary: list of PDF files: PDF_toc[lfn]=...package file
+all_XML_files         = ()       # list with all XML files
+selected_packages_lpt = set()    # python dictionary: list of packages with selected topics
+selected_packages_lap = set()    # python dictionary: list of packages with selected authors
 
 # XML_toc
 #   Structure:                 XML_toc[href] = (XML file, key, onename)
@@ -382,6 +413,7 @@ ext                 = ".xml"     # file name extension for downloaded XML files
 rndg                = 2          # optional rounding of float numbers
 left                = 35         # width of labels in statistics
 ellipse             = " ..."     # abbreviate texts
+ok                  = None
 
 reset_text          = "Info: '{0}' reset to {1} (due to {2})"
 exclusion           = ["authors.xml", "topics.xml", "packages.xml", "licenses.xml"]
@@ -403,6 +435,11 @@ parser.add_argument("-a", "--author",                      # Parameter -a/--auth
                     action  = 'version',
                     version = prg_author + " (" + prg_email + ", " + prg_inst + ")")
 
+parser.add_argument("-A", "--author_template",             # Parameter -A/--author_template
+                    help    = author_template_text + " - Default: " + "%(default)s",
+                    dest    = "author_template",
+                    default = author_template_default)
+
 parser.add_argument("-c", "--check_integrity",             # Parameter -c/--check_integrity
                     help    = integrity_text + " - Default: " + "%(default)s",
 ##                    help    = argparse.SUPPRESS,
@@ -413,10 +450,12 @@ parser.add_argument("-d", "--directory",                   # Parameter -d/--dire
                     help    = direc_text + " - Default: " + "%(default)s",
                     dest    = "direc",
                     default = direc_default)
+
 parser.add_argument("-f", "--download_files",              # Parameter -f/--download_files
                     help    = download_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = download_default)
+
 parser.add_argument("-l", "--lists",                      # Parameter -l/--lists
                     help    = lists_text + " - Default: " + "%(default)s",
                     action  = "store_true",
@@ -465,17 +504,19 @@ parser.add_argument("-V", "--version",                     # Parameter -V/--vers
 # ------------------------------------------------------------------
 # Getting parsed values
 
-args         = parser.parse_args()                         # all parameters of programm call
-direc        = args.direc                                  # parameter -d
-download     = args.download_files                         # parameter -f
-integrity    = args.check_integrity                        # parameter -c
-key_template = args.key_template                           # parameter -k
-lists        = args.lists                                  # parameter -l
-number       = int(args.number)                            # parameter -n
-regenerate   = args.regenerate_pickle_files                # parameter -r
-statistics   = args.statistics                             # Parameter -stat
-template     = args.template                               # parameter -k
-verbose      = args.verbose                                # parameter -v
+args            = parser.parse_args()                         # all parameters of programm call
+
+author_template = args.author_template                        # parameter -A
+direc           = args.direc                                  # parameter -d
+download        = args.download_files                         # parameter -f
+integrity       = args.check_integrity                        # parameter -c
+key_template    = args.key_template                           # parameter -k
+lists           = args.lists                                  # parameter -l
+number          = int(args.number)                            # parameter -n
+regenerate      = args.regenerate_pickle_files                # parameter -r
+statistics      = args.statistics                             # Parameter -stat
+template        = args.template                               # parameter -k
+verbose         = args.verbose                                # parameter -v
 
 # ------------------------------------------------------------------
 # Correct OS directory name, test OS directory existence, and install OS directory
@@ -490,8 +531,14 @@ if not path.exists(direc):
         print ("- Warning: Creation of the directory '{0}' failed".format(direc))
     else:
         print ("- Info: Successfully created the directory '{0}' ".format(direc))
+        
 output_name        = direc + args.output_name              # parameter -d
-topicspackage_file = direc + "CTAN.lpt"                    # name of a add. .lpt file
+
+# ------------------------------------------------------------------
+# additional files, if you want to search topics a/a authors and their corr. packages
+
+topicpackage_file  = direc + "CTAN.lpt"                    # name of a additional xyz.lpt file
+authorpackage_file = direc + "CTAN.lap"                    # name of a additional xyz.lap file
 
 # ------------------------------------------------------------------
 # regular expressions
@@ -500,22 +547,12 @@ p2           = re.compile(template)                        # regular expression 
 p3           = re.compile("^[0-9]{10}-.+[.]pdf$")          # regular expression for local PDF file names
 p4           = re.compile("^.+[.]xml$")                    # regular expression for local XML file names
 p5           = re.compile(key_template)                    # regular expression for topics
+p6           = re.compile(author_template)                 # regular expression for authors
 
 
 #===================================================================
 # Auxiliary function
 
-##def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
-##    """auxiliary function: shorten long option values for output"""
-##    
-##    maxlen = 65
-##    offset = "\n" + 64 * " "
-##    tmp    = s[:]
-##    all    = ""
-##    while len(tmp) > maxlen:
-##        all = all + tmp[0 : maxlen] + offset
-##        tmp = tmp[maxlen :]
-##    return all + tmp
 def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
     """auxiliary function: shorten long option values for output"""
     
@@ -610,7 +647,7 @@ def call_check():                                                 # Function cal
     thr3 = Thread(target=generate_pickle1)                        # dumps authors, packages, topics, licenses, topicspackage, packagetopics
     thr3.start()
     thr3.join()
-   
+    
     if lists:                                                     # if lists are to be generated
         generate_lists()                                          #     generate x.loa, x.lop, x.lok, x.lol, x.lpt, x.lap
 
@@ -648,10 +685,16 @@ def call_load():                                                  # Function cal
     dload_licenses()                                              # load the file licenses.xml
     dload_packages()                                              # load the file packages.xml
 
-    if (key_template != key_template_default):
+    if (key_template != key_template_default) and (author_template != author_template_default):
+        get_CTAN_lpt()                                            # (first) load CTAN.lpt + process dload_XML_files
+        get_CTAN_lap()                                            # (second) load CTAN.lap + process dload_XML_files
+    elif (key_template != key_template_default):
         get_CTAN_lpt()                                            # load CTAN.lpt + process dload_XML_files
+    elif (author_template != author_template_default):
+        get_CTAN_lap()                                            # load CTAN.lap + process dload_XML_files
     else:
         dload_XML_files(packages)                                 # load and processe all required XML files in series
+        
     thr1 = Thread(target=generate_pickle2)                        # dump XML_toc via pickle file via thread
     thr1.start()
     thr1.join()
@@ -1210,21 +1253,55 @@ def get_CTAN_lpt():                                                # function ge
 
     # get_CTAN_lpt --> dload_XML_files
 
-    global selected_packages
+    global selected_packages_lpt, selected_packages_lap
     global number, counter, pdfcounter
 
     try:
-        f = open(topicspackage_file, encoding="utf-8", mode="r")   # open file
+        f = open(topicpackage_file, encoding="utf-8", mode="r")    # open file
         for line in f:
             top, pack=eval(line.strip())
             if p5.match(top):                                      # collect packages with specified topics
                 for g in pack:
-                    selected_packages.add(g)
-        dload_XML_files(selected_packages)
+                    selected_packages_lpt.add(g)
+        if (key_template != key_template_default) and (author_template != author_template_default):
+            pass                                                   # do nothing 
+        else:
+            dload_XML_files(selected_packages_lpt)                 # load XML files and analyze them
         f.close()                                                  # close file
     except IOError:
         if verbose:                                                # there is an error
-            print("- Error: local file '{0}' not loaded".format(topicspackage_file))
+            print("- Error: local file '{0}' not loaded".format(topicpackage_file))
+        sys.exit()                                                 # program terminates
+
+# ------------------------------------------------------------------
+def get_CTAN_lap():                                                # function get_CTAN_lap: load and analyze CTAN.lap
+    """load and analyze CTAN.lap."""
+
+    # get_CTAN_lpt --> dload_XML_files
+
+    global selected_packages_lpt, selected_packages_lap
+    global number, counter, pdfcounter
+
+    try:
+        f = open(authorpackage_file, encoding="utf-8", mode="r")   # open file
+        for line in f:
+            auth, pack=eval(line.strip())                          #
+            if authors[auth][1] != "":
+                auth2 = authors[auth][1]
+            else:
+                auth2 = authors[auth][0]
+            if p6.match(auth2):                                    # collect packages with specified authors
+                for g in pack:
+                    selected_packages_lap.add(g)
+        if (key_template != key_template_default) and (author_template != author_template_default):
+            selected_packages = selected_packages_lpt & selected_packages_lap # combine the two searches
+            dload_XML_files(selected_packages)
+        else:            
+            dload_XML_files(selected_packages_lap)                 # load XML files and analyze them
+        f.close()                                                  # close file
+    except IOError:
+        if verbose:                                                # there is an error
+            print("- Error: local file '{0}' not loaded".format(authorpackage_file))
         sys.exit()                                                 # program terminates
 
 # ------------------------------------------------------------------
@@ -1282,13 +1359,14 @@ def main():                                                        # Function ma
     global integrity
     global number
     global template
+    global author_template
     global regenerate
 
     starttotal  = time.time()                                       # begin of time measure
     startprocess= time.process_time()
     reset_text  = "- Warning: '{0}' reset to {1} (due to {2})"
 
-    load      = (template != template_default) or (key_template != key_template_default)       # load 
+    load      = (template != template_default) or (key_template != key_template_default) or (author_template != author_template_default)       # load 
     check     = (not load) and ((lists != lists_default) or (integrity != integrity_default))  # check
     newpickle = (not load) and (not check) and (regenerate != regenerate_default)              # newpickle
     plain     = (not load) and (not check) and (not newpickle)                                 # plain
@@ -1304,7 +1382,7 @@ def main():                                                        # Function ma
         if (integrity != integrity_default):                        #     -c reset
             integrity = False
             if verbose:
-                print(reset_text.format("-c",False,"'-n' or '-t' or '-f'"))
+                 print(reset_text.format("-c",False,"'-n' or '-t' or '-f'"))
         if (regenerate != regenerate_default):                      #     -r reset
             regenerate = False
             if verbose:
@@ -1339,6 +1417,7 @@ def main():                                                        # Function ma
         if (output_name != direc + output_name_default):  print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))
         if (template != template_default):                print("  {0:5} {2:55} {1}".format("-t", fold(template), "(" + template_text + ")"))
         if (key_template != key_template_default):        print("  {0:5} {2:55} {1}".format("-k", fold(key_template), "(" + key_template_text + ")"))
+        if (author_template != author_template_default):  print("  {0:5} {2:55} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))
         print("\n")
 
     if plain:                                                       # Process all steps for a plain call.

@@ -1,13 +1,15 @@
-usage: CTANLoad.py [-h] [-a] [-c] [-d DIREC] [-f] [-l] [-k KEY_TEMPLATE]
-                   [-n NUMBER] [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat]
-                   [-v] [-V]
+usage: CTANLoad.py [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l]
+                   [-k KEY_TEMPLATE] [-n NUMBER] [-o OUTPUT_NAME] [-r]
+                   [-t TEMPLATE] [-stat] [-v] [-V]
 
 Load XLM and PDF documentation files from CTAN a/o generate some special
-lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.5.1 (2021-07-01)]
+lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.6.1 (2021-07-12)]
 
 Optional parameters:
   -h, --help            show this help message and exit
   -a, --author          Author of the program
+  -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
+                        Name template for authors - Default:
   -c, --check_integrity
                         Flag: Check the integrity of the 2nd .pkl file. -
                         Default: False

@@ -8,7 +8,7 @@ CTANLoad
 - download authors, topics, packages, licenses; write CTAN.pkl
 - not verbose and without statistics
 
-CTANLoad -v -stat
+CTANLoad -v -stat                                            
 - as above
 - verbose                                                    [-v]
 - with statistics                                            [-stat]
@@ -39,24 +39,32 @@ CTANLoad -v -stat -r
 - with statistics                                            [-stat]
 
 CTANLoad -k latex -f -v -stat
-- download all XML packages which match the topic LaTeX      [-k]
+- download all CTAN packages which match the topic "latex"   [-k]
 - load the associated information files (PDF)                [-f]
 - verbose                                                    [-v]
 - with statistics                                            [-stat]
 
 CTANLoad -k chinese -t "^zh" -f -v -stat
-- download all XML packages which match the topic chinese    [-k]
-- load only CTAN XML files with the name template "^zh"      [-t]
+- download all CTAN packages which match the topic "chinese" [-k]
+- download only CTAN XML files with the name template "^zh"  [-t]
 - load the associated information files (PDF)                [-f]
 - verbose                                                    [-v]
 - with statistics                                            [-stat]
 
-Regular expressions
--------------------
-The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
-such as
+CTANLoad -A Knuth -v -stat
+- download all XML packages with the author template "Knuth" [-A] 
+- verbose                                                    [-v]
+- with statistics                                            [-stat]
 
--k latex                matches all topic names which contain "latex"
--t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
--t "^.+$"               matches all file names
--t "^{a-b]"             matches all file names which begin with letters a-b
+CTANLoad -A Knuth -k collection -stat
+- download all XML packages with the author template "Knuth" [-A]
+- download only packages with the topic template "collection"[-k]
+- verbose                                                    [-v]
+- with statistics                                            [-stat]
+
+CTANLoad -A Knuth -k collection -f -v -stat -t knuth
+- download all XML packages with the author template "Knuth" [-A] 
+- download only packages with the topic template "collection"[-k]
+- download only packages with the name template "knuth"      [-t]  
+- verbose                                                    [-v]
+- with statistics                                            [-stat]

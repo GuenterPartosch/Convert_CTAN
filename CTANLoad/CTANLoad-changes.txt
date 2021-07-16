@@ -19,7 +19,7 @@ Changes (CTANLoad.py)
 2.0.16 2021-05-20 OS directory + separator improved
 2.0.17 2021-05-21 more details in verbose mode
 2.0.18 2021-05-23 OS directory name improved
-2.0.19 2021-05-24 OS directory handling improved (existance, installation)
+2.0.19 2021-05-24 OS directory handling improved (existance, installation) 
 2.1.0  2021-05-26 load licences, make corr. directory and file; expand CTAN.pkl
 2.1.1  2021-05-26 correction for not-existing keys in licenses.xml
 2.1.2  2021-06-07 smaller improvements in check_integrity
@@ -40,3 +40,6 @@ Changes (CTANLoad.py)
 2.5.1  2021-07-01 minor corrections
 2.5.2  2021-07-05 function fold restructured
 2.5.3  2021-07-06 pickle file 1 is generated, too
+2.6.0  2021-07-11 search of packages with author name template; new option -A; new function get_CTAN_lap (needs CTAN.lap)
+2.6.1  2021-07-12 some corrections in the handling of -t / -k and -A
+2.6.2  2021-07-15 more corrections in the handling of -t / -k and -A
