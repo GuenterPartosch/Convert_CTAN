@@ -4,7 +4,7 @@ CTANOut
     RIS is output format (default)
     all.ris is output file
     no statistics
-    without verbose output
+    without verbose output                                        
 
 CTANOut -v
     as bove
@@ -25,7 +25,7 @@ CTANOut -m biblatex -b @online -v
     @online as BibLaTeX type                                          [-b]
 
 CTANOut -m bib -b @online -s [texlive,license,miktex] -v -stat
-    as above                                                          [-m]
+    BibLaTeX is output format                                         [-m]
     @online as BibLaTeX type                                          [-b]
     with statistics                                                   [-stat]
     skipped CTAN fields: texlive, license, and miktex                 [-s]
@@ -34,7 +34,7 @@ CTANOut -m LaTeX -mt -v -stat
     LaTeX is output format                                            [-m]
     special topic lists are generated                                 [-mt]
     with statistics and                                               [-stat]
-    verbose output                                                    [-v]
+    verbose output                                                    [-v] 
 
 CTANOut -m latex -k LaTeX -mt
     LaTeX is output format                                            [-m]
@@ -53,6 +53,15 @@ CTANOut -m plain -v -stat -o myfile -s "[texlive,license,miktex]"
     skipped CTAN fields: texlive, license, and miktex                 [-s]
     with statistics and                                               [-stat]
     verbose output                                                    [-v]
+
+CTANOut -A Knuth -k collection -t knuth -m bib -v -stat
+    packages with the author name template "Knuth"                    [-A]
+    only packages with the topic template "collection"                [-k]
+    only packages with the package name template "knuth"              [-t]
+    BibLaTeX is output format                                         [-m]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+
 
 Regular expressions
 -------------------

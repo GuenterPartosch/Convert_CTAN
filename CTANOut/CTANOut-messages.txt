@@ -1,22 +1,25 @@
 Messages (CTANOut)
 ==================
 Fatal Error
+----------
 Error: pickle file '<pickle file>' not found
 Error: tried to use the program indirectly
 
 Information
+-----------
 Info: program successfully completed
-Info: statistics written
 Info: file 'xyz.tap' created: [list with authors and related packages (cross-reference list)]
 Info: file 'xyz.top' created: [topic list]
 Info: file 'xyz.xref' created: [list with topics and related packages (cross-reference list)]
 Info: packages processed
 Info: program successfully completed
 Info: statistics written
+Info: statistics written
 
 Warnings
+--------
 Warning: 'option value' changed to 'option+value' (due to 'option')"
 Warning: XML file for package '<package>' not found
 Warning: XML file for package '<package>' not well-formed
-Warning: key '<key>' not found
-Warning: no correct XML file for any specified package found
+Warning: no correct local XML file for any specified package found
+Warning: no package found which match the specified '<kind of template>' template '<template>'

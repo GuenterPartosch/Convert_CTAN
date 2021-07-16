@@ -7,14 +7,12 @@
 
 # Probleme/Ideen:
 # - Ausgabe des Namens, wenn givenname fehlt (x)
-# - year noch besser extrahieren, ggf. aus <copyright year=....> oder <version date=...> (x)
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
-# - bei BibLaTeX: BibTeX-Kürzel aus Namen + Jahr; z.B. in leading() oder copyright() 
-# - ggf. file.tex, file.bib, ... vor Ausgabe löschen
-# - kann Zeitstempel bei XML/PDF-Dateien genutzt werden?
-# - Löschen von Dateien noch überprüfen
-# - fold schlauer gestalten (x)
-# - neue Fehlermeldung (tried to use the program indirectly) in changeliste eintragen (x)
+# - kann Zeitstempel bei XML/PDF-Dateien genutzt werden? wahrscheinlich nicht
+# - beim Filtern nur die Pakete berücksichtigen, die tatsächlich vorhanden sind (x)
+# - changes neu machen(x)
+# - neue Version(x)
+# -  man und usage neu machen(x)
 
 # History
 # ------------------------------------------------------------------
@@ -37,6 +35,11 @@
 # 1.91 2021-06-24 additional minor corrections
 # 1.82 2021-07-05 function fold restructured
 # 1.93 2021-07-09 construct a unique author year string for BibLaTeX; two new auxiliary functions
+# 1.94 2021-07-11 new functions: load_pickle1() and load_pickle2()
+# 1.95 2021-07-12 new option -A; new functions: get_author_packages, get_name_packages, get_topic_packages; new procedure in process_packages
+# 1.96 2021-07-14 new set of messages; new message no package found which match the specified '<kind of template>' template '<template>'
+# 1.97 2021-07-15 error in make_xref() corrected
+# 1.98 2021-07-16 verbose output enhanced (prevent the listing of non-existing packages); new function get_local_packages()
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -56,37 +59,40 @@
 
 # Information
 # Info: program successfully completed
-# Info: statistics written
 # Info: file 'xyz.tap' created: [list with authors and related packages (cross-reference list)]
 # Info: file 'xyz.top' created: [topic list]
 # Info: file 'xyz.xref' created: [list with topics and related packages (cross-reference list)]
 # Info: packages processed
 # Info: program successfully completed
 # Info: statistics written
+# Info: statistics written
 
 # Warnings
 # Warning: 'option value' changed to 'option+value' (due to 'option')"
 # Warning: XML file for package '<package>' not found
 # Warning: XML file for package '<package>' not well-formed
-# Warning: key '<key>' not found
-# Warning: no correct XML file for any specified package found
+# Warning: no correct local XML file for any specified package found
+# Warning: no package found which match the specified '<kind of template>' template '<template>'
 
 # ------------------------------------------------------------------
 # Usage
 #
-# usage: CTANOut.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
-#                   [-d DIREC] [-k FILTER_KEY]
+# usage: CTANOut.py [-h] [-a] [-A AUTHOR_TEMPLATE]
+#                   [-b {@online,@software,@misc,@ctan,@www}] [-d DIREC]
+#                   [-k FILTER_KEY]
 #                   [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv}]
 #                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
 #                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.93 (2021-07-09)] Convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.98 (2021-07-16)] Convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
 #   -h, --help            show this help message and exit
 #   -a, --author          Show author of the program and exit.
-#   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}                                                                                                                      \r
+#   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
+#                         Name template for authors - Default:
+#   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
 #                         Type of BibLaTex entries to be generated [only for -m
 #                         BibLateX] - Default:
 #   -d DIREC, --directory DIREC
@@ -137,7 +143,7 @@
 #     @online as BibLaTeX type                                          [-b]
 #
 # CTANOut -m bib -b @online -s [texlive,license,miktex] -v -stat
-#     as above                                                          [-m]
+#     BibLaTeX is output format                                         [-m]
 #     @online as BibLaTeX type                                          [-b]
 #     with statistics                                                   [-stat]
 #     skipped CTAN fields: texlive, license, and miktex                 [-s]
@@ -163,6 +169,14 @@
 #     plain text is output format                                       [-m]
 #     myfile.txt is the name for the output file                        [-o]
 #     skipped CTAN fields: texlive, license, and miktex                 [-s]
+#     with statistics and                                               [-stat]
+#     verbose output                                                    [-v]
+#
+# CTANOut -A Knuth -k collection -t knuth -m bib -v -stat
+#     packages with the author name template "Knuth"                    [-A]
+#     only packages with the topic template "collection"                [-k]
+#     only packages with the package name template "knuth"              [-t]
+#     BibLaTeX is output format                                         [-m]
 #     with statistics and                                               [-stat]
 #     verbose output                                                    [-v]
 
@@ -194,7 +208,12 @@ from os import path                          # path informations
 #===================================================================
 # Functions in CTANOut.py
 
+# fold(s)            auxiliary function: shorten long option values for output
+# get_authoryear(a,y) auxiliary function: construct a unique authoryear string (for BibLaTeX)
+# get_local_packages(d) auxiliary function: get loal packages
+# mod_TeXchars(s)    prepare characters for LaTeX/BibLaTeX in a paragraph
 # TeXchars(s)        prepare characters for LaTeX/BibLaTeX
+
 # alias(k)           element <alias .../>
 # also(k)            element <also .../>
 # authorref(k)       element <authorref .../>
@@ -205,27 +224,14 @@ from os import path                          # path informations
 # description(k)     element <description ...> ... </description>
 # documentation(k)   element <documentation ../.>
 # entry(k, t)        elemend <entry ... </entry>
-# first_lines()      Analyze the first lines of each package XML file and output some lines.
-# fold(s)            auxiliary function: shorten long option values for output
-# get_authoryear(a,y) auxiliary function: construct a unique authoryear string (for BibLaTeX)
-# get_year(s)        auxiliary function: get the most recent year in string s (only for BibLaTeX)
 # home(k)            element <home .../>
 # install(k)         element <install .../>
 # keyval(k)          element <keyval .../>
-# leading(k)         first lines of one package
 # li(k)              element <li> ... </li>
 # licenseT(k)        element <license .../>
-# main()             main function
-# make_stat()        generate statistics file (xyz.stat for -m LaTeX a/o -m BibLaTeX).
-# make_statistics()  generate general statitics part (-stat) on terminal
-# make_tap()         generate xyz.tap
-# make_tops()        generate xyz.top
-# make_xref()        generate xyz.xref
-# miktex(k)          element <miktex .../>
-# mod_TeXchars(s)    prepare characters for LaTeX/BibLaTeX in a paragraph
 # mod_a(k)           element <a ...> ... </a>
+# miktex(k)          element <miktex .../>
 # mod_b(k)           element <b> ... </b>
-# mod_backslash(s)   special processing of \ in the source text
 # mod_br(k)          element <br/>
 # mod_em(k)          element <em> ... </em>
 # mod_i(k)           element <i> ... </i>
@@ -233,15 +239,30 @@ from os import path                          # path informations
 # mod_tt(k)          element <tt> ... </tt>
 # mod_xref(k)        element <xref ...> ... </xref>
 # name(k)            element <name> ... </name>
-# onepackage(s, t)   open a file with the package description and initialize XML processing
 # p(k)               element <p> ... </p>
-# process_packages() general loop
 # texlive(k)         element <texlive .../>
-# trailing(k, t)     last lines of a package part
 # ul(k)              element <ul> ... </ul>
 # version(k)         element <version .../>
 # xref(k)            element <xref ...> ... </xref>
 
+# first_lines()      Analyze the first lines of each package XML file and output some lines.
+# get_pickle1()      load pickle file 1
+# get_pickle2()      load pickle file 2
+# get_year(s)        auxiliary function: get the most recent year in string s (only for BibLaTeX)
+# leading(k)         first lines of one package
+# main()             main function
+# make_stat()        generate statistics file (xyz.stat for -m LaTeX a/o -m BibLaTeX).
+# make_statistics()  generate general statitics part (-stat) on terminal
+# make_tap()         generate xyz.tap
+# make_tops()        generate xyz.top
+# make_xref()        generate xyz.xref
+# mod_backslash(s)   special processing of \ in the source text
+# onepackage(s, t)   open a file with the package description and initialize XML processing
+# process_packages() general loop
+# trailing(k, t)     last lines of a package part
+
+# main --> load_pickle1
+# main --> load_pickle2
 # main --> first_lines
 # main --> make_stat
 # main --> make_statistics
@@ -283,6 +304,10 @@ from os import path                          # path informations
 #                                                        texlive       --> TeXchars
 #                                              entry --> trailing
 #                                              entry --> version
+#          process_packages --> get_topic_packages
+#          process_packages --> get_name_packages
+#          process_packages --> get_author_packages
+#          process_packages --> get_local_packages
 
 # ul --> li
 # li --> mod_TeXchars
@@ -302,8 +327,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.93"
-programdate       = "2021-07-09"
+programversion    = "1.98"
+programdate       = "2021-07-16"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -348,34 +373,36 @@ left            = 35                         # width of labels in verbose output
 # ------------------------------------------------------------------
 # Texts for argument parsing
 
-author_text     = "Show author of the program and exit."
-version_text    = "Show version of the program and exit."
-
-verbose_text    = "Flag: Output is verbose."
-statistics_text = "Flag: Print statistics on terminal."
-topics_text     = "Flag: Generate topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX])."
-
-btype_text      = "Type of BibLaTex entries to be generated [only for -m BibLateX]"
-direc_text      = "Directory for input and output files"
-key_text        = "Template for output filtering on the base of keys"
-mode_text       = "Target format"
-out_text        = "Generic name for output files [without extensions]"
-program_text    = "Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated]."
-skip_text       = "Skip specified CTAN fields."
-template_text   = "Template for package names"
+author_text          = "Show author of the program and exit."
+author_template_text = "Name template for authors"
+version_text         = "Show version of the program and exit."
+verbose_text         = "Flag: Output is verbose."
+statistics_text      = "Flag: Print statistics on terminal."   
+topics_text          = "Flag: Generate topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX])."
+btype_text           = "Type of BibLaTex entries to be generated [only for -m BibLateX]"
+direc_text           = "Directory for input and output files"
+key_text             = "Template for output filtering on the base of keys"
+mode_text            = "Target format"
+out_text             = "Generic name for output files [without extensions]"
+program_text         = "Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated]."
+skip_text            = "Skip specified CTAN fields."
+template_text        = "Template for package names"
 
 # ------------------------------------------------------------------
 # Defaults for argument parsing and further processing
 
-make_topics_default   = False               # default for topics output (-mt)
-verbose_default       = False               # default for global flag: verbose output (-v)
-statistics_default    = False               # default for global flag: statistics output (-stat)
-btype_default         = ""                  # default for BibLaTeX entry type (-b)
-skip_default          = "[]"                # default for option -s
-mode_default          = "RIS"               # default for option -m
-name_template_default = """^.+$"""          # default for file name template (-t)
-out_default           = "all"               # default for out file
-filter_key_default    = """^.+$"""          # default for filter (-k)
+make_topics_default     = False               # default for topics output (-mt)
+verbose_default         = False               # default for global flag: verbose output (-v)
+statistics_default      = False               # default for global flag: statistics output (-stat)
+btype_default           = ""                  # default for BibLaTeX entry type (-b)
+skip_default            = "[]"                # default for option -s
+mode_default            = "RIS"               # default for option -m
+name_template_default   = """^.+$"""          # default for file name template (-t)
+out_default             = "all"               # default for out file
+filter_key_default      = """^.+$"""          # default for topic filter (-k)
+author_template_default      = ""                  # default for author name template (-A)
+author_load_template_default = ""                  # default for author load name template (-Al)
+author_out_template_default  = ""                  # default for author out name template (-Ao)
 
 act_direc       = "."                       # actual OS dirtectory
 if operatingsys == "Windows":    
@@ -391,6 +418,7 @@ btype           = ""                        # variable for -b
 skip            = ""                        # variable for -s
 mode            = ""                        # variable for -m
 name_template   = ""                        # variable for -t
+author_template = ""                        # variable for -A
 out_file        = ""                        # variable for -o
 filter_key      = ""                        # variable for -k
 direc           = ""                        # variable for -d
@@ -405,7 +433,8 @@ ellipse         = " ..."
 package_id      = ""                        # ID of a package
 authorexists    = False                     # default for a global flag
 
-err_mode        = "- Warning: '{0} {1}' changed to '{2}' (due to '{3}')" 
+err_mode        = "- Warning: '{0} {1}' changed to '{2}' (due to '{3}')"
+exclusion       = ["authors.xml", "topics.xml", "packages.xml", "licenses.xml"]
 
 # ------------------------------------------------------------------
 # Strings for Excel output
@@ -451,8 +480,30 @@ usedAuthors     = {}                        # Python dictionary:  collect used a
 # usedAuthors: Python dictionary (unsorted)
 #   each element: <key for author>:<tuple with givenname and familyname>
 
-XML_toc         = {}                        # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)
 allauthoryears  = {}                        # python dictionary:  collect author name / year pairs
+
+XML_toc         = {}                        # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)authors         = {}
+packages        = {}                        # python dictionary:  each element: <package key> <tuple with package name and package title>
+topics          = {}                        # python dictionary:  each element: <topics name> <topics title>
+licenses        = {}                        # python dictionary:  each element: <license key> <license title>
+topicspackage   = {}                        # python dictionary:  each element: <topic key> <list with package names>
+packagetopics   = {}                        # python dictionary:  each element: <topic key> <list with package names>
+authorpackages  = {}                        # python dictionary:  each element: <author key> <list with package names>
+authors         = {}                        # python dictionary:  each element: <author key> <tuple with givenname and familyname> 
+# authors: Python dictionary (sorted)
+#   each element: <author key> <tuple with givenname and familyname> 
+# packages: Python dictionary (sorted)
+#   each element: <package key> <tuple with package name and package title>
+# topics: Python dictionary (sorted)
+#   each element: <topics name> <topics title>
+# licenses: Python dictionary (sorted)
+#   each element: <license key> <license title>
+# topicspackage: Python dictionary (unsorted)
+#   each element: <topic key> <list with package names>
+# packagetopics: Python dictionary (sorted)
+#   each element: <topic key> <list with package names>
+# authorpackages: Python dictionary (unsorted)
+#   each element: <author key> <list with package names>
 
 
 #===================================================================
@@ -466,6 +517,11 @@ parser.add_argument("-a", "--author",       # Parameter -a/--author
                     help    = author_text,
                     action  = 'version',
                     version = programauthor + " (" + authoremail + ", " + authorinstitution + ")")
+
+parser.add_argument("-A", "--author_template",             # Parameter -A/--author_template
+                    help    = author_template_text + " - Default: " + "%(default)s",
+                    dest    = "author_template",
+                    default = author_template_default)
 
 parser.add_argument("-b", "--btype",        # Parameter -b/--btype
                     help    = btype_text + " - Default: " + "%(default)s",
@@ -527,18 +583,18 @@ parser.add_argument("-V", "--version",      # Parameter -V/--version
 # ------------------------------------------------------------------
 # Getting parsed values
 
-args          = parser.parse_args()
-
-btype         = args.btype                  # Parameter -b
-direc         = args.direc                  # Parameter -d
-make_topics   = args.make_topics            # Parameter -mt
-mode          = args.mode                   # Parameter -m
-name_template = args.name_template          # Parameter -t
-out_file      = args.out_file               # Parameter -o
-filter_key    = args.filter_key             # Parameter -k
-skip          = args.skip                   # Parameter -s
-verbose       = args.verbose                # Parameter -v
-statistics    = args.statistics             # Parameter -stat
+args            = parser.parse_args()
+author_template = args.author_template        # parameter -A
+btype           = args.btype                  # Parameter -b
+direc           = args.direc                  # Parameter -d
+make_topics     = args.make_topics            # Parameter -mt
+mode            = args.mode                   # Parameter -m
+name_template   = args.name_template          # Parameter -t
+out_file        = args.out_file               # Parameter -o
+filter_key      = args.filter_key             # Parameter -k
+skip            = args.skip                   # Parameter -s
+verbose         = args.verbose                # Parameter -v
+statistics      = args.statistics             # Parameter -stat
 
 # ------------------------------------------------------------------
 # Resettings and settings
@@ -581,12 +637,13 @@ if not path.exists(direc):                  # make OS directory, if necessary
         print ("- Info: Successfully created OS the directory '{0}' ".format(direc))
 
 # ------------------------------------------------------------------
-# pre-compiled regular expressions
+# pre-compiled regular expressions (based on specified options)
 
-p2            = re.compile(name_template)   # regular expression based on -t
-p3            = re.compile(filter_key)      # regular expression based on -k
-p4            = re.compile("[- |.,a-z]")
-
+p2 = re.compile(name_template)   # regular expression based on -t
+p3 = re.compile(filter_key)      # regular expression based on -k
+p4 = re.compile("[- |.,a-z]")    # split a string to find year data
+p5 = re.compile(author_template) # regular expression based on -A
+p6 = re.compile("^.+[.]xml$")    # regular expression for local XML file names
 
 #===================================================================
 # Other settings
@@ -643,48 +700,6 @@ DIV      = 12     % 12-strip layout"""
         trailer = trailer + "\n\\inp{" + args.out_file + ".tap}"
     trailer = trailer + "\n\\printindex\n\\end{document}\n"
 
-
-#===================================================================
-# Pickle load
-
-# 1st pickle file:
-# Get the structures authors, packages, topics, topicspackage, authorpackages (generated by CTANLoad.py)
-#
-# authors: Python dictionary (sorted)
-#   each element: <author key> <tuple with givenname and familyname> 
-# packages: Python dictionary (sorted)
-#   each element: <package key> <tuple with package name and package title>
-# topics: Python dictionary (sorted)
-#   each element: <topics name> <topics title>
-# licenses: Python dictionary (sorted)
-#   each element: <license key> <license title>
-# topicspackage: Python dictionary (unsorted)
-#   each element: <topic key> <list with package names>
-# packagetopics: Python dictionary (sorted)
-#   each element: <topic key> <list with package names>
-# authorpackages: Python dictionary (unsorted)
-#   each element: <author key> <list with package names>
-
-try:                                        # try to open 1st pickle file 
-    pickleFile1 = open(direc + pickle_name1, "br")
-    (authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages) = pickle.load(pickleFile1)
-    pickleFile1.close()                     #   close file
-except FileNotFoundError:                   # unable to open pickle file
-    print("--- Error: pickle file '{0}' not found".format(pickle_name1))
-    sys.exit("- Error: program is terminated")
-
-# ------------------------------------------------------------------
-# 2nd pickle file:
-# get XML_toc (generated by CTANLoad.py)
-
-try:                                        # try to open second pickle file
-    pickleFile2 = open(direc + pickle_name2, "br")
-    XML_toc     = pickle.load(pickleFile2)
-    pickleFile2.close()                     #   close file
-except FileNotFoundError:                   # unable to open pickle file
-    list_info_files = False
-    print("--- Warning: pickle file '{0}' not found; local information files ignored".format(pickle_name2))
-    
 
 # ======================================================================
 # auxiliary functions
@@ -775,17 +790,30 @@ def get_year(s):
 
     s: string"""
     
-    nn    = p4.split(s)                                          # split the given strin according p4
+    nn    = p4.split(s)                                          # split the given string according p4
     years = []
     for i in nn:                                                 # loop over all elements
         if i.isdecimal():                                        # element is decimal
-            if (1980 <= int(i)) and (int(i) <= 2050):            # element is in [1980, 2050]
+            if (1980 <= int(i)) and (int(i) <= 2050):            # element is in the intervall [1980, 2050]
                 years.append(int(i))                             # element is collected
     if len(years) >= 1:
         return max(years)                                        # maximum is calculated
     else:
         return None
     
+# ------------------------------------------------------------------
+def get_local_packages(d):                                       # Function get_local_packages(d): auxiliary function: List all local packages in the OS directory 
+    """auxiliary function: List all local packages in the OS directory d"""
+
+    tmp  = os.listdir(d)                                         # get OS directory list
+    tmp2 = []
+    
+    for f in tmp:
+        if p6.match(f) and not f in exclusion:
+            tmp3 = f[0:len(f) - 4]
+            tmp2.append(tmp3)
+    return set(tmp2)
+
 # ------------------------------------------------------------------
 def mod_backslash(s):                             # function: special processing von \ in the source text
     """special processing von \ in the source text"""
@@ -1312,6 +1340,7 @@ def first_lines():                                          # function: create t
         if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + (btype_text + ")")[0:50] + ellipse))
         if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(filter_key), "(" + key_text + ")"))
         if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))
+        if ("-A" in call) or ("--author_template" in call): print("  {0:5} {2:55} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))
         if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(name_template), "(" + template_text + ")"))
         print("\n")
 
@@ -1389,6 +1418,99 @@ def first_lines():                                          # function: create t
                   "documentation", "home", "install", "keyval", "mikTeX", "TeXLive", "also"]:
             out.write("\t" + f)
         out.write("\n")
+
+# ------------------------------------------------------------------
+def get_author_packages():                                   # Function get_author_packages: Get package names by specified author name template
+    """Get package names by specified author name template."""
+    
+    author_pack = set()                                      # initialize set
+    tmp_set     = set()                                      # initialize auxiliary set
+    
+    for f in authors:                                        # loop over authors
+        (gn, fn) = authors[f]
+        if fn != "":                                         # get familyname
+            tmp_a = authors[f][1]
+        else:
+            tmp_a = authors[f][0]                            # if an incorrect entry is in authors
+        if p5.match(tmp_a):                                  # member matches template
+            tmp_set.add(f)                                   # built-up a new auxiliary set
+    for f in tmp_set:                                        # loop over auxiliary set
+        if f in authorpackages:                              # prevent a wrong entry                         
+            for g in authorpackages[f]:
+                author_pack.add(g)                           # built-up the resulting set
+    if len(author_pack) == 0:
+        print("----- Warning: no package found which match the specified '{0}' template '{1}'".format("author", author_template))
+    return author_pack
+
+# ------------------------------------------------------------------
+def get_topic_packages():                                    # Function get_topic_packages: Get package names by specified topic template.
+    """Get package names by specified topic template."""
+    
+    topic_pack = set()                                       # initialize set
+    
+    for f in topicspackage:                                  # loop over topicspackage
+        if p3.match(f):                                      # member matches template
+            for g in topicspackage[f]:                       # all packagexs for this entry
+                topic_pack.add(g)                            # built-up the resulting set
+    if len(topic_pack) == 0:
+        print("----- Warning: no package found which match the specified '{0}' template '{1}'".format("topic", filter_key))
+    return topic_pack
+
+# ------------------------------------------------------------------
+def get_name_packages():                                     # Function get_name_packages: Get package names by specified package name template.
+    """Get package names by specified package name template."""
+    
+    name_pack = set()                                        # initialize set
+    
+    for f in packages:                                       # loop over packages
+        if p2.match(f):                                      # member matches template
+            name_pack.add(f)                                 # built-up the resulting set
+    if len(name_pack) == 0:
+        print("----- Warning: no package found which match the specified '{0}' template '{1}'".format("name", name_template))
+    return name_pack
+
+# ------------------------------------------------------------------
+def load_pickle1():
+    """Get the structures authors, packages, topics, topicspackage, authorpackages (generated by CTANLoad.py)"""
+
+    global authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages
+    
+    # authors: Python dictionary (sorted)
+    #   each element: <author key> <tuple with givenname and familyname> 
+    # packages: Python dictionary (sorted)
+    #   each element: <package key> <tuple with package name and package title>
+    # topics: Python dictionary (sorted)
+    #   each element: <topics name> <topics title>
+    # licenses: Python dictionary (sorted)
+    #   each element: <license key> <license title>
+    # topicspackage: Python dictionary (unsorted)
+    #   each element: <topic key> <list with package names>
+    # packagetopics: Python dictionary (sorted)
+    #   each element: <topic key> <list with package names>
+    # authorpackages: Python dictionary (unsorted)
+    #   each element: <author key> <list with package names>
+
+    try:                                        # try to open 1st pickle file 
+        pickleFile1 = open(direc + pickle_name1, "br")
+        (authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages) = pickle.load(pickleFile1)
+        pickleFile1.close()                     #   close file
+    except FileNotFoundError:                   # unable to open pickle file
+        print("--- Error: pickle file '{0}' not found".format(pickle_name1))
+        sys.exit("- Error: program is terminated")
+
+# ------------------------------------------------------------------
+def load_pickle2():
+    """get XML_toc (generated by CTANLoad.py)"""
+
+    global XML_toc
+    
+    try:                                        # try to open second pickle file
+        pickleFile2 = open(direc + pickle_name2, "br")
+        XML_toc     = pickle.load(pickleFile2)
+        pickleFile2.close()                     #   close file
+    except FileNotFoundError:                   # unable to open pickle file
+        list_info_files = False
+        print("--- Warning: pickle file '{0}' not found; local information files ignored".format(pickle_name2))
 
 # ------------------------------------------------------------------
 def home(k):                                      # function: element <home .../>
@@ -1658,6 +1780,8 @@ def licenseT(k):                                  # function: element <license .
 def main():                    # function: Main function
     """Main function"""
 
+    # main --> load_pickle1
+    # main --> load_pickle2
     # main --> first_lines
     # main --> process_packages
     # main --> make_tops
@@ -1668,6 +1792,9 @@ def main():                    # function: Main function
 
     starttotal   = time.time()
     startprocess = time.process_time()
+
+    load_pickle1()
+    load_pickle2()
     
     first_lines()             # first lines of output
     process_packages()        # process all packages
@@ -1856,7 +1983,7 @@ def make_xref():                                  # function: Generate the xref 
     xref.write("\n")
     for f in topics:                              # loop: all topics
         if f in usedTopics:                       # topic is used?
-            xref.write("\\item \\index{{Topic!{0}}}".format(f))
+            xref.write("\\item[\\texttt{" + f + "}] \\index{{Topic!" + f + "}}")
             tmp1 = topicspackage[f]               # get the packages for this topic
             package_nr = 0
             for ff in tmp1:                       # loop: all packages with this topic
@@ -2142,36 +2269,44 @@ def process_packages():                          # function: Global loop
     """Global loop"""
 
     # process_packages --> onepackage
+    # process_packages --> get_topic_packages
+    # process_packages --> get_author_packages
+    # process_packages --> get_name_packages
+    # process_packages --> get_local_packages
     
-    key      = filter_key
-    keyexist = False
+    all_packages = set()                         # initialize set
+    for f in packages:
+        all_packages.add(f)                      # construct a set object (packages has not the rfight format)
+        
+    tmp_tp = all_packages.copy()                 # initialize tmp_tp
+    tmp_ap = all_packages.copy()                 # initialize tmp_ap
+    tmp_np = all_packages.copy()                 # initialize tmp_np
 
-    for f in packages:                           # all XML files in loop
+    if filter_key != filter_key_default:
+        tmp_tp = get_topic_packages()            # get packages by topic
+    if author_template != author_template_default:
+        tmp_ap = get_author_packages()           # get packages by author name
+    if name_template != name_template_default:
+        tmp_np = get_name_packages()             # get packages by package name
+
+    tmp_p = tmp_tp & tmp_ap & tmp_np & get_local_packages(direc)
+                                                 # built an intersection
+
+    for f in tmp_p:                              # all XML files in loop
         fext   = f + ext                         # XML file name (with extension)
-        haskey = False
-        if f in packagetopics:
-            tmptopic = packagetopics[f]
-            for g in tmptopic:                   
-                haskey = haskey or p3.match(g)
-        keyexist = keyexist or haskey
 
-        try:
-            if p2.match(f) and haskey:           # 
-                ff       = open(direc + fext, encoding="utf-8", mode="r")
-                mod_time = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(fext)))
-                onepackage(f, mod_time)          # process loaded XML file 
-                ff.close()                       # loaded XML file closed
+        try:                                     # try to open file
+            ff       = open(direc + fext, encoding="utf-8", mode="r")
+            mod_time = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(fext)))
+            onepackage(f, mod_time)              # process loaded XML file 
+            ff.close()                           # loaded XML file closed
         except FileNotFoundError:                # specified XML file not found
             if verbose:
                 print("----- Warning: XML file for package '{0}' not found".format(f))
 
-    if not keyexist:                             # no package found with the specified topic(s)
-        if verbose:
-            print("----- Warning: key '{0}' not found".format(key))
-
     if counter <= 1:                             # no specified package found <=== error1
         if verbose:
-            print("----- Warning: no correct XML file for any specified package found")
+            print("----- Warning: no correct local XML file for any specified package found")
 
     if verbose:
         print("--- Info: packages processed")
