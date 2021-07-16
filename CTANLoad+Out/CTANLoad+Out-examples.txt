@@ -81,7 +81,7 @@ CTANLoad+Out -t pgf -l -c -mt -p -v -stat
   + 3rd step:
   + all local XML files wwith the template "pgf" are processed                  [-t]
   + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
-  + output format is LaTeX (implicitely)
+  + output format is LaTeX (implicitely)                                                                 
   + temporary output file is all.tex
   + 4th step:
   + all.tex is completely compiled                                              [-p]
@@ -89,7 +89,7 @@ CTANLoad+Out -t pgf -l -c -mt -p -v -stat
   + with statistics                                                             [-stat]
   + verbose                                                                     [-v]
 
-CTANLoad+Out -k latex -m txt -v
+CTANLoad+Out -k latex -m txt -v 
   + 1st step:
   + download all XML packages which match the topic "latex"                     [-k]
   + 2nd step:
@@ -98,14 +98,14 @@ CTANLoad+Out -k latex -m txt -v
   + output file is all.txt
   + without statistics
   + verbose                                                                     [-v]
-
+#
 CTANLoad+Out -k latex -f -v -stat -mt -p
   + 1st step:
   + download all XML packages which match the topic "LaTeX"                     [-k]
   + load the associated information files (PDF)                                 [-f]
   + 2nd step:
   + process all local XML files with the topic "latex"                          [-k]
-  + output format is LaTeX (implicitely)
+  + output format is LaTeX (implicitely)                                                                 
   + temporary output file is all.tex
   + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
   + 3th step:
@@ -113,7 +113,7 @@ CTANLoad+Out -k latex -f -v -stat -mt -p
   + output file is all.pdf
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
-
+#
 CTANLoad+Out -k chinese -t "^zh" -f -v -stat
   + 1st step:
   + download all XML packages which match the topic "chinese"                   [-k]
@@ -122,24 +122,44 @@ CTANLoad+Out -k chinese -t "^zh" -f -v -stat
   + 2nd step:
   + process all local XML packages which match the topic "chinese"              [-k]
   + process only local XML files with the name template "^zh"                   [-t]
-  + output format is RIS (default)
+  + output format is RIS (default)                                                                 
   + output file is all.ris
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
-
-CTANLoad+Out -ko latex -m bib -v
+#
+CTANLoad+Out -ko "latex" -m bib -v
   + process all XML files in the current directory with the topic "latex"       [-ko]
-  + output format is BibLaTeX                                                   [-m]
+  + output format is BibLaTeX                                                   [-m]                                                           
   + output file is all.bib
   + verbose                                                                     [-v]
   + without statistics
+#
+CTANLoad+Out -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
+  + 1st step:
+  + download all XML packages which match the topic "collection"                [-k]
+  + download only packages which match the author name template "Knuth"         [-A]
+  + download only packages with the name template "knuth"                       [-t]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + process all local XML files which match the topic "collection"              [-k]
+  + download local XML files which match the author name template "Knuth"       [-A]
+  + download local XML files with the name template "knuth"                     [-t]
+  + output format is LaTeX                                                      [-m]            
+  + temporary output file is all.tex
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
+  + 3th step:
+  + all.tex is completely compiled                                              [-p]
+  + output file is all.pdf
+  + verbose                                                                     [-v]
+  + with statistics                                                             [-stat]
 
 Regular expressions
 -------------------
 The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
 such as
-
+#
 -k latex                matches all topic names which contain "latex"
--t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
+-t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3" or "t3"
 -t "^.+$"               matches all file names
--t "^{a-b]"             matches all file names which begin with letters a-b                                                                                        [-v]
+-t "^{a-b]"             matches all file names which begin with letters a-b
+

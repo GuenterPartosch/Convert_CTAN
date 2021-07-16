@@ -1,12 +1,14 @@
-usage: CTANLoad+Out.py [-h] [-a] [-b {@online,@software,@misc,@ctan,@www}]
-                       [-c] [-d DIREC] [-f] [-k KEY] [-kl KEY_LOAD]
-                       [-ko KEY_OUT] [-l]
+usage: CTANLoad+Out.py [-h] [-a] [-A AUTHOR_TEMPLATE]
+                       [-Al AUTHOR_LOAD_TEMPLATE] [-Ao AUTHOR_OUT_TEMPLATE]
+                       [-b {@online,@software,@misc,@ctan,@www}] [-c]
+                       [-d DIREC] [-f] [-k KEY] [-kl KEY_LOAD] [-ko KEY_OUT]
+                       [-l]
                        [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}]
                        [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-r]
                        [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
                        [-to TEMPLATE_OUT] [-V] [-v]
 
-[CTANLoad+Out.py; Version: 1.9 (2021-07-01)] Combines the tasks of CTANLoad
+[CTANLoad+Out.py; Version: 1.16 (2021-07-15)] Combines the tasks of CTANLoad
 [Load XLM and PDF documentation files from CTAN a/o generates some special
 lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
 files to some formats].
@@ -14,6 +16,13 @@ files to some formats].
 Optional parameters:
   -h, --help            show this help message and exit
   -a, --author          Show author of the program and exit.
+  -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
+                        Name template for authors [in CTANLoad and CTANOut] -
+                        Default:
+  -Al AUTHOR_LOAD_TEMPLATE, --author_load_template AUTHOR_LOAD_TEMPLATE
+                        Name template for authors (CTANLoad) - Default:
+  -Ao AUTHOR_OUT_TEMPLATE, --author_out_template AUTHOR_OUT_TEMPLATE
+                        Name template for authors (CTANOutd) - Default:
   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
                         Type of BibLaTex entries to be generated [valid only
                         for '-m BibLaTeX'/'--mode BibLaTeX'] - Default:
@@ -21,15 +30,17 @@ Optional parameters:
                         Flag: Check the integrity of the 2nd .pkl file. -
                         Default: False
   -d DIREC, --directory DIREC
-                        OS Directory for input and output file - Default: .\
+                        OS Directory for input and output files - Default: .\
   -f, --download_files  Flag: Download associated documentation files [PDF]. -
                         Default: False
-  -k KEY, --key KEY     Template for topic names [in CTANLoad and CTANOut] -
-                        Default:
+  -k KEY, --key KEY     Template for output filtering on the base of keys [in
+                        CTANLoad and CTANOut] - Default:
   -kl KEY_LOAD, --key_load KEY_LOAD
-                        Template for topic names [in CTANLoad] - Default:
+                        Template for output filtering on the base of keys [in
+                        CTANLoad] - Default:
   -ko KEY_OUT, --key_out KEY_OUT
-                        Template for topic names [in CTANOut] - Default: ^.+$
+                        Template for output filtering on the base of keys [in
+                        CTANOut] - Default: ^.+$
   -l, --lists           Flag: Generate some special lists and prepare files
                         for CTANOut. - Default: False
   -m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}, --mode {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}

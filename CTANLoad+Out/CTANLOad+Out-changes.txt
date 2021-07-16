@@ -16,3 +16,6 @@ Changes (CTANLoad+Out)
 1.11 2021-07-05 function fold restructured
 1.12 2021-07-06 new error message: tried to use the program indirectly
 1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced
+1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
+1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
+1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
