@@ -9,10 +9,8 @@
 # - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
 # - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/ (geht eigentlich nicht)(-)
 # - Auswahl auch nach Autor? CTAN.lap oder authorpackages; for f in authorpackages: print(authors[f][1], authorpackages[f])
-# - mit CTAN.pkl neu machen? funktioniert noch nicht? (x)
-# - Zusammenspiel von -A / -k / -t (z.B. für -A Knuth und -k collection) (x)
 # - zusammenspiel von -t/-k/-A am besten wie bei CTANOut
-# - Fehler bei -r; rs wird jedesmal CTAN.pkl neu gemacht (?)
+# - Fehler bei -r; es wird jedesmal CTAN.pkl neu gemacht (?)
 
 # ------------------------------------------------------------------
 # History
