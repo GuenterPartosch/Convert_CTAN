@@ -9,10 +9,6 @@
 # - Ausgabe des Namens, wenn givenname fehlt (x)
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden? wahrscheinlich nicht
-# - beim Filtern nur die Pakete berücksichtigen, die tatsächlich vorhanden sind (x)
-# - changes neu machen(x)
-# - neue Version(x)
-# -  man und usage neu machen(x)
 
 # History
 # ------------------------------------------------------------------
@@ -28,7 +24,7 @@
 # 1.84 2021-05-26 output and interpretaion of language codes improved
 # 1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
 # 1.86 2021-06-12 auxiliary function fold: shorten long option values for output
-# 1.87 2021-06-12 messages classified: Warnings, Error, Info
+# 1.87 2021-06-12 messages classified: Warnings, Error, Infono package found which match
 # 1.88 2021-06-13 string method str.format used (if applicable)
 # 1.89 2021-06-18 some tiny improvements for output
 # 1.90 2021-06-22 misc. smaller corrections
@@ -40,6 +36,9 @@
 # 1.96 2021-07-14 new set of messages; new message no package found which match the specified '<kind of template>' template '<template>'
 # 1.97 2021-07-15 error in make_xref() corrected
 # 1.98 2021-07-16 verbose output enhanced (prevent the listing of non-existing packages); new function get_local_packages()
+# 1.99 2021-07-19 make_stat, make_xref, make_tap respects option -A; output changed
+# 1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
+# 1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -72,7 +71,7 @@
 # Warning: XML file for package '<package>' not found
 # Warning: XML file for package '<package>' not well-formed
 # Warning: no correct local XML file for any specified package found
-# Warning: no package found which match the specified '<kind of template>' template '<template>'
+# Warning: no package found which matched the specified <kind of template> template '<template>'
 
 # ------------------------------------------------------------------
 # Usage
@@ -84,7 +83,7 @@
 #                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
 #                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.98 (2021-07-16)] Convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.101 (2021-07-19)] Convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
@@ -327,8 +326,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.98"
-programdate       = "2021-07-16"
+programversion    = "1.101"
+programdate       = "2021-07-19"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -356,6 +355,7 @@ pickle_name2      = "CTAN2.pkl"
 list_info_files   = True                     # switch for RIS/BibLaTeX: XML_toc is to be proceeded
 info_files        = ""                       # for BibLaTeX: collector for info file names
 ext               = ".xml"                   # file name extension for downloaded info files
+no_package_processed = False
 
 maxcaptionlength  = 65                       # for LaTeX: max length for header lines
 fieldwidth        = 10                       # for BibLaTeX: width of the field labels 
@@ -400,9 +400,9 @@ mode_default            = "RIS"               # default for option -m
 name_template_default   = """^.+$"""          # default for file name template (-t)
 out_default             = "all"               # default for out file
 filter_key_default      = """^.+$"""          # default for topic filter (-k)
-author_template_default      = ""                  # default for author name template (-A)
-author_load_template_default = ""                  # default for author load name template (-Al)
-author_out_template_default  = ""                  # default for author out name template (-Ao)
+author_template_default = """^.+$"""          # default for author name template (-A)
+##author_load_template_default = ""                  # default for author load name template (-Al)
+##author_out_template_default  = ""                  # default for author out name template (-Ao)
 
 act_direc       = "."                       # actual OS dirtectory
 if operatingsys == "Windows":    
@@ -427,7 +427,7 @@ name_default    = name_template_default     # copy of name_template_default
 filter_default  = filter_key                # copy of filter_key
 
 default_text    = "no text"                 # default text for elements without embedded text
-empty           = ""                        # default text if a not embedded text is required but not found
+empty           = ""                        # default text in some cases
 userunknown     = "N. N."                   # default text for elements without a correct author
 ellipse         = " ..."
 package_id      = ""                        # ID of a package
@@ -680,7 +680,7 @@ DIV      = 12     % 12-strip layout"""
 \\usepackage[english]{babel}             % Language support
 \\usepackage{fontspec}                   % font specification
 \\usepackage{makeidx}                    % index generation
-%\\usepackage{lmodern}                   % font lmodern % not necessary
+%\\usepackage{lmodern}                   % font lmodern; not necessary
 \\usepackage[colorlinks=true]{hyperref}  % hypertext structures\n
 \\newcommand{\inp}[1]{\\IfFileExists{#1}{\\input{#1}}{}}\n
 \\makeindex\n"""
@@ -693,7 +693,7 @@ DIV      = 12     % 12-strip layout"""
     
     header       = "\n\\begin{{document}}\n \\pagestyle{{headings}}\n \\maketitle\n \\inp{{{0}.stat}}\n \\newpage\n".format(args.out_file)
     trailer      = ""
-    if make_topics:                          # -mt is specified
+    if make_topics:                          # if -mt is specified
         trailer = trailer + "\n\\newpage\n\\appendix"   
         trailer = trailer + "\n\\inp{" + args.out_file + ".top}"
         trailer = trailer + "\n\\inp{" + args.out_file + ".xref}"
@@ -1345,17 +1345,19 @@ def first_lines():                                          # function: create t
         print("\n")
 
     if mode in ["LaTeX"]:                                   # LaTeX
-        out.write("% file: {0}\n\n".format(out_file))
-        out.write("% date: {0}\n".format(actDate))
-        out.write("% time: {0}\n\n".format(actTime))
-        out.write("% generated by {0} (version: {1} of {2})\n\n".format(programname, programversion, programdate))
-        out.write("% program call             : {0} {1}\n".format(programname, arguments))
-        out.write("% mode                     : {0}\n".format(mode))
-        out.write("% skipped CTAN fields      : {0}\n".format(skip))
+        out.write("% File: {0}\n\n".format(out_file))
+        out.write("% Date: {0}\n".format(actDate))
+        out.write("% Time: {0}\n\n".format(actTime))
+        out.write("% generated by {0} (version  : {1} of {2})\n\n".format(programname, programversion, programdate))
+        out.write("% Program call               : {0} {1}\n".format(programname, arguments))
+        out.write("% mode                       : {0}\n".format(mode))
+        out.write("% skipped CTAN fields        : {0}\n".format(skip))
         if name_template != "":
-            out.write("% filtered by name template: '{0}'\n".format(name_template))
+            out.write("% filtered by name template  : '{0}'\n".format(name_template))
         if filter_key != "":
-            out.write("% filtered by key template : '{0}'\n".format(filter_key))
+            out.write("% filtered by key template   : '{0}'\n".format(filter_key))
+        if author_template != "":
+            out.write("% filtered by author template: '{0}'\n".format(author_template))
         out.write("\n% ---------------------------------------")
         out.write("\n% to be compiled with XeLaTeX or LuaLaTeX")
         out.write("\n% ---------------------------------------\n")
@@ -1365,17 +1367,19 @@ def first_lines():                                          # function: create t
         out.write(header)
     elif mode in ["BibLaTeX"]:                               # BibLaTeX
         out.write("% generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
-        out.write("% File                     : {0}\n".format(out_file))
-        out.write("% Mode                     : {0}\n".format(mode))
-        out.write("% Date                     : {0}\n".format(actDate))
-        out.write("% Time                     : {0}\n\n".format(actTime))
-        out.write("% Program Call             : {0} {1}\n".format(programname, arguments))
-        out.write("% skipped CTAN fields      : {0}\n".format(skip))
-        out.write("% type of BibLaTeX entries : {0}\n".format(btype))
+        out.write("% File                       : {0}\n".format(out_file))
+        out.write("% Mode                       : {0}\n".format(mode))
+        out.write("% Date                       : {0}\n".format(actDate))
+        out.write("% Time                       : {0}\n\n".format(actTime))
+        out.write("% Program Call               : {0} {1}\n".format(programname, arguments))
+        out.write("% skipped CTAN fields        : {0}\n".format(skip))
+        out.write("% Type of BibLaTeX entries   : {0}\n".format(btype))
         if name_template != "":
-            out.write("% filtered by name template: {0}\n".format(name_template))
+            out.write("% filtered by name template  : {0}\n".format(name_template))
         if filter_key != "":
-            out.write("% filtered by key template : {0}\n".format(filter_key))
+            out.write("% filtered by key template   : {0}\n".format(filter_key))
+        if author_template != "":
+            out.write("% filtered by author template: '{0}'\n".format(author_template))
         out.write("\n% actual mapping CTAN --> BibLaTeX\n")
         out.write("% alias         --> note\n")
         out.write("% also          --> related\n")
@@ -1439,7 +1443,7 @@ def get_author_packages():                                   # Function get_auth
             for g in authorpackages[f]:
                 author_pack.add(g)                           # built-up the resulting set
     if len(author_pack) == 0:
-        print("----- Warning: no package found which match the specified '{0}' template '{1}'".format("author", author_template))
+        print("----- Warning: no package found which matched the specified {0} template '{1}'".format("author", author_template))
     return author_pack
 
 # ------------------------------------------------------------------
@@ -1453,7 +1457,7 @@ def get_topic_packages():                                    # Function get_topi
             for g in topicspackage[f]:                       # all packagexs for this entry
                 topic_pack.add(g)                            # built-up the resulting set
     if len(topic_pack) == 0:
-        print("----- Warning: no package found which match the specified '{0}' template '{1}'".format("topic", filter_key))
+        print("----- Warning: no package found which matched the specified {0} template '{1}'".format("topic", filter_key))
     return topic_pack
 
 # ------------------------------------------------------------------
@@ -1466,7 +1470,7 @@ def get_name_packages():                                     # Function get_name
         if p2.match(f):                                      # member matches template
             name_pack.add(f)                                 # built-up the resulting set
     if len(name_pack) == 0:
-        print("----- Warning: no package found which match the specified '{0}' template '{1}'".format("name", name_template))
+        print("----- Warning: no package found which matched the specified {0}+ template '{1}'".format("name", name_template))
     return name_pack
 
 # ------------------------------------------------------------------
@@ -1803,9 +1807,23 @@ def main():                    # function: Main function
     # Generate topic list, topics and their packages (cross-reference), finish
     #
     if mode in ["LaTeX"] and make_topics: 
-        make_tops()           # Topic list
-        make_xref()           # Topics/Packages cross-reference
-        make_tap()            # Authors/Packages cross-reference
+        if not no_package_processed:
+            make_tops()           # Topic list
+        else:
+            if verbose:
+                print("--- Warning: no file '{0}' created".format(direc + args.out_file + ".top"))
+            
+        if not no_package_processed:
+            make_xref()           # Topics/Packages cross-reference
+        else:
+            if verbose:
+                print("--- Warning: no file '{0}' created".format(direc + args.out_file + ".xref"))
+            
+        if not no_package_processed:
+            make_tap()            # Authors/Packages cross-reference
+        else:
+            if verbose:
+                print("--- Warning: no file '{0}' created".format(direc + args.out_file + ".tap"))
         make_stat()           # Statistics file (xyz.stat)
 
     # ------------------------------------------------------------------
@@ -1838,6 +1856,7 @@ def make_stat():                                  # function: Generate statistic
     text1 = ""
     text2 = ""
     text3 = ""
+    text4 = ""
     
     stat = open(direc + args.out_file + ".stat", encoding="utf-8", mode="w")
     stat.write("% file: '{0}.stat'\n".format(args.out_file))
@@ -1858,17 +1877,23 @@ def make_stat():                                  # function: Generate statistic
     stat.write("time of program execution "      + r"&" + actTime + r"\\\\"  "\n")
     
     stat.write("mode "                           + r"& \verb§" + mode + r"§\\" + "\n")
-    if name_template == name_default:
-        text1 = "(all packages = default)"
-    stat.write("template for package names "     + r"& \verb§" + name_template + r"§ & " + text1 + r"\\" + "\n")
-    if filter_key == filter_default:
-        text2 = "(all topics = default)"
-    stat.write("template for topics "            + r"& \verb§" + filter_key + r"§ & " + text2 + r"\\" + "\n")
     stat.write("special lists used\\footnotemark{} "        + r"&" + str(make_topics) + r"\\" + "\n")
     if skip == skip_default:
         text3 = "(no skipped fields = default)"
-    stat.write("skipped CTAN fields "            + r"& \verb§" + skip + r"§ & " + text3 + r"\\\\" + "\n")
+    stat.write("skipped CTAN fields "            + r"& \verb§" + skip + r"§ & " + text3 + r"\\" + "\n")
     
+    if name_template == name_default:
+        text1 = "(all packages = default)"
+    stat.write("template for package names "     + r"& \verb§" + name_template + r"§ & " + text1 + r"\\" + "\n")
+    
+    if filter_key == filter_key_default:
+        text2 = "(all topics = default)"
+    stat.write("template for topics "            + r"& \verb§" + filter_key + r"§ & " + text2 + r"\\" + "\n")
+
+    if author_template == author_template_default:
+        text4 = "(all authors = default)"
+    stat.write("template for author names "     + r"& \verb§" + author_template + r"§ & " + text4 + r"\\\\" + "\n")
+
     stat.write("number of authors, total on CTAN "    + r"&" + str(len(authors)).rjust(6) + r"\\" + "\n")
     stat.write("number of authors, cited here "       + r"&" + str(len(usedAuthors)).rjust(6)  + r"\\" + "\n")
     stat.write("number of packages, total on CTAN "   + r"&" + str(len(packages)).rjust(6)  + r"\\" + "\n")
@@ -1905,7 +1930,7 @@ def make_tap():                                   # function: Generate the tap (
     """Generate the tap (xyz.tap) file."""
     
     # Authors/Packages cross-reference
-    
+        
     tap = open(direc + args.out_file + ".tap", encoding="utf-8", mode="w")
     tap.write("% file: '{0}.tap'\n".format(args.out_file))
     tap.write("% date: {0}\n".format(actDate))
@@ -1929,7 +1954,11 @@ def make_tap():                                   # function: Generate the tap (
             for ff in tmp1:
                 if ff in usedPackages:
                     package_no += 1
-            tap.write(str(package_no) + " package(s): ")
+            if package_no == 1:
+                text1 = " package: "
+            else:
+                text1 = " packages: "
+            tap.write(str(package_no) + text1)
             for ff in tmp1:
                 if ff in usedPackages:
                     ff = re.sub("_", "-", ff)
@@ -1989,7 +2018,11 @@ def make_xref():                                  # function: Generate the xref 
             for ff in tmp1:                       # loop: all packages with this topic
                 if ff in usedPackages:            #    package is used?
                     package_nr += 1               #    count the packages
-            xref.write(str(package_nr) + " package(s): ")
+            if package_nr == 1:
+                text1 = " package: "
+            else:
+                text1 = " packages: "
+            xref.write(str(package_nr) + text1)
             for ff in tmp1:                       # loop: all packages with this topic
                 if ff in usedPackages:            #    package is used?
                     ff = re.sub("_", "-", ff)
@@ -2268,6 +2301,8 @@ def p(k):                                         # function: element <p> ... </
 def process_packages():                          # function: Global loop
     """Global loop"""
 
+    global no_package_processed
+
     # process_packages --> onepackage
     # process_packages --> get_topic_packages
     # process_packages --> get_author_packages
@@ -2307,6 +2342,7 @@ def process_packages():                          # function: Global loop
     if counter <= 1:                             # no specified package found <=== error1
         if verbose:
             print("----- Warning: no correct local XML file for any specified package found")
+            no_package_processed = True
 
     if verbose:
         print("--- Info: packages processed")

@@ -10,7 +10,7 @@
 1.84 2021-05-26 output and interpretaion of language codes improved
 1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
 1.86 2021-06-12 auxiliary function fold: shorten long option values for output
-1.87 2021-06-12 messages classified: Warnings, Error, Info
+1.87 2021-06-12 messages classified: Warnings, Error, Infono package found which match
 1.88 2021-06-13 string method str.format used (if applicable)
 1.89 2021-06-18 some tiny improvements for output
 1.90 2021-06-22 misc. smaller corrections
@@ -22,3 +22,6 @@
 1.96 2021-07-14 new set of messages; new message no package found which match the specified '<kind of template>' template '<template>'
 1.97 2021-07-15 error in make_xref() corrected
 1.98 2021-07-16 verbose output enhanced (prevent the listing of non-existing packages); new function get_local_packages()
+1.99 2021-07-19 make_stat, make_xref, make_tap respects option -A; output changed
+1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
+1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
