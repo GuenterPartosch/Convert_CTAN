@@ -6,18 +6,8 @@
 # (C) Günter Partosch, 2021
 
 # Problems/Plans:
-# + -b nur für -m bib zulassen (x)
-# + -mt nur für -m latex zulassen (x)
-
 # + prüfen, ob ctanload -l -c aufgerufen werden muss (wenn CTANOut folgt)
 # + ist -c gefährlich?
-# + auch bei ctanout: ggf. all.tex vor Generierung löschen?
-# + bei -p vorher überprüfen, ob all.tex existiert; ggf alle anderen LateX-Hilfsdateien vorher löschen (all.aux, all.ind, all.idx)
-# + noch Fehler: -m bib -p
-# + Anpassung an -A (x)
-# + ...-changes neu machen (x)
-# + .man und usage neu machen
-# + x-examples neu machen (x)
 
 # ------------------------------------------------------------------
 # History:
@@ -41,6 +31,10 @@
 # 1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
 # 1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
 # 1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
+# 1.17 2021-07-18 output (listing of program options) enhanced
+# 1.18 2021-07-18 xyz.tex and all other LaTeX relevant files before compilation a/o -mt deleted
+# 1.19 2021-07-19 there is no compilation if -A a/o -k a/o -t results "no packages found"
+# 1.20 2021-07-19 -mo now prevents loading by CTANLoad
 
 # ------------------------------------------------------------------
 # Messages (CTANLoad+Out)
@@ -256,7 +250,7 @@
 #                        [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
 #                        [-to TEMPLATE_OUT] [-V] [-v]
 # 
-# [CTANLoad+Out.py; Version: 1.16 (2021-07-15)] Combines the tasks of CTANLoad
+# [CTANLoad+Out.py; Version: 1.20 (2021-07-19)] Combines the tasks of CTANLoad
 # [Load XLM and PDF documentation files from CTAN a/o generates some special
 # lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
 # files to some formats].
@@ -318,7 +312,7 @@
 #                         Template for package names in CTANOut - Default: ^.+$
 #   -V, --version         Show version of the program and exit.
 #   -v, --verbose         Flag: Output is verbose. - Default: False
-
+ 
 
 #===================================================================
 # Moduls needed
@@ -336,8 +330,8 @@ from os import path                # path informations
 # Settings
 
 programname       = "CTANLoad+Out.py"
-programversion    = "1.16"
-programdate       = "2021-07-15"
+programversion    = "1.20"
+programdate       = "2021-07-19"
 programauthor     = "Günter Partosch"
 authoremail       = "Guenter.Partosch@hrz.uni-giessen.de"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -358,7 +352,7 @@ call_index        = empty
 delete_temporary_file  = True
 
 err_mode          = "+ Warning: '{0} {1}' changed to '{2} (due to {3})'\n"
-latex_files       = [".aux", ".bib", ".ilg", ".log", ".idx", ".ind", ".out", ".tex", ".pdf"]
+latex_files       = [".aux", ".bib", ".ilg", ".log", ".idx", ".ind", ".out", ".tex", ".pdf", ".tap", ".top", ".xref"]
 other_files       = [".ris", ".bib", ".txt", ".tsv"]
 
 # ------------------------------------------------------------------
@@ -665,20 +659,21 @@ elif mode in ["plain", "txt"]:                                 # plain, txt --> 
 else:
     pass
 
-if ("-p" in call) or ("-mt" in call):                          # reset -m to LaTeX, if -p or -mt is set
+if ("-p" in call) or ("--pdf" in call) or ("-mt" in call) or ("--make_topics" in call):  # reset -m to LaTeX, if -p or -mt is set
     if mode != "LaTeX":
         if verbose:
             print(err_mode.format('-m', mode, '-m LaTeX', "'-mt'/'-p'"))
         call.append("-m")
         call.append("LaTeX")
         mode = "LaTeX"
-if "-b" in call:                                               # reset -m to BibLaTeX, if -b is set
+if ("-b" in call) or ("--btype" in call):                      # reset -m to BibLaTeX, if -b is set
     if mode != "BibLaTeX":
         if verbose:
             print(err_mode.format('-m', mode, '-m BibLaTeX', "'-b'"))
         call.append("-m");
         call.append("BibLaTeX")
         mode = "BibLaTeX"
+##if (mode != "LaTeX") and (("-p" in call) or ("--pdf" in call)):
    
 # ------------------------------------------------------------------
 # set load, check, compile, regeneration, and output
@@ -688,7 +683,7 @@ callx       = set(call[1:])
 set_load         = {'-t', '--template', '-tl', '--template_load', '-k', '--key', '-kl', '--key_load', '-A', '--author_template', '-Al', '--author_load_template'}
 set_check        = {'-l', '-c', '--lists', '--check_integrity'}
 set_output       = {'-b',  '-k', '-m', '-mt', '-p', '-s', '--btype', '--key', '--mode', '--make_topics', '--pdf_output', '--skip', 
-                    '-mo', 'make_output', '-to', '--template_out', '-ko', '--key_out', '-Ao', '--author_out_template'}
+                    '-mo', '--make_output', '-to', '--template_out', '-ko', '--key_out', '-Ao', '--author_out_template'}
 set_compile      = {'-p', '--pdf_output'}
 set_regeneration = {'-r', '--regenerate_pickle_files'}
 
@@ -697,6 +692,11 @@ output        = callx & set_output       != empty_set
 compile       = callx & set_compile      != empty_set
 check         = callx & set_check        != empty_set
 regeneration  = callx & set_regeneration != empty_set
+
+if ('-mo' in callx) or ('--make_output' in callx):
+    load = False
+    if verbose:
+        print(err_mode.format("load", "=True", False, "'-mo'"))
 
 
 #===================================================================
@@ -993,6 +993,9 @@ def func_call_output():                                                         
         remove_other_file(".bib")
     elif mode == "LaTeX":
         remove_LaTeX_file(".tex")
+        remove_LaTeX_file(".tap")
+        remove_LaTeX_file(".top")
+        remove_LaTeX_file(".xref")
     elif mode == "RIS":
         remove_other_file(".ris")
     elif mode == "plain":
@@ -1136,16 +1139,16 @@ def head():                                                                     
         if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))                    # -m
         if ("-n" in call) or ("--number" in call):          print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))                # -n
         if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))      # -o
-        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(key), "(" + key_text + ")"))                # -k
+        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(key), "(" + (key_text + ")")[0:50] + ellipse))  # -k
         if ("-kl" in call) or ("--key_load" in call):       print("  {0:5} {2:55} {1}".format("-k", fold(key_load), "(" + key_load_text + ")"))      # -kl
         if ("-ko" in call) or ("--key_out" in call):        print("  {0:5} {2:55} {1}".format("-k", fold(key_out), "(" + key_out_text + ")"))        # -ko
         if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))                    # -s
         if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(template), "(" + template_text + ")"))      # -t
         if ("-tl" in call) or ("--template_load" in call):  print("  {0:5} {2:55} {1}".format("-tl", template_load, "(" + template_load_text + ")")) # -tl
         if ("-to" in call) or ("--template_out" in call):   print("  {0:5} {2:55} {1}".format("-to", template_out, "(" + template_out_text + ")"))   # -to
-        if ("-A" in call) or ("--author_template" in call):       print("  {0:5} {2:55} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))                # --A
-        if ("-Al" in call) or ("-author_load_template" in call):  print("  {0:5} {2:55} {1}".format("-Al", fold(author_load_template), "(" + author_load_template_text + ")"))      # -Al
-        if ("-Ao" in call) or ("--author_outd_template" in call): print("  {0:5} {2:55} {1}".format("-Ao", fold(author_out_template), "(" + author_out_template_text + ")"))        # -Ao
+        if ("-A" in call) or ("--author_template" in call):       print("  {0:5} {2:55} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))            # --A
+        if ("-Al" in call) or ("-author_load_template" in call):  print("  {0:5} {2:55} {1}".format("-Al", fold(author_load_template), "(" + author_load_template_text + ")")) # -Al
+        if ("-Ao" in call) or ("--author_outd_template" in call): print("  {0:5} {2:55} {1}".format("-Ao", fold(author_out_template), "(" + author_out_template_text + ")"))   # -Ao
         print("\n")
 
         if regeneration: print("* Info: CTANLoad (Regeneration) to be executed")
@@ -1174,7 +1177,7 @@ def main():                                                                     
             func_call_compile()
         else:
             print("* Warning: LaTeX file '{0}' does not exist".format(direc + output_name + ".tex"))
-    print("=" * 80)
+    print("-" * 80)
 
   
 #===================================================================
