@@ -19,3 +19,7 @@ Changes (CTANLoad+Out)
 1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
 1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
 1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
+1.17 2021-07-18 output (listing of program options) enhanced
+1.18 2021-07-18 xyz.tex and all other LaTeX relevant files before compilation a/o -mt deleted
+1.19 2021-07-19 there is no compilation if -A a/o -k a/o -t results "no packages found"
+1.20 2021-07-19 -mo now prevents Loading by CTANLoad

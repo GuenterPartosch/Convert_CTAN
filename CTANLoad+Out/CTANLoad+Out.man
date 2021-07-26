@@ -8,7 +8,7 @@ usage: CTANLoad+Out.py [-h] [-a] [-A AUTHOR_TEMPLATE]
                        [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
                        [-to TEMPLATE_OUT] [-V] [-v]
 
-[CTANLoad+Out.py; Version: 1.16 (2021-07-15)] Combines the tasks of CTANLoad
+[CTANLoad+Out.py; Version: 1.20 (2021-07-19)] Combines the tasks of CTANLoad
 [Load XLM and PDF documentation files from CTAN a/o generates some special
 lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
 files to some formats].
