@@ -25,3 +25,6 @@
 1.99 2021-07-19 make_stat, make_xref, make_tap respects option -A; output changed
 1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
 1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
+1.102 2021-07-21 results are sorted
+1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
+1.104 2021-07-21 only for LaTeX: output folded an 1st page; new function TeX_fold()

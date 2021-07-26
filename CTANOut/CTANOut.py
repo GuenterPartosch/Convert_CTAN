@@ -9,6 +9,12 @@
 # - Ausgabe des Namens, wenn givenname fehlt (x)
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden? wahrscheinlich nicht
+# - LaTeX-Ausgabe, 1. Seite: Umbruch bei filter_key notwendig (x)
+# - auch bei BibLaTeX (x)
+# - Ergebnisse sortieren (x)
+# - neue Version machen
+# - man und usage machen
+# - changes machen
 
 # History
 # ------------------------------------------------------------------
@@ -39,6 +45,9 @@
 # 1.99 2021-07-19 make_stat, make_xref, make_tap respects option -A; output changed
 # 1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
 # 1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
+# 1.102 2021-07-21 results are sorted
+# 1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
+# 1.104 2021-07-21 only for LaTeX: output folded an 1st page; new function TeX_fold()
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -83,7 +92,7 @@
 #                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
 #                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.101 (2021-07-19)] Convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.104 (2021-07-21)] Convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
@@ -326,8 +335,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.101"
-programdate       = "2021-07-19"
+programversion    = "1.104"
+programdate       = "2021-07-21"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -706,7 +715,7 @@ DIV      = 12     % 12-strip layout"""
 
 # ------------------------------------------------------------------
 def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
-    """auxiliary function: shorten long option values for output"""
+    """auxiliary function: shorten/fold long option values for normal output"""
     
     offset = 64 * " "
     maxlen = 70
@@ -720,7 +729,49 @@ def fold(s):                                               # function fold: auxi
         else:
             line = line + parts[f]
         if len(line) >= maxlen:
-            out = out +line+ "\n" + offset
+            out = out + line + "\n" + offset
+            line = ""
+    out = out + line            
+    return out
+
+# ------------------------------------------------------------------
+def TeX_fold(s):                                               # function fold: auxiliary function: shorten long option values for output
+    """auxiliary function: shorten/fold long option values in LaTeX tabular output"""
+     
+    offset = 64 * " "
+    maxlen = 70
+    sep    = "|"
+    parts  = s.split(sep)
+    line   = ""
+    out    = ""
+    for f in range(0,len(parts) ):
+        if f != len(parts) - 1:
+            line = line + "\\verb§" + parts[f] + sep + "§"
+        else:
+            line = line + "\\verb§" + parts[f] + "§"
+        if len(line) >= maxlen:
+            out = out + line + "\\\\\n" + offset + "&"
+            line = ""
+    out = out + line            
+    return out
+
+# ------------------------------------------------------------------
+def comment_fold(s):                                            # function fold: auxiliary function: shorten long option values for output
+    """auxiliary function: shorten/fold long option values in LaTeX comment output"""
+     
+    offset = 28 * " "
+    maxlen = 120
+    sep    = "|"
+    parts  = s.split(sep)
+    line   = ""
+    out    = ""
+    for f in range(0,len(parts) ):
+        if f != len(parts) - 1:
+            line = line + parts[f] + sep
+        else:
+            line = line + parts[f]
+        if len(line) >= maxlen:
+            out = out + line + "\n%" + offset + ": "
             line = ""
     out = out + line            
     return out
@@ -1353,11 +1404,11 @@ def first_lines():                                          # function: create t
         out.write("% mode                       : {0}\n".format(mode))
         out.write("% skipped CTAN fields        : {0}\n".format(skip))
         if name_template != "":
-            out.write("% filtered by name template  : '{0}'\n".format(name_template))
+            out.write("% filtered by name template  : '{0}'\n".format(comment_fold(name_template)))
         if filter_key != "":
-            out.write("% filtered by key template   : '{0}'\n".format(filter_key))
+            out.write("% filtered by key template   : '{0}'\n".format(comment_fold(filter_key)))
         if author_template != "":
-            out.write("% filtered by author template: '{0}'\n".format(author_template))
+            out.write("% filtered by author template: '{0}'\n".format(comment_fold(author_template)))
         out.write("\n% ---------------------------------------")
         out.write("\n% to be compiled with XeLaTeX or LuaLaTeX")
         out.write("\n% ---------------------------------------\n")
@@ -1365,7 +1416,7 @@ def first_lines():                                          # function: create t
         out.write(usepkg)
         out.write(title)
         out.write(header)
-    elif mode in ["BibLaTeX"]:                               # BibLaTeX
+    elif mode in ["BibLaTeX"]:                              # BibLaTeX
         out.write("% generated by {0} (version: {1} of {2})\n".format(programname, programversion, programdate))
         out.write("% File                       : {0}\n".format(out_file))
         out.write("% Mode                       : {0}\n".format(mode))
@@ -1375,11 +1426,11 @@ def first_lines():                                          # function: create t
         out.write("% skipped CTAN fields        : {0}\n".format(skip))
         out.write("% Type of BibLaTeX entries   : {0}\n".format(btype))
         if name_template != "":
-            out.write("% filtered by name template  : {0}\n".format(name_template))
+            out.write("% filtered by name template  : {0}\n".format(comment_fold(name_template)))
         if filter_key != "":
-            out.write("% filtered by key template   : {0}\n".format(filter_key))
+            out.write("% filtered by key template   : {0}\n".format(comment_fold(filter_key)))
         if author_template != "":
-            out.write("% filtered by author template: '{0}'\n".format(author_template))
+            out.write("% filtered by author template: {0}\n".format(comment_fold(author_template)))
         out.write("\n% actual mapping CTAN --> BibLaTeX\n")
         out.write("% alias         --> note\n")
         out.write("% also          --> related\n")
@@ -1866,7 +1917,7 @@ def make_stat():                                  # function: Generate statistic
     
     stat.write(r"\minisec{Parameters and Statistics}" + "\n\n")
     stat.write(r"\raggedright" + "\n")
-    stat.write(r"\begin{tabular}{lrl}" + "\n")
+    stat.write(r"\begin{tabular}{lll}" + "\n")
 
     stat.write("\n")
     stat.write("program name "                   + r"& \verb§" + str(programname) + r"§\\" + "\n")
@@ -1880,19 +1931,19 @@ def make_stat():                                  # function: Generate statistic
     stat.write("special lists used\\footnotemark{} "        + r"&" + str(make_topics) + r"\\" + "\n")
     if skip == skip_default:
         text3 = "(no skipped fields = default)"
-    stat.write("skipped CTAN fields "            + r"& \verb§" + skip + r"§ & " + text3 + r"\\" + "\n")
+    stat.write("skipped CTAN fields "            + r"& \verb§" + skip + r"§  " + text3 + r"\\" + "\n")
     
     if name_template == name_default:
         text1 = "(all packages = default)"
-    stat.write("template for package names "     + r"& \verb§" + name_template + r"§ & " + text1 + r"\\" + "\n")
+    stat.write("template for package names "     + r"& " + TeX_fold(name_template) + r" " + text1 + r"\\" + "\n")
     
     if filter_key == filter_key_default:
         text2 = "(all topics = default)"
-    stat.write("template for topics "            + r"& \verb§" + filter_key + r"§ & " + text2 + r"\\" + "\n")
+    stat.write("template for topics "            + r"& " + TeX_fold(filter_key) + r"  " + text2 + r"\\" + "\n")
 
     if author_template == author_template_default:
         text4 = "(all authors = default)"
-    stat.write("template for author names "     + r"& \verb§" + author_template + r"§ & " + text4 + r"\\\\" + "\n")
+    stat.write("template for author names "     + r"& " + TeX_fold(author_template) + r"  " + text4 + r"\\\\" + "\n")
 
     stat.write("number of authors, total on CTAN "    + r"&" + str(len(authors)).rjust(6) + r"\\" + "\n")
     stat.write("number of authors, cited here "       + r"&" + str(len(usedAuthors)).rjust(6)  + r"\\" + "\n")
@@ -2324,8 +2375,9 @@ def process_packages():                          # function: Global loop
     if name_template != name_template_default:
         tmp_np = get_name_packages()             # get packages by package name
 
-    tmp_p = tmp_tp & tmp_ap & tmp_np & get_local_packages(direc)
-                                                 # built an intersection
+    tmp_pp = tmp_tp & tmp_ap & tmp_np & get_local_packages(direc)
+    tmp_p  = sorted(tmp_pp)                      # built an intersection
+                                                 
 
     for f in tmp_p:                              # all XML files in loop
         fext   = f + ext                         # XML file name (with extension)
