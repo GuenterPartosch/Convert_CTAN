@@ -11,6 +11,7 @@
 # - Auswahl auch nach Autor? CTAN.lap oder authorpackages; for f in authorpackages: print(authors[f][1], authorpackages[f])
 # - zusammenspiel von -t/-k/-A am besten wie bei CTANOut
 # - Fehler bei -r; es wird jedesmal CTAN.pkl neu gemacht (?)
+# - irgenein Fehler: crimsonpro fehlt c;\users\guent\documents\python\ctan
 
 # ------------------------------------------------------------------
 # History
