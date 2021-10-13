@@ -6,15 +6,8 @@
 # (C) Günter Partosch, 2019/2021
 
 # Probleme/Ideen:
-# - Ausgabe des Namens, wenn givenname fehlt (x)
 # - Idee: Klassenkonzept für die Ausgabe: für jeden Ausgabetyp eine eigene Klasse?
 # - kann Zeitstempel bei XML/PDF-Dateien genutzt werden? wahrscheinlich nicht
-# - LaTeX-Ausgabe, 1. Seite: Umbruch bei filter_key notwendig (x)
-# - auch bei BibLaTeX (x)
-# - Ergebnisse sortieren (x)
-# - neue Version machen
-# - man und usage machen
-# - changes machen
 
 # History
 # ------------------------------------------------------------------
@@ -47,7 +40,8 @@
 # 1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
 # 1.102 2021-07-21 results are sorted
 # 1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
-# 1.104 2021-07-21 only for LaTeX: output folded an 1st page; new function TeX_fold()
+# 1.104 2021-07-21 only for LaTeX: output folded an 1st page of output; new function TeX_fold()
+# 1.105 2021-07-26 results now alphabetically sorted; output improved
 
 # ------------------------------------------------------------------
 # Inspected CTAN elements
@@ -92,7 +86,7 @@
 #                   [-mt] [-o OUT_FILE] [-s SKIP] [-t NAME_TEMPLATE] [-stat]
 #                   [-v] [-V]
 # 
-# [CTANOut.py; Version: 1.104 (2021-07-21)] Convert CTAN XLM package files to
+# [CTANOut.py; Version: 1.105 (2021-07-26)] Convert CTAN XLM package files to
 # LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 # 
 # Options:
@@ -335,8 +329,8 @@ from os import path                          # path informations
 # Settings
 
 programname       = "CTANOut.py"
-programversion    = "1.104"
-programdate       = "2021-07-21"
+programversion    = "1.105"
+programdate       = "2021-07-26"
 programauthor     = "Günter Partosch"
 documentauthor    = "Günter Partosch"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
@@ -1494,7 +1488,8 @@ def get_author_packages():                                   # Function get_auth
             for g in authorpackages[f]:
                 author_pack.add(g)                           # built-up the resulting set
     if len(author_pack) == 0:
-        print("----- Warning: no package found which matched the specified {0} template '{1}'".format("author", author_template))
+        if verbose:
+            print("----- Warning: no package found which matched the specified {0} template '{1}'".format("author", author_template))
     return author_pack
 
 # ------------------------------------------------------------------
@@ -1508,7 +1503,8 @@ def get_topic_packages():                                    # Function get_topi
             for g in topicspackage[f]:                       # all packagexs for this entry
                 topic_pack.add(g)                            # built-up the resulting set
     if len(topic_pack) == 0:
-        print("----- Warning: no package found which matched the specified {0} template '{1}'".format("topic", filter_key))
+        if verbose:
+            print("----- Warning: no package found which matched the specified {0} template '{1}'".format("topic", filter_key))
     return topic_pack
 
 # ------------------------------------------------------------------
@@ -1521,7 +1517,8 @@ def get_name_packages():                                     # Function get_name
         if p2.match(f):                                      # member matches template
             name_pack.add(f)                                 # built-up the resulting set
     if len(name_pack) == 0:
-        print("----- Warning: no package found which matched the specified {0}+ template '{1}'".format("name", name_template))
+        if verbose:
+            print("----- Warning: no package found which matched the specified {0}+ template '{1}'".format("name", name_template))
     return name_pack
 
 # ------------------------------------------------------------------
@@ -1915,7 +1912,7 @@ def make_stat():                                  # function: Generate statistic
     stat.write("% time: {0}\n".format(actTime))
     stat.write("% is called by '{0}.tex'\n\n".format(args.out_file))
     
-    stat.write(r"\minisec{Parameters and Statistics}" + "\n\n")
+    stat.write(r"\minisec{Parameters and statistics}" + "\n\n")
     stat.write(r"\raggedright" + "\n")
     stat.write(r"\begin{tabular}{lll}" + "\n")
 
@@ -1987,7 +1984,7 @@ def make_tap():                                   # function: Generate the tap (
     tap.write("% date: {0}\n".format(actDate))
     tap.write("% time: {0}\n".format(actTime))
     tap.write("% is called by '{0}.tex'\n\n".format(args.out_file))
-    tap.write(r"\section{Authors and associated Packages}" + "\n\n")
+    tap.write(r"\section{Authors and associated packages}" + "\n\n")
     tap.write(r"\raggedright" + "\n")
     tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
 
@@ -2013,7 +2010,7 @@ def make_tap():                                   # function: Generate the tap (
             for ff in tmp1:
                 if ff in usedPackages:
                     ff = re.sub("_", "-", ff)
-                    tap.write("\\texttt{{{0}}}  (\\ref{{pkg:{0}}}); ".format(ff, ff))
+                    tap.write("\\texttt{{{0}}}~(\\ref{{pkg:{0}}}); ".format(ff, ff))
             tap.write("\n")
     tap.write(r"\end{labeling}" + "\n")
     tap.close()                                   # close file
@@ -2032,7 +2029,7 @@ def make_tops():                                  # function: Generate the tops 
     tops.write("% is called by {0}.tex\n\n".format(args.out_file))
     
     tops.write(r"\appendix" + "\n")
-    tops.write(r"\section{Used Topics, Short Explainations}" + "\n\n")
+    tops.write(r"\section{Used topics, short explainations}" + "\n\n")
     tops.write(r"\raggedright" + "\n")
     tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
   
@@ -2057,7 +2054,7 @@ def make_xref():                                  # function: Generate the xref 
     xref.write("% date: {0}\n".format(actDate))
     xref.write("% time: {0}\n".format(actTime))
     xref.write("% is called by '{0}.tex'\n\n".format(args.out_file))
-    xref.write(r"\section{Used Topics and related Packages}" + "\n\n")
+    xref.write(r"\section{Used topics and related packages}" + "\n\n")
     xref.write(r"\raggedright" + "\n")
     xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxx}" + "\n")
     xref.write("\n")
@@ -2077,7 +2074,7 @@ def make_xref():                                  # function: Generate the xref 
             for ff in tmp1:                       # loop: all packages with this topic
                 if ff in usedPackages:            #    package is used?
                     ff = re.sub("_", "-", ff)
-                    xref.write("\\texttt{{{0}}} (\\ref{{pkg:{1}}}); ".format(ff, ff))
+                    xref.write("\\texttt{{{0}}}~(\\ref{{pkg:{1}}}); ".format(ff, ff))
             xref.write("\n")
     xref.write(r"\end{labeling}" + "\n")
     xref.close()                                  # close file
@@ -2362,7 +2359,7 @@ def process_packages():                          # function: Global loop
     
     all_packages = set()                         # initialize set
     for f in packages:
-        all_packages.add(f)                      # construct a set object (packages has not the rfight format)
+        all_packages.add(f)                      # construct a set object (packages has not the right format)
         
     tmp_tp = all_packages.copy()                 # initialize tmp_tp
     tmp_ap = all_packages.copy()                 # initialize tmp_ap
@@ -2378,7 +2375,6 @@ def process_packages():                          # function: Global loop
     tmp_pp = tmp_tp & tmp_ap & tmp_np & get_local_packages(direc)
     tmp_p  = sorted(tmp_pp)                      # built an intersection
                                                  
-
     for f in tmp_p:                              # all XML files in loop
         fext   = f + ext                         # XML file name (with extension)
 
@@ -2394,7 +2390,7 @@ def process_packages():                          # function: Global loop
     if counter <= 1:                             # no specified package found <=== error1
         if verbose:
             print("----- Warning: no correct local XML file for any specified package found")
-            no_package_processed = True
+        no_package_processed = True
 
     if verbose:
         print("--- Info: packages processed")
