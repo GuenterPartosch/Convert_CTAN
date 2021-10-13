@@ -8,10 +8,9 @@
 # Es fehlen noch  bzw. Probleme:
 # - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
 # - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/ (geht eigentlich nicht)(-)
-# - Auswahl auch nach Autor? CTAN.lap oder authorpackages; for f in authorpackages: print(authors[f][1], authorpackages[f])
-# - zusammenspiel von -t/-k/-A am besten wie bei CTANOut
+# - Auswahl auch nach Autor? CTAN.lap oder authorpackages; for f in authorpackages: print(authors[f][1], authorpackages[f]) (x)
 # - Fehler bei -r; es wird jedesmal CTAN.pkl neu gemacht (?)
-# - irgenein Fehler: crimsonpro fehlt c;\users\guent\documents\python\ctan
+# - irgenein Fehler: crimsonpro fehlt c:\users\guent\documents\python\ctan
 
 # ------------------------------------------------------------------
 # History
@@ -59,6 +58,7 @@
 # 2.6.0  2021-07-11 search of packages with author name template; new option -A; new function get_CTAN_lap (needs CTAN.lap)
 # 2.6.1  2021-07-12 some corrections in the handling of -t / -k and -A
 # 2.6.2  2021-07-15 more corrections in the handling of -t / -k and -A
+# 2.7.0  2021-07-26 combined filtering new organized; new function get_package_set; 2 additional warning messages
 
 # ------------------------------------------------------------------
 # Usage (CTANLoad)
@@ -69,7 +69,7 @@
 #                    [-t TEMPLATE] [-stat] [-v] [-V]
 # 
 # Load XLM and PDF documentation files from CTAN a/o generate some special
-# lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.6.1 (2021-07-12)]
+# lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.7.0 (2021-07-26)]
 # 
 # Optional parameters:
 #   -h, --help            show this help message and exit
@@ -143,6 +143,8 @@
 # - Warning: local XML file for package '<package name>' empty or not well-formed
 # - Warning: local XML file for package '<package name>' not found
 # - Warning: maximum number (<number>) of downloaded XML+PDF files exceeded
+# - Warning: no correct XML file for any specified package found
+# - Warning: no package found which matched the specified <kind of template> template '<template>'
 # - Warning: pickle file '<pickle file name>' cannot be loaded a/o written
 # - Warnung: '<option>' reset to {new value} (due to <reason>)"
 #
@@ -167,14 +169,15 @@
 # generate_pickle1()	   pickle dump: actual authors, packages, licenses, topics, topicspackage, packagetopics
 # generate_pickle2()	   pickle dump: actual XML_toc (list with download information files).
 # generate_topicspackage() Generate topicspackage, packagetopics, and authorpackages.
-# get_CTAN_lpt()           Load CTAN.lpt and analyze
-# get_CTAN_lap()           Load CTAN.lap and analyze
+# get_CTAN_lpt()           Load CTAN.lpt and analyze; get cross-reference of topics and packages
+# get_CTAN_lap()           Load CTAN.lap and analyze; get cross-reference of authors and packages
+# get_package_set()        Analyze dictionary 'packages' for name templates
 # get_PDF_files(d)	   List all PDF files in a OS directory.
 # get_XML_files(d)         List all XML files in the OS directory d.
 # dload_XML_files()	   Download XML package files.
 # load_XML_toc()	   Load pickle file 2 (with XML_toc).
 # dload_authors()	   Download XML file 'authors'.
-# dload_document_file(...) Load one information file (PDF).
+# dload_document_file(...) Download one information file (PDF).
 # dload_licenses()	   Download XML file 'licenses'.
 # dload_packages()	   Download XML file 'packages'.
 # dload_topics()	   Download XML file 'topics'.
@@ -291,8 +294,8 @@ from threading import Thread       # handling of threads
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.6.2"
-prg_date        = "2021-07-15"
+prg_version     = "2.7.0"
+prg_date        = "2021-07-26"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys    = platform.system()
@@ -557,8 +560,8 @@ def fold(s):                                               # function fold: auxi
     
     offset = 64 * " "
     maxlen = 70
-    sep    = "|"
-    parts  = s.split(sep)
+    sep    = "|"                                           # separator for split
+    parts  = s.split(sep)                                  # split s on sep                   
     line   = ""
     out    = ""
     for f in range(0, len(parts)):
@@ -684,15 +687,29 @@ def call_load():                                                  # Function cal
     dload_licenses()                                              # load the file licenses.xml
     dload_packages()                                              # load the file packages.xml
 
-    if (key_template != key_template_default) and (author_template != author_template_default):
-        get_CTAN_lpt()                                            # (first) load CTAN.lpt + process dload_XML_files
-        get_CTAN_lap()                                            # (second) load CTAN.lap + process dload_XML_files
-    elif (key_template != key_template_default):
-        get_CTAN_lpt()                                            # load CTAN.lpt + process dload_XML_files
-    elif (author_template != author_template_default):
-        get_CTAN_lap()                                            # load CTAN.lap + process dload_XML_files
-    else:
-        dload_XML_files(packages)                                 # load and processe all required XML files in series
+    all_packages = set()                                          # initialize set
+    for f in packages:
+        all_packages.add(f)                                       # construct a set object (packages has not the right format)
+        
+    tmp_tp = all_packages.copy()                                  # initialize tmp_tp
+    tmp_ap = all_packages.copy()                                  # initialize tmp_ap
+    tmp_np = all_packages.copy()                                  # initialize tmp_np
+
+    if (template != template_default):
+        tmp_np = get_package_set()                                # analyze 'packages' for name templates
+    if (key_template != key_template_default):
+        tmp_tp = get_CTAN_lpt()                                   # load CTAN.lpt and analyze it for key templates
+    if (author_template != author_template_default):
+        tmp_ap = get_CTAN_lap()                                   # load CTAN.lap and analyze it for author templates
+
+    tmp_pp = tmp_tp & tmp_ap & tmp_np
+    if len(tmp_pp) == 0:
+        if verbose:
+            print("--- Warning: no correct XML file for any specified package found")
+
+    tmp_p  = sorted(tmp_pp)                                       # built an intersection
+
+    dload_XML_files(tmp_p)                                        # load and processe all required XML files in series
         
     thr1 = Thread(target=generate_pickle2)                        # dump XML_toc via pickle file via thread
     thr1.start()
@@ -726,8 +743,8 @@ def call_plain():                                                 # Function cal
     dload_authors()                                               # load the file authors.xml
     dload_licenses()                                              # load the file licenses.xml
     dload_packages()                                              # load the file packages.xml
-    generate_topicspackage()                                      # generates topicspackage, ...
-    thr3 = Thread(target=generate_pickle1)                        # dumps authors, packages, topics, licenses, topicspackage, packagetopics (via thread)
+    generate_topicspackage()                                      # generate topicspackage, ...
+    thr3 = Thread(target=generate_pickle1)                        # dump authors, packages, topics, licenses, topicspackage, packagetopics (via thread)
     thr3.start()
     thr3.join()
 
@@ -817,8 +834,8 @@ def check_integrity(always=False):                                # Function che
         thr2.join()
 
 # ------------------------------------------------------------------
-def dload_authors():                                       # Function dload_authors(): Download XML file 'authors'.
-    """Download XML file 'authors'."""
+def dload_authors():                                       # Function dload_authors(): Download XML file 'authors' from CTAN and generate dictionary 'authors'.
+    """Download XML file 'authors'zztex.xml from CTAN and generate dictionary 'authors'."""
 
     global authors                                         # global Python dictionary with authors
 
@@ -829,7 +846,7 @@ def dload_authors():                                       # Function dload_auth
     try:                                                   # load file 'authors'
         # wget https://ctan.org/xml/2.0/authors?no-dtd=true --no-check-certificate -O ./authors.xml
         process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
-        process.wait()
+        process.wait()                                     # wait?
 
         if verbose:
             print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
@@ -862,8 +879,8 @@ def dload_authors():                                       # Function dload_auth
         sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def dload_document_file(href, key, name):                          # Function dload_document_file(href, key, name): Load one information file (PDF).
-    """Load one information file (PDF)."""
+def dload_document_file(href, key, name):                          # Function dload_document_file(href, key, name): Download one information file (PDF) from CTAN.
+    """Download one information file (PDF) from CTAN."""
     
     # to be improved
 
@@ -895,8 +912,8 @@ def dload_document_file(href, key, name):                          # Function dl
     return noterror
 
 # ------------------------------------------------------------------
-def dload_licenses():                                      # Function dload_licenses: Download XML file 'licenses'.
-    """Download XML file 'licenses'."""
+def dload_licenses():                                      # Function dload_licenses: Download XML file 'licenses' from CTAN and generate dictionary 'licemses'.
+    """Download XML file 'licenses' from CTAN and generate dictionary 'licemses'."""
 
     global licenses                                        # global Python dictionary with licenses
 
@@ -906,7 +923,7 @@ def dload_licenses():                                      # Function dload_lice
 
     try:                                                   # loads file .../licenses
         process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
-        process.wait()
+        process.wait()                                     # wait?
 
         if verbose:
             print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
@@ -941,8 +958,8 @@ def dload_licenses():                                      # Function dload_lice
         sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def dload_packages():                                      # Function dload_packages: Download XML file 'packages'.
-    """Download XML file 'packages'."""
+def dload_packages():                                      # Function dload_packages: Download XML file 'packages' from CTAN and generate dictionary 'packages'.
+    """Download XML file 'packages' from CTAN and generate dictionary 'packages'."""
 
     global packages                                        # global Python dictionary with packages
 
@@ -952,7 +969,7 @@ def dload_packages():                                      # Function dload_pack
 
     try:                                                   # loads file .../packages
         process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
-        process.wait()
+        process.wait()                                     # wait?
 
         if verbose:
             print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
@@ -984,8 +1001,8 @@ def dload_packages():                                      # Function dload_pack
         sys.exit("- Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def dload_topics():                                        # Function dload_topics(): Download XML file 'topics'.
-    """Download XML file 'topics'."""
+def dload_topics():                                        # Function dload_topics(): Download XML file 'topics' from CTANB and generate dictionary 'topics'.
+    """Download XML file 'topics' from CTAN and generate dictionary 'topics'."""
 
     global topics                                          # global Python dictionary with topics
 
@@ -995,7 +1012,7 @@ def dload_topics():                                        # Function dload_topi
 
     try:                                                   # loads file .../topics
         process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
-        process.wait()
+        process.wait()                                     # wait?
 
         if verbose:
             print("--- Info: XML file '{0}' downloaded ('{1}.xml' on PC)".format(file, direc + file))
@@ -1030,7 +1047,7 @@ def dload_XML_files(p):                                             # Function d
 
     p: packages/selected_packages"""
 
-    # load_XML_file --> analyze_XML_file
+    # dload_XML_file --> analyze_XML_file
 
     global topicspackage, number, counter, pdfcounter
 
@@ -1041,7 +1058,7 @@ def dload_XML_files(p):                                             # Function d
 
             try:                                                    # try to download the XML file (packages)
                 process = subprocess.Popen(callx, stderr=subprocess.PIPE, universal_newlines=True)
-                process.wait()
+                process.wait()                                      # wait ?
 
                 if verbose:
                     print("----- Info: XML file for package '{0}' downloaded ('{1}.xml' on PC)".format(f, direc + f))
@@ -1247,12 +1264,9 @@ def generate_topicspackage():                                       # Function g
         print("--- Info: packagetopics, topicspackage, authorpackage collected")
 
 # ------------------------------------------------------------------
-def get_CTAN_lpt():                                                # function get_CTAN_lpt: load and analyze CTAN.lpt
-    """load and analyze CTAN.lpt."""
+def get_CTAN_lpt():                                                # function get_CTAN_lpt: Download and analyze CTAN.lpt for topic templates
+    """Download and analyze CTAN.lpt for topic templates."""
 
-    # get_CTAN_lpt --> dload_XML_files
-
-    global selected_packages_lpt, selected_packages_lap
     global number, counter, pdfcounter
 
     try:
@@ -1262,50 +1276,59 @@ def get_CTAN_lpt():                                                # function ge
             if p5.match(top):                                      # collect packages with specified topics
                 for g in pack:
                     selected_packages_lpt.add(g)
-        if (key_template != key_template_default) and (author_template != author_template_default):
-            pass                                                   # do nothing 
-        else:
-            dload_XML_files(selected_packages_lpt)                 # load XML files and analyze them
         f.close()                                                  # close file
     except IOError:
         if verbose:                                                # there is an error
             print("- Error: local file '{0}' not loaded".format(topicpackage_file))
         sys.exit()                                                 # program terminates
+    if len(selected_packages_lpt) == 0:
+        if verbose:
+            print("--- Warning: no package found which matched the specified {0} template '{1}'".format("topic", key_template))
+    return selected_packages_lpt
 
 # ------------------------------------------------------------------
-def get_CTAN_lap():                                                # function get_CTAN_lap: load and analyze CTAN.lap
-    """load and analyze CTAN.lap."""
+def get_CTAN_lap():                                                # function get_CTAN_lap: Download and analyze CTAN.lap for author templates
+    """Download and analyze CTAN.lap for author templates."""
 
-    # get_CTAN_lpt --> dload_XML_files
-
-    global selected_packages_lpt, selected_packages_lap
     global number, counter, pdfcounter
 
     try:
         f = open(authorpackage_file, encoding="utf-8", mode="r")   # open file
         for line in f:
-            auth, pack=eval(line.strip())                          #
-            if authors[auth][1] != "":
+            auth, pack=eval(line.strip())                          # get the items author and package
+            if authors[auth][1] != "":                             # extract author's familyname
                 auth2 = authors[auth][1]
             else:
                 auth2 = authors[auth][0]
             if p6.match(auth2):                                    # collect packages with specified authors
                 for g in pack:
                     selected_packages_lap.add(g)
-        if (key_template != key_template_default) and (author_template != author_template_default):
-            selected_packages = selected_packages_lpt & selected_packages_lap # combine the two searches
-            dload_XML_files(selected_packages)
-        else:            
-            dload_XML_files(selected_packages_lap)                 # load XML files and analyze them
         f.close()                                                  # close file
     except IOError:
         if verbose:                                                # there is an error
             print("- Error: local file '{0}' not loaded".format(authorpackage_file))
         sys.exit()                                                 # program terminates
+    if len(selected_packages_lap) == 0:
+        if verbose:
+            print("--- Warning: no package found which matched the specified {0} template '{1}'".format("author", author_template))
+    return selected_packages_lap
+
+# ------------------------------------------------------------------
+def get_package_set():                                            # Function get_package_set: Analyze dictionary 'packages' for name templates.
+    """Analyze dictionary 'packages' for name templates."""
+    
+    tmp = set()
+    for f in packages:
+        if p2.match(f):
+            tmp.add(f)
+    if len(tmp) == 0:
+        if verbose:
+            print("--- Warning: no package found which matched the specified {0} template '{1}'".format("name", template))
+    return tmp
 
 # ------------------------------------------------------------------
 def get_PDF_files(d):                                             # Function get_PDF_files(d): List all PDF files in a specified OS directory.
-    """List all PDF files in a specified OS directory.
+    """List all PDF files in the specified OS directory d.
 
     d: directory"""
 
@@ -1332,7 +1355,7 @@ def get_XML_files(d):                                             # Function get
 
 # ------------------------------------------------------------------
 def load_XML_toc():                                                # Function load_XML_toc(): Load pickle file 2 (which contains XML_toc).
-    """Load pickle file 2 (with XML_toc)."""
+    """Load pickle file 2 (which contains XML_toc)."""
 
     global XML_toc                                                 # global Python dictionary
 
@@ -1385,23 +1408,23 @@ def main():                                                        # Function ma
         if (regenerate != regenerate_default):                      #     -r reset
             regenerate = False
             if verbose:
-                print(reset_text.format("-r",False,"'-n' or '-t' or '-f'"))
+                print(reset_text.format("-r", False, "'-n' or '-t' or '-f'"))
 
     if check:                                                       # check mode
         if (regenerate != regenerate_default):                      #     -r reset
             regenerate = False
             if verbose:
-                print(reset_text.format("-r",False,"'-l' or '-c'"))
+                print(reset_text.format("-r", False, "'-l' or '-c'"))
 
     if newpickle:                                                   # newpickle mode
         if number == number_default:
             number  = 3000                                          #     -n reset
             if verbose:
-                print(reset_text.format("-n",3000,"'-r'"))
+                print(reset_text.format("-n", 3000, "'-r'"))
         if download == download_default:
             download = True                                         #     -f reset
             if verbose:
-                print(reset_text.format("-f",True,"'-r'"))
+                print(reset_text.format("-f", True, "'-r'"))
         
     if verbose:                                                     # output on terminal (options in call)
         print("\n- Info: program call (with more details): CTANLoad.py")    
