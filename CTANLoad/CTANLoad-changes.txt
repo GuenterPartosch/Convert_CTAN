@@ -43,3 +43,4 @@ Changes (CTANLoad.py)
 2.6.0  2021-07-11 search of packages with author name template; new option -A; new function get_CTAN_lap (needs CTAN.lap)
 2.6.1  2021-07-12 some corrections in the handling of -t / -k and -A
 2.6.2  2021-07-15 more corrections in the handling of -t / -k and -A
+2.7.0  2021-07-26 combined filtering new organized; new function get_package_set; 2 additional warning messages

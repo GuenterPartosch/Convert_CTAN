@@ -38,6 +38,8 @@ Warnings:
 - Warning: local XML file for package '<package name>' empty or not well-formed
 - Warning: local XML file for package '<package name>' not found
 - Warning: maximum number (<number>) of downloaded XML+PDF files exceeded
+- Warning: no correct XML file for any specified package found
+- Warning: no package found which matched the specified <kind of template> template '<template>'
 - Warning: pickle file '<pickle file name>' cannot be loaded a/o written
 - Warnung: '<option>' reset to {new value} (due to <reason>)"
 
