@@ -27,4 +27,6 @@
 1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
 1.102 2021-07-21 results are sorted
 1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
-1.104 2021-07-21 only for LaTeX: output folded an 1st page; new function TeX_fold()
+1.104 2021-07-21 only for LaTeX: output folded an 1st page of output; new function TeX_fold()
+1.105 2021-07-26 results now alphabetically sorted; output improved
+
