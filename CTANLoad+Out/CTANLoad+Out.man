@@ -5,10 +5,10 @@ usage: CTANLoad+Out.py [-h] [-a] [-A AUTHOR_TEMPLATE]
                        [-l]
                        [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}]
                        [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-r]
-                       [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
-                       [-to TEMPLATE_OUT] [-V] [-v]
+                       [-s SKIP] [-sb SKIP_BIBLATEX] [-stat] [-t TEMPLATE]
+                       [-tl TEMPLATE_LOAD] [-to TEMPLATE_OUT] [-V] [-v]
 
-[CTANLoad+Out.py; Version: 1.20 (2021-07-19)] Combines the tasks of CTANLoad
+[CTANLoad+Out.py; Version: 1.23 (2021-11-28)] Combines the tasks of CTANLoad
 [Load XLM and PDF documentation files from CTAN a/o generates some special
 lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
 files to some formats].
@@ -22,7 +22,7 @@ Optional parameters:
   -Al AUTHOR_LOAD_TEMPLATE, --author_load_template AUTHOR_LOAD_TEMPLATE
                         Name template for authors (CTANLoad) - Default:
   -Ao AUTHOR_OUT_TEMPLATE, --author_out_template AUTHOR_OUT_TEMPLATE
-                        Name template for authors (CTANOutd) - Default:
+                        Name template for authors (CTANOut) - Default:
   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
                         Type of BibLaTex entries to be generated [valid only
                         for '-m BibLaTeX'/'--mode BibLaTeX'] - Default:
@@ -60,6 +60,8 @@ Optional parameters:
                         Flag: Regenerate the two pickle files. - Default:
                         False
   -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
+  -sb SKIP_BIBLATEX, --skip_biblatex SKIP_BIBLATEX
+                        Skip specified BibLaTeX fields. - Default: []
   -stat, --statistics   Flag: Print statistics on terminal. - Default: False
   -t TEMPLATE, --template TEMPLATE
                         Template for package names [in CTANLoad and CTANOut] -
