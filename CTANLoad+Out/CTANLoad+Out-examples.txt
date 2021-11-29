@@ -98,7 +98,7 @@ CTANLoad+Out -k latex -m txt -v
   + output file is all.txt
   + without statistics
   + verbose                                                                     [-v]
-#
+
 CTANLoad+Out -k latex -f -v -stat -mt -p
   + 1st step:
   + download all XML packages which match the topic "LaTeX"                     [-k]
@@ -113,7 +113,7 @@ CTANLoad+Out -k latex -f -v -stat -mt -p
   + output file is all.pdf
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
-#
+
 CTANLoad+Out -k chinese -t "^zh" -f -v -stat
   + 1st step:
   + download all XML packages which match the topic "chinese"                   [-k]
@@ -126,14 +126,14 @@ CTANLoad+Out -k chinese -t "^zh" -f -v -stat
   + output file is all.ris
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
-#
+
 CTANLoad+Out -ko "latex" -m bib -v
   + process all XML files in the current directory with the topic "latex"       [-ko]
   + output format is BibLaTeX                                                   [-m]                                                           
   + output file is all.bib
   + verbose                                                                     [-v]
   + without statistics
-#
+
 CTANLoad+Out -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
   + 1st step:
   + download all XML packages which match the topic "collection"                [-k]
@@ -157,9 +157,8 @@ Regular expressions
 -------------------
 The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
 such as
-#
+
 -k latex                matches all topic names which contain "latex"
 -t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3" or "t3"
 -t "^.+$"               matches all file names
 -t "^{a-b]"             matches all file names which begin with letters a-b
-
