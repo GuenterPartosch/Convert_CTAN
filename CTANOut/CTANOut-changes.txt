@@ -1,3 +1,5 @@
+Changes (CTZANOut)
+==================
 1.75 2021-05-14 more types for -m
 1.76 2021-05-14 clean-up of variables
 1.77 2021-05-15 more details in verbose mode for -mt
@@ -10,7 +12,7 @@
 1.84 2021-05-26 output and interpretaion of language codes improved
 1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
 1.86 2021-06-12 auxiliary function fold: shorten long option values for output
-1.87 2021-06-12 messages classified: Warnings, Error, Infono package found which match
+1.87 2021-06-12 messages classified: Warnings, Error, Info; no package found which match
 1.88 2021-06-13 string method str.format used (if applicable)
 1.89 2021-06-18 some tiny improvements for output
 1.90 2021-06-22 misc. smaller corrections
@@ -22,11 +24,66 @@
 1.96 2021-07-14 new set of messages; new message no package found which match the specified '<kind of template>' template '<template>'
 1.97 2021-07-15 error in make_xref() corrected
 1.98 2021-07-16 verbose output enhanced (prevent the listing of non-existing packages); new function get_local_packages()
-1.99 2021-07-19 make_stat, make_xref, make_tap respects option -A; output changed
+1.99 2021-07-19 make_stat, make_xref, make_tap respect option -A; output changed
 1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
-1.101 2021-07-19 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
+1.101 2021-07-20 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
 1.102 2021-07-21 results are sorted
 1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
 1.104 2021-07-21 only for LaTeX: output folded an 1st page of output; new function TeX_fold()
 1.105 2021-07-26 results now alphabetically sorted; output improved
+1.106 2021-09-25 output of year in BibLaTeX enhanced
+1.107 2021-10-10 changes in get_year: analyze element year, too
+1.108 2021-10-10 completion of language_keys
+1.109 2021-10-10 element documentation indexed
+1.110 2021-10-11 output in Hindi now possible
+1.111 2021-10-11 section headers (for LaTeX) improved
+1.112 2021-10-11 error messages actualized
+1.113 2021-10-12 output headers for LaTeX and BibLaTeX enhanced
+1.114 2021-10-12 new function biblatex_citationkey: generate valid citation keys + corresponding changes in 'leading', 'main', and 'also'
+1.115 2021-10-12 function 'leading' cleaned
+1.116 2021-10-12 comment blocks re-organized
+1.117 2021-10-12 document strings in functions enhanced
+1.118 2021-10-12 in comment block: list of functions and function tree actualized
+1.119 2021-10-13 RIS output: a) type changed to ICOMM; b) UR output: now for main document and CTAN element <documentation .../>
+1.120 2021-10-14 RIS output: field "PY  -" settled now with year (collected from <version.../> and <copyright ... />)
+1.121 2021-10-14 RIS output: "L4  -" changed to "L2  -"
+1.122 2021-10-15 RIS output: output "Y2  - " (from <version ... />); implements "last change"
+1.123 2021-10-15 RIS output: <also ...> mapped into notice (= "N1  -")
+1.124 2021-10-17 RIS output: LA output improved; BibLaTeX output: 'file' output improved
+1.125 2021-10-20 language codes es-mx, sl and zh-cn added
+1.126 2021-10-20 output of title/subtitle a/o T1/T2: output now harmonized in functions 'name'/'caption'
+1.127 2021-10-20 now harmonized: output of 'language' a/o 'LA' in function 'trailing'
+1.128 2021-10-21 Excel: output and processing extended, improved and enhanced; new call parameter -m csv
+1.129 2021-10-22 RIS: better values for 'PY' and 'LA'; mapping von <also .../>; better values for 'Y2' and 'Y3'
+1.130 2021-10-23 RIS: 'N1' re-arranged; fieldwidth (label width) changed; 'L1' output corrected
+1.131 2021-10-24 date of last access in RIS/BibLaTeX: 'Y2' and 'date' unified
+1.132 2021-10-24 output of URL and date of last access in RIS/BibLaTeX: 'UR' and 'Y3' a/o 'url' and 'urldate'
+1.133 2021-10-25 BibLaTeX: licenses collected and output in 'userb'; 'note' corrected; comment block at the beginning re-arranged; 'year' output improved
+1.134 2021-10-25 BibLaTeX: 'language' output enhanced
+1.135 2021-10-26 function 'leading': trimmed; determination of author(s) improved; 'userunknown' renamed to 'authorunknown'
+1.136 2021-10-27 TeX output: additionally URL of Web page on CTAN, year and last access date
+1.137 2021-10-28 plain output: additionally URL of Web page on CTAN, year and last access date
+1.138 2021-10-28 RIS and BibLaTeX output: unnecessary empty output lines suppressed
+1.139 2021-10-29 Excel output: some improvements and a few corrections
+1.140 2021-10-29 output of keywords, language(s), local file name(s), and 'note' a/o 'N1'  improved
+1.141 2021-11-01 supplementary notes at the beginning of xyz.xref and xyz.tap
+1.142 2021-11-01 aesthetic repairs for the processing of <description ...> ...</description> with 'language' attribute
+1.143 2021-11-02 function 'mod_xref' modified
+1.144 2021-11-02 full UTF-8 output on stdout enabled
+1.145 2021-11-03 function 'description', 'p', 'ul', and 'li': output of multiple spaces and empty lines revised
+1.146 2021-11-03 BibLaTeX: mapping of 'description' to 'abstract' improved
+1.147 2021-11-05 BibLaTeX: "@" substituted to 'at' in 'note' and 'usera' output
+1.148 2021-11-05 correct processing of multiple CTAN field 'also' for BibLaTeX/Excel; correct processing of multiple CTAN 'alias' for Excel
+1.149 2021-11-05 correct processing of multiple CTAN field 'description' for all modes
+1.150 2021-11-05 correction for option -b: '@online' as new default; '@electronic' as new choose
+1.151 2021-11-06 new option -sb (--skip_biblatex): additional function 'bibfield_test'; additional requests
+1.153 2021-11-06 BibLaTeX/plain/LaTeX/RIS/Excel: interaction between 'year' und 'date' harmonized
+1.154 2021-11-08 LaTeX: index for 'year' now; index for CTAN field documentation no longer in use
+1.155 2021-11-08 BibLaTeX: some items no longer collected in 'note', but in 'usera', 'userb', 'userc', 'userd', 'usere', 'userf'
+1.156 2021-11-11 new examples for option '-sb'
+1.157 2021-11-11 BibLaTeX: output of 'file' corrected; now jabref compatible
+1.158 2021-11-13 mapping CTAN --> BibLaTeX changed: now 'texlive', 'miktex' --> embedded in 'note'; ctan --> 'userc'; 'contact' --> collected in 'userd'
+1.159 2021-11-19 LaTeX output: "--local file" now with relativ path
+1.160 2021-11-20 'year' in LaTeX/plain: "without year" if it is appropiate
+1.161 2021-11-21 for all modes: empty output for abstract/description corrected
 

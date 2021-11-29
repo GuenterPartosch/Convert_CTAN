@@ -1,0 +1,142 @@
+Functions in CTANOut.py
+===================================================================
+
+TeX_fold(s):              auxiliary function: shorten/fold long option values in LaTeX tabular output
+TeXchars(s):              auxiliary function: prepares characters for LaTeX/BibLaTeX
+bibfield_test(s, f):      auxiliary function: Tests a BibLaTeX field: output text is not empty and filed is not be skipped.
+biblatex_citationkey():   auxiliary function: Generate a dictionary with citations keys for all packages
+comment_fold(s):          auxiliary function: shorten/fold long option values in LaTeX comment output"
+fold(s):                  auxiliary function: shorten long option values for output
+get_authoryear(a, y):     auxiliary function: construct a unique authoryear string (for BibLaTeX only)
+get_local_packages(d):    auxiliary function: List all local packages in the OS directory
+get_year(s):              auxiliary function: get the most recent year in string s (only for BibLaTeX)
+mod_TeXchars(s):          auxiliary function: prepares characters for LaTeX/BibLaTeX in a paragraph
+mod_backslash(s):         auxiliary function: special processing von \ in the source text
+
+alias(k):                 processes element <alias .../>
+also(k):                  processes element <also .../>
+authorref(k):             processes element <authorref .../>
+caption(k):               processes element <caption>...</caption>
+contact(k):               processes element <contact .../>
+copyrightT(k, p):         processes element <copyright .../>
+ctan(k, t):               processes element <ctan .../>
+description(k):           processes element <description ...> ... </description>
+documentation(k):         processes element <documentation .../>
+entry(k, t, p):           processes element <entry ...>...</entry>
+home(k):                  processes element <home .../>
+install(k):               processes element <install .../>
+keyval(k):                processes element <keyval .../>
+fi(k):                    processes element <li>...</li>
+licenseT(k):              processes element <license .../>
+miktex(k):                processes element <miktex .../>
+mod_a(k):                 processes element <a ...> ... </a>
+mod_b(k):                 processes element <b>...</b>
+mod_br(k):                processes element <br/>
+mod_em(k):                processes element <em>...</em>
+mod_i(k):                 processes element <i>...</i>
+mod_pre(k):               processes element <pre>...</pre>
+mod_tt(k):                processes element <tt>...</tt>
+mod_xref(k):              processes element <xref ...> ... </xref>
+name(k):                  processes element <name>...</name>
+p(k):                     processes element <p> ... </p>
+texlive(k):               processes element <texlive .../>
+ul(k):                    processes element <ul>...</ul>
+
+first_lines():            creates the first lines of output.
+get_author_packages():    Gets package names by specified author name template
+get_topic_packages():     Gets package names by specified topic template.
+get_name_packages():      Gets package names by specified package name template.
+load_pickle1():           loads/unpacks pickle file 1
+load_pickle2():           loads/unpacks pickle file 2
+leading(k, p):            first output lines for a package
+lain():                   Main function
+make_stat():              Generates statistics in the stat (xyz.stat) file.
+make_statistics():        Generates statistics on terminal.
+make_tap():               Generates the tap (xyz.tap) file.
+make_tops():              Generates the tops (xyz.top) file.
+make_xref():              Generates the xref (xyz.xref) file.
+onepackage(s, t):         loads a package XML file and start parsing
+process_packages():       Global loop
+trailing(k, t):           last lines for the actual package
+
+------------------------------------------------------------------
+Hierarchy of functions
+
+main --> load_pickle1
+main --> load_pickle2
+main --> first_lines
+main --> make_stat
+main --> make_statistics
+main --> make_tap
+main --> make_tops
+main --> make_xref
+main --> biblatex_citationkey
+         biblatex_citationkeys --> get_year
+         biblatex_citationkeys --> get_authoryear 
+main --> process_packages
+         process_packages --> onepackage
+                              onepackage --> entry
+                                             entry --> alias
+                                             entry --> also	
+                                                       also          --> TeXchars
+                                             entry --> authorref
+                                             entry --> caption
+                                                       caption       --> TeXchars
+                                                       caption       --> bibfield_test
+                                             entry --> contact
+                                             entry --> copyrightT
+                                                       copyrighT     --> TeXchars
+                                             entry --> ctan
+                                                       ctan          --> bibfield_test
+                                             entry --> description
+                                                       description   --> p
+                                                       description   --> ul
+                                                       description   --> mod_pre                    
+                                                       description   --> mod_br                     
+                                                       description   --> mod_a                      
+                                                       description   --> mod_xref                   
+                                                       description   --> mod_b                      
+                                                       description   --> mod_em                     
+                                                       description   --> mod_tt                     
+                                                       description   --> mod_i                      
+                                                       description   --> mod_TeXchars
+                                             entry --> documentation
+                                                       documentation --> TeXchars
+                                             entry --> home
+                                                       home          --> bibfield_test
+                                             entry --> install
+                                                       install       --> bibfield_test
+                                             entry --> keyval
+                                                       keyval        --> TeXchars
+                                             entry --> leading
+                                                       leading       --> TeXchars
+                                                       leading       --> bibfield_test
+                                             entry --> licenseT
+                                             entry --> miktex
+                                                       miktex        --> TeXchars
+                                             entry --> name
+                                                       name          --> TeXchars
+                                                       name          --> bibfield_test
+                                             entry --> texlive
+                                                       texlive       --> TeXchars
+                                             entry --> trailing
+                                                       trailing      --> bibfield_test
+                                             entry --> version
+                                                       version       --> bibfield_test
+         process_packages --> get_topic_packages
+         process_packages --> get_name_packages
+         process_packages --> get_author_packages
+         process_packages --> get_local_packages
+
+ul --> li
+li --> mod_TeXchars
+p  --> mod_TeXchars
+       mod_TeXchars --> mod_backslash
+p --> mod_a
+p --> mod_b
+p --> mod_br
+p --> mod_em
+p --> mod_i
+p --> mod_pre
+p --> mod_tt
+p --> mod_xref

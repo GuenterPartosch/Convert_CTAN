@@ -9,3 +9,4 @@ import sys                                   # system calls
 import platform                              # get OS informations
 import os                                    # OS relevant routines
 from os import path                          # path informations
+import codecs                                # needed for full UTF-8 output on stdout

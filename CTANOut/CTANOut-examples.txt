@@ -1,5 +1,6 @@
-Examples (CTANOut)
-==================
+------------------------------------------------------------------
+Examples
+
 CTANOut
     RIS is output format (default)
     all.ris is output file
@@ -8,6 +9,7 @@ CTANOut
 
 CTANOut -v
     as bove
+
     with verbose output (each processed package is shown)             [-v]
 
 CTANOut -v -stat
@@ -62,7 +64,14 @@ CTANOut -A Knuth -k collection -t knuth -m bib -v -stat
     with statistics and                                               [-stat]
     verbose output                                                    [-v]
 
-
+CTANOut -m bib -t "akktex|biblatex" -sb "[abstract,note,related]" -v -stat -o example
+    BibLaTeX is output format                                         [-m]
+    only packages with the package name template "akktex|biblatex"    [-t]
+    BibLaTeX fields abstract, note, and related are skipped           [-sb]
+    output file is example.bib                                        [-o]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+    
 Regular expressions
 -------------------
 The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
@@ -70,5 +79,6 @@ such as
 
 -k latex                matches all topic names which contain "latex"
 -t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
--t "^.+$"               matches all file names
+-t "^.+$"               matches all file names (at least one character)
 -t "^{a-b]"             matches all file names which begin with letters a-b
+-t "^{a-z].*in$"        matches all file names which begin with letters a-z and end with 'in'

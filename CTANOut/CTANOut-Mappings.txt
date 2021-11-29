@@ -1,0 +1,142 @@
+﻿Mappings in CTAN
+================
+
+Inspected CTAN elements
+-----------------------
+alias, also, authorref, caption, contact, copyright, ctan, description, documentation, home, keyval,
+license, miktex, name, texlive, version
+(useful for specifying a value list for the -s option)
+
+for example: -s "[description,version]" ==> the CTAN elements description and version are skipped.
+
+Multiple elements on CTAN: 
+    keyval, authorref, documentation, also, description, contact, copyright, license
+
+year     ← copyright + version
+date     ← version       
+language ← documentation + description
+
+
+CTAN → plain
+
+CTAN field     mode       source function  output variable                             output function  output text
+--------------+----------+----------------+-------------------------------------------+----------------+------------------
+                                           URL of downloaded XML file                  leading          Web Page on CTAN:
+                                           date of download                            trailing         last access:
+alias          directly   alias            local embedded text + attribute id          alias            alias:
+also           directly   also             attribute refid                             also             see also:
+authorref      directly   authorref        attribute givenname + attribute familyname  authorref        author:
+caption        directly   caption          local embedded text                         caption          caption:
+contact        directly   contact          attribute type + attribute href             contact          contact:
+copyright      directly   copyright        attribute owner + attribute year            copyright        copyright:
+               collected  copyright        global year_str ← attribute year            trailing         year:
+ctan           directly   ctan global      ctanUrl2 + attribute path                   ctan             on CTAN:
+description    directly   description      embedded text                               description      description:
+               collected  description      global language_set ← attribute language    trailing         language(s):
+documentation  directly   docmentation     attribute details + attribute href          documentation    documentation:
+               directly   docmentation     local path + local file name for href       documentation    --local file:
+               collected  documentation    global language_set ← attribute language    trailing         language(s)
+home           directly   home             attribute href                              home             home page:
+install        directly   install          global ctanUrl3 + attribute xpath           install          installation:
+keyval         directly   keyval           attribute value                             keyval           keyword:
+license        directly   license          attribute type + attribute date             license          license:
+miktex         directly   miktex           attribute location                          miktex           on MikTeX:
+name           directly   name             local embedded text                         name             name:
+texlive        directly   texlive          attribute location                          texlive          on TeXLive:
+version        directly   version          attribute date + attribute  number          version          version:
+               directly   version          attribute date                              version          last changes:
+               directly   version          local year ← attribute date                 version          year:
+ 
+CTAN → BibLaTeX
+
+CTAN field         mode       source function    variable(s) involved                                    output function  output variable
+------------------+----------+------------------+-------------------------------------------------------+----------------+------------------                                                 
+                                                 URL of downloaded XML file                              leading          url
+                                                 date of download                                        leading          urldate
+alias              embedded   alias              global notice ← attribute id                            trailing         note
+also (*)           collected  also (*)           global also_str ←attribute refid                        trailing         related
+authorref (*)      collected  leading            local author_string                                     leading          author
+caption            directly   caption            local embedded text                                     caption          subtitle
+contact (*)        collected  contact (*)        global contact_str ←attribute type + attribute href     trailing         userd
+copyright (*)      collected  copyright          global copyright_str ← attribute owner + attribute year trailing         usera
+                   collected  copyright (*)      global year_str ← attribute year                        trailing         year
+ctan               directly   ctan               global ctanUrl2 + attribute path                        ctan             userc
+description (*)    collected  description (*)    gobal description_str ← embedded text                   trailing         abstract
+                   collected  description (*)    global language_set ← attribute language                trailing         language
+documentation (*)  embedded   documentation (*)  global notice ← attribute details + attribute href      trailing         note
+                   collected  documentation (*)  global info_files ← attribute href                      trailing         file
+                   collected  documentation (*)  global language_set ← attribute language                trailing         language
+home               directly   home               attrinbute href                                         home             usere
+install            directly   install            global ctanUrl3 + attribute path                        install          userf
+keyval (*)         collected  leading            attribute value                                         trailing         keywords
+license (*)        collected  license (*)        global license_str ← attribute type + attribute date    trailing         userb
+miktex             embedded   miktex             global notice ← attribute location                      trailing         note
+name               directly   name               local embedded text                                     name             title
+texlive            embedded   texlive            global notice ← attribute location                      trailing         note
+version            directly   version            attribute number + attribute date                       version          version
+                   directly   version            attribute date                                          version          date
+                   directly   version            local year ← attribute date                             version          year
+
+CTAN → LaTeX
+
+CTAN field     mode       source function    output variable                             output function  output text
+--------------+----------+------------------+-------------------------------------------+----------------+------------------                                             
+                                             URL of downloaded XML file                  leading          Web page on CTAN
+                                             date of download                            trailing         last access
+alias          directly   alias              local embedded text + attribute id          alias            alias
+also           directly   also               attribute refid                             also             see also
+authorref      directly   authorref          attribute givenname + attribute familyname  authorref        author
+caption        directly   caption            local  embedded text                        caption          caption
+contact        directly   contact            attribute type + attribute href             contact          contact
+copyright      directly   copyright          attribute owner + attribute year            copyright        copyright
+               collected  copyright (*)      global year_str ← attribute year            trailing         year
+ctan           directly   ctan global        ctanUrl2 + attribute path                   ctan             on CTAN
+description    directly   description        embedded text                               description      description
+               collected  description (*)    global language_set ← attribute language    trailing         language(s)
+documentation  directly   docmentation       attribute details + attribute href          documentation    documentation
+               directly   docmentation       local path + local file name for href       documentation    local file
+               collected  documentation (*)  global language_set ← attribute language    trailing         language(s)
+home           directly   home               attribute href                              home             home page
+install        directly   install            global ctanUrl3 + attribute xpath           install          installation
+keyval         directly   keyval             attribute value                             keyval           keyword
+license        directly   license            attribute type + attribute date             license          license
+miktex         directly   miktex             attribute location                          miktex           on MikTeX
+name           directly   name               local embedded text                         name             name
+texlive        directly   texlive            attribute location                          texlive          on TeXLive
+version        directly   version            attribute date + attribute number           version          version
+               directly   version            attribute date                              version          last changes
+               directly   version            local year ← attribute date                 version          year
+ 
+
+CTAN → RIS
+
+CTAN field        mode       source function    variable(s) involved                               output function  output variable
+-----------------+----------+------------------+--------------------------------------------------+----------------+------------------
+                                                URL of downloaded XML file                         leading          UR
+                                                date of download                                   leading          Y3
+alias             embedded   alias              global notice ← attribute id                       trailing         N1
+also (*)          embedded   also (*)           global notice ←attribute refid                     trailing         N1
+authorref (*)     directly   authorref          attribute familyname + attribute givenname         authorref        AU
+caption           directly   caption            local  embedded text                               caption          T2
+contact (*)       embedded   contact (*)        global notice ←attribute type + attribute href     trailing         N1
+copyright (*)     embedded   copyright          global notice ← attribute owner + attribute year   trailing         N1
+                  collected  copyright (*)      global year_str ← attribute year                   trailing         PY
+ctan              embedded   ctan               global notice ← global ctanUrl2 + attribute path   trailing         N1
+description (*)   directlly  description (*)    embedded text                                      description      AB
+                  collected  description (*)    global language_set ← attribute language           trailing         LA
+documentation (*) embedded   documentation (*)  global notice ← attribute details + attribute href trailing         N1
+                  directly   documentation (*)  attribute href                                     documentation    UR
+                  directly   documentation (*)  local path + local file name for href              documentation    L1
+                  collected  documentation (*)  global language_set ← attribute language           trailing         LA
+home              embedded   home               global notice ← attrinbute href                    trailing         N1
+install           embedded   install            global notice ← global ctanUrl3 + attribute path   trailing         N1
+keyval (*)        directly   keyval             attribute value                                    keyval           KW
+license (*)       embedded   license (*)        global notice ← attribute type + attribute date    trailing         N1
+miktex            embedded   miktex             global notice ← attribute location                 trailing         N1
+name              directly   name               local embedded text                                name             T1
+texlive           embedded   texlive            global notice ← attribute location                 trailing         N1
+version           directly   version            global notice ← attribute number + attribute date  trailing         N1
+                  directly   version            attribute date                                     version          Y2
+                  directly   version            local year ← attribute date                        version          PY
+
+
