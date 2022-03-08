@@ -3,74 +3,94 @@
 
 CTAN file 'authors' ('authors.xml' on pc)
 -----------------------------------------
-Element <authors> ... </authors>
-   sub element <author .../>
-     attributes: id, givenname, familyname
+<authors> ... </authors>
+       <author .../>         attributes: id, givenname, familyname
+
 
 CTAN file 'topics' ('topics.xml' on pc)
 ---------------------------------------
-Element <topics> ... </topics>
-   sub element <topic .../>
-     Attribute; name, details
+<topics> ... </topics>
+       <topic .../>          attribute; name, details
+
 
 CTAN file 'packages' ('packages.xml' on pc)
 -------------------------------------------
-Element <packages> ... </packages>
-   sub element <package .../>
-      attributes: key, name, caption
+<packages> ... </packages>
+       <package .../>        attributes: key, name, caption
+
 
 CTAN file 'licenses' ('licenses.xml' on pc)
 -------------------------------------------
-Element <licenses> ... </licenses>
-   sub element <license .../>
-      attributes: key, name, free
+<licenses> ... </licenses>
+       <license .../>        attributes: key, name, free
+
 
 Package descriptions on CTAN
 ----------------------------
-Element <entry ...> ... </entry>
-   attribute: id
-   sub element <alias .../>
-      attribute: id
-   sub element <also .../>
-      attribute: refid
-   sub element <authorref .../>
-      attributes: key, id, givenname, familyname, active
-   sub element <caption> ... </caption>
-   sub element <contact .../>
-      attributes: type, href
-   sub element <copyright .../>
-      attributes: owner, year
-   sub element <ctan .../>
-      attributes: path, file
-   sub element <description ...> ... </description>
-      attribute: language
-      Sub-sub element <li> ... </li>
-      Sub-sub element <a ...> ... </a>
-         attribute: href
-      Sub-sub element <xref ...> ... </xref>
-         attribute: refid 
-      Sub-sub element <b> ... </b>
-      Sub-sub element <br/>
-      Sub-sub element <em> ... </em>
-      Sub-sub element <i> ... </i>
-      Sub-sub element <pre> ... </pre>
-      Sub-sub element <tt> ... </tt>
-      Sub-sub element <p> ... </p>
-      Sub-sub element <ul> ... </ul>
-   sub element <documentation .../>
-      attributes: details, href, language
-   sub element <home .../>
-      attribute: href
-   sub element <install .../>
-      attribute: path
-   sub element <keyval .../>
-      attributes: key, value
-   sub element <license .../>
-      attributes: type, date
-   sub element <miktex .../>
-      attribute: location
-   sub element <name> ... </name>
-   sub element <texlive .../>
-      attributes: location
-   sub element <version .../>
-      attributes: number, date
+<entry ...> ... </entry>                                                                                                                          attribute: id  
+                             <alias .../>                                                                                                         attribute: id                                       
+                             <also .../>                                                                                                          attribute: refid                                    
+                             <authorref .../>                                                                                                     attributes: key, id, givenname, familyname, active  
+                             <caption> ... </caption>              
+                             <contact .../>                                                                                                       attributes: type, href                              
+                             <copyright .../>                                                                                                     attributes: owner, year                             
+                             <ctan .../>                                                                                                          attributes: path, file                              
+                             <description ...> ... </description>                                                                                 attribute: language                                 
+                                                                   <a ...> ... </a>                                                               attribute: href   
+                                                                   <b> ... </b>            
+                                                                   <br/>                   
+                                                                   <code> ... </code>      
+                                                                   <em> ... </em>          
+                                                                   <i> ... </i>            
+                                                                   <small> ... </small>    
+                                                                   <tt> ... </tt>          
+                                                                   <xref ...> ... </xref>                                                         attribute: refid  
+                                                                   <p> ... </p>            
+                                                                                           <a ...> ... </a>                                       attribute: href   
+                                                                                           <b> ... </b>            
+                                                                                           <br/>                   
+                                                                                           <code> ... </code>      
+                                                                                           <em> ... </em>          
+                                                                                           <i> ... </i>            
+                                                                                           <pre> ... </pre>        
+                                                                                           <tt> ... </tt>          
+                                                                                           <pre> ... </pre>        
+                                                                                           <small> ... </small>    
+                                                                                           <xref ...> ... </xref>                                 attribute: refid  
+                                                                                           <tt> ... </tt>          
+                                                                                           <small> ... </small>    
+                                                                   <dl> ... </dl>          
+                                                                                           <dt> ... </dt>          
+                                                                                           <dd> ... </dd>          
+                                                                                                                   element <a ...> ... </a>                                                                                                                 attribute: href   
+                                                                                                                   element <b> ... </b>            
+                                                                                                                   element <br/>                   
+                                                                                                                   element <em> ... </em>          
+                                                                                                                   element <i> ... </i>            
+                                                                                                                   element <pre> ... </pre>        
+                                                                                                                   element <tt> ... </tt>          
+                                                                                                                   element <small> ... </small>    
+                                                                                                                   element <tt> ... </tt>          
+                                                                                                                   element <small> ... </small>    
+                                                                   <ul> ... </ul>          
+                                                                                           <li> ... </li>          
+                                                                                                                   element <a ...> ... </a>                                                                                                                 attribute: href   
+                                                                                                                   element <b> ... </b>            
+                                                                                                                   element <br/>                   
+                                                                                                                   element <em> ... </em>          
+                                                                                                                   element <i> ... </i>            
+                                                                                                                   element <pre> ... </pre>        
+                                                                                                                   element <tt> ... </tt>          
+                                                                                                                   element <small> ... </small>    
+                                                                                                                   element <xref ...> ... </xref>                                                                                                           attribute: refid  
+                                                                                                                   element <tt> ... </tt>          
+                                                                                                                   element <small> ... </small>    
+                             <documentation .../>                                                                                                                   attributes: details, href, language                 
+                             <home .../>                                                                                                                            attribute: href                                     
+                             <install .../>                                                                                                                         attribute: path                                     
+                             <keyval .../>                                                                                                                          attributes: key, value                              
+                             <license .../>                                                                                                                         attributes: type, date                              
+                             <miktex .../>                                                                                                                          attribute: location                                 
+                             <name> ... </name>                    
+                             <texlive .../>                                                                                                                         attributes: location                                
+                             <version .../>                                                                                                                         attributes: number, date                            
