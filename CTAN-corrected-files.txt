@@ -1,5 +1,7 @@
 XML files to be corrected
 =========================
+2023-07-09
+
 Sometimes there are CTAN XML files with some deficiencies. These file are to be corrected locally-
 
 not well-formed:
@@ -8,7 +10,6 @@ not well-formed:
 
 graphpaper
 luximono
-makeindex
 oriya
 psnfssx-em
 thuthesis
@@ -18,8 +19,6 @@ xpdf
 
 attribute "year" with wrong content:
 ------------------------------------
-hvindex
-latexdemo
 preview
 pdftex
 
