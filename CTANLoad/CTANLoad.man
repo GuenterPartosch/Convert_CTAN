@@ -1,24 +1,29 @@
-usage: CTANLoad.py [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l]
-                   [-k KEY_TEMPLATE] [-n NUMBER] [-o OUTPUT_NAME] [-r]
-                   [-t TEMPLATE] [-stat] [-v] [-V]
+usage: ctanload [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l]
+                [-L LICENSE_TEMPLATE] [-k KEY_TEMPLATE] [-n NUMBER]
+                [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat] [-v] [-V]
 
-Load XLM and PDF documentation files from CTAN a/o generate some special
-lists, and prepare data for CTANOut [CTANLoad.py; Version: 2.7.0 (2021-07-26)]
+Loads XLM and PDF documentation files from CTAN a/o generates some special
+lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.9.0
+(2022-02-23)]
 
 Optional parameters:
   -h, --help            show this help message and exit
   -a, --author          Author of the program
   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
-                        Name template for authors - Default:
+                        Author template for package XML files to be loaded -
+                        Default:
   -c, --check_integrity
-                        Flag: Check the integrity of the 2nd .pkl file. -
+                        Flag: Checks the integrity of the 2nd .pkl file. -
                         Default: False
   -d DIREC, --directory DIREC
                         OS Directory for output files - Default: .\
-  -f, --download_files  Flag: Download associated documentation files [PDF]. -
-                        Default: False
-  -l, --lists           Flag: Generate some special lists and prepare files
+  -f, --download_files  Flag: Downloads associated documentation files [PDF].
+                        - Default: False
+  -l, --lists           Flag: Generates some special lists and prepare files
                         for CTANOut. - Default: False
+  -L LICENSE_TEMPLATE, --license_template LICENSE_TEMPLATE
+                        License template for package XML files to be loaded -
+                        Default:
   -k KEY_TEMPLATE, --key_template KEY_TEMPLATE
                         Key template for package XML files to be loaded -
                         Default:
@@ -27,11 +32,11 @@ Optional parameters:
   -o OUTPUT_NAME, --output OUTPUT_NAME
                         Generic file name for output files - Default: all
   -r, --regenerate_pickle_files
-                        Flag: Regenerate the two pickle files. - Default:
+                        Flag: Regenerates the two pickle files. - Default:
                         False
   -t TEMPLATE, --template TEMPLATE
                         Name template for package XML files to be loaded -
                         Default:
-  -stat, --statistics   Flag: Print statistics. - Default: False
+  -stat, --statistics   Flag: Prints statistics. - Default: False
   -v, --verbose         Flag: Output is verbose. - Default: False
   -V, --version         Version of the program

@@ -1,0 +1,82 @@
+Functions in CTANLoad.py
+========================
+2022-02-17
+
+analyze_XML_file(file)    Analyzes a XML package file for documentation (PDF) files
+call_check()	          Processes all necessary steps for a integrity check
+call_load()	          Processes all steps for a complete ctanout call (without integrity check)
+call_plain()	          Processes all steps for a plain call
+check_integrity(...)	  Checks integrity (tests for inconsistencies)
+dload_XML_files()	  Downloads XML package files
+dload_authors()	          Downloads XML file 'authors'
+dload_document_file(...)  Downloads one information file (PDF)
+dload_licenses()	  Downloads XML file 'licenses'
+dload_packages()	  Downloads XML file 'packages'
+dload_topics()	          Downloads XML file 'topics'
+fold()	                  auxiliary function: shortens long option values for output
+generate_lists()	  Generates xyz.loa (list of authors), xyz.lop (list of packages), xyz.lok (list of topics), 
+                          xyz.lpt (list of topics and associated packages), xyz.lap (list of authors and associated packages), 
+			  xyz.llp (list of licenses and associated packages)
+			  xyz is the specified generic output file name.
+generate_pickle1()	  pickle dump: actual authors, packages, licenses, topics, topicspackage, packagetopics
+generate_pickle2()	  pickle dump: actual XML_toc (lists with download information files)
+generate_topicspackage()  Generates topicspackage, packagetopics, authorpackages, and licensepackages
+get_xyz_lap():            Loads and analyzes xyz.lap for author templates <--
+def get_xyz_llp():        Loads and analyzes xyz.llp for liocense templates<--
+get_xyz_lpt():            Loads and analyzes xyz.lpt for topic templates<--
+get_PDF_files(d)	  Lists all PDF files in a specified OS directory
+get_XML_files(d)          Lists all XML files in the current OS directory
+get_package_set()         Analyzes dictionary 'packages' for name templates
+load_XML_toc()	          Loads pickle file 2 (which contains XML_toc)
+main()	                  Main Function (calls the other functions)
+make_statistics()	  Prints statistics on terminal
+regenerate_pickle_files() Regenerates corrupted pickle files
+set_PDF_toc()             Fills PDF_toc on the basis of XML_Toc
+verify_PDF_files():       Checks actualized PDF_toc; deletes a PDF file if necessary
+
+
+Hierarchy
+---------
+    main --> call_plain --> get_PDF_files
+                        --> dload_topics
+                        --> dload_authors
+                        --> dload_licenses
+                        --> dload_packages
+                        --> generate_topicspackage
+         --> call_check --> get_PDF_files
+                        --> dload_topics
+                        --> dload_authors
+                        --> dload_licenses
+                        --> dload_packages
+                        --> generate_topicspackage
+                        --> generate_pickle1
+                        --> generate_lists
+                        --> check_integrity         --> load_XML_toc
+                                                    --> generate_pickle2
+                                                    --> verify_PDF_files
+                        --> regenerate_pickle_files --> get_PDF_files
+                                                    --> dload_authors
+                                                    --> dload_packages
+                                                    --> dload_topics
+                                                    --> dload_licenses
+                                                    --> generate_topicspackage
+                                                    --> analyze_XML_file
+                                                    --> generate_pickle2
+                                                    --> generate_pickle1
+         --> call_load  --> get_PDF_files
+                        --> dload_topics
+                        --> dload_authors
+                        --> dload_licenses
+                        --> dload_packages
+                        --> get_xyz_lap
+						--> get_xyz_lpt
+                        --> get_xyz_llp
+                        --> get_package_set
+                        --> get_XML_files
+                        --> load_XML_toc
+                        --> set_PDF_toc
+                        --> dload_XML_files         --> analyze_XML_file
+        --> make_statistics
+        --> fold
+
+

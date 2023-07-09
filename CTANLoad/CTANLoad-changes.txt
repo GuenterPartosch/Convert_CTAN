@@ -1,5 +1,7 @@
 Changes (CTANLoad.py)
 =====================
+2022-02-23
+
 2.0.0  2019-10-01 completely revised
 2.0.1  2019-10-03 smaller changes: messages + command parsing
 2.0.2  2019-10-04 smaller changes: messages
@@ -44,3 +46,15 @@ Changes (CTANLoad.py)
 2.6.1  2021-07-12 some corrections in the handling of -t / -k and -A
 2.6.2  2021-07-15 more corrections in the handling of -t / -k and -A
 2.7.0  2021-07-26 combined filtering new organized; new function get_package_set; 2 additional warning messages
+2.7.1  2022-02-02 attribute free in licenses.xml; changes in dload_licenses
+2.7.2  2022-02-03 changes in get_CTAN_lap and get_CTAN_lpt; now on the basis of all.(lap, lpt); additional adjustments
+2.7.3  2022-02-04 functions renamed: get_CTAN_lap --> get_xyz_lap, get_CTAN_lpt --> get_xyz_lpt
+2.8.0  2022-02-16 new option -L; new section in argparse; new variables license_template_text, license_template_default, license_template
+2.8.1  2022-02-16 changes in generate_lists; creates xyz.llp
+2.8.2  2022-02-16 changes in generate_topicspackage; creates Python dictionary licensepackages
+2.8.3  2022-02-16 changes in generate_pickle1: CTAN.pkl extended: now with new component licensepackages
+2.8.4  2022-02-16 new function get_xyz_llp; loads and analyzes xyz.llp; allows license searching with title, shorttitle, and free/not free
+2.8.5  2022-02-17 changes in call_check, call_load, and main; respects license searching
+2.8.6  2022-02-18 changes for -stat; changes in make_statistics
+2.8.7  2022-02-18 messages in get_xyz_lap, get_xyz_lpt, and get_xyz_llp changed
+2.9.0  2022-02-23 other messsages improved

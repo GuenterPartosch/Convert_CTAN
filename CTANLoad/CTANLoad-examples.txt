@@ -1,5 +1,6 @@
 Examples (CTANLoad)
 ===================
+2022-02-18
 
 CTANLoad -h
 - help, show the options
@@ -68,3 +69,35 @@ CTANLoad -A Knuth -k collection -f -v -stat -t knuth
 - download only packages with the name template "knuth"      [-t]  
 - verbose                                                    [-v]
 - with statistics                                            [-stat]
+
+CTANLoad -L collection -v
+    only packages with license template "collection"         [-L]
+    verbose output                                           [-v]
+
+CTANLoad -L collection -v -A Swift
+    only packages with the license template "collection"     [-L]
+    only packages with the author name template "Swift"      [-A]
+    verbose output                                           [-v]
+
+CTANLoad -L gpl -v -A Swift -k typesetting
+    only packages with the license template "gpl"            [-L]
+    only packages with the author name template "Swift"      [-A]
+    only packages with the key template "typesetting"        [-k]
+    verbose output                                           [-v]
+
+CTANLoad -L "not free" -v -stat -A Greenwade -k latex209
+    only packages with the license template "not free"       [-L]
+    only packages with the author name template "Greenwade"  [-A]
+    only packages with the key template "latex209"           [-k]
+    verbose output          
+
+
+Regular expressions
+-------------------
+The options -t, -L, -A,  and -k  need regular expressions as values.
+such as
+
+-k latex                matches all topic names which contain "latex"
+-t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
+-t "^.+$"               matches all file names
+-t "^{a-b]"             matches all file names which begin with letters a-b
