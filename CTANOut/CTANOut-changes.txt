@@ -1,5 +1,7 @@
 Changes (CTZANOut)
 ==================
+2022-03-05
+
 1.75 2021-05-14 more types for -m
 1.76 2021-05-14 clean-up of variables
 1.77 2021-05-15 more details in verbose mode for -mt
@@ -86,4 +88,39 @@ Changes (CTZANOut)
 1.159 2021-11-19 LaTeX output: "--local file" now with relativ path
 1.160 2021-11-20 'year' in LaTeX/plain: "without year" if it is appropiate
 1.161 2021-11-21 for all modes: empty output for abstract/description corrected
-
+1.162 2021-11-28 greater parts of comment blocks moved to external text files
+2.0   2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
+2.1   2022-01-02 functions mod_backslash and mod_TeXchars removed
+2.2   2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
+2.3   2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
+2.4   2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
+2.5   2022-01-04 new function: mod_small (processing of <small> ...</small>)
+2.6   2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
+2.7   2022-01-06 nested <ol>/<ul> can be processed
+2.8   2022-01-07 left indentation of <li> (mode dependant)
+2.9   2022-01-09 new function gen_fold (folds content of <li>)
+2.10  2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
+2.11  2022-01-11 new language code "zn,ja"
+2.12  2022-01-26 texts for the -h option changed
+2.13  2022-01-28 left indentation for all modes tuned
+2.14  2022-01-28 additionally: output of date and time in statistics on output (-stat)
+2.15  2022-02-02 additional license information: now with free a/o not free
+2.16  2022-02-05 additional texts at the top of output files
+2.17  2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
+2.18    2022-02-15 new option -L (selection of packages by licenses)
+2.18.1  2022-02-15 new variables: license_template_text, license_template_default, license_template (used by argparse); licensepackages
+2.18.2  2022-02-15 new section for specifying -L by argparse
+2.18.3  2022-02-15 new function get_license_packages (collecting packages for specified licenses)
+2.18.4  2022-02-15 changes in load_pickle1: new CTAN.pkl component licensepackages
+2.18.5  2022-02-15 new variable p9 [re.compile(license_template)]; allows filtering by license template
+2.18.6  2022-02-15 changes in first_lines, licenseT, process_packages, make_stat, make_statistics, and process_packages
+2.18.7  2022-02-16 shorttitlde and status can be used for -L, too
+2.19    2022-02-19 error in make_stat corrected
+2.20    2022-02-21 some corrections in make_stat
+2.21    2022-02-23 in LaTeX mode: output of licenses and related packages (tlp) + output of licenses and explainations (lic)
+2.21.1  2022-02-03 new function make_tlp; changes in main(); new file xyz.tlp; called in LaTeX document (option -mt)
+2.21.2  2022-02-23 new function make_lics; changes in main(); new file xyz.lic; called in LaTeX document (option -mt)
+2.21.3  2022-02-23 additions and corrections in make_tlp, make_tap, make_lics, make_xref
+2.22    2022-03-01 additions and corrections in make_stat
+2.23    2022-03-01 texts for argparse and terminal log changed
+2.24    2022-03-01 correc tions in first_lines (plain, BibLaTeX)

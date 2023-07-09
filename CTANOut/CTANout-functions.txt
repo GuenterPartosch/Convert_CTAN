@@ -1,17 +1,39 @@
-Functions in CTANOut.py
-===================================================================
+Functions ( CTANOut.py)
+=======================
+2022-03-05
 
+bibfield_test(s, f):      auxiliary function: Tests a BibLaTeX field: output text is not empty and field is not be skipped
+biblatex_citationkey():   auxiliary function: generate a dictionary with citations keys for all the packages
+comment_fold(s):          auxiliary function: shorten/fold long option values in LaTeX comment output
+first_lines():            creates the first lines of output.
+fold(s):                  auxiliary function: shorten long option values for output
+gen_fold(s, o):           auxiliary function: folds content of <p>, <li>, <dd> (mode dependant)
+get_author_packages():    gets package names by specified author name template
+get_authoryear(a, y):     auxiliary function: construct a unique authoryear string (for BibLaTeX only)
+get_license_packages():   gets package names by specified license template
+get_local_packages(d):    auxiliary function: list all local packages in the current OS directory
+get_name_packages():      gets package names by specified package name template.
+get_topic_packages():     gets package names by specified topic template.
+get_year(s):              auxiliary function: get the most recent year in string s (only for BibLaTeX)
+innertext(k, start, pp):  auxiliary function innertext: looks for embedded text and elements and returns an evaluated string
+leading(k, p):            first lines for package output
+load_pickle1():           loads/unpacks pickle file 1
+load_pickle2():           loads/unpacks pickle file 2
+main():                   main function (calls the other functions)
+make_stat():              generates statistics in the stat file (xyz.stat)
+make_statistics():        generates statistics on terminal.
+make_tap():               generates the tap (xyz.tap) file.
+make_tops():              generates the tops (xyz.top) file.
+make_xref():              generates the xref (xyz.xref) file.
+mod_TeXchars1(s):         auxiliary function: prepares characters for LaTeX/BibLaTeX in a paragraph
+mod_TeXchars2(s):         auxiliary function: prepares characters for LaTeX/BibLaTeX
+onepackage(s, t):         loads a package XML file and starts parsing
+process_packages():       global loop (over alll selected packages)
 TeX_fold(s):              auxiliary function: shorten/fold long option values in LaTeX tabular output
 TeXchars(s):              auxiliary function: prepares characters for LaTeX/BibLaTeX
-bibfield_test(s, f):      auxiliary function: Tests a BibLaTeX field: output text is not empty and filed is not be skipped.
-biblatex_citationkey():   auxiliary function: Generate a dictionary with citations keys for all packages
-comment_fold(s):          auxiliary function: shorten/fold long option values in LaTeX comment output"
-fold(s):                  auxiliary function: shorten long option values for output
-get_authoryear(a, y):     auxiliary function: construct a unique authoryear string (for BibLaTeX only)
-get_local_packages(d):    auxiliary function: List all local packages in the OS directory
-get_year(s):              auxiliary function: get the most recent year in string s (only for BibLaTeX)
-mod_TeXchars(s):          auxiliary function: prepares characters for LaTeX/BibLaTeX in a paragraph
-mod_backslash(s):         auxiliary function: special processing von \ in the source text
+TeXchars_restore(s):      auxiliary function: restores characters for LaTeX/BibLaTeX
+test_embedded(k, pp):     auxiliary function: tests current knot for embedded material
+trailing(k, t):           last lines for the actual package
 
 alias(k):                 processes element <alias .../>
 also(k):                  processes element <also .../>
@@ -20,48 +42,37 @@ caption(k):               processes element <caption>...</caption>
 contact(k):               processes element <contact .../>
 copyrightT(k, p):         processes element <copyright .../>
 ctan(k, t):               processes element <ctan .../>
-description(k):           processes element <description ...> ... </description>
+description(k, pp):       processes element <description ...> ... </description>
 documentation(k):         processes element <documentation .../>
 entry(k, t, p):           processes element <entry ...>...</entry>
+fi(k):                    processes element <li>...</li>
 home(k):                  processes element <home .../>
 install(k):               processes element <install .../>
 keyval(k):                processes element <keyval .../>
-fi(k):                    processes element <li>...</li>
 licenseT(k):              processes element <license .../>
 miktex(k):                processes element <miktex .../>
-mod_a(k):                 processes element <a ...> ... </a>
-mod_b(k):                 processes element <b>...</b>
-mod_br(k):                processes element <br/>
-mod_em(k):                processes element <em>...</em>
-mod_i(k):                 processes element <i>...</i>
-mod_pre(k):               processes element <pre>...</pre>
-mod_tt(k):                processes element <tt>...</tt>
-mod_xref(k):              processes element <xref ...> ... </xref>
+mod_a(k, pp)              processes element <a ...> ... </a>
+mod_b(k, pp)              processes element <b>...</b>
+mod_br(k, pp)             processes element <br/>
+mod_dd(k, pp)             processes element <dd>...</dd>
+mod_dl(k, pp)             processes element <dl>...</dl>
+mod_dt(k, pp)             processes element <dt>...</dt>
+mod_em(k, pp)             processes element <em>...</em>
+mod_i(k, pp)              processes element <i>...</i>
+mod_ol(k, pp)             processes element <ol>...</ol>
+mod_p(k, pp)              processes element <p> ... </p>
+mod_pre(k, pp)            processes element <pre>...</pre>
+mod_small(k, pp)          processes element <small>...</small>
+mod_tt(k, pp)             processes element <tt>...</tt>
+mod_ul(k, pp)             processes element <ul>...</ul>
+mod_xref(k, pp)           processes element <xref ...> ... </xref>
 name(k):                  processes element <name>...</name>
-p(k):                     processes element <p> ... </p>
 texlive(k):               processes element <texlive .../>
-ul(k):                    processes element <ul>...</ul>
+version(k, p):            processes element <version .../>
 
-first_lines():            creates the first lines of output.
-get_author_packages():    Gets package names by specified author name template
-get_topic_packages():     Gets package names by specified topic template.
-get_name_packages():      Gets package names by specified package name template.
-load_pickle1():           loads/unpacks pickle file 1
-load_pickle2():           loads/unpacks pickle file 2
-leading(k, p):            first output lines for a package
-lain():                   Main function
-make_stat():              Generates statistics in the stat (xyz.stat) file.
-make_statistics():        Generates statistics on terminal.
-make_tap():               Generates the tap (xyz.tap) file.
-make_tops():              Generates the tops (xyz.top) file.
-make_xref():              Generates the xref (xyz.xref) file.
-onepackage(s, t):         loads a package XML file and start parsing
-process_packages():       Global loop
-trailing(k, t):           last lines for the actual package
 
-------------------------------------------------------------------
 Hierarchy of functions
-
+----------------------
 main --> load_pickle1
 main --> load_pickle2
 main --> first_lines
@@ -89,17 +100,8 @@ main --> process_packages
                                              entry --> ctan
                                                        ctan          --> bibfield_test
                                              entry --> description
-                                                       description   --> p
-                                                       description   --> ul
-                                                       description   --> mod_pre                    
-                                                       description   --> mod_br                     
-                                                       description   --> mod_a                      
-                                                       description   --> mod_xref                   
-                                                       description   --> mod_b                      
-                                                       description   --> mod_em                     
-                                                       description   --> mod_tt                     
-                                                       description   --> mod_i                      
-                                                       description   --> mod_TeXchars
+                                                       description   --> innertext
+                                                       description   --> TeXchars_restore
                                              entry --> documentation
                                                        documentation --> TeXchars
                                              entry --> home
@@ -127,16 +129,47 @@ main --> process_packages
          process_packages --> get_name_packages
          process_packages --> get_author_packages
          process_packages --> get_local_packages
+         process_packages --> get_license_packages
 
-ul --> li
-li --> mod_TeXchars
-p  --> mod_TeXchars
-       mod_TeXchars --> mod_backslash
-p --> mod_a
-p --> mod_b
-p --> mod_br
-p --> mod_em
-p --> mod_i
-p --> mod_pre
-p --> mod_tt
-p --> mod_xref
+innertext --> mod_a
+              mod_b
+              mod_br
+              mod_code
+              mod_dd
+              mod_dl
+              mod_dt
+              mod_em
+              mod_i
+              mod_li
+              mod_ol
+              mod_p
+              mod_pre
+              mod_small
+              mod_tt
+              mod_ul
+              mod_xref
+mod_b -->     innertext
+mod_code -->  innertext
+              mod_TeXchars2
+mod_dd -->    innertext
+              mod_TeXchars1
+              gen_fold
+mod_dl -->    innertext
+mod_dt -->    innertext
+mod_em -->    innertext
+mod_li -->    innertext
+              mod_TeXchars1
+              test_embedded
+              gen_fold
+mod_ol -->    innertext
+mod_p -->     innertext
+              mod_TeXchars1
+              test_embedded
+              gen_fold
+mod_pre -->   innertext
+              mod_TeXchars2
+mod_small --> innertext
+mod_tt -->    innertext
+              mod_TeXchars1
+mod_ul -->    innertext
+mod_xref -->  innertext

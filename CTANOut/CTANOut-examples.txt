@@ -1,5 +1,6 @@
-------------------------------------------------------------------
-Examples
+Examples (CTANOut)
+==================
+2022-02-18
 
 CTANOut
     RIS is output format (default)
@@ -8,8 +9,7 @@ CTANOut
     without verbose output                                        
 
 CTANOut -v
-    as bove
-
+    as above
     with verbose output (each processed package is shown)             [-v]
 
 CTANOut -v -stat
@@ -71,10 +71,35 @@ CTANOut -m bib -t "akktex|biblatex" -sb "[abstract,note,related]" -v -stat -o ex
     output file is example.bib                                        [-o]
     with statistics and                                               [-stat]
     verbose output                                                    [-v]
+
+CTANOut -L collection -v
+    RIS is output format                                              default
+    only packages with license template "collection"                  [-L]
+    verbose output                                                    [-v]
+
+CTANOut -L collection -v -A Swift
+    RIS is output format                                              default
+    only packages with the license template "collection"              [-L]
+    only packages with the author name template "Swift"               [-A]
+    verbose output                                                    [-v]
+
+CTANOut -L gpl -v -A Swift -k typesetting
+    RIS is output format                                              default
+    only packages with the license template "gpl"                     [-L]
+    only packages with the author name template "Swift"               [-A]
+    only packages with the key template "typesetting"                 [-k]
+    verbose output                                                    [-v]
+
+CTANOut -L "not free" -v -stat -A Greenwade -k latex209
+    RIS is output format                                              default
+    only packages with the license template "not free"                [-L]
+    only packages with the author name template "Greenwade"           [-A]
+    only packages with the key template "latex209"                    [-k]
+    verbose output                                                    [-v]
     
 Regular expressions
 -------------------
-The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
+The options -t,  -k, and -L need regular expressions as values.
 such as
 
 -k latex                matches all topic names which contain "latex"

@@ -1,22 +1,35 @@
 Messages (CTANOut)
-------------------
-Fatal Error
-Error: pickle file '<pickle file>' not found
-Error: tried to use the program indirectly
+==================
+2022-03-05
 
-Information
-Info: Program call
-Info: all package files analyzed and directory citation_keys created.
-Info: file 'xyz.tap' created: [list with authors and related packages (cross-reference list)]
-Info: file 'xyz.top' created: [topic list]
-Info: file 'xyz.xref' created: [list with topics and related packages (cross-reference list)]
-Info: packages processed
+Errors
+------
+Error: pickle file '<file>' not found
+Error: tried to use the program indirectly
 Info: CTANOut program successfully completed
-Info: statistics written
+
+Infos
+-----
+Info: Program call:
+Info: all package files analyzed and dictionary citation_keys created.
+Info: file '<stat file>' written: [statistics]
+Info: file '<lic file>' created: [licenses and their explainations]
+Info: file '<tap file>' created: [list with authors and related packages (cross-reference list)]
+Info: file '<tlp file>' created: [list with licenses and related packages (cross-reference list)]
+Info: file '<top file>' created: [topics and their explainations]
+Info: file '<xref file>' created: [list with topics and related packages (cross-reference list)]
+Info: packages processed
+Info: program call (with details)
 
 Warnings
-Warning: 'option value' changed to 'option+value' (due to 'option')"
+--------
 Warning: XML file for package '<package>' not found
 Warning: XML file for package '<package>' not well-formed
-Warning: no correct local XML file for any specified package found
-Warning: no package found which matched the specified <kind of template> template '<template>'
+Warning: no correct local XML file for any specified package found")
+Warning: no file '<lic file>' created
+Warning: no file '<tap file>' created
+Warning: no file '<tlp file>' created
+Warning: no file '<top file>' created
+Warning: no file '<xref file>' created
+Warning: no package found which matches the specified <kind> template '<template>'
+Warning: pickle file '<pickle file>' not found; local information files ignored
