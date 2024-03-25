@@ -1,40 +1,47 @@
-CTANLoad + CTANOut, Files; 2022-03-04
+CTANLoad + CTANOut, Files
 ==================
+2024-03-24
+
 xyz   is a generic file name (option -o in CTANLoad or CTANOut)
 abc   is a name of a CTAN package
-012   is a unique 10-digit part of PDF file names
+012   is a unique 10-digit part of local PDF file names
+
+CTANLoad.py   Python source file of CTANLoad
+CTANOut.py    Python source file of CTANOut
+CTANLoad.exe  executable of CTANLoad.py
+CTANOut.exe   executable of CTANOut.py
 
 authors.xml   local XML file; downloaded by CTANLoad from CTAN
 topics.xml    local XML file; downloaded by CTANLoad from CTAN
 packages.xml  local XML file; downloaded by CTANLoad from CTAN
 licenses.xml  local XML file; downloaded by CTANLoad from CTAN
 
-CTAN.pkl      1st pickle file; created by CTANLoad
-CTAN2.pkl     2nd pickle file; created by CTANLoad
+CTAN.pkl      1st pickle file; created by CTANLoad; used by CTANOut
+CTAN2.pkl     2nd pickle file; created by CTANLoad; used by CTANOut
 
 abc.xml       local XML package file; downloaded by CTANLoad
 012-abc.pdf   local PDF file; downloaded by CTANLoad
 
+xyz.lap       list of authors and associated packages; created by CTANLoad (option -l)
+xyz.llp       list of licenses and associated packages; created by CTANLoad (option -l)
 xyz.loa       list of authors; created by CTANLoad (option -l)
 xyz.lok       list of keys; created by CTANLoad (option -l)
 xyz.lol       list of licenses; created by CTANLoad (option -l)
 xyz.lop       list of packages; created by CTANLoad (option -l)
 xyz.lpt       list of topics and associated packages; created by CTANLoad (option -l)
-xyz.lap       list of authors and associated packages; created by CTANLoad (option -l)
-xyz.llp       list of licenses and associated packages; created by CTANLoad (option -l)
 
-xyz.txt       created by CTANOut; output in plain text format (option -m txt)
-xyz.tsv       created by CTANOut; output in Excel format (option -m tsv)
-xyz.ris       created by CTANOut; output in RIS format (option -m ris)
 xyz.bib       created by CTANOut; output in BibLaTeX format (option -m bib)
+xyz.ris       created by CTANOut; output in RIS format (option -m ris)
 xyz.tex       created by CTANOut; output in LaTeX format (option -m tex)
+xyz.tsv       created by CTANOut; output in Excel format (option -m tsv)
+xyz.txt       created by CTANOut; output in plain text format (option -m txt)
 
+xyz.lic       LaTeX sub-file (licenses and their meanings); created by CTANOut (options -mt and -m tex)
+xyz.stat      LaTeX sub-file (statistics); created by CTANOut (options -mt and -m tex)
+xyz.tap       LaTeX sub-file (authors and associated packages); created by CTANOut (options -mt and -m tex)
+xyz.tlp       LaTeX sub-file (licenses and associated packages); created by CTANOut (options -mt and -m tex)
 xyz.top       LaTeX sub-file (topics and their meanings); created by CTANOut (options -mt and -m tex)
 xyz.xref      LaTeX sub-file (topics and associated packages); created by CTANOut (options -mt and -m tex)
-xyz.tap       LaTeX sub-file (authors and associated packages); created by CTANOut (options -mt and -m tex)
-xyz.lic       LaTeX sub-file (licenses and their meanings); created by CTANOut (options -mt and -m tex)
-xyz.tlp       LaTeX sub-file (licenses and associated packages); created by CTANOut (options -mt and -m tex)
-xyz.stat      LaTeX sub-file (statistics); created by CTANOut (options -mt and -m tex)
 
 xyz.aux       temp. file created by LuaLaTeX
 xyz.idx       raw index file created by LuaLaTeX

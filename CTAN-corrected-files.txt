@@ -1,6 +1,6 @@
 XML files to be corrected
 =========================
-2023-07-09
+2024-03-24
 
 Sometimes there are CTAN XML files with some deficiencies. These file are to be corrected locally-
 
@@ -20,5 +20,5 @@ xpdf
 attribute "year" with wrong content:
 ------------------------------------
 preview
-pdftex
+
 
