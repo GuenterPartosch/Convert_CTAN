@@ -1,6 +1,6 @@
 Changes (CTZANOut)
 ==================
-2022-03-05
+2023-07-07
 
 1.75 2021-05-14 more types for -m
 1.76 2021-05-14 clean-up of variables
@@ -123,4 +123,35 @@ Changes (CTZANOut)
 2.21.3  2022-02-23 additions and corrections in make_tlp, make_tap, make_lics, make_xref
 2.22    2022-03-01 additions and corrections in make_stat
 2.23    2022-03-01 texts for argparse and terminal log changed
-2.24    2022-03-01 correc tions in first_lines (plain, BibLaTeX)
+2.24    2022-03-01 corrections in first_lines (plain, BibLaTeX)
+2.25    2022-03-15 LaTeX header/preambel changed (fonts, languages)
+2.26    2022-03-20 error in mod_pre and mod_code corrected
+2.27    2022-03-25 error in the processing of -mt option corrected
+2.28    2022-03-30 BibLaTeX: "1970" removed from BiobTeX key; get_authorkey changed
+2.29    2022-04-10 BibLaTeX: additional request in biblatex_citationkey, if id is unknown
+2.30    2022-09-25 list of language codes extended
+2.31    2022-09-26 error for index entry in description function repaired
+2.32    2022-09-27 new option --no:files: generate no files; new variable; changes in some functions
+2.33    2022-09-28 some enhancements in "Resettings and Settings" (if -nf is set)
+2.34    2022-09-30 processing of unknown/wrong language in description a/o documentation improved
+2.35    2023-06-11 due to -nf: changes in statistics output (parameter -stat)
+2.36    2023-06-11 changes in rendering of description content
+2.36.1  2023-06-11 interaction of §§= and TeXchars_restore improved   
+2.36.2  2023-06-11 indentation in description in some places corrected
+2.36.3  2023-06-11 line breaks in <pre> are removed; changes in mod_pre, mod_code
+2.37    2023-06-11 LaTeX procession
+2.37.1  2023-06-11 corrected: without -mt no proper file end for LaTeX
+2.37.2  2023-06-11 LaTeX header changed (fonts, languages)
+2.38    2023-06-11 Workaround if language key, topic key, author key, license key are unknown
+2.39    2023-06-11 Error in trailing function: if languagecode is unknown; workaround
+2.40    2023-06-11 new option -y (filtering on the base of year templates
+2.40.1  2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
+2.40.2  2023-06-11 related changes in the statistics part (option -stat)
+2.41    2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
+2.42    2023-06-15 output on terminal changed
+2.43    2023-06-15 new option -dbg/--debugging: debugging mode enabled
+2.44    2023-06-15 output on xyz.stat changed
+2.45    2023-06-26 some changes in statistics output
+2.46    2023-06-28 fold() changed to adjust protocoll output
+2.47    2023-07-06 xyz.lic, xyz.tap, xyz.tlp, xyz.top, xyz.xref now without any \index entry
+

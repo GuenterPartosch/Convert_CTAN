@@ -1,6 +1,6 @@
 ﻿Mappings in CTAN
 ================
-2022-03-05
+2023-07-07
 
 Inspected CTAN elements
 -----------------------
@@ -10,7 +10,7 @@ license, miktex, name, texlive, version
 
 for example: -s "[description,version]" ==> the CTAN elements description and version are skipped.
 
-Multiple elements on CTAN: 
+Multiple elements on CTAN 
     keyval, authorref, documentation, also, description, contact, copyright, license
 
 year     ← copyright + version
@@ -22,31 +22,31 @@ CTAN → plain
 
 CTAN field     mode       source function  output variable                             output function  output text
 --------------+----------+----------------+-------------------------------------------+----------------+------------------
-                                           URL of downloaded XML file                  leading          Web Page on CTAN:
-                                           date of download                            trailing         last access:
-alias          directly   alias            local embedded text + attribute id          alias            alias:
-also           directly   also             attribute refid                             also             see also:
-authorref      directly   authorref        attribute givenname + attribute familyname  authorref        author:
-caption        directly   caption          local embedded text                         caption          caption:
-contact        directly   contact          attribute type + attribute href             contact          contact:
-copyright      directly   copyright        attribute owner + attribute year            copyright        copyright:
-               collected  copyright        global year_str ← attribute year            trailing         year:
-ctan           directly   ctan global      ctanUrl2 + attribute path                   ctan             on CTAN:
-description    directly   description      embedded text                               description      description:
-               collected  description      global language_set ← attribute language    trailing         language(s):
-documentation  directly   docmentation     attribute details + attribute href          documentation    documentation:
-               directly   docmentation     local path + local file name for href       documentation    --local file:
+                                           URL of downloaded XML file                  leading          Web Page on CTAN
+                                           date of download                            trailing         last access
+alias          directly   alias            local embedded text + attribute id          alias            alias
+also           directly   also             attribute refid                             also             see also
+authorref      directly   authorref        attribute givenname + attribute familyname  authorref        author
+caption        directly   caption          local embedded text                         caption          caption
+contact        directly   contact          attribute type + attribute href             contact          contact
+copyright      directly   copyright        attribute owner + attribute year            copyright        copyright
+               collected  copyright        global year_str ← attribute year            trailing         year
+ctan           directly   ctan global      ctanUrl2 + attribute path                   ctan             on CTAN
+description    directly   description      embedded text                               description      description
+               collected  description      global language_set ← attribute language    trailing         language(s)
+documentation  directly   docmentation     attribute details + attribute href          documentation    documentation
+               directly   docmentation     local path + local file name for href       documentation    --local file
                collected  documentation    global language_set ← attribute language    trailing         language(s)
-home           directly   home             attribute href                              home             home page:
-install        directly   install          global ctanUrl3 + attribute xpath           install          installation:
-keyval         directly   keyval           attribute value                             keyval           keyword:
-license        directly   license          attribute type + attribute date             license          license:
-miktex         directly   miktex           attribute location                          miktex           on MikTeX:
-name           directly   name             local embedded text                         name             name:
-texlive        directly   texlive          attribute location                          texlive          on TeXLive:
-version        directly   version          attribute date + attribute  number          version          version:
-               directly   version          attribute date                              version          last changes:
-               directly   version          local year ← attribute date                 version          year:
+home           directly   home             attribute href                              home             home page
+install        directly   install          global ctanUrl3 + attribute xpath           install          installation
+keyval         directly   keyval           attribute value                             keyval           keyword
+license        directly   license          attribute type + attribute date             license          license
+miktex         directly   miktex           attribute location                          miktex           on MikTeX
+name           directly   name             local embedded text                         name             name
+texlive        directly   texlive          attribute location                          texlive          on TeXLive
+version        directly   version          attribute date + attribute  number          version          version
+               directly   version          attribute date                              version          last changes
+               directly   version          local year ← attribute date                 version          year
  
 CTAN → BibLaTeX
 

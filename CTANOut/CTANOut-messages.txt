@@ -1,35 +1,48 @@
 Messages (CTANOut)
 ==================
-2022-03-05
+2023-07-06
 
 Errors
 ------
-Error: pickle file '<file>' not found
+Error: pickle file '<pickle file>' not found
+Error: program is terminated
 Error: tried to use the program indirectly
-Info: CTANOut program successfully completed
 
 Infos
 -----
-Info: Program call:
+Info: CTANOut program successfully completed
+Info: Program call: <program name> <arguments>
+Info: Successfully the OS directory '<OS directory>' created.
 Info: all package files analyzed and dictionary citation_keys created.
-Info: file '<stat file>' written: [statistics]
-Info: file '<lic file>' created: [licenses and their explainations]
-Info: file '<tap file>' created: [list with authors and related packages (cross-reference list)]
-Info: file '<tlp file>' created: [list with licenses and related packages (cross-reference list)]
-Info: file '<top file>' created: [topics and their explainations]
-Info: file '<xref file>' created: [list with topics and related packages (cross-reference list)]
+Info: file '<.lic file>' created: [licenses and their explainations]
+Info: file '<.stat file>' written: [statistics]
+Info: file '<.tap file>' created: [list with authors and related packages (cross-reference list)]
+Info: file '<.tlp file>' created: [list with licenses and related packages (cross-reference list)]
+Info: file '<.top file>' created: [topics and their explainations]
+Info: file '<.xref file>' created: [list with topics and related packages (cross-reference list)]
 Info: packages processed
-Info: program call (with details)
+Info: program call (with details): <program name>
 
 Warnings
 --------
-Warning: XML file for package '<package>' not found
+Warning: '<option> "<value>" changed to '<value>' (due to '<reason>')
+Warning: Creation of the OS directory '<OS directory>' failed.
+Warning: XML file for package '<XML file>' not found
 Warning: XML file for package '<package>' not well-formed
-Warning: no correct local XML file for any specified package found")
-Warning: no file '<lic file>' created
-Warning: no file '<tap file>' created
-Warning: no file '<tlp file>' created
-Warning: no file '<top file>' created
-Warning: no file '<xref file>' created
-Warning: no package found which matches the specified <kind> template '<template>'
+Warning: no correct local XML file for any specified package found
+Warning: no file '<.lic file>' created
+Warning: no file '<.tap file>' created
+Warning: no file '<.tlp file>' created
+Warning: no file '<.top file>' created
+Warning: no file '<.xref file>' created
+Warning: no package found which matches the specified author template '<author template>'
+Warning: no package found which matches the specified license template '<license template>'
+Warning: no package found which matches the specified name template '<name template>'
+Warning: no package found which matches the specified topic template '<topic template>'
+Warning: no package found which matches the specified year template '<year template>'
 Warning: pickle file '<pickle file>' not found; local information files ignored
+Warning: unknown language code '<language code>' in 'description'; ignored
+Warning: unknown language code '<language code>' in 'documentation'; ignored
+
+
+

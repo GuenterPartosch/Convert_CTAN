@@ -1,6 +1,6 @@
 Functions ( CTANOut.py)
 =======================
-2022-03-05
+2023-06-12
 
 bibfield_test(s, f):      auxiliary function: Tests a BibLaTeX field: output text is not empty and field is not be skipped
 biblatex_citationkey():   auxiliary function: generate a dictionary with citations keys for all the packages
@@ -15,6 +15,7 @@ get_local_packages(d):    auxiliary function: list all local packages in the cur
 get_name_packages():      gets package names by specified package name template.
 get_topic_packages():     gets package names by specified topic template.
 get_year(s):              auxiliary function: get the most recent year in string s (only for BibLaTeX)
+get_year_packages():      gets package names by specified year template.
 innertext(k, start, pp):  auxiliary function innertext: looks for embedded text and elements and returns an evaluated string
 leading(k, p):            first lines for package output
 load_pickle1():           loads/unpacks pickle file 1
@@ -130,6 +131,7 @@ main --> process_packages
          process_packages --> get_author_packages
          process_packages --> get_local_packages
          process_packages --> get_license_packages
+         process_packages --> get_year_packages
 
 innertext --> mod_a
               mod_b

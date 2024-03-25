@@ -1,45 +1,37 @@
-usage: ctanout [-h] [-a] [-A AUTHOR_TEMPLATE]
-               [-b {@online,@software,@misc,@ctan,@www,@electronic}]
+usage: ctanout [-h] [-a] [-A AUTHOR_TEMPLATE] 
+               [-b {@online,@software,@misc,@ctan,@www,@electronic}] 
                [-d DIREC] [-k FILTER_KEY] [-L LICENSE_TEMPLATE]
-               [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}]
-               [-mt] [-o OUT_FILE] [-s SKIP] [-sb SKIP_BIBLATEX]
-               [-t NAME_TEMPLATE] [-stat] [-v] [-V]
+               [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}] 
+               [-mt] [-nf] [-o OUT_FILE] [-s SKIP] [-sb SKIP_BIBLATEX] [-t NAME_TEMPLATE] [-stat] [-v] [-V] [-y YEAR_TEMPLATE]
 
-[CTANOut.py; Version: 2.24 (2022-03-01)] Converts CTAN XLM package files to
-LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+[CTANOut.py; Version: 2.44 (2023-06-15)] Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 
 Options:
   -h, --help            show this help message and exit
-  -a, --author          Shows author of the program and exit.
+  -a, --author          Show author of the program and exit.
   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
-                        Template for output filtering on the base of author
-                        names - Default: ^.+$
+                        Template for output filtering on the base of author names - Default: ^.+$
   -b {@online,@software,@misc,@ctan,@www,@electronic}, --btype {@online,@software,@misc,@ctan,@www,@electronic}
-                        Type of BibLaTex entries to be generated [only for -m
-                        BibLateX] - Default: @online
+                        Type of BibLaTex entries to be generated [only for -m BibLateX] - Default: @online
   -d DIREC, --directory DIREC
                         Directory for input and output files - Default: .\
   -k FILTER_KEY, --key FILTER_KEY
-                        Template for output filtering on the base of keys -
-                        Default: ^.+$
+                        Template for output filtering on the base of keys - Default: ^.+$
   -L LICENSE_TEMPLATE, --license_template LICENSE_TEMPLATE
-                        Template for output filtering on the base of license
-                        names - Default: ^.+$
+                        Template for output filtering on the base of license names - Default: ^.+$
   -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}, --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}
                         Target format - Default: RIS
-  -mt, --make_topics    Flag: Generates topic lists [meaning of
-                        topics/licenses + cross-reference (topics/packages,
-                        authors/packages, licenses/packages); only for -m
-                        LaTeX]). - Default: False
+  -mt, --make_topics    Flag: Generate topic lists [meaning of topics/licenses + cross-reference (topics/packages, authors/packages, licenses/packages); only for -m LaTeX]). - Default: False
+  -nf, --no_files       Flag: Do not generate output files. - Default: False
   -o OUT_FILE, --output OUT_FILE
-                        Generic name [without extensions] for output files -
-                        Default: all
-  -s SKIP, --skip SKIP  Skips specified CTAN fields. - Default: []
+                        Generic name [without extensions] for output files - Default: all
+  -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
   -sb SKIP_BIBLATEX, --skip_biblatex SKIP_BIBLATEX
-                        Skips specified BibLaTeX fields. - Default: []
+                        Skip specified BibLaTeX fields. - Default: []
   -t NAME_TEMPLATE, --template NAME_TEMPLATE
-                        Template for output filtering on the base of package
-                        names - Default: ^.+$
-  -stat, --statistics   Flag: Prints statistics on terminal. - Default: False
+                        Template for output filtering on the base of package names - Default: ^.+$
+  -stat, --statistics   Flag: Print statistics on terminal. - Default: False
   -v, --verbose         Flag: Output is verbose. - Default: False
-  -V, --version         Shows version of the program and exit.
+  -V, --version         Show version of the program and exit.
+  -y YEAR_TEMPLATE, --year_template YEAR_TEMPLATE
+                        Template for output filtering on the base of years - Default: ^[12][09][0-9][0-9]$
