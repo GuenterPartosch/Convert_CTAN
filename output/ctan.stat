@@ -1,0 +1,36 @@
+% file: 'all.stat'
+% date: 2024-03-25
+% time: 08:08:05
+% is called by 'all.tex'
+
+\minisec{Parameters and statistics}
+
+\raggedright
+\begin{tabular}{lll}
+
+program name & \verb§CTANOut.py§\\
+program version &2.47 (2023-07-06)\\
+program author &Günter Partosch\\\\
+
+date of program execution &2024-03-25\\
+time of program execution &08:08:05\\\\
+mode & \verb§LaTeX§\\
+special lists used\footnotemark{} &True\\
+skipped CTAN fields & \verb§[]§  (no fields skipped = default)\\
+
+template for package names & \verb§^.+$§ (all packages = default)\\
+template for topics & \verb§^.+$§  (all topics = default)\\
+template for author names & \verb§^.+$§  (all authors = default)\\
+template for licenses & \verb§^.+$§  (all licenses = default)\\
+template for years & \verb§^[12][09][0-9][0-9]$§  (all years = default)\\\\
+
+number of authors, total on CTAN &  2976\\
+number of authors, cited here &  2906\\
+number of packages, total on CTAN &  6576\\
+number of packages, processed locally &  6575\\
+number of topics, total on CTAN &   609\\
+number of topics, used here &   603\\
+number of licenses, total on CTAN &    67\\
+number of licenses, used here &    52\\
+\end{tabular}
+\footnotetext{special lists: topics/licinses and their explanation + topics/authors/licenses and related packages(cross-reference lists)}

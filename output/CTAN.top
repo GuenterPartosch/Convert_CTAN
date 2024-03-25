@@ -1,0 +1,613 @@
+% file: all.top
+% date: 2024-03-25
+% time: 08:08:05
+% is called by all.tex
+
+\section{Used topics, short explainations}
+
+\raggedright
+\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}
+\item[\texttt{abbrev}] macros for defining abbreviations in documents
+\item[\texttt{abstract}] typeset abstracts of documents
+\item[\texttt{accessible}] accessibility support
+\item[\texttt{acrobat}] relies on availability of Adobe Acrobat, etc.
+\item[\texttt{acronym}] define and use acronyms
+\item[\texttt{addr-list}] lists of addresses, for a personal directory (or the like)
+\item[\texttt{adobe-distiller}] convert PostScript to PDF using Adobe Distiller
+\item[\texttt{advert}] small advertisements, fly sheets, etc.
+\item[\texttt{albanian}] support for typesetting Albanian
+\item[\texttt{alignment}] tables, tab structures, etc
+\item[\texttt{alignment-supp}] ancillary code for tables, tab structures, etc
+\item[\texttt{amharic}] support for typesetting Amharic
+\item[\texttt{amusements}] jokes, distractions, tongue-in-cheek packages, and other entertainment material
+\item[\texttt{android}] usable under Android
+\item[\texttt{apa}] typesetting according to the rules of the American Psychological Association
+\item[\texttt{appendix}] Typsetting and using appendices
+\item[\texttt{arabic}] documentation in and support for typesetting Arabic
+\item[\texttt{arch-tree}] Root directory of a (sub-)tree of the archive
+\item[\texttt{archival}] creating archival copies, or copies for distribution
+\item[\texttt{arithmetic}] perform and typeset arithmetic problems
+\item[\texttt{armenian}] support for typesetting Armenian
+\item[\texttt{article-like}] LaTeX article classes and their developments
+\item[\texttt{astrology}] fonts and typesetting for astrologers
+\item[\texttt{astronomy}] astronomy articles, astronomical charts
+\item[\texttt{automata}] finite-state machines, automata, labelled graphs, etc.
+\item[\texttt{azerbaijani}] support for typesetting Azerbaijani
+\item[\texttt{background}] decorate/confuse text by adding a background
+\item[\texttt{bahasa-indonesia+malaysia}] support for typesetting Bahasa Indonesia/Malaysia
+\item[\texttt{barcode}] barcodes and other machine-readable tags
+\item[\texttt{basque}] support for typesetting Basque
+\item[\texttt{belarusian}] support for typesetting Belarusian
+\item[\texttt{bengali}] support for typesetting Bengali
+\item[\texttt{bib-use}] place non-bibliography material in the bibliography
+\item[\texttt{biblatex}] BibLaTeX bibliography support
+\item[\texttt{biblio}] bibliography processor
+\item[\texttt{biblio-supp}] support for manually-written bibliographies
+\item[\texttt{bibtex-annote}] BibTeX annotation styles
+\item[\texttt{bibtex-doc}] documentation of BibTeX, etc., on their own
+\item[\texttt{bibtex-gen}] derive BibTeX data from resources other than BibTeX libraries
+\item[\texttt{bibtex-lib}] collection of BibTeX citations
+\item[\texttt{bibtex-multi}] multiple BibTeX bibliographies in a document
+\item[\texttt{bibtex-sty}] BibTeX style or style generator
+\item[\texttt{bibtex-supp}] BibTeX citation support
+\item[\texttt{bibtex-util}] utility for managing BibTeX files
+\item[\texttt{bidi}] support bidirectional typesettting
+\item[\texttt{biology}] typeset biological data
+\item[\texttt{biomedical}] support for documents in biomedical research
+\item[\texttt{blank-page}] control of blank pages in a document
+\item[\texttt{book-ex}] copies of examples from a published book
+\item[\texttt{book-pub}] preparing a book for publication
+\item[\texttt{book-src}] source of a published book
+\item[\texttt{bosnian}] support for typesetting in Bosnian
+\item[\texttt{botany}] typeset botanical data
+\item[\texttt{box-breaking}] breaking boxes over a page boundary, etc
+\item[\texttt{box-manip}] manipulating boxes
+\item[\texttt{boxing}] creating boxes
+\item[\texttt{breton}] support for typesetting in Breton
+\item[\texttt{bugfix}] correct a problem, ahead of the “proper” fix
+\item[\texttt{bulgarian}] support for typesetting and documentation in Bulgarian
+\item[\texttt{bundle}] pack files up for distribution or archiving
+\item[\texttt{burmese}] support for typesetting Burmese
+\item[\texttt{bus-study}] typeset material for Business Studies
+\item[\texttt{calculation}] perform calculations within TeX
+\item[\texttt{calendar}] typeset calendars, diaries, planning charts, etc.
+\item[\texttt{callback}] call external code and process the result
+\item[\texttt{caption}] typesetting captions
+\item[\texttt{card-flash}] typesetting ‘flash’ cards for teaching and learning
+\item[\texttt{card-gen}] cards for miscellaneous purposes
+\item[\texttt{cartography}] map production and geographical data usage
+\item[\texttt{catalan}] documentation in and support for typesetting Catalan
+\item[\texttt{catalogue}] typeset catalogue data
+\item[\texttt{cgi-latex}] support for LaTeX(-alike) on the web, or feeding into other applications
+\item[\texttt{chemistry}] chemistry document support
+\item[\texttt{cherokee}] support for typesetting Cherokee
+\item[\texttt{chinese}] support for typesetting Chinese languages
+\item[\texttt{chinese-doc}] documentation in Chinese languages
+\item[\texttt{chords}] chord notations, as for song books
+\item[\texttt{chunks}] extract chunks of a document for separate processing
+\item[\texttt{churchslavonic}] support for typesetting Church Slavonic
+\item[\texttt{cite-foot}] citations in footnotes
+\item[\texttt{cite-supp}] citation support
+\item[\texttt{class}] alternative LaTeX class(es)
+\item[\texttt{class-ext}] export features from a class for use elsewhere
+\item[\texttt{class-supp}] support for class (and package) development
+\item[\texttt{code-layout}] improve the appearance of LaTeX code
+\item[\texttt{collection}] a collection of packages
+\item[\texttt{colour}] typesetting in colour
+\item[\texttt{comp-mgmt}] control TeX’s behaviour during compilation
+\item[\texttt{comp-net}] typeset computer network concepts
+\item[\texttt{comp-sci}] typeset computer-science related material
+\item[\texttt{comp-supp}] support for preparing documents
+\item[\texttt{comp-theory}] typeset theoretical computer science material
+\item[\texttt{compact-print}] compact output, typically multiple pages/sheet
+\item[\texttt{compilation}] the document compilation process
+\item[\texttt{cond-comp}] conditional typesetting
+\item[\texttt{confproc}] typesetting conference proceedings
+\item[\texttt{context}] macros of, or for use with, ConTeXt
+\item[\texttt{context-doc}] documentation of ConTeXt
+\item[\texttt{cooking}] typesetting cooking recipes, etc
+\item[\texttt{coptic}] support for typesetting coptic
+\item[\texttt{counter-mgmt}] management of counters
+\item[\texttt{course-material}] course material
+\item[\texttt{covers}] typeset badges, covers or labels for things (or people)
+\item[\texttt{crit-ed}] typeset scholarly editions of texts
+\item[\texttt{croatian}] support for typesetting Croatian
+\item[\texttt{crystallography}] typeset material to do with crystallography
+\item[\texttt{csv-support}] Read, process and convert CSV data
+\item[\texttt{ctan}] support for work with the CTAN archive
+\item[\texttt{cv}] curriculum vitae/Resumé
+\item[\texttt{cvt-html}] generate HTML from TeX-ish sources
+\item[\texttt{cvt-other}] convert TeX-ish sources to some other markup (than HTML)
+\item[\texttt{cwpuzzle}] crossword puzzle
+\item[\texttt{cyrillic}] support languages written using Cyrillic alphabets
+\item[\texttt{czech}] support for typesetting Czech
+\item[\texttt{czech-doc}] documentation in Czech
+\item[\texttt{danish}] support for typesetting, or documentation in Danish
+\item[\texttt{data-disp}] visualisation of data sets
+\item[\texttt{data-import}] importing data into documents
+\item[\texttt{data-manip}] manipulate data within TeX
+\item[\texttt{data-prep}] prepare data for use within TeX
+\item[\texttt{data-sel}] select data from sets in the TeX file
+\item[\texttt{date-time}] manipulate dates and/or times
+\item[\texttt{db-access}] access database for document contents
+\item[\texttt{debug-supp}] support for package or document debugging
+\item[\texttt{decoration}] highlighting typeset material, fancy frames, watermarks, etc.
+\item[\texttt{defer-stuff}] saving things for later use
+\item[\texttt{demo-code}] code that serves as examples of TeX programming
+\item[\texttt{diagram}] diagrams
+\item[\texttt{diagram-block}] block diagrams
+\item[\texttt{diagram-circ}] circuit diagrams
+\item[\texttt{diagram-comm}] commutative diagrams
+\item[\texttt{diagram-ctrl}] control diagrams
+\item[\texttt{diagram-flow}] flow (and similar) diagrams, including Nassi-Shneiderman
+\item[\texttt{diagram-lab}] schematic details of laboratory work
+\item[\texttt{diagram-maths}] diagrams used in mathematics
+\item[\texttt{diagram-tmg}] timing diagrams
+\item[\texttt{dictionary}] macros that support preparation of dictionaries, lexicons, etc
+\item[\texttt{dissertation}] typesetting dissertations, theses, etc.
+\item[\texttt{distribution}] components (or support) of TeX distribution
+\item[\texttt{doc-debug}] tools, etc., for “debugging” documents
+\item[\texttt{doc-errata}] lists of errata in published books
+\item[\texttt{doc-gen}] generate a document by collating other text
+\item[\texttt{doc-mgmt}] support for keeping track of document development
+\item[\texttt{doc-style}] LaTeX 2.09 document style
+\item[\texttt{doc-supp}] macros and tools for preparing documentation
+\item[\texttt{doc-templ}] template to guide document development
+\item[\texttt{doc-tool}] document development tools
+\item[\texttt{docu-pkg}] documentation of another package
+\item[\texttt{documentation}] ‘stand-alone’ documentation
+\item[\texttt{drama-script}] typeset scripts for plays, etc.
+\item[\texttt{dummy-gen}] dummy text generator for tests and examples
+\item[\texttt{dutch}] support for typesetting Dutch
+\item[\texttt{dutch-doc}] documentation in Dutch
+\item[\texttt{dvi-bit}] generate graphic bitmaps from DVI files
+\item[\texttt{dvi-pdf}] convert DVI files to PDF
+\item[\texttt{dvi-prev}] preview DVI files
+\item[\texttt{dvi-print}] convert DVI files for (direct) printing, etc.
+\item[\texttt{dvi-proc}] DVI processor
+\item[\texttt{dvi-struc}] create and/or process text representation of a DVI file
+\item[\texttt{dvi-text}] DVI output to plain text
+\item[\texttt{dvips-special}] use dvips \textbackslash special commands
+\item[\texttt{ebook}] support for preparing e-books
+\item[\texttt{editor}] editor designed (or adapted) for use with (La)TeX
+\item[\texttt{editor-extn}] plug-ins for editors, for better (La)TeX and Meta* support
+\item[\texttt{editorial}] editor’s marks, highlights, etc.
+\item[\texttt{editorial-consistency}] ensure consistency of usage
+\item[\texttt{electronic}] support of electronic design
+\item[\texttt{emphasis}] emphasising text
+\item[\texttt{emulation}] code to emulate “other things”
+\item[\texttt{enc-juggle}] conversion between encodings
+\item[\texttt{endnote}] notes typeset at end document
+\item[\texttt{engine}] TeX (or TeX-alike) typesetting engine
+\item[\texttt{engineering}] typesetting associated with engineering of whatever sort
+\item[\texttt{english}] typesetting specific to English
+\item[\texttt{env-query}] examine the TeX programming environment
+\item[\texttt{epigram}] short quotation typically associated with the start of a chapter
+\item[\texttt{error-supp}] control of LaTeX error messages
+\item[\texttt{esperanto}] support for typesetting Esperanto
+\item[\texttt{essay}] course work essays, assignments, etc.
+\item[\texttt{estonian}] support for typesetting Estonian
+\item[\texttt{etex}] requires e-TeX
+\item[\texttt{exam}] exams, quizzes, etc.
+\item[\texttt{exec-foreign}] execute ‘other types’ of language
+\item[\texttt{exercise}] exercises, problems for solution, etc.
+\item[\texttt{experimental}] offer of a facility that may never make its way to production use
+\item[\texttt{expl3}] package uses experimental LaTeX 3
+\item[\texttt{ext-code}] run an external program from within a document
+\item[\texttt{ext-svc}] link to a service not on CTAN
+\item[\texttt{fac-survey}] survey of TeX-related facilities
+\item[\texttt{fake-glyph}] provide a glyph by construction, rather than from a font
+\item[\texttt{faq}] frequently asked questions, with answers
+\item[\texttt{file-card}] typeset cards for business, filing, etc.
+\item[\texttt{file-control}] manipulation of TeX macro file i/o
+\item[\texttt{file-mgmt}] TeX-related-file management
+\item[\texttt{finnish}] support for typesetting Finnish
+\item[\texttt{finnish-doc}] documentation written in Finnish
+\item[\texttt{fit-to-size}] set up things to fit in a given space
+\item[\texttt{float}] typesetting floats
+\item[\texttt{font}] fonts themselves
+\item[\texttt{font-abnormal}] font in an irregular format
+\item[\texttt{font-absent}] support is for a font not available on CTAN
+\item[\texttt{font-adhoc}] font distributed in an ad-hoc fashion
+\item[\texttt{font-arabic}] fonts for typesetting arabic
+\item[\texttt{font-archaic}] fonts reproducing archaic scripts or inscriptions
+\item[\texttt{font-bbd}] doublestroke (blackboard bold) fonts
+\item[\texttt{font-body}] font designed for use as body font for Latin-based script documents
+\item[\texttt{font-bookhand}] fonts of scripts used for manuscript books
+\item[\texttt{font-calligraphic}] calligraphic (or handwriting) fonts
+\item[\texttt{font-chess}] fonts for typesetting chess problems and diagrams
+\item[\texttt{font-cjk}] fonts for far eastern languages (Chinese, Japanese and Korean)
+\item[\texttt{font-cm}] font serving Computer Modern-style shapes
+\item[\texttt{font-collection}] listing a set of related fonts
+\item[\texttt{font-coptic}] fonts for coptic script
+\item[\texttt{font-cvt}] convert a font to a form usable with TeX
+\item[\texttt{font-cyrillic}] fonts for Cyrillic and related scripts
+\item[\texttt{font-decor}] decorative or initial fonts
+\item[\texttt{font-devel}] support for font development, testing and characterisation
+\item[\texttt{font-display}] Display-style font
+\item[\texttt{font-doc}] documentation about choosing installing and using fonts
+\item[\texttt{font-egyptian}] hieroglyph fonts
+\item[\texttt{font-gothic}] font for gothic or blackletter shapes
+\item[\texttt{font-greek}] font for Greek (archaic, classical and modern)
+\item[\texttt{font-hebrew}] font for Hebrew script
+\item[\texttt{font-historical}] fonts for a script or language now obsolete
+\item[\texttt{font-index}] lists of glyphs available from font(s)
+\item[\texttt{font-indic}] fonts for languages of the Indian subcontinent
+\item[\texttt{font-invented}] font for an ‘invented’ language or script
+\item[\texttt{font-maths}] fonts for use in mathematics
+\item[\texttt{font-medieval}] fonts for Medieval script
+\item[\texttt{font-mf}] fonts distributed as Metafont source
+\item[\texttt{font-mgmt}] management of fonts
+\item[\texttt{font-mono}] monospaced font
+\item[\texttt{font-multilingual}] font with adaptations to several languages
+\item[\texttt{font-music}] fonts of music symbols
+\item[\texttt{font-nonroman}] fonts for “other” non-Roman scripts
+\item[\texttt{font-novelty}] fonts designed more for fun than for actual use
+\item[\texttt{font-ornmnt}] fonts of typographic ornaments
+\item[\texttt{font-otf}] font in OpenType format
+\item[\texttt{font-proc}] process fonts for use with TeX (includes installation)
+\item[\texttt{font-proportional}] variable-spaced font
+\item[\texttt{font-rune}] fonts for runic inscriptions
+\item[\texttt{font-sample}] samples of font usage
+\item[\texttt{font-sans}] Sans-serif font
+\item[\texttt{font-sel}] font selection schemes
+\item[\texttt{font-serif}] Serif font
+\item[\texttt{font-sfd}] FontForge font file
+\item[\texttt{font-specialist}] fonts with specific small application areas
+\item[\texttt{font-supp}] metrics, macro incantations and other font support
+\item[\texttt{font-supp-maths}] metrics, macro incantations and other support for maths fonts
+\item[\texttt{font-supp-misc}] metrics, macro incantations and other support for miscellaneous fonts (not on CTAN)
+\item[\texttt{font-supp-symbol}] metrics, macro incantations and other support for symbol fonts
+\item[\texttt{font-symbol}] fonts that provide collections of symbols
+\item[\texttt{font-symbol-maths}] collections of mathematical symbols
+\item[\texttt{font-t1enc}] font providing LaTeX T1 encoding support
+\item[\texttt{font-thai}] font for typesetting Thai script
+\item[\texttt{font-ttf}] font available in TrueType format
+\item[\texttt{font-type1}] font available in Adobe Type 1 format
+\item[\texttt{font-use}] font selection, mapping, etc.
+\item[\texttt{font-util}] manipulate or examine fonts
+\item[\texttt{font-virtual}] virtual font(s) using existing fonts
+\item[\texttt{fontenc}] support for font encodings
+\item[\texttt{footnote}] footnote support
+\item[\texttt{foreign-import}] import files in a non-TeX (or different TeX) format
+\item[\texttt{form-fillin}] design forms for information collection
+\item[\texttt{formal-spec}] typeset formal specification languages
+\item[\texttt{format}] macros to build a format
+\item[\texttt{format-cvt}] convert one format of file to another
+\item[\texttt{french}] support for typesetting French
+\item[\texttt{french-doc}] documentation in French
+\item[\texttt{frivolous}] TeX code as a source of humour
+\item[\texttt{games}] process game diagrams, gamebooks, and other amusements
+\item[\texttt{gantt}] real-time scheduling Gantt charts
+\item[\texttt{gen-paper}] paper (simply) for communication, not necessarily for publication
+\item[\texttt{genchart}] drawing bar- or pie-charts
+\item[\texttt{genealogy}] typesetting genealogical information
+\item[\texttt{gentex}] generate (La)TeX from other sorts of sources
+\item[\texttt{geometry}] change geometry of page layout
+\item[\texttt{geometry-adj}] temporarily adjust page layout
+\item[\texttt{georgian}] support for typesetting Georgian
+\item[\texttt{german}] support for typesetting German
+\item[\texttt{german-doc}] documentation in German
+\item[\texttt{glossary}] glossary and nomenclature support
+\item[\texttt{graphics}] graphics (support packages)
+\item[\texttt{graphics-3d}] graphics with 3-dimensional output
+\item[\texttt{graphics-curve}] draw (parametric) curves
+\item[\texttt{graphics-doc}] documentation of techniques for using graphics
+\item[\texttt{graphics-drv}] ‘driver’ for output from graphics ‘kernel’ packages
+\item[\texttt{graphics-editor}] graphics editor whose output is good for TeX
+\item[\texttt{graphics-engn}] graphics generator whose output is good for use with TeX
+\item[\texttt{graphics-epspdf}] converting graphics files from Metapost output or (E)PS to embeddable PDF
+\item[\texttt{graphics-fill-tile}] graphics filling or tiling an area
+\item[\texttt{graphics-import}] convert a foreign graphics format for use with TeX
+\item[\texttt{graphics-in-tex}] graphics produced by one of the *TeX engines
+\item[\texttt{graphics-incl}] include external graphics
+\item[\texttt{graphics-inline}] graphics inline for external processing
+\item[\texttt{graphics-manip}] manipulate graphics and/or related text
+\item[\texttt{graphics-motion}] motion graphics
+\item[\texttt{graphics-mpost}] graphics generated using Metapost
+\item[\texttt{graphics-plot}] plot data
+\item[\texttt{graphics-plotfn}] plot a representation of a function
+\item[\texttt{graphics-prep}] prepare graphics for use with *TeX
+\item[\texttt{graphics-subpic}] generate parts of pictures
+\item[\texttt{graphics-supp}] support for other packages or for drivers
+\item[\texttt{graphics-symb}] create symbols, rather than select from a font
+\item[\texttt{graphics-text}] text within graphics (drawn or overlaid)
+\item[\texttt{graphics-use}] graphics (typesetting actual pictures)
+\item[\texttt{greek}] support for typesetting Greek
+\item[\texttt{greek-doc}] documentation in Greek
+\item[\texttt{headings}] chapter, section, etc., heading styles
+\item[\texttt{hebrew}] documentation in and support for typesetting Hebrew
+\item[\texttt{humanities}] support for studies in the humanities
+\item[\texttt{hungarian}] support for typesetting Hungarian
+\item[\texttt{hyper}] support for hypertext
+\item[\texttt{hyph-gen}] support for generating or improving hyphenation tables
+\item[\texttt{hyph-pseudo}] splitting without benefit of hyphenation
+\item[\texttt{hyphenation}] macros or tables for hyphenation
+\item[\texttt{icelandic}] support for typesetting the Icelandic language
+\item[\texttt{ide}] integrated development environments
+\item[\texttt{image-supp}] manipulating images for inclusion in documents
+\item[\texttt{index}] index support
+\item[\texttt{index-auth}] index of referenced authors
+\item[\texttt{index-multi}] multiple indexes in a document
+\item[\texttt{index-proc}] process and/or generate index material
+\item[\texttt{indic}] support for languages of the Indian subcontinent
+\item[\texttt{inputenc}] input encoding support for TeX engines
+\item[\texttt{install-mgmt}] support for (La)TeX installations
+\item[\texttt{interlingua}] support for typesetting interlingua
+\item[\texttt{invoice}] typesetting and calculating invoices
+\item[\texttt{io-mgmt}] manage TeX’s limited i/o streams
+\item[\texttt{irish-gaelic}] support for typesetting the Irish (gaelic) language
+\item[\texttt{italian}] support for typesetting Italian
+\item[\texttt{italian-doc}] documentation in Italian
+\item[\texttt{japanese}] support for typesetting Japanese
+\item[\texttt{japanese-doc}] documentation in Japanese
+\item[\texttt{journ-digest}] digests/partial information about journals
+\item[\texttt{journ-extract}] selections of journals, etc.
+\item[\texttt{journ-personal}] personal journals, diaries, etc.
+\item[\texttt{journ-src}] sources and/or old copies of journals
+\item[\texttt{journalpub}] typesetting journals, etc
+\item[\texttt{keyval}] key-value argument systems
+\item[\texttt{korean}] support for typesetting Korean
+\item[\texttt{korean-doc}] documentation in Korean
+\item[\texttt{kurdish}] support for typesetting Kurdish
+\item[\texttt{kurmanji}] support for typesetting Kurmanji
+\item[\texttt{label-ref}] label and reference systems
+\item[\texttt{labels}] typeset sets of labels (for cutting out, etc.)
+\item[\texttt{landscape}] print landscape orientation, manipulate landscape material
+\item[\texttt{lang-invented}] support for typesetting invented language(s)
+\item[\texttt{latex-devel}] LaTeX experimental developments ‘in the wild’
+\item[\texttt{latex-doc}] LaTeX documentation
+\item[\texttt{latex-qual}] encourage quality in LaTeX markup
+\item[\texttt{latex209}] package only known to work with LaTeX 2.09
+\item[\texttt{latex3}] work done for the project to upgrade LaTeX
+\item[\texttt{latin}] support for typesetting Latin (ancient, medieval and ‘modern’)
+\item[\texttt{latvian}] support for typesetting Latvian
+\item[\texttt{layout}] layout of objects on the page
+\item[\texttt{layout-page}] page trim marks and decorations
+\item[\texttt{layout-show}] display details of page layout
+\item[\texttt{layout-supp}] provide marks to assist in layout design
+\item[\texttt{leaders}] typeset leaders, etc.
+\item[\texttt{legal}] typesetting legal documents or study material
+\item[\texttt{letter}] typesetting letters, envelopes, faxes, etc
+\item[\texttt{letterspace}] change space between characters
+\item[\texttt{lettrine}] drop capitals and flow text around them
+\item[\texttt{licence-mgmt}] manage application of licence information
+\item[\texttt{line-nos}] number the typeset lines
+\item[\texttt{line-patt}] patterning lines (dashes, etc)
+\item[\texttt{line-space}] leading between lines of text
+\item[\texttt{line-weight}] control the weight of rules, etc., in text
+\item[\texttt{linguistic}] support for linguistics
+\item[\texttt{list}] list: general
+\item[\texttt{list-bull}] list: items bulleted
+\item[\texttt{list-descr}] list: items described
+\item[\texttt{list-enum}] list: items enumerated
+\item[\texttt{list-supp}] list support
+\item[\texttt{listing}] computer code listing
+\item[\texttt{lithuanian}] support for typesetting Lithuanian
+\item[\texttt{litprog}] literate programming
+\item[\texttt{litprog-tools}] literate programming tools
+\item[\texttt{log-manip}] analyse or otherwise manipulate logs
+\item[\texttt{logic}] typesetting logician’s discussions
+\item[\texttt{logo}] symbols or drawings to specify an object, including icons
+\item[\texttt{lua-supp}] support for using Lua code
+\item[\texttt{luatex}] LuaTeX and packages that require it
+\item[\texttt{luatex-doc}] documentation of LuaTeX and related packages
+\item[\texttt{lyx}] adapted for use with lyx
+\item[\texttt{macedonian}] documentation in, and support for typesetting Macedonian
+\item[\texttt{macro-def}] alternative ways of defining macros
+\item[\texttt{macro-demo}] print (La)TeX code verbatim alongside the rendered result
+\item[\texttt{macro-gen}] macros that are independent of the (TeX) format in use
+\item[\texttt{macro-iterate}] repeat TeX material
+\item[\texttt{macro-sort}] sort data within TeX macros
+\item[\texttt{macro-supp}] support for development of (La)TeX macros
+\item[\texttt{magazine}] magazines, newspapers and other ephemeral pubications
+\item[\texttt{mail-list}] digests, etc., of mailing lists
+\item[\texttt{mailing}] mail merge, etc
+\item[\texttt{maltese}] support for typesetting Maltese
+\item[\texttt{manju}] support for typesetting Manju
+\item[\texttt{marathi}] support for typesetting Marathi
+\item[\texttt{marginal}] marginal notes, etc.
+\item[\texttt{markup}] alternative markup scheme
+\item[\texttt{mat-sci}] typeset matter relevant to Materials Science
+\item[\texttt{maths}] support for typesetting mathematics
+\item[\texttt{maths-doc}] documentation of typesetting mathematics
+\item[\texttt{maths-symbol}] construction or application of mathematical symbols
+\item[\texttt{maths-syseqn}] systems of equations
+\item[\texttt{maths-tabvar}] mathematical tables of signs and variations
+\item[\texttt{maths-theorem}] typeset mathematical theorems
+\item[\texttt{matrix}] typeset matrices
+\item[\texttt{medical}] typesetting medical material
+\item[\texttt{meeting-admin}] calls, agendas, minutes of meetings
+\item[\texttt{memorandum}] typeset memorandum or other short note
+\item[\texttt{messages}] manage messages to the user
+\item[\texttt{metadata}] process document metadata
+\item[\texttt{mf-doc}] documentation for Metafont users
+\item[\texttt{micro-layout}] paragraph shapes, margin adjustments, etc.
+\item[\texttt{misc-conv}] miscellaneous conversions
+\item[\texttt{misc-paper}] discussion/working paper (rather than journal paper)
+\item[\texttt{misc-support}] miscellaneous support stuff
+\item[\texttt{mobile}] support for mobile use
+\item[\texttt{molbio}] support for typesetting molecular biology
+\item[\texttt{mongolian}] support for typesetting Mongolian
+\item[\texttt{mongolian-doc}] documentation in Mongolian
+\item[\texttt{mp-doc}] documentation for Metapost users
+\item[\texttt{mp-supp}] support tools and macros for Metapost programming
+\item[\texttt{mp-use}] use, and support for use, of Metapost
+\item[\texttt{multicol}] more than one column on the page
+\item[\texttt{multilingual}] support for more than one (natural) language
+\item[\texttt{multilingual-addon}] extra language ‘drivers’ for existing multilingual packages
+\item[\texttt{multimedia}] support for multimedia in documents
+\item[\texttt{music}] typesetting music and related stuff
+\item[\texttt{music-extinp}] external input sources for music
+\item[\texttt{neuro}] typesetting neuroscience material
+\item[\texttt{non-bibtex}] support for bibliographies created without using a biblio processor
+\item[\texttt{norwegian}] support for typesetting Norwegian
+\item[\texttt{notes}] general notes (not including endnotes or footnotes)
+\item[\texttt{novelty}] packages with little obvious application
+\item[\texttt{numbers}] formatting numbers, etc
+\item[\texttt{obscurity}] simple rotation or substitution ciphers
+\item[\texttt{obsolete}] package declared obsolete
+\item[\texttt{occitan}] support for typesetting Occitan
+\item[\texttt{off}] use of opentype font features
+\item[\texttt{omega}] Omega and packages that use it
+\item[\texttt{optics}] diagrams of optical systems
+\item[\texttt{optimise}] optimise part of a TeX system
+\item[\texttt{other-lang}] support for a language whose support is not otherwise catalogued
+\item[\texttt{outline}] document outlining tools
+\item[\texttt{package-devel}] support for package development
+\item[\texttt{package-doc}] markup for documenting package sources
+\item[\texttt{package-mgmt}] support for managing packages within documents
+\item[\texttt{package-supp}] support for other packages
+\item[\texttt{page-control}] select pages to be output, etc.
+\item[\texttt{page-hf}] page head- and foot-lines
+\item[\texttt{page-nos}] control sequence and typesettting of page numbers
+\item[\texttt{para-deco}] decorating paragraphs (lettrines, etc.)
+\item[\texttt{parallel}] parallel columns
+\item[\texttt{paren-mgmt}] match and otherwise manage parentheses
+\item[\texttt{parser}] parser application
+\item[\texttt{parshape}] non-standard paragraph shapes
+\item[\texttt{patent}] prepare a patent application
+\item[\texttt{pdf-feat}] access PDF features
+\item[\texttt{pdf-forms}] create pdf form fields, use form fields as an integral part of the package
+\item[\texttt{pdf-view}] view, or control viewing of, PDF
+\item[\texttt{pdfprocess}] process PDF files
+\item[\texttt{persian}] support for typesetting Persian
+\item[\texttt{persian-doc}] documentation in Persian
+\item[\texttt{pgf-tikz}] package uses PGF-TikZ
+\item[\texttt{philosophy}] support for typesetting philosophy
+\item[\texttt{phonetic}] support for phonetic notation
+\item[\texttt{physics}] support for typesetting physics documents
+\item[\texttt{piedmontese}] support for typesetting Piedmontese
+\item[\texttt{plain-ext}] extensions to Plain TeX for higher-level constructs
+\item[\texttt{plain-text}] derive plain text from a TeX document
+\item[\texttt{planning}] construct diagrams, etc., for planning
+\item[\texttt{polish}] support for typesetting Polish
+\item[\texttt{polish-doc}] documentation in Polish
+\item[\texttt{portuguese}] support for typesetting Portuguese
+\item[\texttt{portuguese-br}] support for typesetting Brazilian Portuguese
+\item[\texttt{portuguese-doc}] documentation in Portuguese
+\item[\texttt{poster}] typeset posters, etc.
+\item[\texttt{pre-release}] developing version of new software
+\item[\texttt{preamble-admin}] construction of a LaTeX document preamble
+\item[\texttt{prepress}] fine-tuning details of output, for printing
+\item[\texttt{preprocessor}] preprocesses source before using TeX
+\item[\texttt{presentation}] slides, beamers, handouts, etc.
+\item[\texttt{previewer}] application for viewing a typeset document on screen
+\item[\texttt{print-app}] application for printing documents
+\item[\texttt{probability}] typeset reports, etc., of probability
+\item[\texttt{production}] support for production printing, etc
+\item[\texttt{program-doc}] support for programming documentation
+\item[\texttt{project-mgmt}] TeX-related project management
+\item[\texttt{proof}] typeset proofs and proof diagrams
+\item[\texttt{proposal}] typeset proposals to funding bodies, etc
+\item[\texttt{protection}] manipulate the LaTeX ‘\textbackslash protect’ mechanism
+\item[\texttt{ps-manip}] manipulate Postscript files
+\item[\texttt{pseudocode}] typeset languages for expressing algorithms
+\item[\texttt{pstricks}] package using PStricks for graphical output
+\item[\texttt{psychology}] support for typesetting texts relating to psychology
+\item[\texttt{publicity}] press releases, etc
+\item[\texttt{publisher}] prepare documents for a specific publisher
+\item[\texttt{puzzle}] problems and puzzles, and their solutions
+\item[\texttt{qrcode}] typeset quick response codes
+\item[\texttt{quotation}] displayed text
+\item[\texttt{quotation-imp}] import text from other documents
+\item[\texttt{quotation-mgmt}] organisation of displayed text
+\item[\texttt{quote-marks}] manage (possibly language dependent) quote marks
+\item[\texttt{random}] generate and/or use pseudo-random numbers
+\item[\texttt{record-keep}] formatting material that constitutes records
+\item[\texttt{ref-latex}] LaTeX reference documents
+\item[\texttt{report-like}] regularly-formatted reports
+\item[\texttt{review-document}] document reviewing subjects relevant for TeX users
+\item[\texttt{romanian}] support for typesetting Romanian
+\item[\texttt{rotation}] rotate typeset objects on their page
+\item[\texttt{rule}] produce rules within a document
+\item[\texttt{russian}] support for typesetting Russian
+\item[\texttt{russian-doc}] documentation in Russian
+\item[\texttt{safety-notice}] risk and safety (etc.) notices
+\item[\texttt{samin}] support for typesetting samin
+\item[\texttt{sanskrit}] support for typesetting Sanskrit
+\item[\texttt{scientific-docs}] support for writers of scientific documents
+\item[\texttt{scottish}] support for typesetting Gaidhlig (Scottish Gaelic)
+\item[\texttt{security}] document security measures
+\item[\texttt{semproc}] typesetting seminar proceedings
+\item[\texttt{serbian}] documentation in, and support for typesetting Serbian
+\item[\texttt{shortcut}] shortcuts when typing
+\item[\texttt{simplified}] simplified markup
+\item[\texttt{slovak}] support for typesetting, and documentation in Slovak
+\item[\texttt{slovenian}] support for typesetting, and documentation in Slovenian
+\item[\texttt{somali}] support for typesetting Somali
+\item[\texttt{sorbian}] support for typesetting Sorbian
+\item[\texttt{spanish}] support for typesetting Spanish
+\item[\texttt{spanish-doc}] documentation in Spanish
+\item[\texttt{spec-alphabet}] specialised versions of alphabets
+\item[\texttt{spell}] TeX-aware spelling checker
+\item[\texttt{statistics}] typeset reports, diagrams, etc., of statistics
+\item[\texttt{std-conform}] support conformance to standards
+\item[\texttt{std-spec}] standards, or other normative documents, about TeX and friends
+\item[\texttt{string}] text string searches and manipulation
+\item[\texttt{struc-mkup}] structured markup
+\item[\texttt{subdocs}] include complete documents in other documents
+\item[\texttt{subfloat}] internal structure within a float
+\item[\texttt{subsup-pos}] position sub- and superscripts (left and right sides)
+\item[\texttt{swedish}] support for typesetting Swedish
+\item[\texttt{swiss}] typesetting as done in Switzerland
+\item[\texttt{symbol-supp}] manage symbols in a document
+\item[\texttt{synt-hlt}] highlight syntax of computer code, etc.
+\item[\texttt{syntax}] syntax of computer science constructs
+\item[\texttt{sys-supp}] os-level support facilities for TeX
+\item[\texttt{table}] table typesetting
+\item[\texttt{table-long}] typeset tables that may be too big for a page
+\item[\texttt{table-rule}] rules within tables
+\item[\texttt{tagged-pdf}] support for tagged pdf
+\item[\texttt{teaching}] support for teachers and teaching administrators
+\item[\texttt{test-bed}] environment for testing (La)TeX code
+\item[\texttt{test-dist}] proposed additions to other packages
+\item[\texttt{text-flow}] flow text round an insertion in the paragraph
+\item[\texttt{text-layout}] layout of text within paragraphs
+\item[\texttt{text-manip}] manipulate strings (typically in token lists)
+\item[\texttt{text-symbol}] symbols for use in text
+\item[\texttt{thai}] support for typesetting, and documentation in Thai
+\item[\texttt{theology}] typeset devotional texts and other material of interest to theologians
+\item[\texttt{tibetan}] support for typesetting Tibetan
+\item[\texttt{timetable}] schedules of operations, courses, etc.
+\item[\texttt{titlepage}] typesetting title pages for documents
+\item[\texttt{toc-etc}] deal with Tables of Contents, and of other such things
+\item[\texttt{translation}] translation of material from the archive, to another language
+\item[\texttt{tree}] mechanisms for drawing trees
+\item[\texttt{turkish}] documentation in, and support for typesetting Turkish
+\item[\texttt{turkmen}] documentation in, and support for typesetting Turkmen
+\item[\texttt{tut-cheat}] tutorial “cheat-sheet”
+\item[\texttt{tut-latex}] tutorial material for LaTeX
+\item[\texttt{tut-latex-prg}] tutorial material for LaTeX programming
+\item[\texttt{tut-plaintex}] tutorial material for Plain TeX
+\item[\texttt{tutorial}] tutorial material (general)
+\item[\texttt{typeset-grid}] typeset, snapping lines of text to a grid
+\item[\texttt{typeset-std}] typeset documents about standards, or the standards themselves
+\item[\texttt{typeset-tool}] tool supporting or evaluating typesetting,
+\item[\texttt{typesetting}] support for variations of typographic style
+\item[\texttt{typo-archaic}] typography to match ancient practices
+\item[\texttt{ukrainian}] documentation in, and support for typesetting Ukrainian
+\item[\texttt{uml}] support for Universal Modelling Language diagrams
+\item[\texttt{underline}] underlining/overlining text (including other decorations)
+\item[\texttt{unicode}] Unicode, material supporting it, and packages requiring it
+\item[\texttt{units}] uniform typesetting of units
+\item[\texttt{urdu}] support for typesetting Urdu
+\item[\texttt{use-lua}] package requires availability of lua
+\item[\texttt{use-luatex}] package will use LuaTeX facilities if available
+\item[\texttt{use-sample}] sample of use of macro collections, etc.
+\item[\texttt{use-xetex}] package will use XeTeX facilities if available
+\item[\texttt{utf8-adapt}] adaptation of existing packages to UTF-8 input
+\item[\texttt{verbatim}] verbatim typesetting, etc.
+\item[\texttt{verse}] typeset verse, etc.
+\item[\texttt{version-control}] version control details
+\item[\texttt{vietnamese}] support for typesetting of Vietnamese
+\item[\texttt{vietnamese-doc}] documentation in Vietnamese
+\item[\texttt{view-app}] application for viewing documents
+\item[\texttt{view-doc}] application for viewing documentation
+\item[\texttt{visual-supp}] support for typesetting with low-vision readers in mind
+\item[\texttt{watermark}] separate printing, under (or over) the page as a whole
+\item[\texttt{welsh}] support for typesetting Welsh
+\item[\texttt{word-count}] count the ‘words’ in a document
+\item[\texttt{word-proc}] dealing with word processors
+\item[\texttt{xetex}] XeTeX, material supporting it, and packages requiring it
+\end{labeling}
