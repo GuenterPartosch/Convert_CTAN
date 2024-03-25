@@ -1,6 +1,6 @@
 Examples (CTANLoad)
 ===================
-2022-02-18
+2023-06-13
 
 CTANLoad -h
 - help, show the options
@@ -25,11 +25,11 @@ CTANLoad -f -n 300 -t "^l3" -v
 - maximum number of download files                           [-n]
 
 CTANLoad -v -l
-- generate some special lists, and prepare files for CTANOut [-l]
+- generate some special lists, and prepare files for CTANLoad [-l]
 - verbose output                                             [-v]
 
 CTANLoad -v -l -c -stat
-- generate some special lists, and prepare files for CTANOut [-l]
+- generate some special lists, and prepare files for CTANLoad [-l]
 - verbose output                                             [-v]
 - with integrity check                                       [-c]
 - with statistics                                            [-stat]
@@ -90,6 +90,42 @@ CTANLoad -L "not free" -v -stat -A Greenwade -k latex209
     only packages with the author name template "Greenwade"  [-A]
     only packages with the key template "latex209"           [-k]
     verbose output          
+
+CTANLoad -y "2022|2023" -v -stat
+    only packages with year template "2022|2023"                      [-y]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+
+CTANLoad -y "2022|2023" -k "font|class" -v -stat..py	
+    only packages with year template "2022|2023"                      [-y]
+    only packages with the key template "font|class"                  [-k]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+
+CTANLoad -A "Voß|Oberdieck" -k "font|class" -y "2022|2023" -v -stat
+    only packages with the author name template "Voß|Oberdieck"       [-A]
+    only packages with year template "2022|2023"                      [-y]
+    only packages with the key template "font|class"                  [-k]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+
+CTANLoad -k "font|class" -A "Voß|Oberdieck" -y "2022|2023" -v -stat 
+    only packages with year template "2022|2023"                      [-y]
+    only packages with the key template "font|class"                  [-k]
+    only packages with the author name template "Voß|Oberdieck"       [-A]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+
+CTANLoad -y "2022|2023" -k "font|class"  -A "Voß|Oberdieck" -v -stat 
+    only packages with year template "2022|2023"                      [-y]
+    only packages with the key template "font|class"                  [-k]
+    only packages with the author name template "Voß|Oberdieck"       [-A]
+    with statistics and                                               [-stat]
+    verbose output                                                    [-v]
+
+
+
+
 
 
 Regular expressions

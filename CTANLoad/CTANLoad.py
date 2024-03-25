@@ -40,12 +40,23 @@ from threading import Thread       # handling of threads
 prg_name        = "CTANLoad.py"
 prg_author      = "Günter Partosch"
 prg_email       = "Guenter.Partosch@hrz.uni-giessen,de"
-prg_version     = "2.9.0"
-prg_date        = "2022-02-23"
+prg_version     = "2.17"
+prg_date        = "2023-07-05"
 prg_inst        = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
-
-operatingsys    = platform.system()
+ 
+operatingsys    = platform.system()        # actual operating system
 call            = sys.argv
+calledprogram   = sys.argv[0]              # name of called program
+act_programname = calledprogram.split("\\")[-1]
+parameters      = call[1:]                 # all parts of call (with the xception of the first)
+call[0]         = act_programname          # actual name (with path) of the called program
+
+empty           = ""
+no_tp           = 0                        # number of packages selected per topics
+no_ap           = 0                        # number of packages selected per author names
+no_np           = 0                        # number of packages selected per n<mes
+no_lp           = 0                        # number of packages selected per licenses
+no_ly           = 0                        # number of packages selected per years
 
 # ------------------------------------------------------------------
 # Texts for argparse and help
@@ -53,14 +64,15 @@ call            = sys.argv
 author_template_text  = "Author template for package XML files to be loaded"
 license_template_text = "License template for package XML files to be loaded"
 key_template_text     = "Key template for package XML files to be loaded"
-template_text         = "Name template for package XML files to be loaded"
+name_template_text    = "Name template for package XML files to be loaded"
+year_text             = "Template for output filtering on the base of years"
 
 author_text           = "Author of the program"
 version_text          = "Version of the program"
 output_text           = "Generic file name for output files"
 number_text           = "Maximum number of file downloads"
-direc_text            = "OS Directory for output files"
-program_text          = "Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut"
+direc_text            = "Directory for output files in the OS"
+program_text          = "Program loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut"
 
 verbose_text          = "Flag: Output is verbose."
 download_text         = "Flag: Downloads associated documentation files [PDF]."
@@ -78,12 +90,14 @@ lists_default            = False      # default for option -n    (special lists 
 number_default           = 250        # default for option -n    (maximum number of files to be loaded)
 output_name_default      = "all"      # default for option -o    (generic file name)
 statistics_default       = False      # default for option -stat (no statistics output)
-template_default         = ""         # default for option -t    (name template for file loading)
-author_template_default  = ""         # default for option -A    (author name template)
-license_template_default = ""         # default for option -L    (license name template)
-key_template_default     = ""         # default for option -k    (key template for file loading)
+name_template_default    = empty      # default for option -t    (name template for file loading)
+author_template_default  = empty      # default for option -A    (author name template)
+license_template_default = empty      # default for option -L    (license name template)
+key_template_default     = empty      # default for option -k    (key template for file loading)
+year_template_default    = """^[12][09][01289][0-9]$""" # default for year template (-y) [four digits]
 verbose_default          = False      # default for option -n    (output is not verbose)
 regenerate_default       = False      # default for option -r    (no regeneration)
+debugging_default        = False      # default for option -dbg  (debugging)
 
 act_direc           = "."        
 if operatingsys == "Windows":    
@@ -96,13 +110,15 @@ download            = None       # option -f    (no PDF download)
 integrity           = None       # option -c    (no integrity check)
 lists               = None       # option -n    (special lists are not generated)
 number              = 0          # option -n    (maximum number of files to be loaded)
-output_name         = ""         # option -o    (generic file name)
+output_name         = empty      # option -o    (generic file name)
 statistics          = None       # option -stat (no statistics output)
-template            = ""         # option -t    (name template for file loading)
-author_template     = ""         # option -A    (author name template)
-license_template    = ""         # option -L    (license name template)
-key_template        = ""         # option -k    (key template) 
+name_template       = empty      # option -t    (name template for file loading)
+author_template     = empty      # option -A    (author name template)
+license_template    = empty      # option -L    (license name template)
+key_template        = empty      # option -k    (key template) 
+year_template       = empty      # option -y    (year template)
 verbose             = None       # option -n    (output is not verbose)
+debugging           = None       # option -dbg  (debugging)
 
 # ------------------------------------------------------------------
 # Dictionaries
@@ -114,7 +130,8 @@ packages              = {}       # python dictionary: list of packages
 licenses              = {}       # python dictionary: list of licenses  
 packagetopics         = {}       # python dictionary: list of packages and their topics
 topics                = {}       # python dictionary: list of topics
-topicspackage         = {}       # python dictionary: list of topics and their packages
+topicspackages        = {}       # python dictionary: list of topics and their packages
+yearpackages          = {}       # python dictionary: list of years and their packagesauthorpackage_file
 XML_toc               = {}       # python dictionary: list of PDF files: XML_toc[href]=...PDF file
 PDF_toc               = {}       # python dictionary: list of PDF files: PDF_toc[lfn]=...package file
 all_XML_files         = ()       # list with all XML files
@@ -137,7 +154,7 @@ selected_packages_llp = set()    # python dictionary: list of packages with sele
 
 # 1st pickle file:
 #   name:      CTAN.pkl
-#   contains:  authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages, licensepackages
+#   contains:  authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages
 #
 # 2nd pickle file:
 #   name:      CTAN2.pkl
@@ -172,7 +189,7 @@ left                = 35         # width of labels in statistics
 ellipse             = " ..."     # abbreviate texts
 ok                  = None
 
-reset_text          = "Info: '{0}' reset to {1} (due to {2})"
+reset_text          = "[CTANLoad] Warning: '{0}' reset to {1} (due to {2})"
 exclusion           = ["authors.xml", "topics.xml", "packages.xml", "licenses.xml"]
 
 random.seed(time.time())         # seed for random number generation
@@ -243,10 +260,10 @@ parser.add_argument("-r", "--regenerate_pickle_files",     # Parameter -r/--rege
                     action  = "store_true",
                     default = regenerate_default)
 
-parser.add_argument("-t", "--template",                    # Parameter -t/--template
-                    help    = template_text + " - Default: " + "%(default)s",
-                    dest    = "template",
-                    default = template_default)
+parser.add_argument("-t", "--name_template",               # Parameter -t/--name_template
+                    help    = name_template_text + " - Default: " + "%(default)s",
+                    dest    = "name_template",
+                    default = name_template_default)
 
 parser.add_argument("-stat", "--statistics",               # Parameter -stat/--statistics
                     help    = statistics_text + " - Default: " + "%(default)s",
@@ -263,10 +280,20 @@ parser.add_argument("-V", "--version",                     # Parameter -V/--vers
                     action  = 'version',
                     version = '%(prog)s ' + prg_version + " (" + prg_date + ")")
 
+parser.add_argument("-y", "--year_template",               # Parameter -y/--year_template
+                    help    = year_text + " - Default: " + "%(default)s",
+                    dest    = "year_template",
+                    default = year_template_default)
+
+parser.add_argument("-dbg", "--debugging",                 # Parameter -dbg/--debugging
+                    help    = argparse.SUPPRESS,
+                    action  = "store_true",
+                    default = debugging_default)
+
 # ------------------------------------------------------------------
 # Getting parsed values
 
-args            = parser.parse_args()                      # all parameters of programm call
+args             = parser.parse_args()                     # all parameters of programm call
 
 author_template  = args.author_template                    # parameter -A
 license_template = args.license_template                   # parameter -L
@@ -277,9 +304,11 @@ key_template     = args.key_template                       # parameter -k
 lists            = args.lists                              # parameter -l
 number           = int(args.number)                        # parameter -n
 regenerate       = args.regenerate_pickle_files            # parameter -r
-statistics       = args.statistics                         # Parameter -stat
-template         = args.template                           # parameter -k
+statistics       = args.statistics                         # parameter -stat
+name_template    = args.name_template                      # parameter -k
 verbose          = args.verbose                            # parameter -v
+year_template    = args.year_template                      # parameter -y
+debugging        = args.debugging                          # parameter -dbg
 
 # ------------------------------------------------------------------
 # Correct OS directory name, test OS directory existence, and install OS directory
@@ -291,9 +320,9 @@ if not path.exists(direc):
     try:
         os.mkdir(direc)
     except OSError:
-        print ("- Warning: Creation of the directory '{0}' failed".format(direc))
+        print ("[CTANLoad] Warning: Creation of the directory '{0}' failed".format(direc))
     else:
-        print ("- Info: Successfully created the directory '{0}' ".format(direc))
+        print ("[CTANLoad] Info: Successfully created the directory '{0}' ".format(direc))
         
 output_name        = direc + args.output_name              # parameter -d
 
@@ -307,19 +336,23 @@ licensepackage_file = output_name + ".llp"                 # name of a the xyz.l
 # ------------------------------------------------------------------
 # special regular expressions
 
-p2           = re.compile(template)                        # regular expression based on parameter -t
+p2           = re.compile(name_template)                   # regular expression based on parameter -t
 p3           = re.compile("^[0-9]{10}-.+[.]pdf$")          # regular expression for local PDF file names
 p4           = re.compile("^.+[.]xml$")                    # regular expression for local XML file names
 p5           = re.compile(key_template)                    # regular expression for topics
 p6           = re.compile(author_template)                 # regular expression for author names
 p7           = re.compile(license_template)                # regular expression for licenses
+p9           = re.compile(year_template)                   # regular expression
+p10          = re.compile(year_template_default)           # regular expression based on -y
 
 
 #===================================================================
 # Auxiliary function
 
 def fold(s):                                               # Function fold: auxiliary function: shortens long option values for output
-    """auxiliary function: shortens long option values for output."""
+    """auxiliary function: shortens long option values for output.
+
+    Returns the folded paragraph s."""
     
     offset = 64 * " "
     maxlen = 70
@@ -343,8 +376,13 @@ def fold(s):                                               # Function fold: auxi
 # Functions for main part
 
 # ------------------------------------------------------------------
-def analyze_XML_file(file):                                        # Function analyze_XML_file(file): Analyzes a XML package file for documentation (PDF) files
-    """Analyzes a XML package file for documentation (PDF) files."""
+def analyze_XML_file(file):                                        # Function analyze_XML_file(file): Analyzes a XML package file
+                                                                   # for documentation (PDF) files
+    """Analyzes a XML package file for documentation (PDF) files.
+
+    Rewrites the global XML_toc and PDF_toc."""
+    
+    if debugging: print("+++analyze_XML_file")
 
     # analyze_XML_file --> dload_document_file
 
@@ -359,7 +397,7 @@ def analyze_XML_file(file):                                        # Function an
         onePackageRoot = onePackage.getroot()                      # get root
     except:                                                        # parsing not successfull
         if verbose:
-            print("------- Warning: local XML file for package '{0}' empty or not well-formed".format(file))
+            print("---- Warning: local XML file for package '{0}' empty or not well-formed".format(file))
         error = True
 
     if not error:
@@ -382,15 +420,20 @@ def analyze_XML_file(file):                                        # Function an
         f.close()                                                  # close the analyzed XML file
 
 # ------------------------------------------------------------------
-def call_check():                                                 # Function call_check: Processes all necessary steps for a integrity check
-    """Processes all necessary steps for a integrity check."""
+def call_check():                                                  # Function call_check: Processes all necessary steps for a integrity check
+    """Processes all necessary steps for a integrity check.
+
+    Rewrites the global PDF_toc, XML_toc, authors, licenses, packages, topics, 
+    topicspackages, packagetopics, number, counter, pdfcounter, yearpackages."""
+    
+    if debugging: print("+++call_check")
 
     # call_check --> get_PDF_files
     # call_check --> dload_topics
     # call_check --> dload_authors
     # call_check --> dload_licenses
     # call_check --> dload_packages
-    # call_check --> generate_topicspackage
+    # call_check --> generate_topicspackages
     # call_check --> generate_pickle1
     # call_check --> generate_lists
     # call_check --> check_integrity
@@ -401,15 +444,16 @@ def call_check():                                                 # Function cal
     global licenses
     global packages
     global topics
-    global topicspackage, packagetopics, number, counter, pdfcounter
+    global topicspackages, packagetopics, number, counter, pdfcounter, yearpackages
 
     get_PDF_files(direc)
     dload_topics()                                                # load the file topics.xml
     dload_authors()                                               # load the file authors.xml
     dload_licenses()                                              # load the file licenses.xml
     dload_packages()                                              # load the file packages.xml
-    generate_topicspackage()                                      # generates topicspackage, ...
-    thr3 = Thread(target=generate_pickle1)                        # dumps authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages, licensepackages
+    generate_topicspackages()                                     # generates topicspackages, ...
+    thr3 = Thread(target=generate_pickle1)                        # dumps authors, packages, topics, licenses, topicspackages, packagetopics,
+                                                                  # authorpackages, licensepackages, yearpackages
     thr3.start()
     thr3.join()
     
@@ -420,9 +464,15 @@ def call_check():                                                 # Function cal
         check_integrity()                                         #     when indicated: remove files or entries
 
 # ------------------------------------------------------------------
-def call_load():                                                  # Function call_load: Processes all steps for a complete ctanload call (without integrity check)
-    """Processes all steps for a complete ctanout call (withoutb integrity check)."""
+def call_load():                                                  # Function call_load: Processes all steps for a complete ctanload call
+                                                                  # (without integrity check)
+    """Processes all steps for a complete ctanout call (withoutb integrity check).
 
+    Rewrites the global PDF_toc, XML_toc, authors, licenses, packages, topics,
+    topicspackages, number, counter, pdfcounter, yearpackages, no_tp, no_ap, no_np, no_lp, no_ly."""
+    
+    if debugging: print("+++call_load")
+ 
     # call_load --> get_PDF_files
     # call_load --> dload_topics
     # call_load --> dload_authors
@@ -436,6 +486,7 @@ def call_load():                                                  # Function cal
     # call_load --> get_xyz_lpt
     # call_load --> get_xyz_lap
     # call_load --> get_xyz_llp
+    # call_load --> get_year_set
 
     global PDF_toc
     global XML_toc
@@ -443,7 +494,8 @@ def call_load():                                                  # Function cal
     global licenses
     global packages
     global topics
-    global topicspackage, number, counter, pdfcounter
+    global topicspackages, number, counter, pdfcounter, yearpackages
+    global no_tp, no_ap, no_np, no_lp, no_ly
     
     get_PDF_files(direc)
     load_XML_toc()
@@ -453,6 +505,7 @@ def call_load():                                                  # Function cal
     dload_authors()                                               # load the file authors.xml
     dload_licenses()                                              # load the file licenses.xml
     dload_packages()                                              # load the file packages.xml
+    generate_topicspackages()                                     # generates topicspackages, ...
 
     all_packages = set()                                          # initialize set
     for f in packages:
@@ -462,17 +515,20 @@ def call_load():                                                  # Function cal
     tmp_ap = all_packages.copy()                                  # initialize tmp_ap (authors)
     tmp_np = all_packages.copy()                                  # initialize tmp_np (names)
     tmp_lp = all_packages.copy()                                  # initialize tmp_lp (licenses)
+    tmp_ly = all_packages.copy()                                  # initialize tmp_ly (years)
 
-    if (template != template_default):
-        tmp_np = get_package_set()                                # analyze 'packages' for name templates
+    if (name_template != name_template_default):
+        tmp_np = get_package_set()                                # analyze 'packages' for name name templates
     if (key_template != key_template_default):
         tmp_tp = get_xyz_lpt()                                    # load xyz.lpt and analyze it for key templates
     if (author_template != author_template_default):
         tmp_ap = get_xyz_lap()                                    # load xyz.lap and analyze it for author templates
     if (license_template != license_template_default):
         tmp_lp = get_xyz_llp()                                    # load xyz.llp and analyze it for license templates
+    if (year_template != year_template_default):
+        tmp_ly = get_year_set()                                   # look for packages with the correct year templates
 
-    tmp_pp = tmp_tp & tmp_ap & tmp_np & tmp_lp                    # built an intersection
+    tmp_pp = tmp_tp & tmp_ap & tmp_np & tmp_lp & tmp_ly           # built an intersection
     if len(tmp_pp) == 0:
         if verbose:
             print("--- Warning: no correct XML file for any specified package found")
@@ -480,25 +536,36 @@ def call_load():                                                  # Function cal
     tmp_p  = sorted(tmp_pp)                                       # built an intersection
 
     dload_XML_files(tmp_p)                                        # load and processe all required XML files in series
+
+    no_tp = len(tmp_tp)
+    no_ap = len(tmp_ap)
+    no_np = len(tmp_np)
+    no_lp = len(tmp_lp)
+    no_ly = len(tmp_ly)
         
     thr1 = Thread(target=generate_pickle2)                        # dump XML_toc via pickle file via thread
     thr1.start()
     thr1.join()
-    generate_topicspackage()                                      # generates topicspackage, ...
+##    generate_topicspackages()                                     # generates topicspackages, ...
     thr2 = Thread(target=generate_pickle1)                        # dump some lists to pickle file
     thr2.start()
     thr2.join()
     
 # ------------------------------------------------------------------
 def call_plain():                                                 # Function call_plain: Processes all steps for a plain call
-    """Processes all steps for a plain call."""
+    """Processes all steps for a plain call.
+
+    Rewrtites the global PDF_toc, authors, licenses, packages, topics,
+    topicspackages, packagetopics, authorpackages, yearpackages."""
+    
+    if debugging: print("+++call_plain")
 
     # call_plain --> get_PDF_files
     # call_plain --> dload_topics
     # call_plain --> dload_authors
     # call_plain --> dload_licenses
     # call_plain --> dload_packages
-    # call_plain --> generate_topicspackage
+    # call_plain --> generate_topicspackages
     # call_plain --> generate_pickle1
     
     global PDF_toc
@@ -506,21 +573,26 @@ def call_plain():                                                 # Function cal
     global licenses
     global packages
     global topics
-    global topicspackage, packagetopics, authorpackages
+    global topicspackages, packagetopics, authorpackages, yearpackages
     
     get_PDF_files(direc)
     dload_topics()                                                # load the file topics.xml
     dload_authors()                                               # load the file authors.xml
     dload_licenses()                                              # load the file licenses.xml
     dload_packages()                                              # load the file packages.xml
-    generate_topicspackage()                                      # generate topicspackage, ...
-    thr3 = Thread(target=generate_pickle1)                        # dump authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages, licensepackages (via thread)
+    generate_topicspackages()                                     # generate topicspackages, ...
+    thr3 = Thread(target=generate_pickle1)                        # dump authors, packages, topics, licenses, topicspackages, packagetopics,
+                                                                  # authorpackages, licensepackages, yearpackages (via thread)
     thr3.start()
     thr3.join()
 
 # ------------------------------------------------------------------
 def check_integrity(always=False):                                # Function check_integrity(): Checks integrity (tests for inconsistencies)
-    """Checks integrity (tests for inconsistencies)."""
+    """Checks integrity (tests for inconsistencies).
+
+    Rewrites the global corrected, PDF_toc, noerror, ok."""
+    
+    if debugging: print("+++check_integrity")
 
     # check_integrity --> load_XML_toc
     # check_integrity --> generate_pickle2
@@ -605,8 +677,13 @@ def check_integrity(always=False):                                # Function che
         thr2.join()
 
 # ------------------------------------------------------------------
-def dload_authors():                                       # Function dload_authors(): Downloads XML file 'authors' from CTAN and generates dictionary 'authors'
-    """Downloads XML file 'authors' from CTAN and generates dictionary 'authors'."""
+def dload_authors():                                       # Function dload_authors():
+                                                           # Downloads XML file 'authors' from CTAN and generates dictionary 'authors'
+    """Downloads XML file 'authors' from CTAN and generates dictionary 'authors'.
+
+    Rewrites the global authors."""
+    
+    if debugging: print("+++dload_authors")
 
     global authors                                         # global Python dictionary with authors
 
@@ -626,7 +703,7 @@ def dload_authors():                                       # Function dload_auth
             authorsRoot  = authorsTree.getroot()           # get the root
 
             for child in authorsRoot:                      # all children
-                key   = ""                                 # defaults
+                key   = empty                              # defaults
                 id    = ""
                 fname = ""
                 gname = ""
@@ -643,15 +720,26 @@ def dload_authors():                                       # Function dload_auth
         except:                                            # parsing was not successfull
             if verbose:
                 print("--- Error: standard XML file '{0}' empty or not well-formed".format(file2))
-            sys.exit("- Error: programm terminated")
+            sys.exit("[CTANLoad] Error: programm terminated")
     except FileNotFoundError:                              # file not downloaded
         if verbose:
             print("--- Error: XML file '{0}' not downloaded".format(file))
-        sys.exit("- Error: programm terminated")           # program terminated
+        sys.exit("[CTANLoad] Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def dload_document_file(href, key, name):                  # Function dload_document_file(href, key, name): Downloads one information file (PDF) from CTAN
-    """Downloads one information file (PDF) from CTAN."""
+def dload_document_file(href, key, name):                  # Function dload_document_file(href, key, name):
+                                                           # Downloads one information file (PDF) from CTAN
+    """Downloads one information file (PDF) from CTAN.
+
+    Parameters:
+    href : URL of document
+    key  : key, direc, name build the name of the new document.
+    name :
+
+    Returns thde status of download.
+    Rewrites the global pdfcounter, pdfctrerr."""
+    
+    if debugging: print("+++dload_document_file")
     
     # to be improved
 
@@ -683,8 +771,13 @@ def dload_document_file(href, key, name):                  # Function dload_docu
     return noterror
 
 # ------------------------------------------------------------------
-def dload_licenses():                                      # Function dload_licenses: Downloads XML file 'licenses' from CTAN and generates dictionary 'licemses'
-    """Downloads XML file 'licenses' from CTAN and generates dictionary 'licemses'."""
+def dload_licenses():                                      # Function dload_licenses:
+                                                           # Downloads XML file 'licenses' from CTAN and generates dictionary 'licemses'
+    """Downloads XML file 'licenses' from CTAN and generates dictionary 'licemses'.
+
+    Rewrites the global licenses."""
+    
+    if debugging: print("+++dload_licenses")
 
     global licenses                                        # global Python dictionary with licenses
 
@@ -703,7 +796,7 @@ def dload_licenses():                                      # Function dload_lice
             licensesRoot   = licensesTree.getroot()        # get the root
 
             for child in licensesRoot:                     # all children in 'licenses'
-                key   = ""                                 # defaults
+                key   = empty                              # defaults
                 name  = ""
                 free  = ""
                 for attr in child.attrib:                  # three attributes: key, name, free
@@ -726,11 +819,16 @@ def dload_licenses():                                      # Function dload_lice
     except FileNotFoundError:                              # file not downloaded
         if verbose:
             print("--- Error: XML file '{0}' not downloaded".format(file))
-        sys.exit("- Error: programm terminated")           # program terminated
+        sys.exit("[CTANLoad] Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def dload_packages():                                      # Function dload_packages: Downloads XML file 'packages' from CTAN and generates dictionary 'packages'
-    """Downloads XML file 'packages' from CTAN and generates dictionary 'packages'."""
+def dload_packages():                                      # Function dload_packages:
+                                                           # Downloads XML file 'packages' from CTAN and generates dictionary 'packages'
+    """Downloads XML file 'packages' from CTAN and generates dictionary 'packages'.
+
+    Rewrites the global packages."""
+    
+    if debugging: print("+++dload_packages")
 
     global packages                                        # global Python dictionary with packages
 
@@ -749,7 +847,7 @@ def dload_packages():                                      # Function dload_pack
             packagesRoot = packagesTree.getroot()          # get the root
 
             for child in packagesRoot:                     # all children in 'packages'
-                key     = ""                               # defaults
+                key     = empty                            # defaults
                 name    = ""
                 caption = ""
                 for attr in child.attrib:                  # three attributes: key, name, caption
@@ -769,11 +867,16 @@ def dload_packages():                                      # Function dload_pack
     except FileNotFoundError:                              # file not downloaded
         if verbose:
             print("--- Error: XML file '" + file + "' not downloaded".format(file))
-        sys.exit("- Error: programm terminated")           # program terminated
+        sys.exit("[CTANLoad] Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
-def dload_topics():                                        # Function dload_topics(): Downloads XML file 'topics' from CTANB and generates dictionary 'topics'
-    """Downloads XML file 'topics' from CTAN and generates dictionary 'topics'."""
+def dload_topics():                                        # Function dload_topics(): Downloads XML file 'topics' from CTANB and generates
+                                                           # dictionary 'topics'
+    """Downloads XML file 'topics' from CTAN and generates dictionary 'topics'.
+
+    Rewrites the global topics."""
+    
+    if debugging: print("+++dload_topics")
 
     global topics                                          # global Python dictionary with topics
 
@@ -792,7 +895,7 @@ def dload_topics():                                        # Function dload_topi
             topicsRoot   = topicsTree.getroot()            # get the root
 
             for child in topicsRoot:                       # all children in 'topics'
-                key     = ""                               # defaults
+                key     = empty                            # defaults
                 name    = ""
                 details = ""
                 for attr in child.attrib:                  # two attributes: name, details
@@ -807,23 +910,28 @@ def dload_topics():                                        # Function dload_topi
             if verbose:
                 print("--- Error: standard XML file '{0}' empty or not well-formed".format(file))
             sys.exit("--- Error: programm terminated")
+        topics["norsk"] = "Nynorsk"                        # Emergency entry !!!!
     except FileNotFoundError:                              # file not downloaded
         if verbose:
             print("--- Error: '{0}' not downloaded".format(file))
-        sys.exit("- Error: programm terminated")           # program terminated
+        sys.exit("[CTANLoad] Error: programm terminated")           # program terminated
 
 # ------------------------------------------------------------------
 def dload_XML_files(p):                                            # Function dload_XML_files: Downloads XML package files
     """Downloads XML package files.
 
-    p: packages/selected_packages"""
+    p: packages a/o selected_packages
+
+    Rewrites the global topicspackages, number, counter, pdfcounter, yearpackages."""
+    
+    if debugging: print("+++dload_XML_files")
 
     # dload_XML_file --> analyze_XML_file
 
-    global topicspackage, number, counter, pdfcounter
+    global topicspackages, number, counter, pdfcounter, yearpackages
 
     for f in p:                                                    # all packages found in 'packages'
-        if p2.match(f) and (counter + pdfcounter < number):        # file name matches template
+        if p2.match(f) and (counter + pdfcounter < number):        # file name matches name_template
             counter = counter + 1
             callx   = call2 + f + parameter + direc + f + ext      # wget https://ctan.org/xml/2.0/pkg/xyz --no-check-certificate -O xyz.xml
 
@@ -844,10 +952,12 @@ def dload_XML_files(p):                                            # Function dl
 
 # ------------------------------------------------------------------
 def generate_lists():                                              # Function generate_lists: Generates some special files (with lists):
-                                                                   # xyz.loa (list of authors), xyz.lop (list of packages), xyz.lok (list of topics),
-                                                                   # xyz.lpt (list of topics and associated packages), xyz.lol file (list of licenses),
-                                                                   # xyz.lap file (list of authors and associated packages)
-                                                                   # xyz.llp file (list of licenses and associated packages)
+                                                                   # xyz.loa (list of authors), xyz.lop (list of packages),
+                                                                   # xyz.lok (list of topics),
+                                                                   # xyz.lpt (list of topics and associated packages),
+                                                                   # xyz.lol (list of licenses),
+                                                                   # xyz.lap (list of authors and associated packages)
+                                                                   # xyz.llp (list of licenses and associated packages)
     """Generates some special files (with lists):
     generates xyz.loa file (list of authors)
     generates xyz.lop file (list of packages)
@@ -856,6 +966,8 @@ def generate_lists():                                              # Function ge
     generates xyz.lpt file (list of topics and associated packages)
     generates xyz.lap file (list of authors and associated packages)
     generates xyz.llp file (list of licenses and associated packages)."""
+    
+    if debugging: print("+++generate_lists")
 
     # .................................................
     # generate xyz.loa file (list of authors)
@@ -915,8 +1027,8 @@ def generate_lists():                                              # Function ge
     lpt_file = output_name + ".lpt"
 
     lpt = open(lpt_file, encoding="utf-8", mode="w")              # open xyz.lpt file
-    for f in topicspackage:                                       # loop
-        lpt.write("('" + f + "', " + str(topicspackage[f]) + ")\n")
+    for f in topicspackages:                                       # loop
+        lpt.write("('" + f + "', " + str(topicspackages[f]) + ")\n")
 
     if verbose:
         print("--- Info: file '" + lpt_file + "' (list of topics and associated packages) generated")
@@ -950,9 +1062,12 @@ def generate_lists():                                              # Function ge
 
 # ------------------------------------------------------------------
 def generate_pickle1():                                           # Function generate_pickle1: pickle dump:
-                                                                  # actual authors, packages, licenses, topics, topicspackage, packagetopics, authorpackages, licensepackages
+                                                                  # actual authors, packages, licenses, topics, topicspackages, packagetopics,
+                                                                  # authorpackages, licensepackages, yearpackages
     """pickle dump: 
-    actual authors, packages, licenses, topics, topicspackage, packagetopics, licensepackages"""
+    actual authors, packages, licenses, topics, topicspackages, packagetopics, licensepackages, yearpackages"""
+    
+    if debugging: print("+++generate_pickle1")
 
     # authors: Python dictionary (sorted)
     #   each element: [author key]: <tuple with givenname and familyname>
@@ -966,7 +1081,7 @@ def generate_pickle1():                                           # Function gen
     # topics: Python dictionary (sorted)
     #   each element: [topics name]: <topics title>
     #
-    # topicspackage: Python dictionary (unsorted)
+    # topicspackages: Python dictionary (unsorted)
     #   each element: [topic key]: <list with package names>
     #
     # packagetopics: Python dictionary (sorted)
@@ -977,20 +1092,30 @@ def generate_pickle1():                                           # Function gen
     #
     # licensepackages: Python dictionary (mostly sorted)
     #   each element: [license key]: <list with package names>
+    #
+    # yearpackages: Python dictionary
+    #   each element: [year]: <list with package names>
 
     pickle_name1  = direc + pkl_file                              # path of the pickle file
-    pickle_file1  = open(pickle_name1, "bw")                      # open the pickle file
-    pickle_data1  = (authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages, licensepackages)
-    pickle.dump(pickle_data1, pickle_file1)                       # dump the data
-    pickle_file1.close()                                          # close the file
-    if verbose:
-        print("--- Info: pickle file '{0}' written".format(pickle_name1))
+    try:
+        pickle_file1  = open(pickle_name1, "bw")                  # open the pickle file
+        pickle_data1  = (authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages)
+        pickle.dump(pickle_data1, pickle_file1)                   # dump the data
+        pickle_file1.close()                                      # close the file
+        if verbose:
+            print("--- Info: pickle file '{0}' written".format(pickle_name1))
+    except:
+        if verbose:
+            print("--- Warning: pickle file '{0}' cannot be loaded a/o written".format(pickle_name1))
 
 # ------------------------------------------------------------------
-def generate_pickle2():                                           # Function generate_pickle2: pickle dump: actual XML_toc (list with download information files
+def generate_pickle2():                                           # Function generate_pickle2: pickle dump: actual XML_toc
+                                                                  # (list with download information files)
     """pickle dump:
-    needs actual XML_toc
+    needs actual XML_toc:
     XML_toc       : list with download information files"""
+    
+    if debugging: print("+++generate_pickle2")
 
     pickle_name2  = direc + pkl_file2
     try:
@@ -1005,34 +1130,43 @@ def generate_pickle2():                                           # Function gen
             print("--- Warning: pickle file '{0}' cannot be loaded a/o written".format(pickle_name2))
 
 # ------------------------------------------------------------------
-def generate_topicspackage():                                       # Function generate_topicspackage:
-                                                                    # Generates topicspackage, packagetopics, authorpackages, and licensepackages.
-    """Generates topicspackage, packagetopics, authorpackages, and licensepackages."""
+def generate_topicspackages():                                      # Function generate_topicspackages:
+                                                                    # Generates topicspackages, packagetopics, authorpackages, licensepackages,
+                                                                    # and yearpackages.
+    """Generates/rewrites topicspackages, packagetopics, authorpackages, licensepackages, and yearpackages."""
+    
+    if debugging: print("+++generate_topicspackages")
 
-    global topicspackage
+    global topicspackages
     global packagetopics
     global authorpackages
     global licensepackages
+    global yearpackages
 
-    for f in packages:                                              # all package XML files are loaded in series
+    yearpackages = {}
+
+    for f in packages:                                              # all package XML files are loaded (+ analyzed) in series
+        tmpyears = []                                               # initialize tmpyears
+        maxyears = '1970'                                           # # initialize maxyears
         try:                                                        # try to open and parse file
             fext = f + ext                                          # file name (with extension)
             ff = open(fext, encoding="utf-8", mode="r")
 
             try:
-                onePackage     = ET.parse(fext)                     # parse the XML file
+                onePackage     = ET.parse(fext)                     # parse one XML file
                 onePackageRoot = onePackage.getroot()               # get root
-                kk             = list(onePackageRoot.iter("keyval"))    # all keyval elements
-                aa             = list(onePackageRoot.iter("authorref")) # all authorref elements
-                ll             = list(onePackageRoot.iter("license"))   # all license elements
-                
+                kk             = list(onePackageRoot.iter("keyval"))    # all keyval elements in the XML file
+                aa             = list(onePackageRoot.iter("authorref")) # all authorref elements in the XML file
+                ll             = list(onePackageRoot.iter("license"))   # all license elements in the XML file
+                mm             = list(onePackageRoot.iter("version"))   # all version elements in the XML file
+                nn             = list(onePackageRoot.iter("copyright")) # all copyright elements in the XML file
 
-                for i in kk:                                        # in keyval: 1 attribute: value
-                    key = i.get("value", "")                        # attribute value
-                    if key in topicspackage:
-                        topicspackage[key].append(f)
+                for i in kk:                                        # in keyval: one attribute: value
+                    key = i.get("value", "")                        #   attribute value
+                    if key in topicspackages:
+                        topicspackages[key].append(f)
                     else:
-                        topicspackage[key] = [f]
+                        topicspackages[key] = [f]
 
                     if f in packagetopics:
                         packagetopics[f].append(key)
@@ -1040,10 +1174,10 @@ def generate_topicspackage():                                       # Function g
                         packagetopics[f] = [key]
 
                 for j in aa:                                        # in authorref: 4 attributes: givenname, familyname, key, id
-                    key1 = j.get("givenname", "")                   # attribute givenname
-                    key2 = j.get("familyname", "")                  # attribute familyname
-                    key3 = j.get("key", "")                         # attribute key
-                    key4 = j.get("id", "")                          # attribute id
+                    key1 = j.get("givenname", "")                   #   attribute givenname
+                    key2 = j.get("familyname", "")                  #   attribute familyname
+                    key3 = j.get("key", "")                         #   attribute key
+                    key4 = j.get("id", "")                          #   attribute id
                     if key4 != "":
                         key3 = key4
                     if key3 in authorpackages:
@@ -1051,26 +1185,63 @@ def generate_topicspackage():                                       # Function g
                     else:
                         authorpackages[key3] = [f]
 
-                for k in ll:
-                    key5 = k.get("type", "")
-                    key6 = k.get("free", "")
+                for k in ll:                                        # in license: 2 attributes: type, free
+                    key5 = k.get("type", "")                        #   attribute type
+                    key6 = k.get("free", "")                        #   attribute free
                     if key5 in licensepackages:
                         licensepackages[key5].append(f)
                     else:
                         licensepackages[key5] = [f]
+
+                for m in mm:                                        # in version: 2 attributes: date, number
+                    key7 = m.get("date", "")                        #   attribute date
+                    key8 = m.get("number", "")                      #   attribute number
+                    tmp7 = re.split("[-]", key7)
+                for x in tmp7:
+                    if p10.match(x):                                #   check: year matches "^[12][09][01289][0-9]$"
+                        if x in tmpyears:
+                            tmpyears.append(x)
+                        else:
+                            tmpyears = [x]
+
+                for n in nn:                                        # in copyright: 2 attributes: owner, year
+                    key9  = n.get("owner", "")                      #   attribute owner
+                    key10 = n.get("year", "")                       #   attribute year
+                    tmp10 = re.split("[, -]", key10)
+                for x in tmp10:
+                    if p10.match(x):                                #   check: year matches "^[12][09][01289][0-9]$"
+                        if x in tmpyears:
+                            tmpyears.append(x)
+                        else:
+                            tmpyears = [x]
+                            
+                if len(tmpyears) >= 1:
+                    maxyears = max(tmpyears)
+                
+                if maxyears in yearpackages:
+                    yearpackages[maxyears].append(f)
+                else:
+                    yearpackages[maxyears] = [f]
+               
             except:                                                 # parsing was not successfull
                 if verbose:
                     print("----- Warning: local XML file for package '{0}' empty or not well-formed".format(f))
-            ff.close()
+                ff.close()
         except FileNotFoundError:                                   # file not downloaded
             if verbose and integrity:
                 print("----- Warning: local XML file for package '" + f + "' not found".format(f))
     if verbose:
-        print("--- Info: packagetopics, topicspackage, authorpackage collected")
+        print("--- Info: packagetopics, topicspackages, authorpackage, yearpackages collected")
 
 # ------------------------------------------------------------------
-def get_xyz_lpt():                                                 # Function get_xyz_lpt: Loads and analyzes xyz.lpt for topic templates
-    """Loads and analyzes xyz.lpt for topic templates."""
+def get_xyz_lpt():                                                 # Function get_xyz_lpt: Loads and analyzes xyz.lpt for topic
+                                                                   # templates
+    """Loads and analyzes xyz.lpt for topic templates.
+
+    Returns a list of selected packages.
+    Rewrites the global number, counter, pdfcounter."""
+    
+    if debugging: print("+++get_xyz_lpt")
 
     global number, counter, pdfcounter
 
@@ -1078,13 +1249,13 @@ def get_xyz_lpt():                                                 # Function ge
         f = open(topicpackage_file, encoding="utf-8", mode="r")    # open file
         for line in f:
             top, pack=eval(line.strip())
-            if p5.match(top):                                      # collect packages with specified topics
+            if p5.match(top):                                      # collect packages with specified key_template
                 for g in pack:
                     selected_packages_lpt.add(g)
         f.close()                                                  # close file
     except IOError:
         if verbose:                                                # there is an error
-            print("- Error: local file '{0}' cannot be loaded; please call ctanload -l ... before".format(topicpackage_file))
+            print("[CTANLoad] Error: local file '{0}' cannot be loaded; please call ctanload -l ... before".format(topicpackage_file))
         sys.exit()                                                 # program terminates
     if len(selected_packages_lpt) == 0:
         if verbose:
@@ -1092,8 +1263,13 @@ def get_xyz_lpt():                                                 # Function ge
     return selected_packages_lpt
 
 # ------------------------------------------------------------------
-def get_xyz_llp():                                                 # Function get_xyz_llp: Loads and analyzes xyz.llp for liocense templates
-    """Loads and analyzes xyz.llp for liocense templates."""
+def get_xyz_llp():                                                 # Function get_xyz_llp: Loads and analyzes xyz.llp for liocense templates.
+    """Loads and analyzes xyz.llp for license templates.
+
+    Returns a list of selected packages.
+    Rewrites the global number, counter, pdfcounter."""
+    
+    if debugging: print("+++get_xyz_llp")
 
     global number, counter, pdfcounter
 
@@ -1113,7 +1289,7 @@ def get_xyz_llp():                                                 # Function ge
         f.close()                                                  # close file
     except IOError:
         if verbose:                                                # there is an error
-            print("- Error: local file '{0}' cannot be loaded; please call ctanload -l ... before".format(licensepackage_file))
+            print("[CTANLoad] Error: local file '{0}' cannot be loaded; please call ctanload -l ... before".format(licensepackage_file))
         sys.exit()                                                 # program terminates
     if len(selected_packages_llp) == 0:
         if verbose:
@@ -1121,8 +1297,13 @@ def get_xyz_llp():                                                 # Function ge
     return selected_packages_llp
 
 # ------------------------------------------------------------------
-def get_xyz_lap():                                                 # Function get_xyz_lap: Loads and analyzes xyz.lap for author templates
-    """Loads and analyzes xyz.lap for author templates."""
+def get_xyz_lap():                                                 # Function get_xyz_lap: Loads and analyzes xyz.lap for author templates.
+    """Loads and analyzes xyz.lap for author templates.
+
+    Returns a list of selected packages.
+    Rewrites the global number, counter, pdfcounter."""
+    
+    if debugging: print("+++get_xyz_lap")
 
     global number, counter, pdfcounter
 
@@ -1140,7 +1321,7 @@ def get_xyz_lap():                                                 # Function ge
         f.close()                                                  # close file
     except IOError:
         if verbose:                                                # there is an error
-            print("- Error: local file '{0}' cannot be loaded; please call ctanload -l ... before".format(authorpackage_file))
+            print("[CTANLoad] Error: local file '{0}' cannot be loaded; please call ctanload -l ... before".format(authorpackage_file))
         sys.exit()                                                 # program terminates
     if len(selected_packages_lap) == 0:
         if verbose:
@@ -1149,47 +1330,85 @@ def get_xyz_lap():                                                 # Function ge
 
 # ------------------------------------------------------------------
 def get_package_set():                                            # Function get_package_set: Analyzes dictionary 'packages' for name templates
-    """Analyzes dictionary 'packages' for name templates."""
+    """Analyzes dictionary 'packages' for name templates.
+
+    Returns a list of selected packages."""
+
+    if debugging: print("+++get_package_set")
     
     tmp = set()
-    for f in packages:
-        if p2.match(f):
+    for f in packages:                                            # loop over all the packages
+        if p2.match(f):                                           #    check: package name matches template
             tmp.add(f)
     if len(tmp) == 0:
         if verbose:
-            print("--- Warning: no package found which matches the specified {0} template '{1}'".format("name", template))
+            print("--- Warning: no package found which matches the specified {0} template '{1}'".format("name", name_template))
     return tmp
 
 # ------------------------------------------------------------------
-def get_PDF_files(d):                                             # Function get_PDF_files(d): Lists all PDF files in a specified OS directory
+def get_year_set():                                               # Function get_package_set: Analyzes dictionary 'yearpackages'
+                                                                  # for year templates.
+    """Analyzes dictionary 'yearpackages' for year templates.
+
+    Returns a list of yselected packages.
+    Rewrites the global yearpackages."""
+
+    if debugging: print("+++get_year_set")
+
+    global yearpackages
+    
+    tmp = set()
+    for f in yearpackages:                                        # loop over all the year-package correspondences
+        if p9.match(f):                                           #    check: year matches year_template
+            tmp2 = set(yearpackages[f])                              
+            tmp = tmp | tmp2
+    if len(tmp) == 0:
+        if verbose:
+            print("--- Warning: no package found which matches the specified {0} template '{1}'".format("year", year_template))
+    return tmp
+
+# ------------------------------------------------------------------
+def get_PDF_files(d):                                             # Function get_PDF_files(d): Lists all PDF files in a specified OS directory.
     """Lists all PDF files in the specified OS directory d.
 
-    d: directory"""
+    d: directory
+
+    Rewrites the global PDF_toc."""
+    
+    if debugging: print("+++get_PDF_files")
 
     global PDF_toc
 
     tmp  = os.listdir(d)                                          # get OS directory list
     tmp2 = {}
     for f in tmp:                                                 # all PDF files in current OS directory
-        if p3.match(f):                                           #    check: file name matches p3
-            tmp2[f] = ""                                          #    presets with empty string
+        if p3.match(f):                                           #    check: file name matches "^[0-9]{10}-.+[.]pdf$"
+            tmp2[f] = empty                                       #    presets with empty string
     PDF_toc = tmp2
 
 # ------------------------------------------------------------------
 def get_XML_files(d):                                             # Function get_XML_files: Lists all XML files in the current OS directory
-    """Lists all XML files in the current OS directory d"""
+    """Lists all XML files in the current OS directory d.
+
+    Returns a list of XML files."""
+    
+    if debugging: print("+++get_XML_files")
 
     tmp  = os.listdir(d)                                          # get OS directory list
     tmp2 = []
     
     for f in tmp:
-        if p4.match(f) and not f in exclusion:
+        if p4.match(f) and not f in exclusion:                    #   check: file name matches "^.+[.]xml$"
             tmp2.append(f)
     return tmp2
 
 # ------------------------------------------------------------------
 def load_XML_toc():                                                # Function load_XML_toc(): Loads pickle file 2 (which contains XML_toc)
-    """Loads pickle file 2 (which contains XML_toc)."""
+    """Loads pickle file 2 (which contains XML_toc).
+
+    Rewrites the global XML_toc."""
+    
+    if debugging: print("+++load_XML_toc")
 
     global XML_toc                                                 # global Python dictionary
 
@@ -1202,7 +1421,11 @@ def load_XML_toc():                                                # Function lo
 
 # ------------------------------------------------------------------
 def main():                                                        # Function main(): Main Function (calls the other functions)
-    """Main Function (calls the other functions)"""
+    """Main Function (calls the other functions)
+
+    Rewrites the global PDF_toc, download, lists, integrity, number, template, author_template, regenerate."""
+    
+    if debugging: print("+++main")
 
     # main --> call_plain
     # main --> call_check
@@ -1222,23 +1445,23 @@ def main():                                                        # Function ma
 
     starttotal  = time.time()                                       # begin of time measure
     startprocess= time.process_time()
-    reset_text  = "- Warning: '{0}' reset to {1} (due to {2})"
-    call[0]     = "CTANLoad.py"
+    reset_text  = "[CTANLoad] Warning: '{0}' reset to {1} (due to {2})"
 
-    n_bool    = template != template_default
+    n_bool    = name_template != name_template_default
     k_bool    = key_template != key_template_default
     a_bool    = author_template != author_template_default
     l_bool    = license_template != license_template_default
+    y_bool    = year_template != year_template_default
     i_bool    = integrity != integrity_default
     r_bool    = regenerate != regenerate_default
       
-    load      = n_bool or k_bool or a_bool or l_bool                # load 
+    load      = n_bool or k_bool or a_bool or l_bool or y_bool      # load 
     check     = (not load) and ((lists != lists_default) or i_bool) # check
     newpickle = (not load) and (not check) and r_bool               # newpickle
     plain     = (not load) and (not check) and (not newpickle)      # plain
     
     if verbose:
-        print("- Info: Program call:", call)
+        print("\n" + "[CTANLoad] Info: Program call:", call)
 
     if load:                                                        # load mode
         if (lists != lists_default):                                #     -l reset
@@ -1271,25 +1494,31 @@ def main():                                                        # Function ma
                 print(reset_text.format("-f", True, "'-r'"))
         
     if verbose:                                                     # output on terminal (options in call)
-        print("\n- Info: Program call (with more details): CTANLoad.py")    
+        print("\n" + "[CTANLoad] Info: Program call (with more details): CTANLoad.py")    
         if (download != download_default):                print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))
+        if (number != number_default):                    print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))
         if (lists != lists_default):                      print("  {0:5} {1:55}".format("-l", "(" + (lists_text + ")")[0:50] + ellipse))
         if (regenerate != regenerate_default):            print("  {0:5} {1:55}".format("-r", "(" + regenerate_text + ")"))
         if (statistics != statistics_default):            print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))
         if (integrity != integrity_default):              print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))
         if (verbose != verbose_default):                  print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))
-        if (direc != direc_default):                      print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
-        if (number != number_default):                    print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))
         if (output_name != direc + output_name_default):  print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))
-        if (template != template_default):                print("  {0:5} {2:55} {1}".format("-t", fold(template), "(" + template_text + ")"))
-        if (key_template != key_template_default):        print("  {0:5} {2:55} {1}".format("-k", fold(key_template), "(" + key_template_text + ")"))
-        if (author_template != author_template_default):  print("  {0:5} {2:55} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))
-        if (license_template != license_template_default):print("  {0:5} {2:55} {1}".format("-L", fold(license_template), "(" + license_template_text + ")"))
+        if (direc != direc_default):                      print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))
+
+        if (name_template != name_template_default):      print("  {0:5} {2:55} {1}".format("-t", fold(name_template),
+                                                                                            "(" + name_template_text + ")"))
+        if (key_template != key_template_default):        print("  {0:5} {2:55} {1}".format("-k", fold(key_template),
+                                                                                            "(" + key_template_text + ")"))
+        if (author_template != author_template_default):  print("  {0:5} {2:55} {1}".format("-A", fold(author_template),
+                                                                                            "(" + author_template_text + ")"))
+        if (license_template != license_template_default):print("  {0:5} {2:55} {1}".format("-L", fold(license_template),
+                                                                                            "(" + license_template_text + ")"))
+        if (year_template != year_template_default):      print("  {0:5} {2:55} {1}".format("-y", fold(year_template), "(" + year_text + ")"))
         print("\n")
 
     if plain:                                                       # Process all steps for a plain call.
         call_plain()
-    elif load:                                                      # Process all steps for a complete ctanout call (withoutb integrity check).
+    elif load:                                                      # Process all steps for a complete ctanload call (withoutb integrity check).
         call_load()
     elif check:                                                     # Process all necessary steps for a integrity check.
         call_check()
@@ -1297,43 +1526,50 @@ def main():                                                        # Function ma
         regenerate_pickle_files()
         check_integrity(always=True)
     else:
-        pass
+        pass                                                        # do nothing
 
     if verbose:
-        print("- Info: program successfully completed")
+        print("[CTANLoad] Info: program successfully completed")
 
     if statistics:                                                  # if statistics are to be output
+        pp = 5
         make_statistics()
 
         endtotal   = time.time()                                    # end of time measure
         endprocess = time.process_time()
         print("--")
-        print("total time: ".ljust(left + 1), round(endtotal-starttotal, rndg))
-        print("process time: ".ljust(left + 1), round(endprocess-startprocess, rndg))
+        print("total time (CTANLoad): ".ljust(left + 1), str(round(endtotal-starttotal, rndg)).rjust(pp))
+        print("process time (CTANLoad): ".ljust(left + 1), str(round(endprocess-startprocess, rndg)).rjust(pp))
 
 # ------------------------------------------------------------------
 def make_statistics():                                            # Function make_statistics(): Prints statistics on terminal
-    """Prints statistics on terminal."""
+    """Prints statistics on terminal.
+
+    Rewsrites the global counter, pdfcounter."""
+    
+    if debugging: print("+++make_statistics")
 
     global counter, pdfcounter
 
-    l         = left
+    l         = left + 1
     r         = 5
-    load      = (template != "")
+    load      = (name_template != "")
     nrXMLfile = 0
 
     XMLdir = os.listdir(direc)
-    for f in XMLdir:
-        if p4.match(f):
+    for f in XMLdir:                                              
+        if p4.match(f):                                           # check: XML file name matches "^.+[.]xml$"
             nrXMLfile += 1
 
     print("\nStatistics:")
     print("date/time:".ljust(l + 1), actDate, actTime)
+    print("program/version:".ljust(l + 1), prg_name, "/", prg_version, "\n")
+
     print("total number of authors on CTAN:".ljust(l), str(len(authors)).rjust(r))
     print("total number of topics on CTAN:".ljust(l), str(len(topics)).rjust(r))
     print("total number of packages on CTAN:".ljust(l), str(len(packages)).rjust(r))
     print("total number of licenses on CTAN:".ljust(l), str(len(licenses)).rjust(r))
-    if download:
+    if download or (counter > 0):
         print("number of downloaded XML files:".ljust(l), str(counter).rjust(r), "(in the actual session)")
         print("number of downloaded PDF files:".ljust(l), str(pdfcounter).rjust(r), "(in the actual session)")
         print("number of not downloaded PDF files:".ljust(l), str(pdfctrerr).rjust(r), "(in the actual session)")
@@ -1342,20 +1578,37 @@ def make_statistics():                                            # Function mak
     if integrity:
         print("number of corrected entries:".ljust(l), str(corrected).rjust(r), "(in the actual session)")
 
+    print(empty)
+    if name_template != name_template_default:
+        print("no. of packages (based on names):".ljust(l),    str(no_np).rjust(r))
+    if key_template != key_template_default:
+        print("no. of packages (based on keys):".ljust(l),   str(no_tp).rjust(r))
+    if license_template != license_template_default:
+        print("no. of packages (based on licenses):".ljust(l), str(no_lp).rjust(r))
+    if author_template != author_template_default:
+        print("no. of packages (based on authors):".ljust(l),  str(no_ap).rjust(r))
+    if year_template != year_template_default:
+        print("no. of packages (based on years):".ljust(l),    str(no_ly).rjust(r))
+
 # ------------------------------------------------------------------
 def regenerate_pickle_files():                                  # Function regenerate_pickle_files: Regenerates corrupted pickle files
-    """Regenerates corrupted pickle files."""
+    """Regenerates corrupted pickle files.
+
+    Rewrites CTAN1.pkl, CTAN2.pkl, XML_toc, PDF_toc, authors, packages, topics, licenses, topicspackages, packagetopics,
+    authorpackages, licensepackages, yearpackages."""
+    
+    if debugging: print("+++regenerate_pickle_files")
 
     global XML_toc
     global PDF_toc
-    global authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages, licensepackages
+    global authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages
 
     # generate_pickle_files --> get_PDF_files
     # generate_pickle_files --> dload_authors
     # generate_pickle_files --> dload_packages
     # generate_pickle_files --> dload_topics
     # generate_pickle_files --> dload_licenses
-    # generate_pickle_files --> generate_topicspackage
+    # generate_pickle_files --> generate_topicspackages
     # generate_pickle_files --> analyze_XML_file
     # generate_pickle_files --> generate_pickle2
     # generate_pickle_files --> generate_pickle1
@@ -1373,7 +1626,8 @@ def regenerate_pickle_files():                                  # Function regen
     dload_packages()                                              # load packages
     dload_topics()                                                # load topics
     dload_licenses()                                              # load licenses
-    generate_topicspackage()                                      # generate topicspackage, packagetopics, authorpackages, liocensepackages
+    generate_topicspackages()                                     # generate topicspackages, packagetopics, authorpackages, liocensepackages,
+                                                                  # yearpackages
     
     for f in get_XML_files(direc):
         if verbose:
@@ -1386,18 +1640,23 @@ def regenerate_pickle_files():                                  # Function regen
     
 # .................................................................
 # Regeneration of CTAN1.pkl
-# CTAN2.pkl needs authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages
+# CTAN1.pkl needs authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, yearpackages
 
     if verbose:
         print("--- Info: Regeneration of '{0}'".format(direc + pkl_file))
     
-    thr2 = Thread(target=generate_pickle1)                        # dump authors, packages, topics, licenses, topicspackage, packagetopics, authorpackages, licdensepackages into CTAN1.pkl
+    thr2 = Thread(target=generate_pickle1)                        # dump authors, packages, topics, licenses, topicspackages,
+                                                                  # packagetopics, authorpackages, licensepackages, yearpackages into CTAN1.pkl
     thr2.start()
     thr2.join()
     
 # ------------------------------------------------------------------
 def set_PDF_toc():                                                # set_PDF_toc: Fills PDF_toc on the basis of XML_Toc
-    """Fills PDF_toc on the basis of XML_toc."""
+    """Fills PDF_toc on the basis of XML_toc.
+
+    Rewrites the global PDF_toc, XML_toc."""
+    
+    if debugging: print("+++set_PDF_toc")
     
     global PDF_toc
     global XML_toc
@@ -1410,8 +1669,13 @@ def set_PDF_toc():                                                # set_PDF_toc:
             pass
 
 # ------------------------------------------------------------------
-def verify_PDF_files():                                           # Function verify_PDF_files: Checks actualized PDF_toc; deletes a PDF file if necessary
-    """Checks actualized PDF_toc; deletes a PDF file if necessary."""
+def verify_PDF_files():                                           # Function verify_PDF_files: Checks actualized PDF_toc;
+                                                                  # deletes a PDF file if necessary
+    """Checks actualized PDF_toc; deletes a PDF file if necessary.
+
+    Rewrites the global ok, PDF_toc, corrected."""
+    
+    if debugging: print("+++verify_PDF_files")
     
     global ok
     global PDF_toc
@@ -1424,8 +1688,8 @@ def verify_PDF_files():                                           # Function ver
             if verbose:
                 print("----- Warning: PDF file '{0}' without associated XML file".format(g))
             if os.path.isfile(g):                                 #    g is file
-                os.remove(g)                                      #         delete the PDF file (if it exists)
-                corrected += 1                                    #         number of corrections increased
+                os.remove(g)                                      #        delete the PDF file (if it exists)
+                corrected += 1                                    #        number of corrections increased
                 if verbose:
                     print("----- Warning: PDF file '{0}' in OS deleted".format(g))
         else:
@@ -1441,7 +1705,7 @@ if __name__ == "__main__":
     main()
 else:
     if verbose:
-        print("- Error: tried to use the program indirectly")
+        print("[CTANLoad] Error: tried to use the program indirectly")
 
 
 # ==================================================================
@@ -1451,12 +1715,12 @@ else:
 # - Fehler bei -r; es wird jedesmal CTAN.pkl neu gemacht (?)
 # - irgenein Fehler: crimsonpro fehlt c:\users\guent\documents\python\ctan
 # - neues feature: alle ungladenen Pakete laden (?)
-# - Auswahl nach Datum (?)
-# - später: get_CTAN_lap und get_CTAN_lpt umstellen auf direkte CTAN-Abfrage
+# - Auswahl nach Datum (-)
+# - später: get_CTAN_lap und get_CTAN_lpt umstellen auf direkte CTAN-Abfrage (?)
 # - neu machen: Funktionshierarchie, Beispiele, Übersicht über Meldungen
-
-# - Auswahl auch nach Autor? CTAN.lap oder authorpackages; for f in authorpackages: print(authors[f][1], authorpackages[f]) (x)
-# - Meldungen überarbeitet (x)
+# - aufgerufene Optionen normieren (?)
+# - Meldungen mit Signatur (x)
+# - kleine Fehler in get_year_set und get_package_set korrigiert (x)
 
 # ------------------------------------------------------------------
 # History
@@ -1510,10 +1774,20 @@ else:
 # 2.7.3  2022-02-04 functions renamed: get_CTAN_lap --> get_xyz_lap, get_CTAN_lpt --> get_xyz_lpt
 # 2.8.0  2022-02-16 new option -L; new section in argparse; new variables license_template_text, license_template_default, license_template
 # 2.8.1  2022-02-16 changes in generate_lists; creates xyz.llp
-# 2.8.2  2022-02-16 changes in generate_topicspackage; creates Python dictionary licensepackages
+# 2.8.2  2022-02-16 changes in generate_topicspackages; creates Python dictionary licensepackages
 # 2.8.3  2022-02-16 changes in generate_pickle1: CTAN.pkl extended: now with new component licensepackages
 # 2.8.4  2022-02-16 new function get_xyz_llp; loads and analyzes xyz.llp; allows license searching with title, shorttitle, and free/not free
-# 2.8.5  2022-02-17 changes in call_check, call_load, and main; respects license searching
+# 2.8.5  2022-02-17 changes in call_check, call_load, and main; respects license searching   
 # 2.8.6  2022-02-18 changes for -stat; changes in make_statistics
 # 2.8.7  2022-02-18 messages in get_xyz_lap, get_xyz_lpt, and get_xyz_llp changed
 # 2.9.0  2022-02-23 other messsages improved
+# 2.10   2022-06-11 messages revised
+# 2.11   2023-06-11 new option -y (filtering on the base of year templates
+# 2.11.1 2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
+# 2.11.2 2023-06-11 related changes in the statistics part (option -stat)
+# 2.12   2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
+# 2.13   2023-06-15 output on terminal changed
+# 2.14   2023-06-15 new option -dbg/--debugging: debugging mode enabled
+# 2.15   2023-06-26 some minor changes in statistics output
+# 2.16   2023-07-05 some messages with the signature [CTANLoad]
+# 2.17   2023-07-05 some minor errors in get_year_set and get_package_set corrected

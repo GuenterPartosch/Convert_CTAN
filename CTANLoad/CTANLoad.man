@@ -1,42 +1,32 @@
-usage: ctanload [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l]
-                [-L LICENSE_TEMPLATE] [-k KEY_TEMPLATE] [-n NUMBER]
-                [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat] [-v] [-V]
+usage: ctanload [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l] [-L LICENSE_TEMPLATE] [-k KEY_TEMPLATE] [-n NUMBER] [-o OUTPUT_NAME] [-r] [-t TEMPLATE] [-stat] [-v] [-V] [-y YEAR_TEMPLATE]
 
-Loads XLM and PDF documentation files from CTAN a/o generates some special
-lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.9.0
-(2022-02-23)]
+Program loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.14 (2023-06-15)]
 
 Optional parameters:
   -h, --help            show this help message and exit
   -a, --author          Author of the program
   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
-                        Author template for package XML files to be loaded -
-                        Default:
+                        Author template for package XML files to be loaded - Default:
   -c, --check_integrity
-                        Flag: Checks the integrity of the 2nd .pkl file. -
-                        Default: False
+                        Flag: Checks the integrity of the 2nd .pkl file. - Default: False
   -d DIREC, --directory DIREC
-                        OS Directory for output files - Default: .\
-  -f, --download_files  Flag: Downloads associated documentation files [PDF].
-                        - Default: False
-  -l, --lists           Flag: Generates some special lists and prepare files
-                        for CTANOut. - Default: False
+                        Directory for output files in the OS - Default: .\
+  -f, --download_files  Flag: Downloads associated documentation files [PDF]. - Default: False
+  -l, --lists           Flag: Generates some special lists and prepare files for CTANOut. - Default: False
   -L LICENSE_TEMPLATE, --license_template LICENSE_TEMPLATE
-                        License template for package XML files to be loaded -
-                        Default:
+                        License template for package XML files to be loaded - Default:
   -k KEY_TEMPLATE, --key_template KEY_TEMPLATE
-                        Key template for package XML files to be loaded -
-                        Default:
+                        Key template for package XML files to be loaded - Default:
   -n NUMBER, --number NUMBER
                         Maximum number of file downloads - Default: 250
   -o OUTPUT_NAME, --output OUTPUT_NAME
                         Generic file name for output files - Default: all
   -r, --regenerate_pickle_files
-                        Flag: Regenerates the two pickle files. - Default:
-                        False
+                        Flag: Regenerates the two pickle files. - Default: False
   -t TEMPLATE, --template TEMPLATE
-                        Name template for package XML files to be loaded -
-                        Default:
+                        Name template for package XML files to be loaded - Default:
   -stat, --statistics   Flag: Prints statistics. - Default: False
   -v, --verbose         Flag: Output is verbose. - Default: False
   -V, --version         Version of the program
+  -y YEAR_TEMPLATE, --year_template YEAR_TEMPLATE
+                        Template for output filtering on the base of years - Default: ^[12][09][01289][0-9]$

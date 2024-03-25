@@ -1,6 +1,6 @@
 Functions in CTANLoad.py
 ========================
-2022-02-17
+2023-06-13
 
 analyze_XML_file(file)    Analyzes a XML package file for documentation (PDF) files
 call_check()	          Processes all necessary steps for a integrity check
@@ -27,6 +27,7 @@ get_xyz_lpt():            Loads and analyzes xyz.lpt for topic templates<--
 get_PDF_files(d)	  Lists all PDF files in a specified OS directory
 get_XML_files(d)          Lists all XML files in the current OS directory
 get_package_set()         Analyzes dictionary 'packages' for name templates
+get_year_set()		  Analyzes dictionary 'yearpackages' for year templates.
 load_XML_toc()	          Loads pickle file 2 (which contains XML_toc)
 main()	                  Main Function (calls the other functions)
 make_statistics()	  Prints statistics on terminal
@@ -69,9 +70,10 @@ Hierarchy
                         --> dload_licenses
                         --> dload_packages
                         --> get_xyz_lap
-						--> get_xyz_lpt
+			--> get_xyz_lpt
                         --> get_xyz_llp
                         --> get_package_set
+			--> get_year_set
                         --> get_XML_files
                         --> load_XML_toc
                         --> set_PDF_toc

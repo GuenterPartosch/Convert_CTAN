@@ -1,6 +1,6 @@
 Changes (CTANLoad.py)
 =====================
-2022-02-23
+2023-07-06
 
 2.0.0  2019-10-01 completely revised
 2.0.1  2019-10-03 smaller changes: messages + command parsing
@@ -58,3 +58,13 @@ Changes (CTANLoad.py)
 2.8.6  2022-02-18 changes for -stat; changes in make_statistics
 2.8.7  2022-02-18 messages in get_xyz_lap, get_xyz_lpt, and get_xyz_llp changed
 2.9.0  2022-02-23 other messsages improved
+2.10   2022-06-11 messages revised
+2.11   2023-06-11 new option -y (filtering on the base of year templates
+2.11.1 2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
+2.11.2 2023-06-11 related changes in the statistics part (option -stat)
+2.12   2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
+2.13   2023-06-15 output on terminal changed
+2.14   2023-06-15 new option -dbg/--debugging: debugging mode enabled
+2.15   2023-06-26 some minor changes in statistics output
+2.16   2023-07-05 some messages with the signature [CTANLoad]
+2.17   2023-07-05 some minor errors in get_year_set and get_package_set corrected
