@@ -1,6 +1,6 @@
 % file: 'all.stat'
-% date: 2024-03-25
-% time: 08:08:05
+% date: 2024-08-15
+% time: 21:10:59
 % is called by 'all.tex'
 
 \minisec{Parameters and statistics}
@@ -9,11 +9,12 @@
 \begin{tabular}{lll}
 
 program name & \verb§CTANOut.py§\\
-program version &2.47 (2023-07-06)\\
+program version &2.58 (2024-02-28)\\
 program author &Günter Partosch\\\\
+program date &2024-02-28\\\\
 
-date of program execution &2024-03-25\\
-time of program execution &08:08:05\\\\
+date of program execution &2024-08-15\\
+time of program execution &21:10:59\\\\
 mode & \verb§LaTeX§\\
 special lists used\footnotemark{} &True\\
 skipped CTAN fields & \verb§[]§  (no fields skipped = default)\\
@@ -22,12 +23,12 @@ template for package names & \verb§^.+$§ (all packages = default)\\
 template for topics & \verb§^.+$§  (all topics = default)\\
 template for author names & \verb§^.+$§  (all authors = default)\\
 template for licenses & \verb§^.+$§  (all licenses = default)\\
-template for years & \verb§^[12][09][0-9][0-9]$§  (all years = default)\\\\
+template for years & \verb§^19[89][0-9]|§\verb§20[012][0-9]$§  (all years = default)\\\\
 
-number of authors, total on CTAN &  2976\\
-number of authors, cited here &  2906\\
-number of packages, total on CTAN &  6576\\
-number of packages, processed locally &  6575\\
+number of authors, total on CTAN &  3005\\
+number of authors, cited here &  2932\\
+number of packages, total on CTAN &  6625\\
+number of packages, processed locally &  6624\\
 number of topics, total on CTAN &   609\\
 number of topics, used here &   603\\
 number of licenses, total on CTAN &    67\\
