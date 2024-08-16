@@ -1,6 +1,6 @@
 Changes (CTZANOut)
 ==================
-2023-07-07
+2024-03-17
 
 1.75 2021-05-14 more types for -m
 1.76 2021-05-14 clean-up of variables
@@ -89,24 +89,24 @@ Changes (CTZANOut)
 1.160 2021-11-20 'year' in LaTeX/plain: "without year" if it is appropiate
 1.161 2021-11-21 for all modes: empty output for abstract/description corrected
 1.162 2021-11-28 greater parts of comment blocks moved to external text files
-2.0   2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
-2.1   2022-01-02 functions mod_backslash and mod_TeXchars removed
-2.2   2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
-2.3   2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
-2.4   2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
-2.5   2022-01-04 new function: mod_small (processing of <small> ...</small>)
-2.6   2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
-2.7   2022-01-06 nested <ol>/<ul> can be processed
-2.8   2022-01-07 left indentation of <li> (mode dependant)
-2.9   2022-01-09 new function gen_fold (folds content of <li>)
-2.10  2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
-2.11  2022-01-11 new language code "zn,ja"
-2.12  2022-01-26 texts for the -h option changed
-2.13  2022-01-28 left indentation for all modes tuned
-2.14  2022-01-28 additionally: output of date and time in statistics on output (-stat)
-2.15  2022-02-02 additional license information: now with free a/o not free
-2.16  2022-02-05 additional texts at the top of output files
-2.17  2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
+2.0     2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
+2.1     2022-01-02 functions mod_backslash and mod_TeXchars removed
+2.2     2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
+2.3     2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
+2.4     2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
+2.5     2022-01-04 new function: mod_small (processing of <small> ...</small>)
+2.6     2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
+2.7     2022-01-06 nested <ol>/<ul> can be processed
+2.8     2022-01-07 left indentation of <li> (mode dependant)
+2.9     2022-01-09 new function gen_fold (folds content of <li>)
+2.10    2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
+2.11    2022-01-11 new language code "zn,ja"
+2.12    2022-01-26 texts for the -h option changed
+2.13    2022-01-28 left indentation for all modes tuned
+2.14    2022-01-28 additionally: output of date and time in statistics on output (-stat)
+2.15    2022-02-02 additional license information: now with free a/o not free
+2.16    2022-02-05 additional texts at the top of output files
+2.17    2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
 2.18    2022-02-15 new option -L (selection of packages by licenses)
 2.18.1  2022-02-15 new variables: license_template_text, license_template_default, license_template (used by argparse); licensepackages
 2.18.2  2022-02-15 new section for specifying -L by argparse
@@ -154,4 +154,21 @@ Changes (CTZANOut)
 2.45    2023-06-26 some changes in statistics output
 2.46    2023-06-28 fold() changed to adjust protocoll output
 2.47    2023-07-06 xyz.lic, xyz.tap, xyz.tlp, xyz.top, xyz.xref now without any \index entry
+2.48    2023-07-07 variable year_default_template redefined
+2.49    2023-07-08 messages now with the signature [CTANOut]
+2.50    2023-07-08 \index entries in xyz.xref, xyz.lic, xyz.tlp removed
+2.51    2023-07-08 new concept for the handling of languages
+2.51.1  2023-07-08 new default language: nls
+2.51.2  2023-07-09 new concept for the language handling in documentation a/o descrpition
+2.51.3  2023-07-10 language \index entries in LaTeX mode improved
+2.51.4  2023-07-10 language \item entries in LaTeX mode improved
+2.51.5  2023-07-10 in RIS/plain/BibLaTeX mode: smaller errors in the output of documentation a/o description corrected
+2.52    2023-07-16 language en,ru now in languagecodes
+2.53    2023-07-28 output of -stat now with program date
+2.54    2024-02-18 new language codes: en,fr and es-pe
+2.55    2024-02-18 \inp ecaped to \\inp, Mik\TeX escaped to Mik\\TeX
+2.56    2024-02-18 "[\^s]+" changed to "r[\^]+"; "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]"
+2.57    2024-02-28 in make_tap: enable processing of "_" in author names
+2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
+
 

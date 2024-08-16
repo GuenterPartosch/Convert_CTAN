@@ -1,9 +1,29 @@
-#!/usr/bin/python3.8
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # please adjust these two lines if necessary
 
 # CTANOut.py (CTANout.py)
-# (C) Günter Partosch, 2019/2021/2022
+# (C) Günter Partosch, 2019/2021/2022/2023/2024
+
+# may be compiled by
+
+# (a) pyinstaller
+# pyinstaller --paths ... CTANLoad.py -F
+# --> provides CTANLoad.exe (Windows)
+# pyinstaller works under Linux in a similar way
+
+# (b) nuitka
+
+# (c) PyPy
+# is only suitable to a limited extent, as only a limited Python can be interpreted
+
+# --> provides CTANOut.exe (Windows) a/o CTANOut (Linux)
+
+# Requirements:
+# + operating system windows 10/11 or Linux (like Linux Mint or Ubuntu or Debian)
+# + wget a/o wget2 installed
+# + Python installation 3.10 or newer
+# + a series of Python modules (see the import instructions below)
 
 # see also CTANOut-changes.txt
 #          CTANOut-messages.txt
@@ -28,14 +48,15 @@ import platform                              # get OS informations
 import os                                    # OS relevant routines
 from os import path                          # path informations
 import codecs                                # needed for full UTF-8 output on stdout
+##import pyperclip3 as PC
 
 
 #===================================================================
 # Settings
 
 programname             = "CTANOut.py"
-programversion          = "2.47"
-programdate             = "2023-07-06"
+programversion          = "2.58"
+programdate             = "2024-02-28"
 programauthor           = "Günter Partosch"
 documentauthor          = "Developers and contributors for {\\TeX}, {\\LaTeX}, \\& Co"
 documentauthor_txt      = "Developers and contributors for TeX, LaTeX, & Co"
@@ -87,6 +108,7 @@ no_np                   = 0
 no_lp                   = 0
 no_ly                   = 0
 
+nls                     = "nls"                    # no language specified
 also_str                = empty                    # collects all also items for a package
 author_str              = empty                    # collecting authors of a package
 contact_str             = empty                    # collects contact information
@@ -94,7 +116,7 @@ copyright_str           = empty                    # collects all copyright item
 date_str                = empty                    # collects date information
 description_str         = empty                    # collects description content
 info_files              = []                       # default for each package: collection of local info files
-language_set            = {'en'}                   # default for each package: collection of language items
+language_set            = {nls}                    # default for each package: collection of language items
 level                   = empty                    # level of itemize/enumerate (<ol>, <ul>)
 license_str             = empty                    # collects all license items for a package
 notice                  = empty                    # collecting infos /RIS/BibLaTeX)
@@ -150,7 +172,7 @@ license_template_default = """^.+$"""              # default for option -L (lice
 name_template_default    = """^.+$"""              # default for file name template (-t) [at least one character]
 key_template_default     = """^.+$"""              # default for topic filter (-k) [at least one character]
 author_template_default  = """^.+$"""              # default for author name template (-A) [at least one character]
-year_template_default    = """^[12][09][0-9][0-9]$""" # default for year template (-y) [four digits]
+year_template_default    = """^19[89][0-9]|20[012][0-9]$""" # default for year template (-y) [four digits]
 btype_default            = "@online"               # default for BibLaTeX entry type (-b)
 skip_default             = "[]"                    # default for option -s
 skip_biblatex_default    = "[]"                    # default for option -sb
@@ -182,18 +204,19 @@ statistics              = None                     # variable for -stat
 verbose                 = None                     # variable for -v
 debugging               = None                     # variable for -dbg
 
-##filter_default          = key_template               # copy of key_template
-    
+   
 # ------------------------------------------------------------------
 # python dictionaries and lists
+# 2.54    2024-02-18 new language codes: en,fr and es-pe
 
 languagecodes   = {"af":"Afrikaans", "am":"Amharic", "ar":"Arabic", "ar-dz":"Arabic (Algeria)", "az":"Azerbaijani",
                    "be":"Belarusian", "bg":"Bulgarian", "bn":"Bengali", "br":"Breton", "bs":"Bosnian",
                    "bs-Cyrl":"Bosnian (Cyrillic)", "bs-Latn":"Bosniann (Latin)", "ca":"Catalan", "co":"Corsican", "cop":"Coptic",
                    "cs":"Czech", "cu":"Church Slavic", "cy":"Welsh", "da":"Danish", "de":"German", "de,en":"German + English",
                    "de-at":"German (Austria)", "de-chg":"Swiss High German", "de-de":"German (Germany)", "dsb":"Lower Sorbian",
-                   "el":"Greek", "en":"English", "en,ja":"English + Japanese", "en-gb":"English (Great britain)", "eo":"Esperanto",
-                   "es":"Spanish", "es-mx":"Spanish (Mexico)", "es-ve":"Spanish (Venezuela)", "et":"Estonian", "eu":"Basque",
+                   "el":"Greek", "en":"English", "en,fr":"English + French", "en,ja":"English + Japanese", 
+                   "en-gb":"English (Great britain)", "eo":"Esperanto", "es":"Spanish", "es-mx":"Spanish (Mexico)", 
+                   "es-pe":"Spanish (Peru)","es-ve":"Spanish (Venezuela)", "et":"Estonian", "eu":"Basque",
                    "fa":"Farsi", "fa":"Persian", "fa-ir":"Farsi (Iran)", "fi":"Finnish", "fo":"Faroese", "fr":"French",
                    "fr-ca":"French (Canada)", "fr-ch":"French (Switzerland)", "fr-lu":"French (Luxembourg)",
                    "fy":"Western Frisian", "ga":"Irish", "gd":"Gaelic, Scottish Gaelic", "gl":"Galician", "he":"Hebrew",
@@ -209,7 +232,7 @@ languagecodes   = {"af":"Afrikaans", "am":"Amharic", "ar":"Arabic", "ar-dz":"Ara
                    "sr-Cyrl":"Serbian (Cyrillic)", "sr-Latn":"Serbian (Latin)", "sr-sp":"Serbian (Serbia)", "sv":"Swedish",
                    "ta":"Tamil", "tg":"Tajik", "th":"Thai", "tk":"Turkmen", "tr":"Turkish", "uk":"Ukrainian", "ur":"Urdu",
                    "uz":"Uzbek", "vi":"Vietnamese", "yi":"Yiddish", "zh":"Chinese", "zh,en":"Chinese + English",
-                   "zh,ja":"Chinese + Japanese", "zh-cn":"Chinese (China)"} 
+                   "zh,ja":"Chinese + Japanese", "zh-cn":"Chinese (China)", "en,ru":"English + Russian", nls:"no language specified"} 
 
 usedTopics               = {}                      # Python dictionary:  collect used topics for all packages
 usedPackages             = []                      # python list:        collect used packages
@@ -219,7 +242,8 @@ usedLicenses             = {}                      # Python dictionary:  collect
 allauthoryears           = {}                      # Python dictionary:  each element: allauthoryears[(<author>,<year>] = <appendix>
 citation_keys            = {}                      # Python dictionary:  each element: citation_keys[package] = (<author>, <year>, <appendix>)
 
-XML_toc                  = {}                      # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)
+XML_toc                  = {}                      # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key,
+                                                   # plain PDF file name)
 packages                 = {}                      # python dictionary:  each element: <package key>:<tuple with package name and package title>
 topics                   = {}                      # python dictionary:  each element: <topics name>:<topics title>
 licenses                 = {}                      # python dictionary:  each element: <license key>:<license title>
@@ -435,9 +459,6 @@ if (skip_biblatex != skip_biblatex_default) and (mode != "BibLaTeX"):
     if verbose:                             # "- [CTANOut] Warning: '{0} {1}' changed to '{2}' (due to '{3}')"
         print(err_mode_text.format('-m', mode, '-m BibLaTeX', '-sb'))
     mode  = "BibLaTeX"                      #   mode is set to BibLaTeX if -sb is given
-##    if verbose:                             # "- [CTANOut] Warning: '{0} {1}' changed to '{2}' (due to '{3}')"
-##        print(err_mode_text.format('-b', btype, '-b @online', '-sb')) 
-##    btype = "@online"                       #   btype is reset
 
 if (btype != btype_default) and (mode != "BibLaTeX"): 
     if verbose:                             # "- [CTANOut] Warning: '{0} {1}' changed to '{2}' (due to '{3}')"
@@ -467,12 +488,14 @@ if not path.exists(direc):
 # ------------------------------------------------------------------
 # pre-compiled regular expressions (based on specified options)
 
+# Change: 2.56    2024-02-18 "[\^s]+" changed to "r[\^]+"
+
 p2  = re.compile(name_template)             # regular expression based on -t
 p3  = re.compile(key_template)              # regular expression based on -k
 p4  = re.compile("[- |.,a-z]")              # split a string to find year data
 p5  = re.compile(author_template)           # regular expression based on -A
 p6  = re.compile("^.+[.]xml$")              # regular expression for local XML file names
-p7  = re.compile("[\s]+")                   # regular expression: test of "white space"
+p7  = re.compile(r"[\s]+")                   # regular expression: test of "white space"
 p8  = re.compile("§§=([1-2][0-9]|[1-9])")   # regular expression: processing of "§§=xx"
 p9  = re.compile(license_template)          # regular expression based on -L
 p10 = re.compile(year_template)             # regular expression based on -y
@@ -501,6 +524,8 @@ if not no_files:
 # ------------------------------------------------------------------
 # Preambel for LaTeX output
 
+# Change: 2.55    2024-02-18 \inp ecaped to \\inp
+
 if mode in ["LaTeX"]:                       # only for LaTeX: package loading + font declaration
     usepkg  = """
 \\usepackage[silent]{fontspec}              % font specification
@@ -520,7 +545,7 @@ if mode in ["LaTeX"]:                       # only for LaTeX: package loading + 
 \\usepackage{makeidx}                        % index generation
 \\usepackage[colorlinks=true]{hyperref}      % hypertext structures
 
-\\newcommand{\inp}[1]{\\IfFileExists{#1}
+\\newcommand{\\inp}[1]{\\IfFileExists{#1}
             {\\input{#1}}{}}
 
 \\makeindex"""
@@ -545,20 +570,31 @@ english"""
 \\author{""" + documentauthor + """}
 \\date{\\today}\n"""
     
-    header       = "\n\\begin{{document}}\n \\pagestyle{{headings}}\n \\maketitle\n \\inp{{{0}.stat}}\n \\newpage\n".format(args.out_file)
+    header       = """
+\\begin{{document}}
+\\pagestyle{{headings}}
+\\maketitle
+\\inp{{{0}.stat}}
+\\newpage
+""".format(args.out_file)
     trailer      = empty
     if make_topics:                         # if option -mt is specified
-        trailer = trailer + "\n\\newpage\n\\appendix"   
+        trailer = trailer + """
+\\newpage
+\\appendix"""   
         trailer = trailer + "\n\\inp{" + args.out_file + ".top}"
         trailer = trailer + "\n\\inp{" + args.out_file + ".xref}"
         trailer = trailer + "\n\\inp{" + args.out_file + ".tap}"
         trailer = trailer + "\n\\inp{" + args.out_file + ".lic}"
         trailer = trailer + "\n\\inp{" + args.out_file + ".tlp}"
-    trailer = trailer + "\n\\printindex\n\\end{document}\n"
+    trailer = trailer + """
+\\printindex
+\\end{document}"""
 
 
 # ======================================================================
 # auxiliary functions
+
 
 # ------------------------------------------------------------------
 def bibfield_test(s, f):                                   # auxiliary function bibfield_test: output text is not empty and field is not be skipped
@@ -1056,6 +1092,8 @@ def authorref(k):                                 # function: processes element 
 
     Fetches the local attributes key, id, givenname, familyname, active.
     Rewrites the global authorexists, s_author, usedAuthors"""
+
+    # 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
     
     global authorexists                           # flag
     global s_author                               # string for Excel: authorref
@@ -1091,7 +1129,8 @@ def authorref(k):                                 # function: processes element 
         tmp = tmp + " (not active)"
 
     if mode in ["LaTeX"] and not no_files:        # LaTeX
-        out.write("\\item[author] {0}\n".format(tmp))
+        tmp2 = TeXchars(tmp2)
+        out.write("\\item[author] {0}\n".format(tmp2))
         out.write("\\index{{Author!{0}}}\n".format(tmp2)) 
     elif mode in ["RIS"] and not no_files:        # RIS
         out.write("AU  - " + tmp2 + "\n")
@@ -1191,6 +1230,8 @@ def copyrightT(k, p):                             # function: processes element 
     Fetches the emebedded attributes owner, year.
     Rewrites the global notice, copyright_str, s_copyright, year_str."""
 
+    # 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
+
     # copyrighT --> TeXchars
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
@@ -1213,6 +1254,7 @@ def copyrightT(k, p):                             # function: processes element 
     if mode in ["LaTeX"] and not no_files:        # LaTeX
         tmp = TeXchars(tmp)
         out.write("\\item[copyright] {0}\n".format(tmp))
+##        out.write("\\index{{Copyright!{0}}}\n".format(tmp)) 
     elif mode in ["RIS"]:                         # RIS
         if notice != empty:
             notice += ";\n" + blank * (ris_fieldwidth + 1) + "Copyright: " + tmp
@@ -1290,8 +1332,7 @@ def documentation(k):                             # function: processes element 
     
     details  = k.get("details", empty)            # get attribute details
     href     = k.get("href", empty)               # get attribute href
-    language = k.get("language", empty)           # get attribute language
-##    print("***documentation: details, language", details, language)
+    language = k.get("language", nls)             # get attribute language
 
     href2    = href.replace("ctan:/", ctanUrl2)
     p        = None
@@ -1304,20 +1345,15 @@ def documentation(k):                             # function: processes element 
         if language != empty:
             if verbose:
                 print("----- Warning: unknown language code '{0}' in '{1}'; ignored".format(language, "documentation"))
-##    print("***documentation: languagex", languagex)
 
     if languagex != empty:                        # gives <re.Match object; span=(18, 24), match='French'>, for instance
         p = re.search(languagecodes[language], details)
-##    print("***documentation: p", p)               
 
     if mode in ["LaTeX"] and not no_files:        # LaTeX
         details = TeXchars(details)
-        if languagex != empty:
-            out.write("\\index{{Language in description/documentation!{0}}}\n".format(languagecodes[language]))
         if p == None:                             #   no language found in details
-            out.write("\\item[documentation] {0} \\textit{{{1}}}: \\url{{{2}}}\n".format(languagex, details, href2))
+            out.write("\\item[documentation]  {0} \\textit{{{1}}}: \\url{{{2}}}\n".format(languagex, details, href2))
         else:
-            out.write("\\index{{Language in description/documentation!{0}}}\n".format(p.group()))
             out.write("\\item[documentation] \\textit{{{0}}}: \\url{{{1}}}\n".format(details, href2))
         if href in XML_toc:
             tmp    = XML_toc[href]
@@ -1333,7 +1369,7 @@ def documentation(k):                             # function: processes element 
                 fx     = os.path.abspath(one_if)
                 out.write("L1  - {0}\n".format(fx))
         if p == None:                             #   no language found in details
-            notice += ";\n" + blank * (ris_fieldwidth + 1) + "Documentation" + languagex + ": " + details + ": " + href2
+            notice += ";\n" + blank * (ris_fieldwidth + 1) + "Documentation " + languagex + ": " + details + ": " + href2
         else:
             notice += ";\n" + blank * (ris_fieldwidth + 1) + "Documentation" + ": " + details + ": " + href2
     elif mode in ["BibLaTeX"]:                    # BibLaTeX
@@ -1344,7 +1380,7 @@ def documentation(k):                             # function: processes element 
                 one_if     = tmp[1] + "-" + tmp[2]#   one info file
                 info_files += [one_if]
         if p == None:                             #   no language found in details
-            tmp = "Documentation{0}: {1}: {2}".format(languagex, details, href2)
+            tmp = "Documentation {0}: {1}: {2}".format(languagex, details, href2)
         else:
             tmp = "Documentation: {0}: {1}".format(details, href2)
             
@@ -1354,7 +1390,7 @@ def documentation(k):                             # function: processes element 
             notice = tmp
     elif mode in ["plain"] and not no_files:      # plain
         if p == None:                             #   no language found in details
-            out.write("\ndocumentation: ".ljust(labelwidth + 1) + details + languagex + ": " + href2)
+            out.write("\ndocumentation: ".ljust(labelwidth + 1) + details + blank + languagex + ": " + href2)
         else:
             out.write("\ndocumentation: ".ljust(labelwidth + 1) + details + ": " + href2)
         if href in XML_toc:
@@ -1599,8 +1635,8 @@ def first_lines():                                # function: creates the first 
         out.write("% contact       --> collected in 'userd'\n")
         out.write("% copyright     --> 'usera'; 'year' (if applicable)\n")
         out.write("% ctan          --> 'userc'\n")
-        out.write("% description   --> 'abstract'; collected in 'language' (if appliocable)\n")
-        out.write("% documentation --> embedded in 'note'; local download in 'file' (if applicable); collected in 'language' (if appliocable)\n")
+        out.write("% description   --> 'abstract'; collected in 'language' (if applicable)\n")
+        out.write("% documentation --> embedded in 'note'; local download in 'file' (if applicable); collected in 'language' (if applicable)\n")
         out.write("% home          --> 'usere'\n")
         out.write("% install       --> 'userf'\n")
         out.write("% keyval        --> collected in 'keywords'\n")
@@ -2199,8 +2235,8 @@ def main():                                       # function: Main function (cal
         endtotal   = time.time()
         endprocess = time.process_time()
         print("--")
-        print("total time (CTANOut): ".ljust(left + 3), str(round(endtotal-starttotal, 2)).rjust(pp))
-        print("process time (CTANOut): ".ljust(left + 3), str(round(endprocess-startprocess, 2)).rjust(pp))
+        print("total time (CTANOut): ".ljust(left + 3), str(round(endtotal-starttotal, 2)).rjust(pp), "s")
+        print("process time (CTANOut): ".ljust(left + 3), str(round(endprocess-startprocess, 2)).rjust(pp), "s")
 
 # ------------------------------------------------------------------
 def make_stat():                                  # function: generates statistics in the stat file (xyz.stat)
@@ -2230,7 +2266,8 @@ def make_stat():                                  # function: generates statisti
     stat.write("\n")
     stat.write("program name "                   + r"& \verb§" + str(programname) + r"§\\" + "\n")
     stat.write("program version "                + r"&" + programversion + " (" + programdate + r")\\"  "\n")
-    stat.write("program author "                 + r"&" + programauthor + r"\\\\"  "\n\n")
+    stat.write("program author "                 + r"&" + programauthor + r"\\\\"  "\n")
+    stat.write("program date "                   + r"&" + programdate + r"\\\\"  "\n\n")
 
     stat.write("date of program execution "      + r"&" + actDate + r"\\"  "\n")
     stat.write("time of program execution "      + r"&" + actTime + r"\\\\"  "\n")
@@ -2289,7 +2326,7 @@ def make_statistics():                            # function: Generates statisti
     # Statistics on terminal
     print("\nStatistics:")
     print("date/time:".ljust(l + 1), actDate, "/", actTime)
-    print("program/version:".ljust(l + 1), programname, "/", programversion)
+    print("program/version/date:".ljust(l + 1), programname, "/", programversion, "/", programdate)
     if not no_files:
         print("target format:".ljust(l + 1), mode)
         print("output file:".ljust(l + 1), direc + out_file, "\n")
@@ -2320,6 +2357,8 @@ def make_tap():                                   # function: Generates the tap 
     """Generates the tap (xyz.tap) file.
     (Authors/Packages cross-reference)"""
 
+    # 2.57    2024-02-28 Change in make_tap: enable processing of "_" in author names
+
     if debugging: print("+++make_tap")
 
     # Authors/Packages cross-reference
@@ -2341,8 +2380,8 @@ def make_tap():                                   # function: Generates the tap 
                 tmp2 = authors[f][1] + ", " + authors[f][0]
             else:
                 tmp2 = authors[f][0]
+            tmp2 = TeXchars(tmp2)
             tap.write("\\item[{0}] ".format(tmp2))
-##            tap.write("\\index{{Author!{0}}}".format(tmp2))
             tmp1 = authorpackages[f]
             package_no = 0
             for ff in tmp1:
@@ -2385,7 +2424,6 @@ def make_tlp():                                   # function: Generates the tlp 
     for f in licenses:                            # loop: all licenses
         if f in usedLicenses:                     # license is used?
             tlp.write("\\item[\\texttt{" + f + "}]")
-##            tlp.write("\\index{{License!" + f + "}}")
             tmp1 = licensepackages[f]             # get the packages for this license
             package_no = 0	
 			
@@ -2432,7 +2470,6 @@ def make_tops():                                  # function: Generates the tops
             tmp = topics[f]
             tmp = re.sub(r"\\", r"\\textbackslash ", tmp)
             tops.write("\\item[\\texttt{{{0}}}] {1}\n".format(f, tmp))
-##            tops.write("\\index{{Topic!{0}}}\n".format(f))
     tops.write(r"\end{labeling}" + "\n")
     tops.close()                                  # close file
     if verbose:
@@ -2466,7 +2503,6 @@ def make_lics():                                  # function: Generates the lics
             else:
                 tmp3 = "not free"
             lics.write("\\item[\\texttt{{{0}}}] {1} ({2})\n".format(f, tmp, tmp3))
-##            lics.write("\\index{{License!{0}}}\n".format(f))
     lics.write(r"\end{labeling}" + "\n")
     lics.close()                                  # close file
     if verbose:
@@ -2495,7 +2531,6 @@ def make_xref():                                  # function: Generates the xref
     for f in topics:                              # loop: all topics
         if f in usedTopics:                       # topic is used?
             xref.write("\\item[\\texttt{" + f + "}]")
-##            xref.write("\\index{{Topic!" + f + "}}")
             tmp1 = topicspackages[f]              # get the packages for this topic
             package_nr = 0
             for ff in tmp1:                       # loop: all packages with this topic
@@ -2525,6 +2560,8 @@ def miktex(k):                                    # function: processes element 
     Fetches the local attribute location.
     Rewrites the global notice, s_miktex."""
 
+    # Change: 2.55    2024-02-18 Mik\TeX escaped to Mik\\TeX
+
     # miktex --> TeXchars
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
@@ -2536,7 +2573,7 @@ def miktex(k):                                    # function: processes element 
 
     if mode in ["LaTeX"] and not no_files:                         # LaTeX
         tmp = TeXchars(location)
-        out.write("\\item[on Mik\TeX] \\texttt{{{0}}}\n".format(tmp))
+        out.write("\\item[on Mik\\TeX] \\texttt{{{0}}}\n".format(tmp))
     elif mode in ["RIS"]:                         # RIS
         if notice != empty:
             notice += ";\n" + blank * (ris_fieldwidth + 1) + "on MikTeX: " + location
@@ -2590,7 +2627,7 @@ def name(k):                                      # function: processes element 
 
 # ------------------------------------------------------------------
 def onepackage(s, t):                             # function: loads a package XML file and start parsing
-    """Loads a package XML file and start parsing.
+    """Loads a package XML file and starts parsing.
 
     s: package name
     t: current package date
@@ -2757,7 +2794,9 @@ def trailing(k, t, p):                            # function: last lines for the
 
     kw = []                                       # keywords
      
-    language_set.discard(empty)         
+    language_set.discard(empty)
+    if len(language_set) > 1:
+        language_set.discard(nls)
     lang      = sorted(list(language_set))
     lang_str  = empty                             # construct lang_str; used for Excel
     lang_str2 = empty                             # used for RIS, BibLaTeX
@@ -2793,11 +2832,13 @@ def trailing(k, t, p):                            # function: last lines for the
         else:
             act_year = year_default2
     if mode in ["LaTeX"] and not no_files:                         # LaTeX
-        out.write("\\item[language(s)] {0}\n".format(lang_str3))
+        out.write("\\item[language(s)] {0}\n".format(lang_str2))
+        for f in language_set:
+            out.write("\\index{{Language in description/documentation!{0}}}\n".format(languagecodes[f]))
         if (str(act_year) != empty) and (date_str == empty):       #   year
             out.write("\\item[year] {0}\n".format(act_year))
             out.write("\\index{Year!" + str(act_year) + "}\n")
-        out.write("\\item[last access] {0}\n".format(t))            #   date of last access
+        out.write("\\item[last access] {0}\n".format(t))           #   date of last access
         out.write(r"\end{labeling}" + "\n")
     elif mode in ["RIS"] and not no_files:                         # RIS
         if not authorexists:
@@ -2870,7 +2911,7 @@ def trailing(k, t, p):                            # function: last lines for the
 
     notice          = empty                         # re-initialize notice
     info_files      = []                            # re-initialize info_files
-    language_set    = {'en'}                        # re-initialize language_set
+    language_set    = {nls}                         # re-initialize language_set
     year            = empty                         # re-initialize year
     authorexists    = False                         # re-initialize authorexists
     year_str        = year_default                  # re-initialize year_str
@@ -2990,7 +3031,7 @@ def description(k, pp):                           # function: processes element 
 
     if debugging: print("+++version")
 
-    language = k.get("language", empty)           # get attribute language
+    language = k.get("language", nls)             # get attribute language
 
     if language in languagecodes:                 # convert language keys
         languagex = languagecodes[language]
@@ -3008,10 +3049,9 @@ def description(k, pp):                           # function: processes element 
     tmptext = TeXchars_restore(tmptext)           # restore changed characters
     tmptext = re.sub("[\n]+[ ]*[\n]+", "\n\n", tmptext)
 
-    if mode in ["LaTeX"] and not no_files:                         # LaTeX
+    if mode in ["LaTeX"] and not no_files:        # LaTeX
         if languagex != empty:
-            out.write("\\item[description] ({0})".format(languagex))
-            out.write("\\index{{Language in description/documentation!{0}}}\n".format(languagex))
+            out.write("\\item[description] ({0}) ".format(languagex))
         else:
             out.write("\\item[description] ")
     elif mode in ["RIS"] and not no_files:                         # RIS
@@ -3021,12 +3061,12 @@ def description(k, pp):                           # function: processes element 
             out.write("AB  - ")
     elif mode in ["plain"] and not no_files:                       # plain
         if languagex != empty:
-            out.write("\ndescription:".ljust(labelwidth + 1) + "(" + languagex + ")")
+            out.write("\ndescription:".ljust(labelwidth + 1) + "(" + languagex + ") ")
         else:
             out.write("\ndescription:".ljust(labelwidth + 1))
-    elif mode in ["BibLaTeX"]:                                     # BibLaTeX
+    elif mode in ["BibLaTeX"] and not no_files:                    # BibLaTeX
         if languagex != empty:
-            tmptext2 = "(" + languagex + ")"
+            tmptext2 = "(" + languagex + ") "
         else:
             tmptext2 = empty
         if not "abstract" in skip_biblatex:
@@ -3204,7 +3244,6 @@ def mod_br(k, pp):                            # function: processes element <br/
     if mode in ["LaTeX"]:                     # LaTeX / BibLaTeX
         k.text = "§§3§§3 "                    #   change embedded text
     elif mode in ["BibLaTeX"]:                # RIS / plain
-##        k.text = "§§3§§3 §§-§§=" + str(width) #   change embedded text
         k.text = "§§3§§3-"                    #   change embedded text
     elif mode in ["RIS", "plain"]:            # RIS / plain
         k.text = "§§-"                        #   change embedded text
@@ -3484,6 +3523,8 @@ def mod_TeXchars1(s):                                       # auxiliary function
 
     returns a changed string s."""
 
+    # change: 2.56    2024-02-18 "[\[] --> r"[\[]
+
     if debugging: print("+++mod_TeXchars1")
 
     # $ ---> \$   ---> 
@@ -3502,7 +3543,7 @@ def mod_TeXchars1(s):                                       # auxiliary function
     # } ---> §§2
 
     tmp = s
-    tmp = re.sub("[\[]", "[", tmp)                         # change [
+    tmp = re.sub(r"[\[]", "[", tmp)                         # change [
     tmp = re.sub("≥", "§§4>=§§4", tmp)                     # change ≥
     tmp = re.sub("≤", "§§4<=§§4", tmp)                     # change ≤
     tmp = re.sub("#", "§§3§§6", tmp)                       # change #
@@ -3512,7 +3553,7 @@ def mod_TeXchars1(s):                                       # auxiliary function
     tmp = re.sub("%", "§§3§§9", tmp)                       # change %
     tmp = re.sub("{", "§§1§§3textbraceleft§§2", tmp)       # change {
     tmp = re.sub("}", "§§1§§3textbraceright§§2", tmp)      # change }
-    tmp = re.sub("\^", "§§1§§3textasciicircum§§2", tmp)    # change ^
+    tmp = re.sub(r"[\^]", "§§1§§3textasciicircum§§2", tmp) # change ^
     tmp = re.sub("[$]", "§§3§§4", tmp)                     # change $
     tmp = re.sub(r"\\", "§§1§§3textbackslash§§2", tmp)     # change \
     tmp = re.sub("“", "``", tmp)                           # change	“
@@ -3529,6 +3570,8 @@ def mod_TeXchars2(s):                                      # auxiliary function:
 
     returns a changed string s."""
 
+    # Change: 2.56    2024-02-18 "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]
+
     if debugging: print("+++mod_TeXchars2")
 
     tmp = s
@@ -3539,7 +3582,7 @@ def mod_TeXchars2(s):                                      # auxiliary function:
     tmp = re.sub("&", "§§5", tmp)                          # change	&
     tmp = re.sub("#", "§§6", tmp)                          # change	#
     tmp = re.sub("_", "§§7", tmp)                          # change	_
-    tmp = re.sub("\^", "§§8", tmp)                         # change	^
+    tmp = re.sub(r"\^", "§§8", tmp)                        # change	^
     tmp = re.sub("%", "§§9", tmp)                          # change	%
     tmp = re.sub("~", "§§0", tmp)                          # change	~
     tmp = re.sub("“", "``", tmp)                           # change	“
@@ -3881,24 +3924,24 @@ else:
 # 1.160 2021-11-20 'year' in LaTeX/plain: "without year" if it is appropiate
 # 1.161 2021-11-21 for all modes: empty output for abstract/description corrected
 # 1.162 2021-11-28 greater parts of comment blocks moved to external text files
-# 2.0   2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
-# 2.1   2022-01-02 functions mod_backslash and mod_TeXchars removed
-# 2.2   2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
-# 2.3   2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
-# 2.4   2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
-# 2.5   2022-01-04 new function: mod_small (processing of <small> ...</small>)
-# 2.6   2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
-# 2.7   2022-01-06 nested <ol>/<ul> can be processed
-# 2.8   2022-01-07 left indentation of <li> (mode dependant)
-# 2.9   2022-01-09 new function gen_fold (folds content of <li>)
-# 2.10  2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
-# 2.11  2022-01-11 new language code "zn,ja"
-# 2.12  2022-01-26 texts for the -h option changed
-# 2.13  2022-01-28 left indentation for all modes tuned
-# 2.14  2022-01-28 additionally: output of date and time in statistics on output (-stat)
-# 2.15  2022-02-02 additional license information: now with free a/o not free
-# 2.16  2022-02-05 additional texts at the top of output files
-# 2.17  2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
+# 2.0     2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
+# 2.1     2022-01-02 functions mod_backslash and mod_TeXchars removed
+# 2.2     2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
+# 2.3     2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
+# 2.4     2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
+# 2.5     2022-01-04 new function: mod_small (processing of <small> ...</small>)
+# 2.6     2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
+# 2.7     2022-01-06 nested <ol>/<ul> can be processed
+# 2.8     2022-01-07 left indentation of <li> (mode dependant)
+# 2.9     2022-01-09 new function gen_fold (folds content of <li>)
+# 2.10    2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
+# 2.11    2022-01-11 new language code "zn,ja"
+# 2.12    2022-01-26 texts for the -h option changed
+# 2.13    2022-01-28 left indentation for all modes tuned
+# 2.14    2022-01-28 additionally: output of date and time in statistics on output (-stat)
+# 2.15    2022-02-02 additional license information: now with free a/o not free
+# 2.16    2022-02-05 additional texts at the top of output files
+# 2.17    2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
 # 2.18    2022-02-15 new option -L (selection of packages by licenses)
 # 2.18.1  2022-02-15 new variables: license_template_text, license_template_default, license_template (used by argparse); licensepackages
 # 2.18.2  2022-02-15 new section for specifying -L by argparse
@@ -3946,6 +3989,23 @@ else:
 # 2.45    2023-06-26 some changes in statistics output
 # 2.46    2023-06-28 fold() changed to adjust protocoll output
 # 2.47    2023-07-06 xyz.lic, xyz.tap, xyz.tlp, xyz.top, xyz.xref now without any \index entry
+# 2.48    2023-07-07 variable year_default_template redefined
+# 2.49    2023-07-08 messages now with the signature [CTANOut]
+# 2.50    2023-07-08 \index entries in xyz.xref, xyz.lic, xyz.tlp removed
+# 2.51    2023-07-08 new concept for the handling of languages
+# 2.51.1  2023-07-08 new default language: nls
+# 2.51.2  2023-07-09 new concept for the language handling in documentation a/o descrpition
+# 2.51.3  2023-07-10 language \index entries in LaTeX mode improved
+# 2.51.4  2023-07-10 language \item entries in LaTeX mode improved
+# 2.51.5  2023-07-10 in RIS/plain/BibLaTeX mode: smaller errors in the output of documentation a/o description corrected
+# 2.52    2023-07-16 language en,ru now in languagecodes
+# 2.53    2023-07-28 output of -stat now with program date
+# 2.54    2024-02-18 new language codes: en,fr and es-pe
+# 2.55    2024-02-18 \inp ecaped to \\inp, Mik\TeX escaped to Mik\\TeX
+# 2.56    2024-02-18 "[\^s]+" changed to "r[\^]+"; "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]"
+# 2.57    2024-02-28 in make_tap: enable processing of "_" in author names
+# 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
+
 
 # ------------------------------------------------------------------
 # Probleme/Ideen:
@@ -3964,12 +4024,18 @@ else:
 # - BibLaTeX: Probleme noch bei Mehrfach-related (laut jabref)
 # - Protokollausgabe der Aufrufparameter: Änderungen berücksichtigen?
 # - Fehler in @online{Tanguy2021: \\} ; (x)
+# - aufgerufene OPtionen normieren (nicht notwendig)
+
+# - korrigieren: URLs mit "+" laden (auch für andere unzulässige Zeichen)
+# - bestimmte Ergebnisse in die zwischenablage liefern?
+# - Konzept der <year>-Suche überdenken
+# - m=LaTeX: mehr Texte in """-"""-Notation (x)
 # - Aufstellung über die TeX-Zeichen-Konvertierungen (x)
 # - als Kommentar: Aufstellung der §§-Konstruktionen (x)
-
-# - aufgerufene OPtionen normieren (nicht notwendig)
-# - Meldungen mit Signatur (x)
-# - Index nicht aus den zusätzlich generierten Listen (x)
-# - Behandlung der Sprache in description und documentation überarbeiten
-# - m=LaTeX: mehr Texte in """-"""- Notation
-
+# - Zeitangaben mit Maßeinheit
+# - erneuern: Change-Liste, Manpage
+# - copyright im Index (-)
+# - Unzuzlänglichkeit bei LaTeX:  _ in <author>: Paket weiqi; Ms_yam;
+# - für BibLaTeX auch ?
+# - Text korrigieren: \footnotetext{special lists: topics/licinses and their explanation + topics/authors/licenses and related packages(cross-reference lists)}
+# - aall.tp, all.xref, all.tap, all.lic, all.tlp, all.stat mit Verweis auf LaTeX
