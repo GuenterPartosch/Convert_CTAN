@@ -18,5 +18,11 @@
 * [CTANLoad-messages.txt](./CTANLoad-messages.txt "messages in CTANLoad"):
    messages in CTANLoad 
 
-* [CTANLoad-modules.txt](./CTANLoad-modules.txt "modules used in CTANLoad"):
+* [CTANLoad-modules.txt](./CTANLoad-modules.txt "modules used in CTANLoad.py"):
    modules used in CTANLoad
+
+* [CTANLoad-changes.txt](./CTANLoad-changes.txt "changes in CTANLoad.py"):
+   changes in CTANLoad.py
+
+* [CTANLoad-functions.txt](./CTANLoad-functions.txt "functions in CTANLoad.py"):
+   functions in CTANLoad.py
