@@ -1,6 +1,6 @@
 Messages (CTANLoad)
 ===================
-2023-07-05
+2023-07-16
 
 Errors
 ------
@@ -22,7 +22,7 @@ Info: Regeneration of '<pickle file>'
 Info: Successfully created the directory '<OS directory>' 
 Info: XML file '<file>' downloaded ('<directory><file>.xml' on PC)
 Info: XML file for package '<package name>' downloaded ('<directory><file>.xml' on PC)
-Info: authors collected
+Info: authors downloaded
 Info: file '<.lap file>' (list of authors and associated packages) generated
 Info: file '<.llp file>' (list of licenses and associated packages) generated
 Info: file '<.loa file>' (list of authors) generated
@@ -31,14 +31,18 @@ Info: file '<.lol file>' (list of licenses) generated
 Info: file '<.lop file>' (list of packages) generated
 Info: file '<.lpt file>' (list of topics and associated packages) generated
 Info: integrity check
-Info: licenses collected
+Info: licenses downloaded
 Info: local XML file '<directory><local file name>'
 Info: no error with integrity check
-Info: packages collected
+Info: packages downloaded
 Info: packagetopics, topicspackages, authorpackage, yearpackages collected
 Info: pickle file '<pickle file>' written
 Info: program successfully completed
-Info: topics collected
+Info: summary: file not well-formed or empty: <XML file>
+Info: summary: inconsistencies with PDF files for : <package>
+Info: summary: package not found: <package>
+Info: summary: PDF could not be loaded: <PDF file>
+Info: topics downloaded
 Info: unique local file name: '<local file name>'
 
 Warnings

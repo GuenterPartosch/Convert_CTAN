@@ -1,6 +1,6 @@
 Modules (CTANLoad)
 ==================
-2022-03-05
+2024-03-17
 
 import argparse                    # parse arguments
 import os                          # delete a file on disk, for instance
@@ -14,3 +14,4 @@ import sys                         # system calls
 import time                        # used for random seed, time measurement
 import xml.etree.ElementTree as ET # XML processing
 from threading import Thread       # handling of threads
+import pyperclip3 as pc            # writing to clipboard

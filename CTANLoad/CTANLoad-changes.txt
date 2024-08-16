@@ -1,11 +1,11 @@
 Changes (CTANLoad.py)
 =====================
-2023-07-06
+2024-03-17
 
-2.0.0  2019-10-01 completely revised
+2.0    2019-10-01 completely revised
 2.0.1  2019-10-03 smaller changes: messages + command parsing
 2.0.2  2019-10-04 smaller changes: messages
-2.0.3  2019-11-26 smaller change: error message and parameter -n
+2.0.3  2019-11-26 smaller changes: error message and parameter -n
 2.0.4  2020-01-09 -c enhanced
 2.0.5  2020-01-12 some corrections
 2.0.6  2020-01-15 time measure
@@ -21,12 +21,15 @@ Changes (CTANLoad.py)
 2.0.16 2021-05-20 OS directory + separator improved
 2.0.17 2021-05-21 more details in verbose mode
 2.0.18 2021-05-23 OS directory name improved
-2.0.19 2021-05-24 OS directory handling improved (existance, installation) 
-2.1.0  2021-05-26 load licences, make corr. directory and file; expand CTAN.pkl
+2.0.19 2021-05-24 OS directory handling improved (existance, installation)
+
+2.1    2021-05-26 load licences, make corr. directory and file; expand CTAN.pkl
 2.1.1  2021-05-26 correction for not-existing keys in licenses.xml
-2.1.2  2021-06-07 smaller improvements in check_integrity
-2.2.0  2021-06-08 new approach in check_integrity
-2.3.0  2021-06-09 some funcion calls as threads
+2.1.2  2021-06-07 smaller improvements in check_integrity+ Zeitangaben mit Maßeinheit
+
+2.2    2021-06-08 new approach in check_integrity
+
+2.3    2021-06-09 some funcion calls as threads
 2.3.1  2021-06-12 auxiliary function fold: shorten long option values for output
 2.3.2  2021-06-14 messages classified: Warnings, Error, Info
 2.3.3  2021-06-14 str.format(...) used (if applicable); ellipses used to shorten some texts
@@ -35,36 +38,115 @@ Changes (CTANLoad.py)
 2.3.6  2021-06-18 new function verify_PDF_files: check actualized PDF_toc; delete a PDF file if necessary
 2.3.7  2021-06-19 main function more modularized; new functions call_plain, call_load, call_check
 2.3.8  2021-06-22 error corrections and improvements for the handling von PDF_toc and XML_toc
-2.4.0  2021-06-23 regeneration of pickle file enabled: new option -r; new functions regenerate_pickle_files and get_XML_files
+
+2.4    2021-06-23 regeneration of pickle file enabled: new option -r; new functions regenerate_pickle_files and get_XML_files
 2.4.1  2021-06-24 error handling in the check_integrity context changed
 2.4.2  2021-06-26 handling of -r changed
-2.5.0  2021-06-30 add. option -k; add. function get_CTAN_lpt (needs CTAN.lpt)
+
+2.5    2021-06-30 add. option -k; add. function get_CTAN_lpt (needs CTAN.lpt)
 2.5.1  2021-07-01 minor corrections
 2.5.2  2021-07-05 function fold restructured
 2.5.3  2021-07-06 pickle file 1 is generated, too
-2.6.0  2021-07-11 search of packages with author name template; new option -A; new function get_CTAN_lap (needs CTAN.lap)
+
+2.6    2021-07-11 search of packages with author name template; new option -A; new function get_CTAN_lap (needs CTAN.lap)
 2.6.1  2021-07-12 some corrections in the handling of -t / -k and -A
 2.6.2  2021-07-15 more corrections in the handling of -t / -k and -A
-2.7.0  2021-07-26 combined filtering new organized; new function get_package_set; 2 additional warning messages
+
+2.7    2021-07-26 combined filtering new organized; new function get_package_set; 2 additional warning messages
 2.7.1  2022-02-02 attribute free in licenses.xml; changes in dload_licenses
 2.7.2  2022-02-03 changes in get_CTAN_lap and get_CTAN_lpt; now on the basis of all.(lap, lpt); additional adjustments
 2.7.3  2022-02-04 functions renamed: get_CTAN_lap --> get_xyz_lap, get_CTAN_lpt --> get_xyz_lpt
-2.8.0  2022-02-16 new option -L; new section in argparse; new variables license_template_text, license_template_default, license_template
+
+2.8    2022-02-16 new option -L; new section in argparse; new variables license_template_text, license_template_default, license_template
 2.8.1  2022-02-16 changes in generate_lists; creates xyz.llp
-2.8.2  2022-02-16 changes in generate_topicspackage; creates Python dictionary licensepackages
+2.8.2  2022-02-16 changes in generate_topicspackages; creates Python dictionary licensepackages
 2.8.3  2022-02-16 changes in generate_pickle1: CTAN.pkl extended: now with new component licensepackages
 2.8.4  2022-02-16 new function get_xyz_llp; loads and analyzes xyz.llp; allows license searching with title, shorttitle, and free/not free
-2.8.5  2022-02-17 changes in call_check, call_load, and main; respects license searching
+2.8.5  2022-02-17 changes in call_check, call_load, and main; respects license searching   
 2.8.6  2022-02-18 changes for -stat; changes in make_statistics
 2.8.7  2022-02-18 messages in get_xyz_lap, get_xyz_lpt, and get_xyz_llp changed
-2.9.0  2022-02-23 other messsages improved
+
+2.9    2022-02-23 other messsages improved
+
 2.10   2022-06-11 messages revised
-2.11   2023-06-11 new option -y (filtering on the base of year templates
+
+2.11   2023-06-11 new option -y (filtering on the base of year templates)
 2.11.1 2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
 2.11.2 2023-06-11 related changes in the statistics part (option -stat)
+
 2.12   2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
 2.13   2023-06-15 output on terminal changed
 2.14   2023-06-15 new option -dbg/--debugging: debugging mode enabled
 2.15   2023-06-26 some minor changes in statistics output
 2.16   2023-07-05 some messages with the signature [CTANLoad]
 2.17   2023-07-05 some minor errors in get_year_set and get_package_set corrected
+2.18   2023-07-11 year_default_template renewed
+
+2.19   2023-07-11 file not found, not well formed, PDF notloaded
+2.19.1 2023-07-11 additionally in statistics: output of the lists file_not_found, not_well_formed, PDF_notloaded
+2.19.2 2023-07-11 therefore 3 new messages; 3 minor changes in messages
+2.19.3 2023-07-12 file_not_found, not_well_formed, PDF_notloaded now Python sets
+2.19.4 2023-07-16 test_clipboard() new: tests if there is file_not_found, not_well_formed or PDF_notloaded + generates a specific program call in clipboard
+
+2.20   2023-07-16 now new message, if -l is set: in the case of inconsistencies with PDF files
+2.21   2023-07-28 output of -stat now with program date
+2.23   2023-07-28 message "Info: summary: package not found" corrected and adjusted
+2.24   2024-03-04 wget processor and subprocess timeout now configurable
+
+2.25   2024-03-04 Function dload_authors revised
+2.25.1 2024-03-04 parameters for wget and subprocess reorganized
+2.25.2 2024-03-04 parameters for wget now in a list
+2.25.3 2024-03-04 subprocess.Popen replaced by subprocess.run
+2.25.4 2024-03-04 subprocess.run additionally with check=True, timeout=...
+2.25.5 2024-03-04 Exception handling extended
+
+2.26   2024-03-04 Function dload_licenses revised
+2.26.1 2024-03-04 parameters for wget and subprocess reorganized
+2.26.2 2024-03-04 parameters for wget now in a list
+2.26.3 2024-03-04 subprocess.Popen replaced by subprocess.run
+2.26.4 2024-03-04 subprocess.run additionally with check=True, timeout=...
+2.26.5 2024-03-04 Exception handling extended
+
+2.27   2024-03-04 Function dload_packages revised
+2.27.1 2024-03-04 parameters for wget and subprocess reorganized
+2.27.2 2024-03-04 parameters for wget now in a list
+2.27.3 2024-03-04 subprocess.Popen replaced by subprocess.run
+2.27.4 2024-03-04 subprocess.run additionally with check=True, timeout=...
+2.27.5 2024-03-04 Exception handling extended
+
+2.27   2024-03-04 Function dload_topics revised
+2.27.1 2024-03-04 parameters for wget and subprocess reorganized
+2.27.2 2024-03-04 parameters for wget now in a list
+2.27.3 2024-03-04 subprocess.Popen replaced by subprocess.run
+2.27.4 2024-03-04 subprocess.run additionally with check=True, timeout=...
+2.27.5 2024-03-04 Exception handling extended
+
+2,28   2024-03-04 in dload_document_file: PDF_XML now in global list
+2.29   2024-03-04 time specifications with unit s
+
+2.30   2024-03-04 Function dload_XML_files revised
+2.30.1 2024-03-04 parameters for wget and subprocess reorganized
+2.30.2 2024-03-04 parameters for wget now in a list
+2.30.3 2024-03-04 subprocess.Popen replaced by subprocess.run
+2.30.4 2024-03-04 subprocess.run additionally with check=True, timeout=...
+2.30.5 2024-03-04 Exception handling extended
+
+2.31   2024-03-04 Function dload_document_file revised
+2.31.1 2024-03-04 parameters for wget and subprocess reorganized
+2.31.2 2024-03-04 parameters for wget now in a list
+2.31.3 2024-03-04 subprocess.Popen replaced by subprocess.run
+2.31.4 2024-03-04 subprocess.run additionally with check=True, timeout=...
+2.31.5 2024-03-04 Exception handling extended
+
+2.32   2024-03-05 in analyze_XML_file: additions to the not_well_formed set corrected
+2.33   2024-03-05 test_clipboard() made more robust
+
+2.34   2024-03-13 dload_topics, dload_authors, dload_licenses, dload_packages revised
+2.34.1 2024-03-13 parameter -O and -P for wget corrected
+2.34.2 2024-03-13 exception handling revised
+
+2.35   2024-03-15 in dload_XML_files: parameter -O and -P for wget corrected
+2.36   2024-03-15 in analyze_XML_file: exception handling extended (parsing a XML file)
+2.37   2024-04-15 in dload_XML_files: exception handling revised (downloading a XML file)
+2.38   2024-03-15 in dload_document_file: parameter -O and -P for wget corrected
+2.39   2024-03-17 in dload_document_file: error in URL building corrected
