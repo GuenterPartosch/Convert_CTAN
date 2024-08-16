@@ -3,316 +3,15 @@
 # please adjust these two lines if necessary
 
 # CTANLoad+Out.py
-# (C) Günter Partosch, 2021
+# (C) Günter Partosch, 2021/2022/2023
 
-# Problems/Plans:
-# + prüfen, ob ctanload -l -c aufgerufen werden muss (wenn CTANOut folgt)
-# + ist -c gefährlich?
+# see also CTANLoad+Out-changes.txt
+#          CTANLoad+Out-messages.txt
+#          CTANLoad+Out.man
+#          CTANLoad+Out-examples.txt
+#          CTANLoad+Out-modules.txt
+#          CTAN-files.txt
 
-# ------------------------------------------------------------------
-# History:
-
-# 0.1  2021-05-01 start
-# 0.9  2021-05-04 first working version
-# 1.0  2021-05-24 program completed
-# 1.1  2021-05-28 compilation enabled
-# 1.2  2021-05-31 some improvements (calls, compilation)
-# 1.3  2021-06-12 auxiliary function fold: shorten long option values for output
-# 1.4  2021-06-20 some smaller errors/deficiencies corrected
-# 1.5  2021-06-23 error correction
-# 1.6  2021-06-24 adaption for the CTANLoad option -r
-# 1.7  2021-06-25 some new handling of subprocesses
-# 1.8  2021-06-25 transfer of options to CTANLoad (Regeneration) improved; handling of -r improved
-# 1.9  2021-07-01 adaption of the option -k (CTANLoad); new options -ko and -kl
-# 1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove specified temporary LaTeX files
-# 1.11 2021-07-05 function fold restructured
-# 1.12 2021-07-06 new error message: tried to use the program indirectly
-# 1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced
-# 1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
-# 1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
-# 1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
-# 1.17 2021-07-18 output (listing of program options) enhanced
-# 1.18 2021-07-18 xyz.tex and all other LaTeX relevant files before compilation a/o -mt deleted
-# 1.19 2021-07-19 there is no compilation if -A a/o -k a/o -t results "no packages found"
-# 1.20 2021-07-19 -mo now prevents loading by CTANLoad
-
-# ------------------------------------------------------------------
-# Messages (CTANLoad+Out)
-# 
-# Fatal error:
-# Error: Error in <step>
-# Error: tried to use the program indirectly
-#
-# Information:
-# Info: <step> OK
-# Info: Call: <call>
-# Info: <step> to be executed
-# Info: <step>
-# Info: more information in '<log file>'
-# Info: result in '<file>'
-#
-# Warning:
-# Warning: LaTeX file '<file>' does not exist
-# Warning: LaTeX file '<file>' removed
-# Warning: file '<file>' removed
- 
-# ------------------------------------------------------------------
-# Functions in CTANLoad+Out.py
-
-# fold(s)                      auxiliary function shorten long option value text for output
-# func_call_check()            CTANLoad (Check) is processed.
-# func_call_compile()          Compile the generated LaTeX file.
-# func_call_load()             CTANLoad is processed.      
-# func_call_output()           CTANOut is processed.
-# func_call_regeneration()     CTANLoad (Regeneration) is processed.
-# head()                       show the given options
-# main()                       main function
-# remove_LaTeX_file(t)         auxiliary function; remove some temporary LaTeX files
-
-# ------------------------------------------------------------------
-# Examples (CTANLoad+Out)
-# 
-# CTANLoad+Out -r
-#   + regeneration of the 2 pickle files                                           [-r]
-#   + a lot of new PDF files
-#   + results in CTAN.pkl and CTAN2.pkl
-#   + without statistics
-#   + not verbose
-# 
-# CTANLoad+Out -r -v -stat
-#   + regeneration of the 2 pickle files                                           [-r]
-#   + a lot of new PDF files
-#   + results in CTAN.pkl and CTAN2.pkl
-#   + with statistics                                                              [-stat]
-#   + verbose                                                                      [-v]
-# 
-# CTANLoad+Out -l
-#   + CTAN.pkl rewritten
-#   + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten               [-l]
-#   + without statistics
-#   + not verbose
-# 
-# CTANLoad+Out -l -v -stat
-#   + CTAN.pkl rewritten
-#   + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten               [-l]
-#   + with statistics
-#   + verbose                                                                      [-v]
-# 
-# CTANLoad+Out -mt -p
-#   + no XML/PDF file from CTAN is downloaded
-#   + 1st step:
-#   + all XML/PDF files in the current directory are processed
-#   + output format is LaTeX (implicitely)                                         [-mt]
-#   + temporary output file is all.tex
-#   + all.top,  all.xref, all.tap are generated (will be included in all.tex)      [-mt]
-#   + 2nd step:
-#   + all.tex is completely compiled                                     [-p]
-#   + output file is all.pdf
-#   + without statistics
-#   + not verbose
-# 
-# CTANLoad+Out -mt -m latex -p -v -stat
-#   + no XML/PDF file from CTAN is downloaded
-#   + 1st step:
-#   + all XML files in the current directory are processed
-#   + output format is LaTeX                                                       [-m]
-#   + temporary output file is all.tex
-#   + all.top,  all.xref, all.tap are generated (will be included in all.tex)      [-mt]
-#   + 2nd step:
-#   + all.tex is completely compiled                                               [-p]
-#   + output file is all.pdf
-#   + with statistics                                                              [-stat]
-#   + verbose                                                                      [-v]
-# 
-# CTANLoad+Out -to latex -m bib -v -stat
-#   + no XML/PDF file from CTAN is downloaded
-#   + all local XML fies which match the name template "latex" are processed       [-to]
-#   + output format is BibLaTeX
-#   + output file is all.bib                                                       [-m]
-#   + with statistics                                                              [-stat]
-#   + verbose                                                                      [-v]
-# 
-# CTANLoad+Out -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
-#   + 1st step:
-#   + XML file with the name template "latex|ltx|l3|lt3" are downloaded from CTAN        [-t]
-#   + associated PDF files are downloaded, too                                           [-f]
-#   + 2nd step:
-#   + all local XML files which match the name template "latex|ltx|l3|lt3" are processed [-t]
-#   + all.top, all.xref, all.tap are generated (will be included in all.tex)             [-mt]
-#   + output format is LaTeX                                                             [-m]
-#   + output file is all.tex
-#   + with statistics                                                                    [-stat]
-#   + verbose                                                                            [-v]
-# 
-# CTANLoad+Out -t pgf -l -c -mt -p -v -stat
-#   + 1st step:
-#   + XML file with the name template "pgf" are downloaded from CTAN              [-t]
-#   + 2nd step:
-#   + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten              [-l]
-#   + a consistency check is done                                                 [-c]
-#   + 3rd step:
-#   + all local XML files wwith the template "pgf" are processed                  [-t]
-#   + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
-#   + output format is LaTeX (implicitely)                                                                 
-#   + temporary output file is all.tex
-#   + 4th step:
-#   + all.tex is completely compiled                                              [-p]
-#   + output file is all.pdf
-#   + with statistics                                                             [-stat]
-#   + verbose                                                                     [-v]
-# 
-# CTANLoad+Out -k latex -m txt -v 
-#   + 1st step:
-#   + download all XML packages which match the topic "latex"                     [-k]
-#   + 2nd step:
-#   + all local XML files with the topic "latex" are processed                    [-k]
-#   + output format is plain                                                      [-m]
-#   + output file is all.txt
-#   + without statistics
-#   + verbose                                                                     [-v]
-#
-# CTANLoad+Out -k latex -f -v -stat -mt -p
-#   + 1st step:
-#   + download all XML packages which match the topic "LaTeX"                     [-k]
-#   + load the associated information files (PDF)                                 [-f]
-#   + 2nd step:
-#   + process all local XML files with the topic "latex"                          [-k]
-#   + output format is LaTeX (implicitely)                                                                 
-#   + temporary output file is all.tex
-#   + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
-#   + 3th step:
-#   + all.tex is completely compiled                                              [-p]
-#   + output file is all.pdf
-#   + verbose                                                                     [-v]
-#   + with statistics                                                             [-stat]
-#
-# CTANLoad+Out -k chinese -t "^zh" -f -v -stat
-#   + 1st step:
-#   + download all XML packages which match the topic "chinese"                   [-k]
-#   + load only CTAN XML files with the name template "^zh"                       [-t]
-#   + load the associated information files (PDF)                                 [-f]
-#   + 2nd step:
-#   + process all local XML packages which match the topic "chinese"              [-k]
-#   + process only local XML files with the name template "^zh"                   [-t]
-#   + output format is RIS (default)                                                                 
-#   + output file is all.ris
-#   + verbose                                                                     [-v]
-#   + with statistics                                                             [-stat]
-#
-# CTANLoad+Out -ko "latex" -m bib -v
-#   + process all XML files in the current directory with the topic "latex"       [-ko]
-#   + output format is BibLaTeX                                                   [-m]                                                           
-#   + output file is all.bib
-#   + verbose                                                                     [-v]
-#   + without statistics
-#
-# CTANLoad+Out -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
-#   + 1st step:
-#   + download all XML packages which match the topic "collection"                [-k]
-#   + download only packages which match the author name template "Knuth"         [-A]
-#   + download only packages with the name template "knuth"                       [-t]
-#   + load the associated information files (PDF)                                 [-f]
-#   + 2nd step:
-#   + process all local XML files which match the topic "collection"              [-k]
-#   + download local XML files which match the author name template "Knuth"       [-A]
-#   + download local XML files with the name template "knuth"                     [-t]
-#   + output format is LaTeX                                                      [-m]            
-#   + temporary output file is all.tex
-#   + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
-#   + 3th step:
-#   + all.tex is completely compiled                                              [-p]
-#   + output file is all.pdf
-#   + verbose                                                                     [-v]
-#   + with statistics                                                             [-stat]
-
-# Regular expressions
-# -------------------
-# The options -t (a/o -to and -tl) and -k (a/o -ko and -kl) need regular expressions as values.
-# such as
-#
-# -k latex                matches all topic names which contain "latex"
-# -t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3" or "t3"
-# -t "^.+$"               matches all file names
-# -t "^{a-b]"             matches all file names which begin with letters a-b
-
-
-#===================================================================
-# Usage
-# =====
-
-# usage: CTANLoad+Out.py [-h] [-a] [-A AUTHOR_TEMPLATE]
-#                        [-Al AUTHOR_LOAD_TEMPLATE] [-Ao AUTHOR_OUT_TEMPLATE]
-#                        [-b {@online,@software,@misc,@ctan,@www}] [-c]
-#                        [-d DIREC] [-f] [-k KEY] [-kl KEY_LOAD] [-ko KEY_OUT]
-#                        [-l]
-#                        [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}]
-#                        [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-r]
-#                        [-s SKIP] [-stat] [-t TEMPLATE] [-tl TEMPLATE_LOAD]
-#                        [-to TEMPLATE_OUT] [-V] [-v]
-# 
-# [CTANLoad+Out.py; Version: 1.20 (2021-07-19)] Combines the tasks of CTANLoad
-# [Load XLM and PDF documentation files from CTAN a/o generates some special
-# lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
-# files to some formats].
-# 
-# Optional parameters:
-#   -h, --help            show this help message and exit
-#   -a, --author          Show author of the program and exit.
-#   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
-#                         Name template for authors [in CTANLoad and CTANOut] -
-#                         Default:
-#   -Al AUTHOR_LOAD_TEMPLATE, --author_load_template AUTHOR_LOAD_TEMPLATE
-#                         Name template for authors (CTANLoad) - Default:
-#   -Ao AUTHOR_OUT_TEMPLATE, --author_out_template AUTHOR_OUT_TEMPLATE
-#                         Name template for authors (CTANOutd) - Default:
-#   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
-#                         Type of BibLaTex entries to be generated [valid only
-#                         for '-m BibLaTeX'/'--mode BibLaTeX'] - Default:
-#   -c, --check_integrity
-#                         Flag: Check the integrity of the 2nd .pkl file. -
-#                         Default: False
-#   -d DIREC, --directory DIREC
-#                         OS Directory for input and output files - Default: .\
-#   -f, --download_files  Flag: Download associated documentation files [PDF]. -
-#                         Default: False
-#   -k KEY, --key KEY     Template for output filtering on the base of keys [in
-#                         CTANLoad and CTANOut] - Default:
-#   -kl KEY_LOAD, --key_load KEY_LOAD
-#                         Template for output filtering on the base of keys [in
-#                         CTANLoad] - Default:
-#   -ko KEY_OUT, --key_out KEY_OUT
-#                         Template for output filtering on the base of keys [in
-#                         CTANOut] - Default: ^.+$
-#   -l, --lists           Flag: Generate some special lists and prepare files
-#                         for CTANOut. - Default: False
-#   -m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}, --mode {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}
-#                         Target format - Default: RIS
-#   -mo, --make_output    Flag: Generate output [RIS, LaTeX, BibLaTeX, Excel,
-#                         plain] via CTANOut. - Default: False
-#   -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-
-#                         reference (topics/packages, authors/packages); only
-#                         for -m LaTeX]). - Default: False
-#   -n NUMBER, --number NUMBER
-#                         Maximum number of file downloads - Default: 250
-#   -o OUTPUT_NAME, --output OUTPUT_NAME
-#                         Generic name for output files [without extensions] -
-#                         Default: all
-#   -p, --pdf_output      Flag: Generate PDF output. - Default: False
-#   -r, --regenerate_pickle_files
-#                         Flag: Regenerate the two pickle files. - Default:
-#                         False
-#   -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
-#   -stat, --statistics   Flag: Print statistics on terminal. - Default: False
-#   -t TEMPLATE, --template TEMPLATE
-#                         Template for package names [in CTANLoad and CTANOut] -
-#                         Default:
-#   -tl TEMPLATE_LOAD, --template_load TEMPLATE_LOAD
-#                         Template for package names in CTANLoad - Default:
-#   -to TEMPLATE_OUT, --template_out TEMPLATE_OUT
-#                         Template for package names in CTANOut - Default: ^.+$
-#   -V, --version         Show version of the program and exit.
-#   -v, --verbose         Flag: Output is verbose. - Default: False
- 
 
 #===================================================================
 # Moduls needed
@@ -324,114 +23,148 @@ import subprocess                  # handling of sub-processes
 import re                          # regular expression
 import os                          # delete a file on disk, for instance
 from os import path                # path informations
+import codecs                      # needed for full UTF-8 output on stdout
+import time                        # get time/date of a file
 
 
 #===================================================================
 # Settings
 
 programname       = "CTANLoad+Out.py"
-programversion    = "1.20"
-programdate       = "2021-07-19"
+programversion    = "1.39"
+programdate       = "2023-07-01"
 programauthor     = "Günter Partosch"
 authoremail       = "Guenter.Partosch@hrz.uni-giessen.de"
 authorinstitution = "Justus-Liebig-Universität Gießen, Hochschulrechenzentrum"
 
 operatingsys      = platform.system()
-call              = sys.argv
+call              = sys.argv                 # get call and its options
+actDate           = time.strftime("%Y-%m-%d")# actual date of program execution
+actTime           = time.strftime("%X")      # actual time of program execution
 empty_set         = set()
-latex_processor   = "xelatex"
-index_processor   = "makeindex"
+latex_processor   = "lualatex"               # default LaTeX processor
+index_processor   = "makeindex"              # default index processor
+
 empty             = ""
 space             = " "
 ellipse           = " ..."
-call_check        = empty
-call_load         = empty
-call_output       = empty
-call_compile      = empty
-call_index        = empty
+
+left              = 35                       # width of labels in verbose output
+sepline_length    = 80                       # length of separation line in output
+
+call_check        = empty                    # initialization
+call_load         = empty                    # initialization
+call_output       = empty                    # initialization
+call_compile      = empty                    # initialization
+call_index        = empty                    # initialization
+
 delete_temporary_file  = True
 
-err_mode          = "+ Warning: '{0} {1}' changed to '{2} (due to {3})'\n"
-latex_files       = [".aux", ".bib", ".ilg", ".log", ".idx", ".ind", ".out", ".tex", ".pdf", ".tap", ".top", ".xref"]
+err_mode          = "[CTANLoad+Out] Warning: '{0} {1}' changed to '{2} (due to {3})'"
+latex_files       = [".aux", ".bib", ".ilg", ".log", ".idx", ".ilg", ".ind", ".out", ".tex", ".pdf", ".stat", ".tap", ".top", ".xref"]
 other_files       = [".ris", ".bib", ".txt", ".tsv"]
 
 # ------------------------------------------------------------------
 # Texts for argument parsing and help
 
-author_load_template_text = "Name template for authors (CTANLoad)"                    # Parameter -Al
-author_out_template_text  = "Name template for authors (CTANOutd)"                    # Parameter -Ao
-author_template_text      = "Name template for authors [in CTANLoad and CTANOut]"     # Parameter -A
+author_load_template_text = "[CTANLoad} Name template for authors"                    # option -Al
+author_out_template_text  = "[CTANOut} Name template for authors"                     # option -Ao
+author_template_text      = "[CTANLoad and CTANOut] Name template for authors"        # option -A
 
-author_text               = "Show author of the program and exit."
+license_load_template_text= "[CTANLoad] Name template for licenses"                   # option -Ll
+license_out_template_text = "[CTANOut] Name template for licenses"                    # option -Lo
+license_template_text     = "[CTANLoad and CTANOut] Name template for licenses"       # option -L
+
+key_load_template_text    = "[CTANLoad] Template for keys"                            # option -kl
+key_out_template_text     = "[CTANOut] Template for keys"                             # option -ko
+key_template_text         = "[CTANLoad and CTANOut] Template for keys"                # option -k
+
+name_load_template_text   = "[CTANLoad] Template for package names"                   # option -tl
+name_out_template_text    = "[CTANOut] Template for package names"                    # option -to
+name_template_text        = "[CTANLoad and CTANOut] Template for package names"       # option -t
+
+year_template_text        = "[CTANLoad and CTANOut] Template for years"               # option -y
+year_load_template_text   = "[CTANLoad] Template for years"                           # option -yl
+year_out_template_text    = "[CTANOut] Template for years"                            # option -yo
+
+author_text               = "Flag: Shows author of the program and exits."            # option -a
+download_text             = "Flag: Downloads associated documentation files [PDF]."   # option -f
+integrity_text            = "Flag: Checks the integrity of the 2nd .pkl file."        # option -c
+lists_text                = "Flag: Generates some special lists and prepare files for CTANOut."
+                                                                                      # option -l
+make_output_text          = "Flag: Generates only output [RIS, LaTeX, BibLaTeX, Excel, plain] via CTANOut."
+                                                                                      # option -mo
+no_files_text             = "Flag: Do not generate output files."                     # option -nf
+pdf_output_text           = "Flag: Generates PDF output."                             # option -p
+
+regenerate_text           = "Flag: Regenerates the two pickle files."                 # option -r
+statistics_text           = "Flag: Prints statistics on terminal."                    # option -stat
+topics_text               = "Flag: Generates topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX])."
+                                                                                      # option -mt
+verbose_text              = "Flag: Output is verbose."                                # option -v
+version_text              = "Flag: Shows version of the program and exits."           # option -V
+
 btype_text                = "Type of BibLaTex entries to be generated [valid only for '-m BibLaTeX'/'--mode BibLaTeX']"
-direc_text                = "OS Directory for input and output files"
-download_text             = "Flag: Download associated documentation files [PDF]."
-integrity_text            = "Flag: Check the integrity of the 2nd .pkl file."
-
-key_load_text             = "Template for output filtering on the base of keys [in CTANLoad]"
-key_out_text              = "Template for output filtering on the base of keys [in CTANOut]"
-key_text                  = "Template for output filtering on the base of keys [in CTANLoad and CTANOut]"
-
-##key_text                  = "Template for topic names [in CTANLoad and CTANOut]"
-lists_text                = "Flag: Generate some special lists and prepare files for CTANOut."
-make_output_text          = "Flag: Generate output [RIS, LaTeX, BibLaTeX, Excel, plain] via CTANOut."
-mode_text                 = "Target format"
-number_text               = "Maximum number of file downloads"
-output_text               = "Generic name for output files [without extensions]"
-pdf_text                  = "Flag: Generate PDF output."
+                                                                                      # option -b
+direc_text                = "OS Directory for input and output files"                 # option -d
+mode_text                 = "Target format"                                           # option -m
+number_text               = "Maximum number of file downloads"                        # option -n
+output_text               = "Generic name for output files [without extensions]"      # option -o
+skip_text                 = "Skips specified CTAN fields."                            # option -s
+skip_biblatex_text        = "Skips specified BibLaTeX fields."                        # option -sb
 program_text              = "Combines the tasks of CTANLoad [Load XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package files to some formats]."
-regenerate_text           = "Flag: Regenerate the two pickle files."
-skip_text                 = "Skip specified CTAN fields."
-statistics_text           = "Flag: Print statistics on terminal."
-
-template_load_text        = "Template for package names in CTANLoad"
-template_out_text         = "Template for package names in CTANOut"
-template_text             = "Template for package names [in CTANLoad and CTANOut]"
-
-topics_text               = "Flag: Generate topic lists [meaning of topics + cross-reference (topics/packages, authors/packages); only for -m LaTeX])."
-verbose_text              = "Flag: Output is verbose."
-version_text              = "Show version of the program and exit."
 
 # ------------------------------------------------------------------
 # Defaults/variables for argparse
 
-author_load_template_default = ""               # default for author load name template (-Al)
-author_out_template_default  = ""               # default for author out name template (-Ao)
-author_template_default      = ""               # default for author name template (-A)
+author_template_default      = """^.+$"""                  # default for author name template (-A)
+author_load_template_default = empty                       # default for author load name template (-Al)
+author_out_template_default  = author_template_default     # default for author out name template (-Ao)
 
-btype_default                = empty            # default for option -b (BibLaTeX entry type)
-download_default             = False            # flag: download PDF files
-integrity_default            = False            # flag: integrity check
+license_template_default     = """^.+$"""                  # default for license name template (-L)
+license_load_template_default= empty                       # default for license load name template (-Ll)
+license_out_template_default = license_template_default    # default for license out name template (-Lo)
 
-key_default                  = empty            # default for option -k
-key_load_default             = key_default      # default for option -kl
-key_out_default              = """^.+$"""       # default for option -ko
+key_template_default         = """^.+$"""                  # default for option -k
+key_load_template_default    = empty                       # default for option -kl
+key_out_template_default     = key_template_default        # default for option -ko
 
-lists_default                = False            # flag: generate special lists
-make_output_default          = False            # Flag: generate output (RIS, LaTeX, BibLaTeX, Excel, plain)
-make_topics_default          = False            # flag: make topics output
-mode_default                 = "RIS"            # default for option -m 
-number_default               = 250              # default for option -n (maximum number of files to be loaded)
-output_name_default          = "all"            # default for option -o (generic file name)
-pdf_default                  = False            # flag: produce PDF output
-regenerate_default           = False            # default for option -r    (no regeneration)
-skip_default                 = "[]"             # default for option -s
-statistics_default           = False            # flag: output statistics
+name_template_default        = """^.+$"""                  # default for option -t
+name_load_template_default   = empty                       # default for option -tl
+name_out_template_default    = name_template_default       # default for option -to
 
-template_default             = empty            # default for option -t
-template_load_default        = template_default # default for option -tl 
-template_out_default         = """^.+$"""       # default for option -to
+year_template_default        = """^19[89][0-9]|20[012][0-9]$"""
+                                                           # default for year template (-y) [four digits]
+year_load_template_default   = empty                       # default for year_load_template (-yl) [four digits]
+year_out_template_default    = year_load_template_default  # default for year_out_template (-yo) [four digits]
 
-verbose_default              = False            # flag: output is verbose
+btype_default                = empty                       # default for option -b (BibLaTeX entry type)
+mode_default                 = "RIS"                       # default for option -m
+number_default               = 250                         # default for option -n (maximum number of files to be loaded)
+output_name_default          = "all"                       # default for option -o (generic file name)
+skip_default                 = "[]"                        # default for option -s
+skip_biblatex_default        = "[]"                        # default for option -sb
 
-act_direc             = "."
+download_default             = False                       # flag: download PDF files      (option -f)
+integrity_default            = False                       # flag: integrity check         (option -c)
+lists_default                = False                       # flag: generate special lists  (option -l)
+make_output_default          = False                       # Flag: generate only output (RIS, LaTeX, BibLaTeX, Excel, plain)
+make_topics_default          = False                       # flag: make topics output      (option -mt)
+no_files_default             = False                       # flag: no output files         (option -nf)
+pdf_output_default           = False                       # flag: produce PDF output      (option -p)
+regenerate_default           = False                       # flag: regenerate pickle files (option -r)
+statistics_default           = False                       # flag: output statistics       (option -stat)
+verbose_default              = False                       # flag: output is verbose       (option -v)
+debugging_default            = False                       # flag: debugging               (option -dbg)
 
-if operatingsys == "Windows":    
+act_direc                    = "."                         # actual directory
+
+if operatingsys == "Windows":
     direc_sep      = "\\"
 else:
     direc_sep      = "/"
-    
-direc_default         = act_direc + direc_sep # default for -d (OS output directory)
+
+direc_default                = act_direc + direc_sep       # default for -d (OS output directory)
 
 
 #===================================================================
@@ -440,212 +173,287 @@ direc_default         = act_direc + direc_sep # default for -d (OS output direct
 parser = argparse.ArgumentParser(description = "[" + programname + "; " + "Version: " + programversion + " (" + programdate + ")] " + program_text)
 parser._optionals.title   = 'Optional parameters'
 
-parser.add_argument("-a", "--author",                      # Parameter -a/--author
+parser.add_argument("-a", "--author",                      # option -a/--author
                     help    = author_text,
                     action  = 'version',
                     version = programauthor + " (" + authoremail + ", " + authorinstitution + ")")
 
-parser.add_argument("-A", "--author_template",             # Parameter -A/--author_template
+parser.add_argument("-A", "--author_template",             # option -A/--author_template
                     help    = author_template_text + " - Default: " + "%(default)s",
                     dest    = "author_template",
                     default = author_template_default)
 
-parser.add_argument("-Al", "--author_load_template",       # Parameter -Al/--author_load_template
+parser.add_argument("-Al", "--author_load_template",       # option -Al/--author_load_template
                     help    = author_load_template_text + " - Default: " + "%(default)s",
                     dest    = "author_load_template",
                     default = author_load_template_default)
 
-parser.add_argument("-Ao", "--author_out_template",        # Parameter -Ao/--author_out_template
+parser.add_argument("-Ao", "--author_out_template",        # option -Ao/--author_out_template
                     help    = author_out_template_text + " - Default: " + "%(default)s",
                     dest    = "author_out_template",
                     default = author_out_template_default)
 
-parser.add_argument("-b", "--btype",                       # Parameter -b/--btype
+parser.add_argument("-L", "--license_template",            # option -L/--license_template
+                    help    = license_template_text + " - Default: " + "%(default)s",
+                    dest    = "license_template",
+                    default = license_template_default)
+
+parser.add_argument("-Ll", "--license_load_template",      # option -Ll/--license_load_template
+                    help    = license_load_template_text + " - Default: " + "%(default)s",
+                    dest    = "license_load_template",
+                    default = license_load_template_default)
+
+parser.add_argument("-Lo", "--license_out_template",       # option -Lo/--license_out_template
+                    help    = license_out_template_text + " - Default: " + "%(default)s",
+                    dest    = "license_out_template",
+                    default = license_out_template_default)
+
+parser.add_argument("-b", "--btype",                       # option -b/--btype
                     help    = btype_text + " - Default: " + "%(default)s",
                     choices = ["@online", "@software", "@misc", "@ctan", "@www"],
                     dest    = "btype",
                     default = btype_default)
 
-parser.add_argument("-c", "--check_integrity",             # Parameter -i/--integrity
+parser.add_argument("-c", "--check_integrity",             # option -i/--integrity
                     help    = integrity_text + " - Default: " + "%(default)s",
-##                    help    = argparse.SUPPRESS,
                     action  = "store_true",
                     default = integrity_default)
 
-parser.add_argument("-d", "--directory",                   # Parameter -d/--directory
+parser.add_argument("-d", "--directory",                   # option -d/--directory
                     help    = direc_text + " - Default: " + "%(default)s",
                     dest    = "direc",
                     default = direc_default)
 
-parser.add_argument("-f", "--download_files",              # Parameter -f/--download_files
+parser.add_argument("-f", "--download_files",              # option -f/--download_files
                     help    = download_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = download_default)
 
-parser.add_argument("-k", "--key",                         # Parameter -k/--key
-                    help    = key_text + " - Default: " + "%(default)s",
-                    dest    = "key",
-                    default = key_default)
+parser.add_argument("-k", "--key_template",                # option -k/--key_template
+                    help    = key_template_text + " - Default: " + "%(default)s",
+                    dest    = "key_template",
+                    default = key_template_default)
 
-parser.add_argument("-kl", "--key_load",                   # Parameter -kl/--key_load
-                    help    = key_load_text + " - Default: " + "%(default)s",
-                    dest    = "key_load",
-                    default = key_load_default)
+parser.add_argument("-kl", "--key_load_template",          # option -kl/--key_load_template
+                    help    = key_load_template_text + " - Default: " + "%(default)s",
+                    dest    = "key_load_template",
+                    default = key_load_template_default)
 
-parser.add_argument("-ko", "--key_out",                    # Parameter -ko/--key_out
-                    help    = key_out_text + " - Default: " + "%(default)s",
-                    dest    = "key_out",
-                    default = key_out_default)
+parser.add_argument("-ko", "--key_out_template",           # option -ko/--key_out_template
+                    help    = key_out_template_text + " - Default: " + "%(default)s",
+                    dest    = "key_out_template",
+                    default = key_out_template_default)
 
-parser.add_argument("-l", "--lists",                       # Parameter -l/--lists
+parser.add_argument("-l", "--lists",                       # option -l/--lists
                     help = lists_text + " - Default: " + "%(default)s",
                     action = "store_true",
                     default = lists_default)
 
-parser.add_argument("-m", "--mode",                        # Parameter -m/--mode
+parser.add_argument("-m", "--mode",                        # option -m/--mode
                     help    = mode_text + " - Default: " + "%(default)s",
                     choices = ["LaTeX", "latex", "tex", "RIS", "ris", "plain", "txt", "BibLaTeX", "biblatex", "bib", "Excel", "excel"],
                     dest    = "mode",
                     default = mode_default)
 
-parser.add_argument("-mo", "--make_output",                # Parameter -mo/--make_output
+parser.add_argument("-mo", "--make_output",                # option -mo/--make_output
                     help    = make_output_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = make_output_default)
 
-parser.add_argument("-mt", "--make_topics",                # Parameter -mt/--make_topics
+parser.add_argument("-mt", "--make_topics",                # option -mt/--make_topics
                     help    = topics_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = make_topics_default)
 
-parser.add_argument("-n", "--number",                      # Parameter -n/--number
+parser.add_argument("-n", "--number",                      # option -n/--number
                     help    = number_text + " - Default: " + "%(default)s",
                     dest    = "number",
                     default = number_default)
 
-parser.add_argument("-o", "--output",                      # Parameter -o/--output
+parser.add_argument("-nf", "--no_files",                   # option -nf/--no_files
+                    help    = no_files_text + " - Default: " + "%(default)s",
+                    action  = "store_true",
+                    default = no_files_default)
+
+parser.add_argument("-o", "--output",                      # option -o/--output
                     help    = output_text + " - Default: " + "%(default)s",
                     dest    = "output_name",
                     default = output_name_default)
 
-parser.add_argument("-p", "--pdf_output",                  # Parameter -p/--pdf_output
-                    help    = pdf_text + " - Default: " + "%(default)s",
+parser.add_argument("-p", "--pdf_output",                  # option -p/--pdf_output
+                    help    = pdf_output_text + " - Default: " + "%(default)s",
                     action  = "store_true",
-                    default = pdf_default)
+                    default = pdf_output_default)
 
-parser.add_argument("-r", "--regenerate_pickle_files",     # Parameter -r/--regenerate_pickle_files
+parser.add_argument("-r", "--regenerate_pickle_files",     # option -r/--regenerate_pickle_files
                     help    = regenerate_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = regenerate_default)
 
-parser.add_argument("-s", "--skip",                        # Parameter -s/--skip
+parser.add_argument("-s", "--skip",                        # option -s/--skip
                     help    = skip_text + " - Default: " + "%(default)s",
                     dest    = "skip",
                     default = skip_default)
 
-parser.add_argument("-stat", "--statistics",               # Parameter -stat/--statistics
+parser.add_argument("-sb", "--skip_biblatex",              # option -sb/--skip_biblatex
+                    help    = skip_biblatex_text + " - Default: " + "%(default)s",
+                    dest    = "skip_biblatex",
+                    default = skip_biblatex_default)
+
+parser.add_argument("-stat", "--statistics",               # option -stat/--statistics
                     help    = statistics_text + " - Default: " + "%(default)s",
                     action  = "store_true",
                     default = statistics_default)
 
-parser.add_argument("-t", "--template",                    # Parameter -t/--template
-                    help    = template_text + " - Default: " + "%(default)s",
-                    dest    = "template",
-                    default = template_default)
+parser.add_argument("-t", "--name_template",               # option -t/--template
+                    help    = name_template_text + " - Default: " + "%(default)s",
+                    dest    = "name_template",
+                    default = name_template_default)
 
-parser.add_argument("-tl", "--template_load",              # Parameter -tl/--template_load
-                    help    = template_load_text + " - Default: " + "%(default)s",
-                    dest    = "template_load",
-                    default = template_load_default)
+parser.add_argument("-tl", "--name_load_template",         # option -tl/--template_load
+                    help    = name_load_template_text + " - Default: " + "%(default)s",
+                    dest    = "name_load_template",
+                    default = name_load_template_default)
 
-parser.add_argument("-to", "--template_out",               # Parameter -to/--template_out
-                    help    = template_out_text + " - Default: " + "%(default)s",
-                    dest    = "template_out",
-                    default = template_out_default)
+parser.add_argument("-to", "--name_out_template",          # option -to/--template_out
+                    help    = name_out_template_text + " - Default: " + "%(default)s",
+                    dest    = "name_out_template",
+                    default = name_out_template_default)
 
-parser.add_argument("-V", "--version",                     # Parameter -V/--version
+parser.add_argument("-V", "--version",                     # option -V/--version
                     help    = version_text,
                     action  = 'version',
                     version = '%(prog)s ' + programversion + " (" + programdate + ")")
 
-parser.add_argument("-v", "--verbose",                     # Parameter -v/--verbose
+parser.add_argument("-v", "--verbose",                     # option -v/--verbose
                     help = verbose_text + " - Default: " + "%(default)s",
                     action = "store_true",
                     default = verbose_default)
 
+parser.add_argument("-y", "--year_template",               # option -y/--year_template
+                    help    = year_template_text + " - Default: " + "%(default)s",
+                    dest    = "year_template",
+                    default = year_template_default)
+
+parser.add_argument("-yl", "--year_load_template",         # option -yl/--year_load_template
+                    help    = year_load_template_text + " - Default: " + "%(default)s",
+                    dest    = "year_load_template",
+                    default = year_load_template_default)
+
+parser.add_argument("-yo", "--year_out_template",          # option -yo/--year_out_template
+                    help    = year_out_template_text + " - Default: " + "%(default)s",
+                    dest    = "year_out_template",
+                    default = year_out_template_default)
+
+parser.add_argument("-dbg", "--debugging",                 # option -dbg/--debugging
+                    help    = argparse.SUPPRESS,           # will be suppressed in help
+                    action  = "store_true",
+                    default = debugging_default)
+
 # ------------------------------------------------------------------
-# Getting parsed values
+# Getting parsed options
 
-args            = parser.parse_args()
+args                  = parser.parse_args()
+   
+author_template       = args.author_template        # option -A
+author_load_template  = args.author_load_template   # option -Al
+author_out_template   = args.author_out_template    # option -Ao
 
-author_template      = args.author_template   # parameter -A
-author_load_template = args.author_template   # parameter -Al
-author_out_template  = args.author_template   # parameter -Ao
+license_template      = args.license_template       # option -L
+license_load_template = args.license_load_template  # option -Ll
+license_out_template  = args.license_out_template   # option -Lo
 
-btype           = args.btype                  # Parameter -b
-direc           = args.direc                  # Parameter -d
-download        = args.download_files         # Parameter -f
+name_template         = args.name_template          # option -t
+name_load_template    = args.name_load_template     # option -tl
+name_out_template     = args.name_out_template      # option -to
 
-key             = args.key                    # Parameter -k
-key_out         = args.key_out                # Parameter -ko
-key_load        = args.key_load               # Parameter -kl
+key_template          = args.key_template           # option -k
+key_out_template      = args.key_out_template       # option -ko
+key_load_template     = args.key_load_template      # option -kl
 
-integrity       = args.check_integrity        # Parameter -c
-lists           = args.lists                  # Parameter -l
-make_output     = args.make_output            # Parameter -mo
-make_topics     = args.make_topics            # Parameter -mt
-mode            = args.mode                   # Parameter -m
-number          = int(args.number)            # Parameter -n
-output_name     = args.output_name            # Parameter -o
-pdf_output      = args.pdf_output             # Parameter -p
-regenerate      = args.regenerate_pickle_files# parameter -r
-skip            = args.skip                   # Parameter -s
-statistics      = args.statistics             # Parameter -stat
+year_template         = args.year_template          # option -y
+year_load_template    = args.year_load_template     # option -yl
+year_out_template     = args.year_out_template      # option -yo
 
-template        = args.template               # Parameter -t
-template_load   = args.template_load          # Parameter -tl
-template_out    = args.template_out           # Parameter -to
+btype                 = args.btype                  # option -b
+direc                 = args.direc                  # option -d
+download              = args.download_files         # option -f
 
-verbose         = args.verbose                # Parameter -v
+integrity             = args.check_integrity        # option -c
+lists                 = args.lists                  # option -l
+make_output           = args.make_output            # option -mo
+make_topics           = args.make_topics            # option -mt
+mode                  = args.mode                   # option -m
+number                = int(args.number)            # option -n
+no_files              = args.no_files               # option -nf
+output_name           = args.output_name            # option -o
+pdf_output            = args.pdf_output             # option -p
+regenerate            = args.regenerate_pickle_files# option -r
+skip                  = args.skip                   # option -s
+skip_biblatex         = args.skip_biblatex          # option -sb
+statistics            = args.statistics             # option -stat
+
+verbose               = args.verbose                # option -v
+debugging             = args.debugging              # option -dbg
 
 # ------------------------------------------------------------------
 # Correct direc
 
-direc = direc.strip()                         # correct OS directory name (-d)
+direc = direc.strip()                               # correct/expand OS directory name (-d)
 if direc[len(direc) - 1] != direc_sep:
     direc += direc_sep
-    
+
 
 #===================================================================
 # check values
 
 #        load  check output compile
 # -a     x     x     x      -
+
 # -A     x     -     x      -
 # -Al    x     -     -      -
 # -Ao    -     -     x      -
+
 # -b     -     -     x      -
 # -c     -     x     -      -
 # -d     x     -     x      x
+# -dbg   x     x     x      -
 # -f     x     x     -      -
+
 # -k     x     -     x      -
 # -kl    x     -     -      -
 # -ko    -     -     x      -
+
 # -l     -     x     -      -
+
+# -L     x     -     x      -
+# -Ll    x     -     -      -
+# -Lo    -     -     x      -
+
 # -m     -     -     x      -
 # -mo    -     -     x      -
 # -mt    -     -     x      -
+
 # -n     x     -     -      -
+# -nf    -     -     x      -
 # -o     x     x     x      x
 # -p     -     -     x      x
 # -s     -     -     x      -
 # -stat  x     x     x      -
+
 # -t     x     -     x      -
 # -to    -     -     x      -
 # -tl    x     -     -      -
+
+# -y     x     -     x      -
+# -yo    -     -     x      -
+# -yl    x     -     -      -
+
 # -v     x     x     x      -
 # -V     x     x     x      -
 
+# ------------------------------------------------------------------
+# unify modes
 if mode in ["LaTeX", "latex", "tex"]:                          # LaTeX, latex, tex --> LaTeX
     mode = "LaTeX"
 elif mode in ["BibLaTeX", "biolatex", "bib"]:                  # BibLaTeX, biblatex, bib --> BibLaTeX
@@ -659,62 +467,99 @@ elif mode in ["plain", "txt"]:                                 # plain, txt --> 
 else:
     pass
 
-if ("-p" in call) or ("--pdf" in call) or ("-mt" in call) or ("--make_topics" in call):  # reset -m to LaTeX, if -p or -mt is set
+# ------------------------------------------------------------------
+# reset modes
+print(empty)
+if (make_topics != make_topics_default):                       # reset -m to LaTeX, if -mt is set
     if mode != "LaTeX":
         if verbose:
-            print(err_mode.format('-m', mode, '-m LaTeX', "'-mt'/'-p'"))
+            print(err_mode.format('-m', mode, '-m LaTeX', '-mt'))
         call.append("-m")
         call.append("LaTeX")
         mode = "LaTeX"
-if ("-b" in call) or ("--btype" in call):                      # reset -m to BibLaTeX, if -b is set
+if (pdf_output != pdf_output_default):                         # reset -m to LaTeX, if -p is set
+    if mode != "LaTeX":
+        if verbose:
+            print(err_mode.format('-m', mode, '-m LaTeX', '-p'))
+            print(err_mode.format('-mt =', make_topics, True, '-p'))
+        call.append("-m")
+        call.append("LaTeX")
+        call.append("-mt")
+        make_topics = True
+        mode        = "LaTeX"
+if (btype != btype_default):                                   # reset -m to BibLaTeX, if -b is set
     if mode != "BibLaTeX":
         if verbose:
             print(err_mode.format('-m', mode, '-m BibLaTeX', "'-b'"))
         call.append("-m");
         call.append("BibLaTeX")
         mode = "BibLaTeX"
-##if (mode != "LaTeX") and (("-p" in call) or ("--pdf" in call)):
-   
+if (skip_biblatex != skip_biblatex_default):                   # reset -m to BibLaTeX, if -sb is set
+    if mode != "BibLaTeX":
+        if verbose:
+            print(err_mode.format('-m', mode, '-m BibLaTeX', "'-sb'"))
+        call.append("-m");
+        call.append("BibLaTeX")
+        mode = "BibLaTeX"
+
 # ------------------------------------------------------------------
 # set load, check, compile, regeneration, and output
 
-callx       = set(call[1:])
+callx            = set(call[1:])                               # copy (set type)
 
-set_load         = {'-t', '--template', '-tl', '--template_load', '-k', '--key', '-kl', '--key_load', '-A', '--author_template', '-Al', '--author_load_template'}
-set_check        = {'-l', '-c', '--lists', '--check_integrity'}
-set_output       = {'-b',  '-k', '-m', '-mt', '-p', '-s', '--btype', '--key', '--mode', '--make_topics', '--pdf_output', '--skip', 
-                    '-mo', '--make_output', '-to', '--template_out', '-ko', '--key_out', '-Ao', '--author_out_template'}
+set_load         = {'-A', '--author_template', '-Al', '--author_load_template', '-L', '--license_template', '-Ll', '--license_load_template',
+                    '-f', '--download_files', '-k', '--key_template', '-kl', '--key_load_template', '-n', '--number', '-t', '--template', '-tl',
+                    '--template_load', '-dbg', '--debugging', '-y', '--year_template', '-yl', '--year_load_template'}
+set_check        = {'-c','--check_integrity', '-l','--lists'}
+set_output       = { '-A', '--author_template', '-Ao', '--author_out_template', '-b', '--btype', '-k', '--key_template', '-ko', '--key_out_template',
+                     '-L', '--license_template', '-Lo', '--license_out_template', '-m', '--mode', '-mo', '--make_output', '-mt', '--make_topics',
+                     '-s', '--skip', '-sb', '--skip_biblatex' '-t', '--template', '-to', '--template_out', '-dbg', '--debugging', '-nf',
+                     'no_files', '-y', '--year_template', '-yo', '--year_out_template' }
 set_compile      = {'-p', '--pdf_output'}
-set_regeneration = {'-r', '--regenerate_pickle_files'}
+set_regeneration = {'-r', '--regenerate_pickle_files' }
 
-load          = callx & set_load         != empty_set
-output        = callx & set_output       != empty_set
-compile       = callx & set_compile      != empty_set
-check         = callx & set_check        != empty_set
-regeneration  = callx & set_regeneration != empty_set
+load             = callx & set_load         != empty_set
+output           = callx & set_output       != empty_set
+compile          = callx & set_compile      != empty_set
+check            = callx & set_check        != empty_set
+regeneration     = callx & set_regeneration != empty_set
 
-if ('-mo' in callx) or ('--make_output' in callx):
-    load = False
+# ------------------------------------------------------------------
+# some other resettings
+if load and output and (lists == lists_default):               # load, output, -l ==> check = True, -l = True
     if verbose:
-        print(err_mode.format("load", "=True", False, "'-mo'"))
+        print(err_mode.format("check =", check, True, "load & output"))
+        print(err_mode.format("-l =", lists, True, "load & output"))
+    callx.add("-l")
+    check = True
 
+if (make_output != make_output_default):                       # -mo ==> load = False
+    if verbose:
+        print(err_mode.format("load =", load, False, "'-mo'"))
+    load = False
+
+if no_files != no_files_default:                               # -nf ==> -p = True, -mt = True
+    if pdf_output != pdf_output_default:                       #   -p
+        if verbose:
+            print(err_mode.format("-p =", pdf_output, pdf_output_default, "-nf"))
+        pdf_output = pdf_output_default
+    if make_topics != make_topics_default:                     #   -mt
+        if verbose:
+            print(err_mode.format("-mt =", make_topics, make_topics_default, "-nf"))
+        make_topics = make_topics_default
 
 #===================================================================
 # Construct the calls
 
-t  = (template      != template_default)
-tl = (template_load != template_load_default)
-to = (template_out  != template_out_default)
-
-call_load         = empty
-call_check        = empty
-call_output       = empty
-call_regeneration = empty
-call_compile      = empty
-call_index        = empty
+call_load         = empty    # (A)
+call_check        = empty    # (B)
+call_output       = empty    # (C)
+call_regeneration = empty    # (D)
+call_compile      = empty    # (E)
+call_index        = empty    # (F)
 
 # ------------------------------------------------------------------
-# call_load
+# (A) call_load
 # construct the call for loading
 
 if load:
@@ -731,40 +576,139 @@ if load:
     if download != download_default:                      # -f
         call_load.append("-f")
     if statistics != statistics_default:                  # -stat
-        call_load.append("-stat")                        
+        call_load.append("-stat")
     if verbose != verbose_default:                        # -v
         call_load.append("-v")
-    if template_load != template_load_default:            # -tl
-        call_load.append("-t")
-        call_load.append(template_load)
-    else:
-        if template != template_default:                  
-            call_load.append("-t")
-            call_load.append(template)
+    if debugging != debugging_default:                    # -dbg
+        call_load.append("-dbg")
 
-    if key_load != key_load_default:                      # -k/-kl
-        call_load.append("-k")
-        call_load.append(key_load)
+    # process -t a/o -tl a/o -to
+    w1 = name_template
+    w2 = name_load_template
+    w3 = name_out_template
+    A1 = name_template      != name_template_default
+    A2 = name_load_template != name_load_template_default
+    A3 = name_out_template  != name_out_template_default
+    if A1:
+        if A2 and A3:
+            call_load.append("-t"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-t"); call_load.append(w2)
+        elif not A2 and A3:
+            call_load.append("-t"); call_load.append(w1)
+        elif not A2 and not A3:
+            call_load.append("-t"); call_load.append(w1)
     else:
-        if key != key_default:                  
-            call_load.append("-k")
-            call_load.append(key)
+        if A2 and A3:
+            call_load.append("-t"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-t"); call_load.append(w2)
+        elif not A2 and A3:
+            pass
 
-    if author_load_template != author_load_template_default:  # -A/-Al
-        call_load.append("-A")
-        call_load.append(author_load_template)
+    # process -k a/o -kl a/o -ko
+    w1 = key_template
+    w2 = key_load_template
+    w3 = key_out_template
+    A1 = key_template      != key_template_default
+    A2 = key_load_template != key_load_template_default
+    A3 = key_out_template  != key_out_template_default
+    if A1:
+        if A2 and A3:
+            call_load.append("-k"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-k"); call_load.append(w2)
+        elif not A2 and A3:
+            call_load.append("-k"); call_load.append(w1)
+        elif not A2 and not A3:
+            call_load.append("-k"); call_load.append(w1)
     else:
-        if author_template != author_template_default:                  
-            call_load.append("-A")
-            call_load.append(author_template)
+        if A2 and A3:
+            call_load.append("-k"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-k"); call_load.append(w2)
+        elif not A2 and A3:
+            pass
+
+    # process -A a/o -Al a/o -Ao
+    w1 = author_template
+    w2 = author_load_template
+    w3 = author_out_template
+    A1 = author_template      != author_template_default
+    A2 = author_load_template != author_load_template_default
+    A3 = author_out_template  != author_out_template_default
+    if A1:
+        if A2 and A3:
+            call_load.append("-A"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-A"); call_load.append(w2)
+        elif not A2 and A3:
+            call_load.append("-A"); call_load.append(w1)
+        elif not A2 and not A3:
+            call_load.append("-A"); call_load.append(w1)
+    else:
+        if A2 and A3:
+            call_load.append("-A"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-A"); call_load.append(w2)
+        elif not A2 and A3:
+            pass
+
+    # process -L a/o -Ll a/o -Lo
+    w1 = license_template
+    w2 = license_load_template
+    w3 = license_out_template
+    A1 = license_template      != license_template_default
+    A2 = license_load_template != license_load_template_default
+    A3 = license_out_template  != license_out_template_default
+    if A1:
+        if A2 and A3:
+            call_load.append("-L"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-L"); call_load.append(w2)
+        elif not A2 and A3:
+            call_load.append("-L"); call_load.append(w1)
+        elif not A2 and not A3:
+            call_load.append("-L"); call_load.append(w1)
+    else:
+        if A2 and A3:
+            call_load.append("-L"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-L"); call_load.append(w2)
+        elif not A2 and A3:
+            pass
+
+    # process -y a/o -yl a/o -yo
+    w1 = year_template
+    w2 = year_load_template
+    w3 = year_out_template
+    A1 = year_template      != year_template_default
+    A2 = year_load_template != year_load_template_default
+    A3 = year_out_template  != year_out_template_default
+    if A1:
+        if A2 and A3:
+            call_load.append("-y"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-y"); call_load.append(w2)
+        elif not A2 and A3:
+            call_load.append("-y"); call_load.append(w1)
+        elif not A2 and not A3:
+            call_load.append("-y"); call_load.append(w1)
+    else:
+        if A2 and A3:
+            call_load.append("-y"); call_load.append(w2)
+        elif A2 and not A3:
+            call_load.append("-y"); call_load.append(w2)
+        elif not A2 and A3:
+            pass
 
 # ------------------------------------------------------------------
-# call_check
+# (B) call_check
 # construct the call for checking
 
 if check:
     call_check = [sys.executable, "ctanload.py"]
-    if verbose != verbose_default:                        # .v
+    if verbose != verbose_default:                        # -v
         call_check.append("-v")
     if statistics != statistics_default:                  # -stat
         call_check.append("-stat")
@@ -778,9 +722,11 @@ if check:
     if output_name != output_name_default:                # -o
         call_check.append("-o")
         call_check.append(output_name)
+    if debugging != debugging_default:                    # -dbg
+        call_check.append("-dbg")
 
 # ------------------------------------------------------------------
-# call_output
+# (C) call_output
 # construct the call for output generating
 
 if output:
@@ -792,6 +738,9 @@ if output:
     if btype != btype_default:                            # -b
         call_output.append("-b")
         call_output.append(btype)
+    if skip_biblatex != skip_biblatex_default:            # -sb
+        call_output.append("-sb")
+        call_output.append(skip_biblatex)
     if direc != direc_default:                            # -d
         call_output.append("-d")
         call_output.append(direc)
@@ -806,32 +755,133 @@ if output:
         call_output.append(skip)
     if make_topics != make_topics_default:                # -mt
         call_output.append("-mt")
-    if template_out != template_out_default:              # -to
-        call_output.append("-t")
-        call_output.append(template_out)
+    if debugging != debugging_default:                    # -dbg
+        call_output.append("-dbg")
+    if no_files != no_files_default:                      # -nf
+        call_output.append("-nf")
+    
+    # process -t a/o -to a/o -tl
+    w1 = name_template
+    w2 = name_load_template
+    w3 = name_out_template
+    A1 = name_template      != name_template_default
+    A2 = name_load_template != name_load_template_default
+    A3 = name_out_template  != name_out_template_default
+    if A1:
+        if A2 and A3:
+            call_output.append("-t"); call_output.append(w3)
+        elif A2 and not A3:
+            call_output.append("-t"); call_output.append(w1)
+        elif not A2 and A3:
+            call_output.append("-t"); call_output.append(w3)
+        elif not A2 and not A3:
+            call_output.append("-t"); call_output.append(w1)
     else:
-        if template != template_default:                  
-            call_output.append("-t")
-            call_output.append(template)
-    if key_out != key_out_default:                        # -k/-ko
-        call_output.append("-k")
-        call_output.append(key_out)
-    else:
-        if key != key_default:                  
-            call_output.append("-k")
-            call_output.append(key)
+        if A2 and A3:
+            call_output.append("-t"); call_output.append(w3)
+        elif A2 and not A3:
+            pass
+        elif not A2 and A3:
+            call_output.append("-t"); call_output.append(w3)
 
-    if author_out_template != author_out_template_default: # -A/-ko
-        call_output.append("-A")
-        call_output.append(author_out_template)
+    # process -k a/o -ko a/o -kl
+    w1 = key_template
+    w2 = key_load_template
+    w3 = key_out_template
+    A1 = key_template      != key_template_default
+    A2 = key_load_template != key_load_template_default
+    A3 = key_out_template  != key_out_template_default
+    if A1:
+        if A2 and A3:
+            call_output.append("-k"); call_output.append(w3)
+        elif A2 and not A3:
+            call_output.append("-k"); call_output.append(w1)
+        elif not A2 and A3:
+            call_output.append("-k"); call_output.append(w3)
+        elif not A2 and not A3:
+            call_output.append("-k"); call_output.append(w1)
     else:
-        if author_template != author_template_default:                  
-            call_output.append("-A")
-            call_output.append(author_template)
+        if A2 and A3:
+            call_output.append("-k"); call_output.append(w3)
+        elif A2 and not A3:
+            pass
+        elif not A2 and A3:
+            call_output.append("-k"); call_output.append(w3)
 
+    # process -A a7o -Ao a/o -Al
+    w1 = author_template
+    w2 = author_load_template
+    w3 = author_out_template
+    A1 = author_template      != author_template_default
+    A2 = author_load_template != author_load_template_default
+    A3 = author_out_template  != author_out_template_default
+    if A1:
+        if A2 and A3:
+            call_output.append("-A"); call_output.append(w3)
+        elif A2 and not A3:
+            call_output.append("-A"); call_output.append(w1)
+        elif not A2 and A3:
+            call_output.append("-A"); call_output.append(w3)
+        elif not A2 and not A3:
+            call_output.append("-A"); call_output.append(w1)
+    else:
+        if A2 and A3:
+            call_output.append("-A"); call_output.append(w3)
+        elif A2 and not A3:
+            pass
+        elif not A2 and A3:
+            call_output.append("-A"); call_output.append(w3)
+
+    # process -L a/o -Lo a/o -Ll
+    w1 = license_template
+    w2 = license_load_template
+    w3 = license_out_template
+    A1 = license_template      != license_template_default
+    A2 = license_load_template != license_load_template_default
+    A3 = license_out_template  != license_out_template_default
+    if A1:
+        if A2 and A3:
+            call_output.append("-L"); call_output.append(w3)
+        elif A2 and not A3:
+            call_output.append("-L"); call_output.append(w1)
+        elif not A2 and A3:
+            call_output.append("-L"); call_output.append(w3)
+        elif not A2 and not A3:
+            call_output.append("-L"); call_output.append(w1)
+    else:
+        if A2 and A3:
+            call_output.append("-L"); call_output.append(w3)
+        elif A2 and not A3:
+            pass
+        elif not A2 and A3:
+            call_output.append("-L"); call_output.append(w3)
+
+    # process -y a/o -yl a/o -yo
+    w1 = year_template
+    w2 = year_load_template
+    w3 = year_out_template
+    A1 = year_template      != year_template_default
+    A2 = year_load_template != year_load_template_default
+    A3 = year_out_template  != year_out_template_default
+    if A1:
+        if A2 and A3:
+            call_output.append("-y"); call_output.append(w3)
+        elif A2 and not A3:
+            call_output.append("-y"); call_output.append(w1)
+        elif not A2 and A3:
+            call_output.append("-y"); call_output.append(w3)
+        elif not A2 and not A3:
+            call_output.append("-y"); call_output.append(w1)
+    else:
+        if A2 and A3:
+            call_output.append("-y"); call_output.append(w3)
+        elif A2 and not A3:
+            pass
+        elif not A2 and A3:
+            call_output.append("-y"); call_output.append(w3)
 
 # ------------------------------------------------------------------
-# call_compile + call_index
+# (E, F) call_compile + call_index
 
 if compile:
     direc_comp   = re.sub(r"\\", "/", direc)
@@ -839,7 +889,7 @@ if compile:
     call_index   = index_processor + space + direc_comp + output_name  + ".idx" + space + "-o " + space + direc_comp + output_name  + ".ind"
 
 # ------------------------------------------------------------------
-# call_regeneration
+# (D) call_regeneration
 # construct the call for regneration
 
 if regeneration:
@@ -859,26 +909,19 @@ if regeneration:
     if output_name != output_name_default:                # -o
         call_regeneration.append("-o")
         call_regeneration.append(output_name)
+    if debugging != debugging_default:                    # -dbg
+        call_regeneration.append("-dbg")
 
 
 #===================================================================
 # Auxiliary function
 
-##def fold(s):                                                                    # function fold: auxiliary function: shorten long option value text for output
-##    """auxiliary function: shorten long option value text for output"""
-##    
-##    maxlen = 65
-##    offset = "\n" + 64 * " "
-##    tmp    = s[:]
-##    all    = ""
-##    while len(tmp) > maxlen:
-##        all = all + tmp[0 : maxlen] + offset
-##        tmp = tmp[maxlen :]
-##    return all + tmp
-def fold(s):                                               # function fold: auxiliary function: shorten long option values for output
-    """auxiliary function: shorten long option values for output"""
-    
-    offset = 64 * " "
+def fold(s):                                              # function fold: auxiliary function: shorten long option lists for output
+    """auxiliary function: shorten long option values for output
+
+    s: string, to be folded"""
+
+    offset = 79 * " "
     maxlen = 70
     sep    = "|"
     parts  = s.split(sep)
@@ -892,32 +935,44 @@ def fold(s):                                               # function fold: auxi
         if len(line) >= maxlen:
             out = out +line+ "\n" + offset
             line = ""
-    out = out + line            
+    out = out + line
     return out
 
 # ------------------------------------------------------------------
-def remove_LaTeX_file(t):                                                       # auxiliary function: remove named LaTeX file.
-    """auxiliary function: remove named LaTeX file."""
-    
+def remove_LaTeX_file(t):                                 # auxiliary function remove_LaTeX_file: removes named LaTeX file.
+    """auxiliary function: remove named LaTeX file.
+
+    t: file to be removed"""
+
+    # external methods/functions:
+    # path.exists
+    # os.remove
+
     if delete_temporary_file:
         if t in latex_files:
             if path.exists(args.output_name + t):
                 os.remove(args.output_name + t)
                 if verbose:
-                    print("* Warning: LaTeX file '{}' removed".format(args.output_name + t))
+                    print("[CTANLoad+Out] Warning: LaTeX file '{}' removed".format(args.output_name + t))
             else:
                 pass
 
 # ------------------------------------------------------------------
-def remove_other_file(t):                                                       # auxiliary function: remove named LaTeX file.
-    """auxiliary function: remove named other file."""
+def remove_other_file(t):                                 # auxiliary function remove_other_file: removes named other file
+    """auxiliary function: remove named other file.
+
+    t: file to be removed """
+
+    # external methods/functions:
+    # path.exists
+    # os.remove
 
     if delete_temporary_file:
         if t in other_files:
             if path.exists(args.output_name + t):
                 os.remove(args.output_name + t)
                 if verbose:
-                    print("* Warning: file '{}' removed".format(args.output_name + t))
+                    print("[CTANLoad+Out] Warning: file '{}' removed".format(args.output_name + t))
             else:
                 pass
 
@@ -926,76 +981,109 @@ def remove_other_file(t):                                                       
 # Functions
 
 # ------------------------------------------------------------------
-def func_call_load():                                                           # function func_call_load(): CTANLoad is processed.      
+def func_call_load():                                     # function func_call_load(): CTANLoad is processed.
     """CTANLoad is processed."""
 
-    print("-" * 80)
-    print("* Info: CTANLoad (Load)")
+    # external methods/functions:
+    # subprocess.run
+    # sys.exit
+
+    if verbose:
+        print("-" * sepline_length)
+    print("[CTANLoad+Out] Info: CTANLoad (Load)")
 
     try:
         process_load      = subprocess.run(call_load, capture_output=True, universal_newlines=True)
         load_message      = process_load.stdout
         load_errormessage = process_load.stderr
         if len(load_errormessage) > 0:
-            print("* Error: Error in CTANLoad (Load):")
             print(load_errormessage)
             sys.exit()
         else:
             print(load_message)
     except:
-        sys.exit("* Error: Error in CTANLoad (Load)")
+        sys.exit("[CTANLoad+Out] Error: Error in CTANLoad (Load)")
+
     if verbose:
-        print("* Info: CTANLoad (Load) completed")
+        print("\n" + "[CTANLoad+Out] Info: CTANLoad (Load) completed")
 
 # ------------------------------------------------------------------
-def func_call_check():                                                          # function func_call_check(): CTANLoad (Check) is processed.
+def func_call_check():                                    # function func_call_check(): CTANLoad (Check) is processed.
     """CTANLoad (Check) is processed."""
 
-    print("-" * 80)
-    print("* Info: CTANLoad (Check)")
+    # external methods/functions:
+    # subprocess.run
+    # sys.exit
 
-    try:                                                  
-        process_check      = subprocess.run(call_check, universal_newlines=True)
-    except:
-        sys.exit("* Error: Error in CTANLoad (Check)")
     if verbose:
-        print("* Info: CTANLoad (Check) completed")
+        print("-" * sepline_length)
+    print("[CTANLoad+Out] Info: CTANLoad (Check)")
+
+    try:
+        process_check      = subprocess.run(call_check, universal_newlines=True)
+        check_message      = process_check.stdout
+        check_errormessage = process_check.stderr
+        if check_errormessage != None:
+            print(check_errormessage)
+            sys.exit()
+        elif check_message != None:
+            print(check_message)
+    except:
+        sys.exit("[CTANLoad+Out] Error: Error in CTANLoad (Check)")
+
+    if verbose:
+        print("\n" + "[CTANLoad+Out] Info: CTANLoad (Check) completed")
 
 # ------------------------------------------------------------------
-def func_call_regeneration():                                                   # function func_call_regeneration(): CTANLoad (Regeneration) is processed.
+def func_call_regeneration():                             # function func_call_regeneration(): CTANLoad (Regeneration) is processed.
     """CTANLoad (Regeneration) is processed."""
 
-    print("-" * 80)
-    print("* Info: CTANLoad (Regeneration)")
+    # external methods/functions:
+    # subprocess.run
+    # sys.exit
 
-    try:                                                  
+    if verbose:
+        print("-" * sepline_length)
+    print("[CTANLoad+Out] Info: CTANLoad (Regeneration)")
+
+    try:
         process_regeneration      = subprocess.run(call_regeneration, capture_output=True, universal_newlines=True)
         regeneration_errormessage = process_regeneration.stderr
         regeneration_message      = process_regeneration.stdout
         if len(regeneration_errormessage) > 0:
-            print("* Error: Error in CTANLoad (Regeneration)")
+            print("[CTANLoad+Out] Error: Error in CTANLoad (Regeneration)")
             print(regeneration_errormessage)
             sys.exit()
         else:
             print(regeneration_message)
     except:
-        sys.exit("* Error: Error in CTANLoad (Regeneration)")
+        sys.exit("[CTANLoad+Out] Error: Error in CTANLoad (Regeneration)")
+
     if verbose:
-        print("* Info: CTANLoad (Regeneration) completed")
+        print("\n" + "[CTANLoad+Out] Info: CTANLoad (Regeneration) completed")
 
 # ------------------------------------------------------------------
-def func_call_output():                                                         # function func_call_output(): CTANOut is processed.
+def func_call_output():                                   # function func_call_output(): CTANOut is processed.
     """CTANOut is processed."""
 
-    print("-" * 80)
-    print("* Info: CTANOut")
+    # func_call_output ---> remove_other_file
+    # func_call_output ---> remove_LaTeX_file
+
+    # --------------------------------------------
+    # external methods/functions:
+    # subprocess.run
+    # sys.exit
+
+    if verbose:
+        print("-" * sepline_length)
+    print("[CTANLoad+Out] Info: CTANOut")
+
+    # remove some relevant files
     if mode == "BibLaTeX":
         remove_other_file(".bib")
     elif mode == "LaTeX":
-        remove_LaTeX_file(".tex")
-        remove_LaTeX_file(".tap")
-        remove_LaTeX_file(".top")
-        remove_LaTeX_file(".xref")
+        for e in [".tex", ".tap", ".top", ".xref", ".stat", ".tlp", ".lic"]:
+            remove_LaTeX_file(e)
     elif mode == "RIS":
         remove_other_file(".ris")
     elif mode == "plain":
@@ -1005,185 +1093,349 @@ def func_call_output():                                                         
     else:
         pass
 
-    try:                                                  
+    try:
         process_output      = subprocess.run(call_output, capture_output=True, universal_newlines=True)
         output_errormessage = process_output.stderr
         output_message      = process_output.stdout
         if len(output_errormessage) > 0:
-            print("* Error: Error in CTANOut")
+            print("[CTANLoad+Out] Error: Error in CTANOut")
             print(output_errormessage)
             sys.exit()
         else:
             print(output_message)
     except:
-        sys.exit("* Error: Error in CTANOut")
+        sys.exit("[CTANLoad+Out] Error: Error in CTANOut")
+
     if verbose:
-        print("* Info: CTANOut completed")
+        print("\n" + "[CTANLoad+Out] Info: CTANOut completed")
 
 # ------------------------------------------------------------------
-def func_call_compile():                                                        # function: Compile the generated LaTeX file.
+def func_call_compile():                                  # Compiles the generated LaTeX file
     """Compile the generated LaTeX file."""
 
-    print("-" * 80)
-    print("* Info: Compilation")
-    for e in [".aux", ".idx", ".ind", ".log", ".ilg", ".pdf", ".out"]:
-        remove_LaTeX_file(e)
-    print("\n* Info: XeLaTeX")
-    if verbose:
-        print("* Info: Call:", call_compile)
+    # func_call_compile ---> remove_LaTeX_file
 
-    try:                                                  
-        process_compile1      = subprocess.run(call_compile, capture_output=True, universal_newlines=True)
-        compile1_errormessage = process_compile1.stderr
-        compile1_message      = process_compile1.stdout
-        if len(compile1_errormessage) > 0:
-            print("* Error: Error in compilation")
-            print(compile1_errormessage)
-            sys.exit()
-        else:
+    # --------------------------------------------
+    # external methods/functions:
+    # path.exists
+
+    if verbose:
+        print("-" * sepline_length)
+    print("[CTANLoad+Out] Info: Compilation")
+
+    file_name     = direc + output_name + ".tex"
+    file_name_log = direc + output_name + ".log"
+    file_name_ilg = direc + output_name + ".ilg"
+
+    if path.exists(file_name):
+        if path.getsize(file_name) > 3000:
+
+            # step 1
+            for e in [".aux", ".idx", ".ind", ".log", ".ilg", ".pdf", ".out", ".bbl", ".indlualatex"]:
+                remove_LaTeX_file(e)
+
+            print("[CTANLoad+Out] Info: " + latex_processor)
             if verbose:
-                print("* Info: more information in '" + direc + output_name + ".log'\n")
-                print("* Info: Compilation OK")
-    except:
-        if verbose:
-            print("* Info: more information in '" + direc + output_name + ".log'")
-        sys.exit("* Error: Error in compilation")
+                print("[CTANLoad+Out] Info: Program call:", call_compile)
+
+            try:
+                process_compile1      = subprocess.run(call_compile, capture_output=True, universal_newlines=True)
+                compile1_errormessage = process_compile1.stderr
+                compile1_message      = process_compile1.stdout
+                if len(compile1_errormessage) > 0:
+                    print("[CTANLoad+Out] Error: Error in compilation")
+                    sys.exit()
+                else:
+                    if verbose:
+                        print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_log))
+                        print("[CTANLoad+Out] Info: Compilation OK")
+            except:
+                if verbose:
+                    print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_log))
+                sys.exit("[CTANLoad+Out] Error: Error in compilation")
 
 # ...................................................................
-    print("." * 80)
-    print("* Info: XeLaTeX")
-    if verbose:
-        print("* Info: Call:", call_compile)
-
-    try:                                                  
-        process_compile2      = subprocess.run(call_compile, capture_output=True, universal_newlines=True)
-        compile2_errormessage = process_compile2.stderr
-        compile2_message      = process_compile2.stdout
-        if len(compile2_errormessage) > 0:
-            print("* Error: Error in compilation:")
-            print(compile2_errormessage)
-            sys.exit()
-        else:
+            # step 2
             if verbose:
-                print("* Info: more information in '" + direc + output_name + ".log'\n")
-                print("* Info: Compilation OK")
-    except:
-        if verbose:
-            print("* Info: more information in '" + direc + output_name + ".log'")
-        sys.exit("* Error: Error in compilation")
-
-# ...................................................................
-    print("." * 80)
-    print("* Info: Makeindex")
-    if verbose:
-        print("* Info: Call:", call_index)
-
-    try:                                                  
-        process_index      = subprocess.run(call_index, capture_output=True, universal_newlines=True)
-        index_errormessage = process_index.stderr
-        index_message      = process_index.stdout
-    except:
-        if verbose:
-            print("* Info: more information in '" + direc + output_name + ".ilg'\n")
-        sys.exit("* Error: Error in Makeindex")
-    if verbose:
-        print("* Info: more information in '" + direc + output_name + ".ilg'\n")
-        print("* Info: Makeindex OK")
-
-# ...................................................................
-    print("." * 80)
-    print("* Info: XeLaTeX")
-    if verbose:
-        print("* Info: Call:", call_compile)
-
-    try:                                                  
-        process_compile3      = subprocess.run(call_compile, capture_output=True, universal_newlines=True)
-        compile3_errormessage = process_compile3.stderr
-        compile3_message      = process_compile3.stdout
-        if len(compile3_errormessage) > 0:
-            print("* Error: Error in compilation:")
-            print(compile3_errormessage)
-            sys.exit()
-        else:
+                print("." * sepline_length)
+            print("[CTANLoad+Out] Info: " + latex_processor)
             if verbose:
-                print("* Info: more information in '" + direc + output_name + ".log'") 
-                print("* Info: result in '" + direc + output_name + ".pdf'\n")
-                print("* Info: Compilation OK")
-    except:
-        if verbose:
-            print("* Info: more information in '" + direc + output_name + ".log'")
-        sys.exit("* Error: Error in compilation")
+                print("[CTANLoad+Out] Info: Program call:", call_compile)
+
+            try:
+                process_compile2      = subprocess.run(call_compile, capture_output=True, universal_newlines=True)
+                compile2_errormessage = process_compile2.stderr
+                compile2_message      = process_compile2.stdout
+                if len(compile2_errormessage) > 0:
+                    print("[CTANLoad+Out] Error: Error in compilation")
+                    sys.exit()
+                else:
+                    if verbose:
+                        print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_log))
+                        print("[CTANLoad+Out] Info: Compilation OK")
+            except:
+                if verbose:
+                    print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_log))
+                sys.exit("[CTANLoad+Out] Error: Error in compilation")
 
 # ...................................................................
-    for e in [".aux", ".idx", ".ind", ".out"]:
+            # step 3
+            if verbose:
+                print("." * sepline_length)
+            print("[CTANLoad+Out] Info: " + index_processor)
+            if verbose:
+                print("[CTANLoad+Out] Info: Program call:", call_index)
+
+            try:
+                process_index      = subprocess.run(call_index, capture_output=True, universal_newlines=True)
+                index_errormessage = process_index.stderr
+                index_message      = process_index.stdout
+            except:
+                if verbose:
+                    print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_ilg))
+                sys.exit("[CTANLoad+Out] Error: Error in Makeindex")
+            if verbose:
+                print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_ilg))
+                print("[CTANLoad+Out] Info: Makeindex OK")
+
+# ...................................................................
+            # step 4
+            if verbose:
+                print("." * sepline_length)
+            print("[CTANLoad+Out] Info: " + latex_processor)
+            if verbose:
+                print("[CTANLoad+Out] Info: Program call:", call_compile)
+
+            try:
+                process_compile3      = subprocess.run(call_compile, capture_output=True, universal_newlines=True)
+                compile3_errormessage = process_compile3.stderr
+                compile3_message      = process_compile3.stdout
+                if len(compile3_errormessage) > 0:
+                    print("[CTANLoad+Out] Error: Error in compilation:")
+                    sys.exit()
+                else:
+                    if verbose:
+                        print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_log))
+                        print("[CTANLoad+Out] Info: result in '" + direc + output_name + ".pdf'")
+                        print("[CTANLoad+Out] Info: Compilation OK\n")
+            except:
+                if verbose:
+                    print("[CTANLoad+Out] Info: more information in '{0}'".format(file_name_log))
+                sys.exit("[CTANLoad+Out] Error: Error in compilation")
+        else:
+            if verbose: print("[CTANLoad+Out] Warning: LaTeX file '{0}' without content, no compilation".format(file_name))
+    else:
+        if verbose: print("[CTANLoad+Out] Warning: LaTeX file '{0}' does not exist, no compilation".format(file_name))
+
+# ...................................................................
+    # remove some LaTeX files
+    for e in [".aux", ".idx", ".ind", ".out", ".bbl", ".indlualatex"]:
         remove_LaTeX_file(e)
 
 # ------------------------------------------------------------------
-def head():                                                                     # function head: show the given options
+def head():                                               # function head: shows the called options
     """Show the given options."""
-    
-    print("* Info: CTANLoad+Out")
+
+    # head ---> fold
+
+    call[0] = "CTANLoad+Out.py"
+    print("[CTANLoad+Out] Info: CTANLoad+Out")
     if verbose:
-        print("* Info: Call:", call)
-        if ("-c" in call) or ("--check_integrity" in call): print("  {0:5} {1:55}".format("-c", "(" + integrity_text + ")"))                         # -c
-        if ("-f" in call) or ("--download_files" in call):  print("  {0:5} {1:55}".format("-f", "(" + download_text + ")"))                          # -f
-        if ("-l" in call) or ("--lists" in call):           print("  {0:5} {1:55}".format("-l", "(" + (lists_text + ")")[0:50] + ellipse))           # -l 
-        if ("-mo" in call) or ("--make_output" in call):    print("  {0:5} {1:55}".format("-mo", "(" + (make_output_text + ")")[0:50] + ellipse))    # -mo
-        if ("-mt" in call) or ("--make_topics" in call):    print("  {0:5} {1:55}".format("-mt", "(" + (topics_text + ")")[0:50] + ellipse))         # -mt
-        if ("-p" in call) or ("--pdf_output" in call):      print("  {0:5} {1:55}".format("-p", "(" + pdf_text + ")"))                               # -p
-        if ("-r" in call) or ("--regenerate_pickle_files" in call): print("  {0:5} {1:55}".format("-r", "(" + regenerate_text + ")"))                # -v
-        if ("-stat" in call) or ("--statistics" in call):   print("  {0:5} {1:55}".format("-stat", "(" + statistics_text + ")"))                     # -stat
-        if ("-v" in call) or ("--verbose" in call):         print("  {0:5} {1:55}".format("-v", "(" + verbose_text + ")"))                           # -v
-        if ("-b" in call) or ("--btype" in call):           print("  {0:5} {2:55} {1}".format("-b", btype, "(" + btype_text + ")"))                  # -b
-        if ("-d" in call) or ("--directory" in call):       print("  {0:5} {2:55} {1}".format("-d", direc, "(" + direc_text + ")"))                  # -d
-        if ("-m" in call) or ("--mode" in call):            print("  {0:5} {2:55} {1}".format("-m", mode, "(" + mode_text + ")"))                    # -m
-        if ("-n" in call) or ("--number" in call):          print("  {0:5} {2:55} {1}".format("-n", number, "(" + number_text + ")"))                # -n
-        if ("-o" in call) or ("--output" in call):          print("  {0:5} {2:55} {1}".format("-o", args.output_name, "(" + output_text + ")"))      # -o
-        if ("-k" in call) or ("--key" in call):             print("  {0:5} {2:55} {1}".format("-k", fold(key), "(" + (key_text + ")")[0:50] + ellipse))  # -k
-        if ("-kl" in call) or ("--key_load" in call):       print("  {0:5} {2:55} {1}".format("-k", fold(key_load), "(" + key_load_text + ")"))      # -kl
-        if ("-ko" in call) or ("--key_out" in call):        print("  {0:5} {2:55} {1}".format("-k", fold(key_out), "(" + key_out_text + ")"))        # -ko
-        if ("-s" in call) or ("--skip" in call):            print("  {0:5} {2:55} {1}".format("-s", skip, "(" + skip_text + ")"))                    # -s
-        if ("-t" in call) or ("--template" in call):        print("  {0:5} {2:55} {1}".format("-t", fold(template), "(" + template_text + ")"))      # -t
-        if ("-tl" in call) or ("--template_load" in call):  print("  {0:5} {2:55} {1}".format("-tl", template_load, "(" + template_load_text + ")")) # -tl
-        if ("-to" in call) or ("--template_out" in call):   print("  {0:5} {2:55} {1}".format("-to", template_out, "(" + template_out_text + ")"))   # -to
-        if ("-A" in call) or ("--author_template" in call):       print("  {0:5} {2:55} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))            # --A
-        if ("-Al" in call) or ("-author_load_template" in call):  print("  {0:5} {2:55} {1}".format("-Al", fold(author_load_template), "(" + author_load_template_text + ")")) # -Al
-        if ("-Ao" in call) or ("--author_outd_template" in call): print("  {0:5} {2:55} {1}".format("-Ao", fold(author_out_template), "(" + author_out_template_text + ")"))   # -Ao
+        print("date/time:".ljust(left + 1), actDate, actTime)
+        print("program/version:".ljust(left + 1), programname, "/", programversion, "\n")
+
+        
+        print("[CTANLoad+Out] Info: Program call:", call)
+        if ("-c" in call) or ("--check_integrity" in call):
+            print("  {0:5} {1:70}".format("-c", "(" + integrity_text + ")"))                                                          # -c (Flag)
+        if ("-f" in call) or ("--download_files" in call):
+            print("  {0:5} {1:70}".format("-f", "(" + download_text + ")"))                                                           # -f (Flag)
+        if ("-l" in call) or ("--lists" in call):
+            print("  {0:5} {1:70}".format("-l", "(" + (lists_text + ")")[0:65] + ellipse))                                            # -l (Flag)
+        if ("-mo" in call) or ("--make_output" in call):
+            print("  {0:5} {1:70}".format("-mo", "(" + (make_output_text + ")")[0:65] + ellipse))                                     # -mo (Flag)
+        if ("-mt" in call) or ("--make_topics" in call):
+            print("  {0:5} {1:70}".format("-mt", "(" + (topics_text + ")")[0:65] + ellipse))                                          # -mt (Flag)
+        if ("-nf" in call) or ("--no_files" in call):
+            print("  {0:5} {1:70}".format("-nf", "(" + (no_files_text + ")")[0:65] + ellipse))                                        # -nf (Flag)
+        if ("-p" in call) or ("--pdf_output" in call):
+            print("  {0:5} {1:70}".format("-p", "(" + pdf_output_text + ")"))                                                         # -p (Flag)
+        if ("-r" in call) or ("--regenerate_pickle_files" in call):
+            print("  {0:5} {1:70}".format("-r", "(" + regenerate_text + ")"))                                                         # -r (Flag)
+        if ("-stat" in call) or ("--statistics" in call):
+            print("  {0:5} {1:70}".format("-stat", "(" + statistics_text + ")"))                                                      # -stat (Flag)
+        if ("-v" in call) or ("--verbose" in call):
+            print("  {0:5} {1:70}".format("-v", "(" + verbose_text + ")"))                                                            # -v (Flag)
+
+        if ("-b" in call) or ("--btype" in call):
+            print("  {0:5} {2:70} {1}".format("-b", btype, "(" + btype_text + ")"))                                                   # -b
+        if ("-d" in call) or ("--directory" in call):
+            print("  {0:5} {2:70} {1}".format("-d", direc, "(" + direc_text + ")"))                                                   # -d
+        if ("-m" in call) or ("--mode" in call):
+            print("  {0:5} {2:70} {1}".format("-m", mode, "(" + mode_text + ")"))                                                     # -m
+        if ("-n" in call) or ("--number" in call):
+            print("  {0:5} {2:70} {1}".format("-n", number, "(" + number_text + ")"))                                                 # -n
+        if ("-o" in call) or ("--output" in call):
+            print("  {0:5} {2:70} {1}".format("-o", args.output_name, "(" + output_text + ")"))                                       # -o
+        if ("-s" in call) or ("--skip" in call):
+            print("  {0:5} {2:70} {1}".format("-s", skip, "(" + skip_text + ")"))                                                     # -s
+        if ("-sb" in call) or ("--skip_biblatex" in call):
+            print("  {0:5} {2:70} {1}".format("-sb", skip_biblatex, "(" + skip_biblatex_text + ")"))                                  # -sb
+
+        if ("-k" in call) or ("--key_template" in call):
+            print("  {0:5} {2:70} {1}".format("-k", fold(key_template), "(" + (key_template_text + ")")[0:65] + ellipse))             # -k (keys)
+        if ("-kl" in call) or ("--key_load_template" in call):
+            print("  {0:5} {2:70} {1}".format("-kl", fold(key_load_template), "(" + (key_load_template_text + ")")[0:65] + ellipse))  # -kl (keys)
+        if ("-ko" in call) or ("--key_out_template" in call):
+            print("  {0:5} {2:70} {1}".format("-ko", fold(key_out_template), "(" + (key_out_template_text + ")")[0:65] + ellipse))    # -ko (keys)
+
+        if ("-t" in call) or ("--name_template" in call):
+            print("  {0:5} {2:70} {1}".format("-t", fold(name_template), "(" + name_template_text + ")"))                             # -t (names)
+        if ("-tl" in call) or ("--name_load_template" in call):
+            print("  {0:5} {2:70} {1}".format("-tl", fold(name_load_template), "(" + name_load_template_text + ")"))                  # -tl (names)
+        if ("-to" in call) or ("--name_out_template" in call):
+            print("  {0:5} {2:70} {1}".format("-to", fold(name_out_template), "(" + name_out_template_text + ")"))                    # -to (names)
+
+        if ("-A" in call) or ("--author_template" in call):
+            print("  {0:5} {2:70} {1}".format("-A", fold(author_template), "(" + author_template_text + ")"))                         # -A (authors)
+        if ("-Al" in call) or ("--author_load_template" in call):
+            print("  {0:5} {2:70} {1}".format("-Al", fold(author_load_template), "(" + author_load_template_text + ")"))              # -Al (authors)
+        if ("-Ao" in call) or ("--author_out_template" in call):
+            print("  {0:5} {2:70} {1}".format("-Ao", fold(author_out_template), "(" + author_out_template_text + ")"))                # -Ao (authors)
+
+        if ("-L" in call) or ("--license_template" in call):
+            print("  {0:5} {2:70} {1}".format("-L", fold(license_template), "(" + license_template_text + ")"))                       # -L (licenses)
+        if ("-Ll" in call) or ("--license_load_template" in call):
+            print("  {0:5} {2:70} {1}".format("-Ll", fold(license_load_template), "(" + license_load_template_text + ")"))            # -Ll (licenses)
+        if ("-Lo" in call) or ("--license_out_template" in call):
+            print("  {0:5} {2:70} {1}".format("-Lo", fold(license_out_template), "(" + license_out_template_text + ")"))              # -Lo (licenses)
+
+        if ("-y" in call) or ("--year_template" in call):
+            print("  {0:5} {2:70} {1}".format("-y", fold(year_template), "(" + year_template_text + ")"))                             # -y (years)
+        if ("-yl" in call) or ("--year_load_template" in call):
+            print("  {0:5} {2:70} {1}".format("-yl", fold(year_load_template), "(" + year_load_template_text + ")"))                  # -yl (years)
+        if ("-yo" in call) or ("--year_out_template" in call):
+            print("  {0:5} {2:70} {1}".format("-yo", fold(year_out_template), "(" + year_out_template_text + ")"))                    # -yo (years)
+
         print("\n")
 
-        if regeneration: print("* Info: CTANLoad (Regeneration) to be executed")
-        if load:         print("* Info: CTANLoad (Load)         to be executed")
-        if check:        print("* Info: CTANLoad (Check)        to be executed")
-        if output:       print("* Info: CTANOut                 to be executed")
-        if compile:      print("* Info: XeLaTeX and MakeIndex   to be executed")
-        print("\n")
-    
+        if regeneration: print("[CTANLoad+Out] Info: CTANLoad (Regeneration) to be executed")
+        if load:         print("[CTANLoad+Out] Info: CTANLoad (Load)         to be executed")
+        if check:        print("[CTANLoad+Out] Info: CTANLoad (Check)        to be executed")
+        if output:       print("[CTANLoad+Out] Info: CTANOut                 to be executed")
+        if compile:      print("[CTANLoad+Out] Info: LuaLaTeX and MakeIndex  to be executed")
+
 # ------------------------------------------------------------------
-def main():                                                                     # main function
+def main():                                       # main function
     """Main Function"""
-    
-    print("=" * 80)
+
+    # main ---> head
+    # main ---> func_call_regeneration
+    # main ---> func_call_load
+    # main ---> func_call_check
+    # main ---> func_call_output
+    # main ---> func_call_compile
+
+    file_name = direc + output_name + ".tex"
+
+    if verbose:
+        print("=" * sepline_length)
     head()
-    if regeneration:
+
+    if regeneration:                              # -r has been called
         func_call_regeneration()
     if load:
         func_call_load()
-    if check:
+    if check:                                     # -l a/o -c has been called
         func_call_check()
     if output:
         func_call_output()
-    if compile:
-        if path.exists(direc + output_name + ".tex"):
-            func_call_compile()
-        else:
-            print("* Warning: LaTeX file '{0}' does not exist".format(direc + output_name + ".tex"))
-    print("-" * 80)
+    if compile:                                   # the LaTeX processor will produce a PDF file
+        func_call_compile()
+    if verbose:
+        print("-" * sepline_length)
+           
 
-  
 #===================================================================
 # Main Part
 
 if __name__ == "__main__":
-    main()
+    try:
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
+    except:
+        pass
+    
+    starttotal   = time.time()                    # set begin of total time
+    startprocess = time.process_time()            # set begin of process time
+
+    main()                                        # main part called
+    if statistics:                                # output the rest of statistics
+        pp         = 6
+        endtotal   = time.time()
+        endprocess = time.process_time()
+        print("---")
+        print("total time (CTANLoad+Out): ".ljust(left + 3), str(round(endtotal-starttotal, 2)).rjust(pp))
+        print("process time (CTANLoad+Out): ".ljust(left + 3), str(round(endprocess-startprocess, 2)).rjust(pp))
+    if verbose:
+        print("\n" + "[CTANLoad+Out] Info: CTANLoad+Out completed.")
 else:
-    print("- Error: tried to use the program indirectly")
+    print("[CTANLoad+Out] Error: tried to use the program indirectly")
+
+
+#===================================================================
+
+# Problems/Plans:
+# + prüfen, ob ctanload -l -c aufgerufen werden muss (wenn CTANOut folgt)
+# + ist -c gefährlich?
+# + Index verweist auf Seitenummern; all.xref und all.tap auf Abschnittsnummer
+# + Programmabbruch bei -ko graphics oder -ko class (x)
+# + Fehler bei LaTeX-Ausgabe: UnicodeDecodeError: 'charmap' codec can't decode byte 0x8f in position 262476: character maps to <undefined>
+# + alle Textdateien überprüfen bzw. neu machen (x)
+# + year_template_default angepasst an CTANLoad und CTANOut (x)
+
+# ------------------------------------------------------------------
+# History:
+
+# 0.1  2021-05-01 start
+# 0.9  2021-05-04 first working version
+# 1.0  2021-05-24 program completed
+# 1.1  2021-05-28 compilation enabled
+# 1.2  2021-05-31 some improvements (calls, compilation)
+# 1.3  2021-06-12 auxiliary function fold: shorten long option lists for output
+# 1.4  2021-06-20 some smaller errors/deficiencies corrected
+# 1.5  2021-06-23 error correction
+# 1.6  2021-06-24 adaption for the CTANLoad option -r
+# 1.7  2021-06-25 some new handling of subprocesses
+# 1.8  2021-06-25 transfer of options to CTANLoad (Regeneration) improved; handling of -r improved
+# 1.9  2021-07-01 adaption of the option -k (CTANLoad); new options -ko and -kl
+# 1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove specified temporary LaTeX files
+# 1.11 2021-07-05 function fold restructured
+# 1.12 2021-07-06 new error message: tried to use the program indirectly
+# 1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced
+# 1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
+# 1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
+# 1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
+# 1.17 2021-07-18 output (listing of program options) enhanced
+# 1.18 2021-07-18 xyz.tex and all other LaTeX relevant files before compilation a/o -mt removed
+# 1.19 2021-07-19 there is no compilation if -A a/o -k a/o -t results "no packages found"
+# 1.20 2021-07-19 -mo now prevents unintended loading of CTANLoad
+# 1.21 2021-11-27 -sb (CTANOut) enabled
+# 1.22 2021-11-28 process time and total time can be computed
+# 1.23 2021-11-28 greater parts of comment blocks moved to external text files
+# 1.24 2021-12-30 option -L enabled; changes in argparse, in the func_call_load and func_call_output functions
+# 1.25 2022-01-02 argparse messages changed
+# 1.26 2022-01-12 changes in func_call_compile, main, call_ouput
+# 1.27 2022-01-22 corrections and changes of log output on terminal
+# 1.28 2022-02-28 processing of -L, -Ll, -Lo (and related options) improved
+# 1.29 2023-06-22 all Python comments revised
+# 1.30 2023-06-22 new option -dbg (debugging) + processing
+# 1.31 2023-06-22 processing of options improved; esp. to prevent collissions
+# 1.32 2023-06-22 new option -nf (no files) installed + processing: relevant in CTANOut
+# 1.33 2023-06-22 some additional requests/settings to avoid collissions of -nf with other options
+# 1.34 2023-06-22 variable names (in the context of argparse) unified
+# 1.35 2023-06-22 func_call_check improved
+# 1.36 2023-06-22 new option -y (filtering on the base of years) + processing; relevant in CTANLoad and CTANOut
+# 1.37 2023-06-26 some minor changes in statistics output
+# 1.38 2023-06-28 fold() changed to adjust protocoll output
+# 1.39 2ß23-07-01 messages with an additional identifier "[CTANLoad+Out]"

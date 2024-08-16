@@ -1,0 +1,14 @@
+Functions (CTANLoad+out)
+========================
+2023-06-30
+
+fold(s):                    # auxiliary function: shortens long option values for output
+func_call_check():          # CTANLoad (Check) is processed.
+func_call_compile():        # Compiles the generated LaTeX file.
+func_call_load():           # CTANLoad is processed.
+func_call_output():         # CTANOut is processed.
+func_call_regeneration():   # CTANLoad (Regeneration) is processed.
+head():                     # shows the given options
+main():                     # main function
+remove_LaTeX_file(t):       # auxiliary function: removes named LaTeX file.
+remove_other_file(t):       # auxiliary function: removes named other file.

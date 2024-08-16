@@ -1,18 +1,51 @@
 Messages (CTANLoad+Out)
 =======================
-Fatal error:
-Error: Error in <step>
-Error: tried to use the program indirectly
+2023-07-04
 
-Information:
-Info: <step> OK
-Info: Call: <call>
-Info: <step> to be executed
-Info: <step>
-Info: more information in '<log file>'
-Info: result in '<file>'
+Fatal errors
+------------
+[CTANLoad+Out] Error: Error in CTANLoad (Check)
+[CTANLoad+Out] Error: Error in CTANLoad (Load)
+[CTANLoad+Out] Error: Error in CTANLoad (Regeneration)
+[CTANLoad+Out] Error: Error in CTANOut
+[CTANLoad+Out] Error: Error in Makeindex
+[CTANLoad+Out] Error: Error in compilation
+[CTANLoad+Out] Error: tried to use the program indirectly
 
-Warning:
-Warning: LaTeX file '<file>' does not exist
-Warning: LaTeX file '<file>' removed
-Warning: file '<file>' removed
+Infos
+-----
+[CTANLoad+Out] Info: <index_processor>
+[CTANLoad+Out] Info: <latex_processor>
+[CTANLoad+Out] Info: CTANLoad (Check)
+[CTANLoad+Out] Info: CTANLoad (Check) completed
+[CTANLoad+Out] Info: CTANLoad (Check) to be executed
+[CTANLoad+Out] Info: CTANLoad (Load)
+[CTANLoad+Out] Info: CTANLoad (Load) completed
+[CTANLoad+Out] Info: CTANLoad (Load) to be executed
+[CTANLoad+Out] Info: CTANLoad (Regeneration)
+[CTANLoad+Out] Info: CTANLoad (Regeneration) completed
+[CTANLoad+Out] Info: CTANLoad (Regeneration) to be executed
+[CTANLoad+Out] Info: CTANLoad+Out
+[CTANLoad+Out] Info: CTANLoad+Out completed
+[CTANLoad+Out] Info: CTANOut
+[CTANLoad+Out] Info: CTANOut completed
+[CTANLoad+Out] Info: CTANOut to be executed
+[CTANLoad+Out] Info: Compilation
+[CTANLoad+Out] Info: Compilation OK
+[CTANLoad+Out] Info: LuaLaTeX and MakeIndex to be executed
+[CTANLoad+Out] Info: Makeindex OK
+[CTANLoad+Out] Info: Program call: <call>
+[CTANLoad+Out] Info: Program call: <call compile>
+[CTANLoad+Out] Info: Program call: <call index>
+[CTANLoad+Out] Info: more information in '<log file>'
+[CTANLoad+Out] Info: result in '<directory><output name>.pdf'
+
+Warnings
+--------
+[CTANLoad+Out] Warning: '<option + value>' changed to '<value>' (due to '<option>')
+[CTANLoad+Out] Warning: LaTeX file '<latex file>' does not exist, no compilation
+[CTANLoad+Out] Warning: LaTeX file '<latex file>' removed
+[CTANLoad+Out] Warning: LaTeX file '<latex file>' without content, no compilation
+[CTANLoad+Out] Warning: file '<file>' removed
+
+

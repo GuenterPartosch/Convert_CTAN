@@ -1,74 +1,92 @@
 usage: CTANLoad+Out.py [-h] [-a] [-A AUTHOR_TEMPLATE]
                        [-Al AUTHOR_LOAD_TEMPLATE] [-Ao AUTHOR_OUT_TEMPLATE]
+                       [-L LICENSE_TEMPLATE] [-Ll LICENSE_LOAD_TEMPLATE]
+                       [-Lo LICENSE_OUT_TEMPLATE]
                        [-b {@online,@software,@misc,@ctan,@www}] [-c]
-                       [-d DIREC] [-f] [-k KEY] [-kl KEY_LOAD] [-ko KEY_OUT]
-                       [-l]
+                       [-d DIREC] [-f] [-k KEY_TEMPLATE]
+                       [-kl KEY_LOAD_TEMPLATE] [-ko KEY_OUT_TEMPLATE] [-l]
                        [-m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}]
-                       [-mo] [-mt] [-n NUMBER] [-o OUTPUT_NAME] [-p] [-r]
-                       [-s SKIP] [-sb SKIP_BIBLATEX] [-stat] [-t TEMPLATE]
-                       [-tl TEMPLATE_LOAD] [-to TEMPLATE_OUT] [-V] [-v]
+                       [-mo] [-mt] [-n NUMBER] [-nf] [-o OUTPUT_NAME] [-p]
+                       [-r] [-s SKIP] [-sb SKIP_BIBLATEX] [-stat]
+                       [-t NAME_TEMPLATE] [-tl NAME_LOAD_TEMPLATE]
+                       [-to NAME_OUT_TEMPLATE] [-V] [-v] [-y YEAR_TEMPLATE]
+                       [-yl YEAR_LOAD_TEMPLATE] [-yo YEAR_OUT_TEMPLATE]
 
-[CTANLoad+Out.py; Version: 1.23 (2021-11-28)] Combines the tasks of CTANLoad
+[CTANLoad+Out.py; Version: 1.43 (2023-07-30)] Combines the tasks of CTANLoad
 [Load XLM and PDF documentation files from CTAN a/o generates some special
 lists, and prepares data for CTANOut] and CTANOut [Convert CTAN XLM package
 files to some formats].
 
 Optional parameters:
   -h, --help            show this help message and exit
-  -a, --author          Show author of the program and exit.
+  -a, --author          Flag: Shows author of the program and exits.
   -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
-                        Name template for authors [in CTANLoad and CTANOut] -
-                        Default:
+                        [CTANLoad and CTANOut] Name template for authors -
+                        Default: ^.+$
   -Al AUTHOR_LOAD_TEMPLATE, --author_load_template AUTHOR_LOAD_TEMPLATE
-                        Name template for authors (CTANLoad) - Default:
+                        [CTANLoad} Name template for authors - Default:
   -Ao AUTHOR_OUT_TEMPLATE, --author_out_template AUTHOR_OUT_TEMPLATE
-                        Name template for authors (CTANOut) - Default:
+                        [CTANOut} Name template for authors - Default: ^.+$
+  -L LICENSE_TEMPLATE, --license_template LICENSE_TEMPLATE
+                        [CTANLoad and CTANOut] Name template for licenses -
+                        Default: ^.+$
+  -Ll LICENSE_LOAD_TEMPLATE, --license_load_template LICENSE_LOAD_TEMPLATE
+                        [CTANLoad] Name template for licenses - Default:
+  -Lo LICENSE_OUT_TEMPLATE, --license_out_template LICENSE_OUT_TEMPLATE
+                        [CTANOut] Name template for licenses - Default: ^.+$
   -b {@online,@software,@misc,@ctan,@www}, --btype {@online,@software,@misc,@ctan,@www}
                         Type of BibLaTex entries to be generated [valid only
                         for '-m BibLaTeX'/'--mode BibLaTeX'] - Default:
   -c, --check_integrity
-                        Flag: Check the integrity of the 2nd .pkl file. -
+                        Flag: Checks the integrity of the 2nd .pkl file. -
                         Default: False
   -d DIREC, --directory DIREC
                         OS Directory for input and output files - Default: .\
-  -f, --download_files  Flag: Download associated documentation files [PDF]. -
-                        Default: False
-  -k KEY, --key KEY     Template for output filtering on the base of keys [in
-                        CTANLoad and CTANOut] - Default:
-  -kl KEY_LOAD, --key_load KEY_LOAD
-                        Template for output filtering on the base of keys [in
-                        CTANLoad] - Default:
-  -ko KEY_OUT, --key_out KEY_OUT
-                        Template for output filtering on the base of keys [in
-                        CTANOut] - Default: ^.+$
-  -l, --lists           Flag: Generate some special lists and prepare files
+  -f, --download_files  Flag: Downloads associated documentation files [PDF].
+                        - Default: False
+  -k KEY_TEMPLATE, --key_template KEY_TEMPLATE
+                        [CTANLoad and CTANOut] Template for keys - Default:
+                        ^.+$
+  -kl KEY_LOAD_TEMPLATE, --key_load_template KEY_LOAD_TEMPLATE
+                        [CTANLoad] Template for keys - Default:
+  -ko KEY_OUT_TEMPLATE, --key_out_template KEY_OUT_TEMPLATE
+                        [CTANOut] Template for keys - Default: ^.+$
+  -l, --lists           Flag: Generates some special lists and prepare files
                         for CTANOut. - Default: False
   -m {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}, --mode {LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,bib,Excel,excel}
                         Target format - Default: RIS
-  -mo, --make_output    Flag: Generate output [RIS, LaTeX, BibLaTeX, Excel,
-                        plain] via CTANOut. - Default: False
-  -mt, --make_topics    Flag: Generate topic lists [meaning of topics + cross-
-                        reference (topics/packages, authors/packages); only
-                        for -m LaTeX]). - Default: False
+  -mo, --make_output    Flag: Generates only output [RIS, LaTeX, BibLaTeX,
+                        Excel, plain] via CTANOut. - Default: False
+  -mt, --make_topics    Flag: Generates topic lists [meaning of topics +
+                        cross-reference (topics/packages, authors/packages);
+                        only for -m LaTeX]). - Default: False
   -n NUMBER, --number NUMBER
                         Maximum number of file downloads - Default: 250
+  -nf, --no_files       Flag: Do not generate output files. - Default: False
   -o OUTPUT_NAME, --output OUTPUT_NAME
                         Generic name for output files [without extensions] -
                         Default: all
-  -p, --pdf_output      Flag: Generate PDF output. - Default: False
+  -p, --pdf_output      Flag: Generates PDF output. - Default: False
   -r, --regenerate_pickle_files
-                        Flag: Regenerate the two pickle files. - Default:
+                        Flag: Regenerates the two pickle files. - Default:
                         False
-  -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
+  -s SKIP, --skip SKIP  Skips specified CTAN fields. - Default: []
   -sb SKIP_BIBLATEX, --skip_biblatex SKIP_BIBLATEX
-                        Skip specified BibLaTeX fields. - Default: []
-  -stat, --statistics   Flag: Print statistics on terminal. - Default: False
-  -t TEMPLATE, --template TEMPLATE
-                        Template for package names [in CTANLoad and CTANOut] -
-                        Default:
-  -tl TEMPLATE_LOAD, --template_load TEMPLATE_LOAD
-                        Template for package names in CTANLoad - Default:
-  -to TEMPLATE_OUT, --template_out TEMPLATE_OUT
-                        Template for package names in CTANOut - Default: ^.+$
-  -V, --version         Show version of the program and exit.
+                        Skips specified BibLaTeX fields. - Default: []
+  -stat, --statistics   Flag: Prints statistics on terminal. - Default: False
+  -t NAME_TEMPLATE, --name_template NAME_TEMPLATE
+                        [CTANLoad and CTANOut] Template for package names -
+                        Default: ^.+$
+  -tl NAME_LOAD_TEMPLATE, --name_load_template NAME_LOAD_TEMPLATE
+                        [CTANLoad] Template for package names - Default:
+  -to NAME_OUT_TEMPLATE, --name_out_template NAME_OUT_TEMPLATE
+                        [CTANOut] Template for package names - Default: ^.+$
+  -V, --version         Flag: Shows version of the program and exits.
   -v, --verbose         Flag: Output is verbose. - Default: False
+  -y YEAR_TEMPLATE, --year_template YEAR_TEMPLATE
+                        [CTANLoad and CTANOut] Template for years - Default:
+                        ^19[89][0-9]|20[012][0-9]$
+  -yl YEAR_LOAD_TEMPLATE, --year_load_template YEAR_LOAD_TEMPLATE
+                        [CTANLoad] Template for years - Default:
+  -yo YEAR_OUT_TEMPLATE, --year_out_template YEAR_OUT_TEMPLATE
+                        [CTANOut] Template for years - Default:
