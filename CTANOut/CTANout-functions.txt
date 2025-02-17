@@ -1,75 +1,80 @@
-Functions ( CTANOut.py)
+Functions (CTANOut.py)
 =======================
-2023-06-12
+2024-08-12
 
-bibfield_test(s, f):      auxiliary function: Tests a BibLaTeX field: output text is not empty and field is not be skipped
-biblatex_citationkey():   auxiliary function: generate a dictionary with citations keys for all the packages
-comment_fold(s):          auxiliary function: shorten/fold long option values in LaTeX comment output
-first_lines():            creates the first lines of output.
-fold(s):                  auxiliary function: shorten long option values for output
-gen_fold(s, o):           auxiliary function: folds content of <p>, <li>, <dd> (mode dependant)
-get_author_packages():    gets package names by specified author name template
-get_authoryear(a, y):     auxiliary function: construct a unique authoryear string (for BibLaTeX only)
-get_license_packages():   gets package names by specified license template
-get_local_packages(d):    auxiliary function: list all local packages in the current OS directory
-get_name_packages():      gets package names by specified package name template.
-get_topic_packages():     gets package names by specified topic template.
-get_year(s):              auxiliary function: get the most recent year in string s (only for BibLaTeX)
-get_year_packages():      gets package names by specified year template.
-innertext(k, start, pp):  auxiliary function innertext: looks for embedded text and elements and returns an evaluated string
-leading(k, p):            first lines for package output
-load_pickle1():           loads/unpacks pickle file 1
-load_pickle2():           loads/unpacks pickle file 2
-main():                   main function (calls the other functions)
-make_stat():              generates statistics in the stat file (xyz.stat)
-make_statistics():        generates statistics on terminal.
-make_tap():               generates the tap (xyz.tap) file.
-make_tops():              generates the tops (xyz.top) file.
-make_xref():              generates the xref (xyz.xref) file.
-mod_TeXchars1(s):         auxiliary function: prepares characters for LaTeX/BibLaTeX in a paragraph
-mod_TeXchars2(s):         auxiliary function: prepares characters for LaTeX/BibLaTeX
-onepackage(s, t):         loads a package XML file and starts parsing
-process_packages():       global loop (over alll selected packages)
-TeX_fold(s):              auxiliary function: shorten/fold long option values in LaTeX tabular output
-TeXchars(s):              auxiliary function: prepares characters for LaTeX/BibLaTeX
-TeXchars_restore(s):      auxiliary function: restores characters for LaTeX/BibLaTeX
-test_embedded(k, pp):     auxiliary function: tests current knot for embedded material
-trailing(k, t):           last lines for the actual package
+bibfield_test(s, f)		auxiliary function bibfield_test: output text is not empty and field is not be skipped
+biblatex_citationkey()		auxiliary function: Generates a set with citations keys for all packages
+comment_fold(s)			auxiliary function: shortens/folds long option values in LaTeX comment output
+fold(s)				auxiliary function fold: shortens long option values for output
+gen_fold(s, o)			auxiliary function gen_fold: folds content of <p>, <li>, <dd> (mode dependant)
+get_authoryear(a, y)		auxiliary function get_authoryear: constructs a unique authoryear string
+get_local_packages(d)		auxiliary function get_local_packages(d): Lists all local packages
+get_year_packages()		Function get_package_set: Analyzes dictionary 'yearpackages'
+get_year(s)			auxiliary function: gets the most recent year in string s (only for BibLaTeX)
+TeX_fold(s)			auxiliary function TeX_fold: shortens/folds long option values in LaTeX tabular output
+TeXchars(s)			auxiliary function: prepares characters for LaTeX/BibLaTeX
+first_lines()			function: creates the first lines of output.
+get_author_packages()		Function get_author_packages: Gets package names by specified author name template
+get_name_packages()		Function get_name_packages: Gets package names by specified package name template.
+get_topic_packages()		Function get_topic_packages: Gets package names by specified topic template.
+get_license_packages()		Function get_license_packages: Gets package names by specified license template.
+load_pickle1()			Function load_pickle1: loads/unpacks pickle file 1
+load_pickle2()			Function load_pickle2: loads/unpacks pickle file 2
+main()	function: 		Main function (calls the other functions)
+make_stat()			function: generates statistics in the stat file (xyz.stat)
+make_statistics()		function: Generates statistics on terminal.
+make_tap()			function: Generates the tap (xyz.tap) file.
+make_tlp()			function: Generates the tlp (xyz.tlp) file
+make_tops()			function: Generates the tops (xyz.top) file.
+make_lics()			function: Generates the lics (xyz.lic) file.
+make_xref()			function: Generates the xref (xyz.xref) file.
+onepackage(s, t)		function: loads a package XML file and start parsing
+process_packages()		function: Global loop (over alll selected packaged)
+trailing(k, t, p)		function: last lines for the actual package
+test_embedded(k, pp)		auxiliary function test_embedded: tests current knot for embedded material
+TeXchars_restore(s)		auxiliary function: restores characters for LaTeX/BibLaTeX
 
-alias(k):                 processes element <alias .../>
-also(k):                  processes element <also .../>
-authorref(k):             processes element <authorref .../>
-caption(k):               processes element <caption>...</caption>
-contact(k):               processes element <contact .../>
-copyrightT(k, p):         processes element <copyright .../>
-ctan(k, t):               processes element <ctan .../>
-description(k, pp):       processes element <description ...> ... </description>
-documentation(k):         processes element <documentation .../>
-entry(k, t, p):           processes element <entry ...>...</entry>
-fi(k):                    processes element <li>...</li>
-home(k):                  processes element <home .../>
-install(k):               processes element <install .../>
-keyval(k):                processes element <keyval .../>
-licenseT(k):              processes element <license .../>
-miktex(k):                processes element <miktex .../>
-mod_a(k, pp)              processes element <a ...> ... </a>
-mod_b(k, pp)              processes element <b>...</b>
-mod_br(k, pp)             processes element <br/>
-mod_dd(k, pp)             processes element <dd>...</dd>
-mod_dl(k, pp)             processes element <dl>...</dl>
-mod_dt(k, pp)             processes element <dt>...</dt>
-mod_em(k, pp)             processes element <em>...</em>
-mod_i(k, pp)              processes element <i>...</i>
-mod_ol(k, pp)             processes element <ol>...</ol>
-mod_p(k, pp)              processes element <p> ... </p>
-mod_pre(k, pp)            processes element <pre>...</pre>
-mod_small(k, pp)          processes element <small>...</small>
-mod_tt(k, pp)             processes element <tt>...</tt>
-mod_ul(k, pp)             processes element <ul>...</ul>
-mod_xref(k, pp)           processes element <xref ...> ... </xref>
-name(k):                  processes element <name>...</name>
-texlive(k):               processes element <texlive .../>
-version(k, p):            processes element <version .../>
+alias(k)			function: processes element <alias .../>
+also(k)				function: processes element <also .../>
+authorref(k)			function: processes element <authorref .../>
+caption(k)			function: processes element <caption>...</caption>
+contact(k)			function: processes element <contact .../>
+copyrightT(k, p)		function: processes element <copyright .../>
+ctan(k, t)			function: processes element <ctan .../>
+description(k, pp)		function: processes element <description ...> ... </description>
+documentation(k)		function: processes element <documentation .../>
+entry(k, t, p)			function: processes element <entry ...>...</entry>
+home(k)				function: processes element <home .../>
+install(k)			function: processes element <install .../>
+keyval(k)			function: processes element <keyval .../>
+leading(k, p, t)		function: first lines for package output
+licenseT(k)			function: processes element <license .../>
+miktex(k)			function: processes element <miktex .../>
+name(k)				function: processes element <name>...</name>
+texlive(k)			function: processes element <texlive .../>
+version(k, p)			function: processes <version .../> element
+
+innertext(k, start, pp)		function innertext: looks for embedded text and elements and returns an evaluated string
+mod_a(k, pp)			function: processes element <a ...> ... </a>
+mod_b(k, pp)			function: processes element <b>...</b>
+mod_br(k, pp)			function: processes element <br/>
+mod_code(k, pp)			function: processes element <code>...</code>
+mod_dd(k, pp)			function: processes element <dd>...</dd>
+mod_dl(k, pp)			function: processes element <dl>...</dl>
+mod_dt(k, pp)			function: processes element <dt>...</dt>
+mod_em(k, pp)			function: processes element <em>...</em>
+mod_i(k, pp)			function: processes element <i>...</i>
+mod_li(k, pp)			function: processes element <li>...</li>
+mod_pre(k, pp)			function: processes element <pre>...</pre>
+mod_small(k, pp)		function: processes element <small>...</small>
+mod_TeXchars1(s)		auxiliary function: prepares characters for LaTeX/BibLaTeX in a paragraph
+mod_TeXchars2(s)		auxiliary function: prepares characters for LaTeX/BibLaTeX
+mod_tt(k, pp)			function: processes element <tt>...</tt>
+mod_xref(k, pp)			function: processes element <xref ...> ... </xref>
+mod_ol(k, pp)			function: processes element <ol>...</ol>
+mod_p(k, pp)			function: processes element <p> ... </p>
+mod_ul(k, pp)			function: processes element <ul>...</ul>
+
 
 
 Hierarchy of functions

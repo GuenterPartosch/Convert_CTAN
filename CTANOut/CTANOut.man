@@ -1,49 +1,55 @@
-usage: CTANOut.py [-h] [-a] [-A AUTHOR_TEMPLATE]
-                  [-b {@online,@software,@misc,@ctan,@www,@electronic}]
-                  [-d DIREC] [-k KEY_TEMPLATE] [-L LICENSE_TEMPLATE]
-                  [-m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}]
-                  [-mt] [-nf] [-o OUT_FILE] [-s SKIP] [-sb SKIP_BIBLATEX]
-                  [-t NAME_TEMPLATE] [-stat] [-v] [-V] [-y YEAR_TEMPLATE]
+usage: CTANOut [-h] [-a] [-stat] [-v] [-V] [-A <author template>] [-b <btype>]
+               [-d <directory>] [-k <key template>] [-L <license template>]
+               [-m <mode>] [-mt] [-nf] [-o <output>] [-s <skip>]
+               [-sb <skip biblatex>] [-t <name template>] [-y <year template>]
 
-[CTANOut.py; Version: 2.58 (2024-02-28)] Convert CTAN XLM package files to
-LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
+CTANOut
+Version: 2.63.3 (2024-07-26)
 
-Options:
+Converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX,
+Excel [tab separated].
+
+Global options (without any actions):
   -h, --help            show this help message and exit
-  -a, --author          Show author of the program and exit.
-  -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
+  -a, --author          Shows author of the program and exits.
+  -stat, --statistics   Flag: Prints statistics on terminal. -- Default: False
+  -v, --verbose         Flag: Output is verbose. -- Default: False
+  -V, --version         Shows version of the program and exit.
+
+Options related to output:
+  -A <author template>, --author_template <author template>
                         Template for output filtering on the base of author
-                        names - Default: ^.+$
-  -b {@online,@software,@misc,@ctan,@www,@electronic}, --btype {@online,@software,@misc,@ctan,@www,@electronic}
-                        Type of BibLaTex entries to be generated [only for -m
-                        BibLateX] - Default: @online
-  -d DIREC, --directory DIREC
-                        Directory for input and output files - Default: .\
-  -k KEY_TEMPLATE, --key_template KEY_TEMPLATE
-                        Template for output filtering on the base of keys -
+                        names -- Default: ^.+$
+  -b <btype>, --btype <btype>
+                        Type of BibLaTex entries to be generated [only for
+                        BibLateX mode] -- Default: @online
+  -d <directory>, --directory <directory>
+                        Folder for input and output files -- Default: .\
+  -k <key template>, --key_template <key template>
+                        Template for output filtering on the base of keys --
                         Default: ^.+$
-  -L LICENSE_TEMPLATE, --license_template LICENSE_TEMPLATE
+  -L <license template>, --license_template <license template>
                         Template for output filtering on the base of license
-                        names - Default: ^.+$
-  -m {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}, --mode {LaTeX,latex,tex,RIS,plain,txt,BibLaTeX,biblatex,bib,ris,Excel,excel,tsv,csv}
-                        Target format - Default: RIS
-  -mt, --make_topics    Flag: Generate topic lists [meaning of topics/licenses
-                        + cross-reference (topics/packages, authors/packages,
-                        licenses/packages); only for -m LaTeX]). - Default:
-                        False
-  -nf, --no_files       Flag: Do not generate output files. - Default: False
-  -o OUT_FILE, --output OUT_FILE
-                        Generic name [without extensions] for output files -
+                        names -- Default: ^.+$
+  -m <mode>, --mode <mode>
+                        Target format -- Default: RIS
+  -mt, --make_topics    Flag: Generates topic lists [meaning of
+                        topics/licenses + cross-reference (topics/packages,
+                        authors/packages, licenses/packages); only for -m
+                        LaTeX]). -- Default: False
+  -nf, --no_files       Flag: Do not generate output files. -- Default: False
+  -o <output>, --output <output>
+                        Generic name [without extensions] for output files --
                         Default: all
-  -s SKIP, --skip SKIP  Skip specified CTAN fields. - Default: []
-  -sb SKIP_BIBLATEX, --skip_biblatex SKIP_BIBLATEX
-                        Skip specified BibLaTeX fields. - Default: []
-  -t NAME_TEMPLATE, --name_template NAME_TEMPLATE
+  -s <skip>, --skip <skip>
+                        Skips specified CTAN fields. -- Default: []
+  -sb <skip biblatex>, --skip_biblatex <skip biblatex>
+                        Skips specified BibLaTeX fields. -- Default: []
+  -t <name template>, --name_template <name template>
                         Template for output filtering on the base of package
-                        names - Default: ^.+$
-  -stat, --statistics   Flag: Print statistics on terminal. - Default: False
-  -v, --verbose         Flag: Output is verbose. - Default: False
-  -V, --version         Show version of the program and exit.
-  -y YEAR_TEMPLATE, --year_template YEAR_TEMPLATE
-                        Template for output filtering on the base of years -
+                        names -- Default: ^.+$
+  -y <year template>, --year_template <year template>
+                        Template for output filtering on the base of years --
                         Default: ^19[89][0-9]|20[012][0-9]$
+
+Thanks for using CTANOut!

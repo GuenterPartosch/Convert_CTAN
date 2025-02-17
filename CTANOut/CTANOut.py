@@ -14,7 +14,7 @@
 
 # (b) nuitka
 
-# (c) PyPy
+# (c) not PyPy
 # is only suitable to a limited extent, as only a limited Python can be interpreted
 
 # --> provides CTANOut.exe (Windows) a/o CTANOut (Linux)
@@ -48,15 +48,14 @@ import platform                              # get OS informations
 import os                                    # OS relevant routines
 from os import path                          # path informations
 import codecs                                # needed for full UTF-8 output on stdout
-##import pyperclip3 as PC
 
 
 #===================================================================
 # Settings
 
 programname             = "CTANOut.py"
-programversion          = "2.58"
-programdate             = "2024-02-28"
+programversion          = "2.63.3"
+programdate             = "2024-07-26"
 programauthor           = "Günter Partosch"
 documentauthor          = "Developers and contributors for {\\TeX}, {\\LaTeX}, \\& Co"
 documentauthor_txt      = "Developers and contributors for TeX, LaTeX, & Co"
@@ -140,15 +139,18 @@ cases                   = {"BibLaTeX":fieldwidth + 2, "LaTeX":tex_fieldwidth, "R
 # ------------------------------------------------------------------
 # Texts for argument parsing
 
-author_text             = "Show author of the program and exit."
-btype_text              = "Type of BibLaTex entries to be generated [only for -m BibLateX]"
-direc_text              = "Directory for input and output files"
+# 2.62    2024-07-26 some smaller text changes for argparse
+
+author_text             = "Shows author of the program and exits."
+btype_text              = "Type of BibLaTex entries to be generated [only for BibLateX mode]"
+direc_text              = "Folder for input and output files"
 mode_text               = "Target format"
 out_text                = "Generic name [without extensions] for output files"
-program_text            = "Convert CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated]."
-skip_biblatex_text      = "Skip specified BibLaTeX fields."
-skip_text               = "Skip specified CTAN fields."
-version_text            = "Show version of the program and exit."
+program_text            = """Converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX,
+Excel [tab separated]."""
+skip_biblatex_text      = "Skips specified BibLaTeX fields."
+skip_text               = "Skips specified CTAN fields."
+version_text            = "Shows version of the program and exit."
 
 author_template_text    = "Template for output filtering on the base of author names"
 key_template_text       = "Template for output filtering on the base of keys"
@@ -157,8 +159,8 @@ template_text           = "Template for output filtering on the base of package 
 year_template_text      = "Template for output filtering on the base of years"
 
 no_files_text           = "Flag: Do not generate output files."
-statistics_text         = "Flag: Print statistics on terminal."   
-topics_text             = "Flag: Generate topic lists [meaning of topics/licenses + cross-reference (topics/packages, authors/packages, licenses/packages); only for -m LaTeX])."
+statistics_text         = "Flag: Prints statistics on terminal."   
+topics_text             = "Flag: Generates topic lists [meaning of topics/licenses + cross-reference (topics/packages, authors/packages, licenses/packages); only for -m LaTeX])."
 verbose_text            = "Flag: Output is verbose."
 
 # ------------------------------------------------------------------
@@ -182,12 +184,12 @@ debugging_default        = False                   # default for debugging (-dbg
 
 name_default            = name_template_default    # copy of name_template_default
 
-act_direc                = "."                     # actual OS directory
+act_direc                = "."                     # actual OS folder
 if operatingsys == "Windows":    
-    direc_sep      = "\\"                          #   directory separator (Windows)
+    direc_sep      = "\\"                          #   folder separator (Windows)
 else:
-    direc_sep      = "/"                           #   directory separator (else)
-direc_default           = act_direc + direc_sep    # default for -d (output directory)
+    direc_sep      = "/"                           #   folder separator (else)
+direc_default           = act_direc + direc_sep    # default for -d (output folder)
 
 author_template         = empty                    # variable for -A
 btype                   = empty                    # variable for -b
@@ -303,85 +305,34 @@ s_texlive_text           = "TeXLive"               # texlive element
 #===================================================================
 # Parsing the arguments
 
-parser = argparse.ArgumentParser(description = "[" + programname + "; " + "Version: " + programversion + " (" + programdate + ")] " + program_text)
-parser._positionals.title = 'Positional parameters'# actually there are none
-parser._optionals.title   = 'Options'
+parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFormatter,
+                                 prog             = (programname.split("."))[0],
+                                 description      = "{0}\nVersion: {1} ({2})\n\n{3}".format("%(prog)s", programversion, programdate, program_text),
+                                 epilog           = "Thanks for using %(prog)s!",
+                                 )
+parser._optionals.title   = 'Global options (without any actions)'
 
 parser.add_argument("-a", "--author",              # Parameter -a/--author
                     help    = author_text,
                     action  = 'version',
                     version = programauthor + " (" + authoremail + ", " + authorinstitution + ")")
 
-parser.add_argument("-A", "--author_template",     # Parameter -A/--author_template
-                    help    = author_template_text + " - Default: " + "%(default)s",
-                    dest    = "author_template",
-                    default = author_template_default)
-
-parser.add_argument("-b", "--btype",               # Parameter -b/--btype
-                    help    = btype_text + " - Default: " + "%(default)s",
-                    choices = ["@online", "@software", "@misc", "@ctan", "@www", "@electronic"],
-                    dest    = "btype",
-                    default = btype_default)
-
-parser.add_argument("-d", "--directory",           # Parameter -d/--directory
-                    help    = direc_text + " - Default: " + "%(default)s",
-                    dest    = "direc",
-                    default = direc_default)
-
-parser.add_argument("-k", "--key_template",        # Parameter -k/--key_template
-                    help    = key_template_text + " - Default: " + "%(default)s",
-                    dest    = "key_template",
-                    default = key_template_default)
-
-parser.add_argument("-L", "--license_template",    # Parameter -L/--license_template
-                    help    = license_template_text + " - Default: " + "%(default)s",
-                    dest    = "license_template",
-                    default = license_template_default)
-
-parser.add_argument("-m", "--mode",                # Parameter -m/--mode
-                    help    = mode_text + " - Default: " + "%(default)s",
-                    choices = ["LaTeX", "latex", "tex", "RIS", "plain", "txt", "BibLaTeX", "biblatex", "bib", "ris", "Excel", "excel", "tsv", "csv"],
-                    dest    = "mode",
-                    default = mode_default)
-
-parser.add_argument("-mt", "--make_topics",        # Parameter -mt/--make_topics
-                    help    = topics_text + " - Default: " + "%(default)s",
+parser.add_argument("-dbg", "--debugging",         # Parameter -dbg/--debugging
+                    help    = argparse.SUPPRESS,
                     action  = "store_true",
-                    default = make_topics_default)
-
-parser.add_argument("-nf", "--no_files",           # Parameter -nf/--no_files
-                    help    = no_files_text + " - Default: " + "%(default)s",
-                    action  = "store_true",
-                    default = no_files_default)
-
-parser.add_argument("-o", "--output",              # Parameter -o/--output
-                    help    = out_text + " - Default: " + "%(default)s",
-                    dest    = "out_file",
-                    default = out_default)
-
-parser.add_argument("-s", "--skip",                # Parameter -s/--skip
-                    help    = skip_text + " - Default: " + "%(default)s",
-                    dest    = "skip",
-                    default = skip_default)
-
-parser.add_argument("-sb", "--skip_biblatex",      # Parameter -sb/--skip_biblatex
-                    help    = skip_biblatex_text + " - Default: " + "%(default)s",
-                    dest    = "skip_biblatex",
-                    default = skip_biblatex_default)
-
-parser.add_argument("-t", "--name_template",       # Parameter -t/--name_template
-                    help    = template_text + " - Default: " + "%(default)s",
-                    dest    = "name_template",
-                    default = name_template_default)
+                    dest    = "debugging",
+                    default = debugging_default)
 
 parser.add_argument("-stat", "--statistics",       # Parameter -stat/--statistics
-                    help    = statistics_text + " - Default: " + "%(default)s",
+                    help    = statistics_text + " -- Default: " + "%(default)s",
                     action  = "store_true",
+                    dest    = "statistics",
                     default = statistics_default)
 
 parser.add_argument("-v", "--verbose",             # Parameter -v/--verbose
-                    help    = verbose_text + " - Default: " + "%(default)s",
+                    help    = verbose_text + " -- Default: " + "%(default)s",
                     action  = "store_true",
+                    dest    = "verbose",
                     default = verbose_default)
 
 parser.add_argument("-V", "--version",             # Parameter -V/--version
@@ -389,15 +340,97 @@ parser.add_argument("-V", "--version",             # Parameter -V/--version
                     action  = 'version',
                     version = '%(prog)s ' + programversion + " (" + programdate + ")")
 
-parser.add_argument("-y", "--year_template",       # Parameter -y/--year_template
-                    help    = year_template_text + " - Default: " + "%(default)s",
+group1 = parser.add_argument_group("Options related to output")
+
+group1.add_argument("-A", "--author_template",     # Parameter -A/--author_template
+                    metavar = "<author template>",
+                    help    = author_template_text + " -- Default: " + "%(default)s",
+                    dest    = "author_template",
+                    default = author_template_default)
+
+group1.add_argument("-b", "--btype",               # Parameter -b/--btype
+                    metavar = "<btype>",
+                    help    = btype_text + " -- Default: " + "%(default)s",
+                    choices = ["@online", "@software", "@misc", "@ctan", "@www", "@electronic"],
+                    action  = "store",
+                    dest    = "btype",
+                    default = btype_default)
+
+group1.add_argument("-d", "--directory",           # Parameter -d/--directory (folder)
+                    metavar = "<directory>",
+                    help    = direc_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "direc",
+                    default = direc_default)
+
+group1.add_argument("-k", "--key_template",        # Parameter -k/--key_template
+                    metavar = "<key template>",
+                    help    = key_template_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "key_template",
+                    default = key_template_default)
+
+group1.add_argument("-L", "--license_template",    # Parameter -L/--license_template
+                    metavar = "<license template>",
+                    help    = license_template_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "license_template",
+                    default = license_template_default)
+
+group1.add_argument("-m", "--mode",                # Parameter -m/--mode
+                    metavar = "<mode>",
+                    help    = mode_text + " -- Default: " + "%(default)s",
+                    choices = ["LaTeX", "latex", "tex", "RIS", "plain", "txt", "BibLaTeX", "biblatex", "bib", "ris", "Excel", "excel", "tsv", "csv"],
+                    action  = "store",
+                    dest    = "mode",
+                    default = mode_default)
+
+group1.add_argument("-mt", "--make_topics",        # Parameter -mt/--make_topics
+                    help    = topics_text + " -- Default: " + "%(default)s",
+                    action  = "store_true",
+                    dest    = "make_topics",
+                    default = make_topics_default)
+
+group1.add_argument("-nf", "--no_files",           # Parameter -nf/--no_files
+                    help    = no_files_text + " -- Default: " + "%(default)s",
+                    action  = "store_true",
+                    dest    = "no_files",
+                    default = no_files_default)
+
+group1.add_argument("-o", "--output",              # Parameter -o/--output
+                    metavar = "<output>",
+                    help    = out_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "out_file",
+                    default = out_default)
+
+group1.add_argument("-s", "--skip",                # Parameter -s/--skip
+                    metavar = "<skip>",
+                    help    = skip_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "skip",
+                    default = skip_default)
+
+group1.add_argument("-sb", "--skip_biblatex",      # Parameter -sb/--skip_biblatex
+                    metavar ="<skip biblatex>",
+                    help    = skip_biblatex_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "skip_biblatex",
+                    default = skip_biblatex_default)
+
+group1.add_argument("-t", "--name_template",       # Parameter -t/--name_template
+                    metavar = "<name template>",
+                    help    = template_text + " -- Default: " + "%(default)s",
+                    action  = "store",
+                    dest    = "name_template",
+                    default = name_template_default)
+
+group1.add_argument("-y", "--year_template",       # Parameter -y/--year_template
+                    metavar = "<year template>",
+                    help    = year_template_text + " -- Default: " + "%(default)s",
+                    action  = "store",
                     dest    = "year_template",
                     default = year_template_default)
-
-parser.add_argument("-dbg", "--debugging",         # Parameter -dbg/--debugging
-                    help    = argparse.SUPPRESS,
-                    action  = "store_true",
-                    default = debugging_default)
 
 # ------------------------------------------------------------------
 # Getting parsed values
@@ -471,19 +504,19 @@ if (make_topics != make_topics_default) and (mode != "LaTeX"):
     mode = "LaTeX"                          # mode is set to LaTeX if -mt is given
 
 # ------------------------------------------------------------------
-# Correct directory name, test directory existence, and/or install directory
+# Correct folder name, test folder existence, and/or install folder
 
-direc = direc.strip()                       # strip directory name (-d)
+direc = direc.strip()                       # strip folder name (-d)
 if direc[len(direc) - 1] != direc_sep:      #   append a separator, if necessary
     direc += direc_sep
     
 if not path.exists(direc):                  
     try:
-        os.mkdir(direc)                     # create OS directory, if necessary 
+        os.mkdir(direc)                     # create OS folder, if necessary 
     except OSError:
-        print("[CTANOut] Warning: Creation of the OS directory '{0}' failed.".format(direc))
+        print("[CTANOut] Warning: Creation of the OS folder '{0}' failed.".format(direc))
     else:
-        print("[CTANOut] Info: Successfully the OS directory '{0}' created.".format(direc))
+        print("[CTANOut] Info: Successfully the OS folder '{0}' created.".format(direc))
 
 # ------------------------------------------------------------------
 # pre-compiled regular expressions (based on specified options)
@@ -528,22 +561,24 @@ if not no_files:
 
 if mode in ["LaTeX"]:                       # only for LaTeX: package loading + font declaration
     usepkg  = """
-\\usepackage[silent]{fontspec}              % font specification
+\\usepackage[silent]{fontspec}                        % font specification
 \\defaultfontfeatures{Scale=MatchUppercase,
                       Ligatures=TeX,
                       Renderer=HarfBuzz}
-\\usepackage[bidi=basic]{babel}              % language support
+\\usepackage[bidi=basic]{babel}                       % language support
 \\babelprovide[import, onchar=ids fonts]{hindi}
 \\babelprovide[import, onchar=ids fonts]{chinese}
+\\babelprovide[import, onchar=ids fonts]{russian}
 
-\\babelfont[hindi]{rm}{Shobhika}             % hindi font
-\\babelfont[chinese]{rm}{FandolSong}         % chinese font
-\\babelfont{rm}[Ligatures=Common]{FreeSerif} % serif font
-\\babelfont{sf}[Ligatures=Common]{FreeSans}  % sans-serif font
-\\babelfont{tt}[Scale=0.9]{FreeMono}         % mono-spaced font
+\\babelfont[hindi]{rm}{Shobhika}                      % hindi font
+\\babelfont[chinese]{rm}{FandolSong}                  % chinese font
+\\babelfont[russian]{rm}{FreeSerif}                   % russian font
+\\babelfont[english]{rm}[Ligatures=Common]{FreeSerif} % serif font
+\\babelfont[english]{sf}[Ligatures=Common]{FreeSans}  % sans-serif font
+\\babelfont[english]{tt}[Scale=0.95]{FreeMono}        % mono-spaced font
 
-\\usepackage{makeidx}                        % index generation
-\\usepackage[colorlinks=true]{hyperref}      % hypertext structures
+\\usepackage{makeidx}                                 % index generation
+\\usepackage[colorlinks=true]{hyperref}               % hypertext structures
 
 \\newcommand{\\inp}[1]{\\IfFileExists{#1}
             {\\input{#1}}{}}
@@ -600,37 +635,45 @@ english"""
 def bibfield_test(s, f):                                   # auxiliary function bibfield_test: output text is not empty and field is not be skipped
     """auxiliary function: tests a BibLaTeX field: output text is not empty and field is not be skipped.
 
+    parameters:
     s: string for output
     f: BibLaTeX field
 
     returns True/False"""
 
-    if debugging: print("+++bibfield_test")
+    if debugging:
+        print("+++ -CTANOut;bibfield_test")
 
     return (s != empty) and (not f in skip_biblatex)
 
 # ------------------------------------------------------------------
-def biblatex_citationkey():                                # auxiliary function: Generates a dictionary with citations keys for all packages
-    """auxiliary function: Generates a dictionary with citations keys for all packages.
+def biblatex_citationkey():                                # auxiliary function: Generates a set with citations keys for all packages
+    """auxiliary function: Generates a sewt with citations keys for all packages.
 
     citation_keys[package] = (name, year, appendix)
 
     Inspects the authorref, version, copyright elements.
-    Rewrites the global citation_keys."""
+    Rewrites the global citation_keys.
 
-    global citation_keys                                   # set: citation keys
+    no parameters
 
-    if debugging: print("+++biblatex_citationkey")
+    global variable:
+    citation_keys       set: citation keys"""
 
     # biblatex_citationkeys --> get_year()
     # biblatex_citationkeys --> get_authoryear()
+
+    global citation_keys                                   # set: citation keys
+
+    if debugging:
+        print("+++ >CTANOut: >CTANOut:biblatex_citationkey")
         
     author_id_default = authorunknown
     citation_key      = {}
     
-    tmp = get_local_packages(direc)                        # get a directory list
+    tmp = get_local_packages(direc)                        # get a folder list
     
-    for f in tmp:                                          # some dafaults for the actual pacKAGE
+    for f in tmp:                                          # some dafaults for the actual pacKage
         auth         = []                                  
         vers         = empty
         copyr        = empty
@@ -664,7 +707,7 @@ def biblatex_citationkey():                                # auxiliary function:
                 familyname = author_id_default
                 givenname  = author_id_default
             else:
-                id                    = auth[0]
+                id         = auth[0]
                 if id in authors:
                     givenname, familyname = authors[id]    # get the author's name
                 else:
@@ -677,17 +720,22 @@ def biblatex_citationkey():                                # auxiliary function:
             tmp              = get_authoryear(familyname, year)
             citation_keys[f] = tmp
     if verbose:
-        print("[CTANOut] Info: all package files analyzed and dictionary citation_keys created.")
+        print("[CTANOut] Info: all package files analyzed and set citation_keys created.")
+
+    if debugging:
+        print("+++ <CTANOut: >CTANOut:biblatex_citationkey")
 
 # ------------------------------------------------------------------
 def comment_fold(s):                                       # auxiliary function: shortens/folds long option values in LaTeX comment output
     """auxiliary function: Shortens/folds long option values in LaTeX comment output
 
+    parameter:
     s: string
 
     Returns a string."""
 
-    if debugging: print("+++comment_fold")
+    if debugging:
+        print("+++ -CTANOut:comment_fold")
 
     offset = 29 * blank
     maxlen = 120
@@ -711,11 +759,13 @@ def comment_fold(s):                                       # auxiliary function:
 def fold(s):                                               # auxiliary function fold: shortens long option values for output
     """auxiliary function: Shortens/folds long option values for normal output
 
+    parameter:
     s: string
 
-    Returns a string."""
+    Returns the folded string."""
 
-    if debugging: print("+++fold")
+    if debugging:
+        print("+++ -CTANOut:fold")
 
     offset = 69 * blank                                    # left indentation
     maxlen = 70                                            # maximal lined length
@@ -739,12 +789,14 @@ def fold(s):                                               # auxiliary function 
 def gen_fold(s, o):                                         # auxiliary function gen_fold: folds content of <p>, <li>, <dd> (mode dependant)
     """auxiliary function: folds content of <p>, <li>, <dd> (mode dependant)
 
+    parameters:
     s: string
     o: offset
 
     Returns a folded string."""
 
-    if debugging: print("+++gen_fold")
+    if debugging:
+        print("+++ -CTANOut:gen_fold")
 
     offset = "§§=" + str(o)
     maxlen = 100                                            # maximal line length
@@ -777,11 +829,15 @@ def get_authoryear(a, y):                                  # auxiliary function 
     y: year (int)
 
     Returns a tuple (name, year, appendix).
-    Rewrites the global allauthoryears."""
+    Rewrites the global allauthoryears.
+
+    global variable:
+    + allauthoryears"""
 
     global allauthoryears
 
-    if debugging: print("+++get_authoryear")
+    if debugging:
+        print("+++ -CTANOut:get_authoryear")
 
     name = a
     if name == "":                                         # if name is not specified
@@ -878,16 +934,17 @@ def get_authoryear(a, y):                                  # auxiliary function 
 
 # ------------------------------------------------------------------
 def get_local_packages(d):                                 # auxiliary function get_local_packages(d): Lists all local packages
-                                                           # in the current OS directory 
-    """auxiliary function: Lists all local packages in the current OS directory d
+                                                           # in the current OS folder 
+    """auxiliary function: Lists all local packages in the current OS folder d
 
-    d: OS directory to be analyzed
+    d: OS folder to be analyzed
 
     Returns a set (= local packages)."""
 
-    if debugging: print("+++get_local_packages")
+    if debugging:
+        print("+++ -CTANOut:get_local_packages")
 
-    tmp  = os.listdir(d)                                   # get local OS directory list
+    tmp  = os.listdir(d)                                   # get local OS folder list
     tmp2 = []
     
     for f in tmp:                                          # check all the files
@@ -902,11 +959,17 @@ def get_year_packages():                                    # Function get_packa
     """Analyzes dictionary 'yearpackages' for year templates.
 
     Returns a list of selected packages.
-    Rewrites the global set yearpackages."""
+    Rewrites the global set yearpackages.
+
+    no parameter
+
+    global variable:
+    + yearpackages"""
 
     global yearpackages
     
-    if debugging: print("+++get_year_set")
+    if debugging:
+        print("+++ -CTANOut:get_year_packages")
 
     tmp = set()
     for f in yearpackages:                                  # loop over all the year-package correspondences
@@ -923,11 +986,13 @@ def get_year(s):                                           # auxiliary function:
     """auxiliary function: Gets the most recent year in string s (only for BibLaTeX)
     includes decimal numbers in the intervall [year_default, max_year]
 
+    parameter:
     s: string
 
     returns the maximum year in s."""
 
-    if debugging: print("+++get_year_set")
+    if debugging:
+        print("+++ -CTANOut:get_year")
 
     nn    = p4.split(s)                                    # split the given string according p4: re.compile("[- |.,a-z]")
     years = []
@@ -945,11 +1010,13 @@ def get_year(s):                                           # auxiliary function:
 def TeX_fold(s):                                           # auxiliary function TeX_fold: shortens/folds long option values in LaTeX tabular output
     """auxiliary function: Shortens/folds long option values in LaTeX tabular output
 
-    s: string
+    parameter:
+    s: TeX stringto be folded
 
     Returns a folded string."""
 
-    if debugging: print("+++get_year_set")
+    if debugging:
+        print("+++ -CTANOut:TeX_fold")
 
     offset = 64 * blank                                    # left indendation
     maxlen = 65                                            # maximal line length
@@ -973,11 +1040,12 @@ def TeX_fold(s):                                           # auxiliary function 
 def TeXchars(s):                                           # auxiliary function: prepares characters for LaTeX/BibLaTeX
     """auxiliary function: Prepares characters for LaTeX/BibLaTeX (with the exception of description).
 
-    s: string
+    s: string with characters which are to be prepared for LaTeX/BibLaTeX
 
     Returns a changed string s."""
 
-    if debugging: print("+++get_year_set")
+    if debugging:
+        print("+++ -CTANOut:TeXchars")
 
     tmp = s
     tmp = re.sub(r"\\", r"{\\textbackslash}", tmp)
@@ -995,10 +1063,16 @@ def TeXchars(s):                                           # auxiliary function:
 def alias(k):                                     # function: processes element <alias .../>
     """Processes the alias element.
 
+    parameter:
     k: current knot
 
     Inspects embedded text and the ambedded attribute id.
-    Rewrites the global notice, s_alias, package_id."""
+    Rewrites the global notice, s_alias, package_id.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    s_alias             string for Excel: alias
+    package_id          string: package id"""
 
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global s_alias                                # string for Excel: alias
@@ -1006,7 +1080,8 @@ def alias(k):                                     # function: processes element 
 
     id  = k.get("id", empty)                      # get attribute id
 
-    if debugging: print("+++alias")
+    if debugging:
+        print("+++ >CTANOut:alias")
     
     if len(k.text) > 0:                           # get embedded text
         tmp = k.text                             
@@ -1036,14 +1111,23 @@ def alias(k):                                     # function: processes element 
         else:
             s_alias = tmp
 
+    if debugging:
+        print("+++ <CTANOut:alias")
+
 # ------------------------------------------------------------------
 def also(k):                                      # function: processes element <also .../>
     """Processes the also elements.
 
+    parameter:
     k: current knot
 
     Fetches the local attribute refid.
-    Redwrites the global s_also, notice, also_str."""
+    Redwrites the global s_also, notice, also_str.
+
+    global variables:
+    s_also              string for Eccel: also
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    also_str            string: collect also"""
 
     # also --> TeXchars
     
@@ -1051,7 +1135,8 @@ def also(k):                                      # function: processes element 
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global also_str                               # string: collect also
 
-    if debugging: print("+++also")
+    if debugging:
+        print("+++ >CTANOut:also")
     
     refid = k.get("refid",empty)                  # get attribute refid
 
@@ -1084,14 +1169,23 @@ def also(k):                                      # function: processes element 
             else:
                 s_also = refid
 
+    if debugging:
+        print("+++ <CTANOut:also")
+
 # ------------------------------------------------------------------
 def authorref(k):                                 # function: processes element <authorref .../>
     """Processes the authorref elements, constructs the complete name and usedAuthors entry.
 
+    parameter:
     k: current knot
 
     Fetches the local attributes key, id, givenname, familyname, active.
-    Rewrites the global authorexists, s_author, usedAuthors"""
+    Rewrites the global authorexists, s_author, usedAuthors
+
+    global variables:
+    authorexists        flag
+    s_author            string for Excel: authorref
+    usedAuthors         dictionary: collects used authors"""
 
     # 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
     
@@ -1099,7 +1193,8 @@ def authorref(k):                                 # function: processes element 
     global s_author                               # string for Excel: authorref
     global usedAuthors                            # dictionary: collects used authors
 
-    if debugging: print("+++authorref")
+    if debugging:
+        print("+++ >CTANOut:authorref")
     
     key        = k.get("key", empty)              # get attribute key
     xid        = k.get("id", empty)               # get attribute id
@@ -1143,21 +1238,29 @@ def authorref(k):                                 # function: processes element 
 
     authorexists = True
 
+    if debugging:
+        print("+++ <CTANOut:authorref")
+
 # ------------------------------------------------------------------
 def caption(k):                                   # function: processes element <caption>...</caption>
     """Processes the caption element (sub title).
 
+    parameter:
     k: current knot
 
     Fetches any embedded text.
-    Rewrites the global s_caption."""
+    Rewrites the global s_caption.
+
+    global variable:
+    s_caption           string for Excel: caption"""
 
     # caption --> TeXchars
     # caption --> bibfield_test
     
     global s_caption                              # string for Excel: caption
 
-    if debugging: print("+++caption")
+    if debugging:
+        print("+++ >CTANOut:caption")
     
     if len(k.text) > 0:                           # get embedded text
         tmp = k.text.strip()
@@ -1181,20 +1284,30 @@ def caption(k):                                   # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         s_caption = tmp
 
+    if debugging:
+        print("+++ <CTANOut:caption")
+
 # ------------------------------------------------------------------
 def contact(k):                                   # function: processes element <contact .../>
     """Processes the contact elements.
 
+    parameter:
     k: current knot
 
     Fetches the local attributes type, href.
-    Rewrites the global notice, contact_str, s_contact."""
+    Rewrites the global notice, contact_str, s_contact.
+
+    göobal variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note  
+    contact_str         string: collect contact
+    s_contact           string for Excel"""
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note  
     global contact_str                            # string: collect contact
     global s_contact                              # string for Excel
 
-    if debugging: print("+++caption")
+    if debugging:
+        print("+++ >CTANOut:contact")
     
     typeT = k.get("type", empty)                  # get attribute type (announce, bugs, development, repository, support)
     href  = k.get("href", empty)                  # get attribute href
@@ -1220,15 +1333,25 @@ def contact(k):                                   # function: processes element 
         else:
             s_contact = typeT + ": " + href
 
+    if debugging:
+        print("+++ <CTANOut:contact")
+
 # ------------------------------------------------------------------
 def copyrightT(k, p):                             # function: processes element <copyright .../>
     """Processes the copyright element.
 
+    parameters:
     k: current knot
     p: current package
 
     Fetches the emebedded attributes owner, year.
-    Rewrites the global notice, copyright_str, s_copyright, year_str."""
+    Rewrites the global notice, copyright_str, s_copyright, year_str.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    copyright_str       string: collect copyright
+    s_copyright         string for Excel: copyright
+    year_str            string: collect all year items for a package"""
 
     # 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
 
@@ -1239,7 +1362,8 @@ def copyrightT(k, p):                             # function: processes element 
     global s_copyright                            # string for Excel: copyright
     global year_str                               # string: collect all year items for a package
 
-    if debugging: print("+++caption")
+    if debugging:
+        print("+++ >CTANOut:copyrightT")
     
     owner    = k.get("owner", empty)              # get attribute owner
     year     = k.get("year", "--")                # get attribute year
@@ -1275,15 +1399,23 @@ def copyrightT(k, p):                             # function: processes element 
         else:
             s_copyright = tmp
 
+    if debugging:
+        print("+++ <CTANOut:copyrightT")
+
 # ------------------------------------------------------------------
 def ctan(k, t):                                   # function: processes element <ctan .../>
     """Processes the ctan element.
 
+    parameters:
     k: current knot
     t: current package date
 
     Fetches the local attributes path and file.
-    Rewrites the global s_ctan, notice."""
+    Rewrites the global s_ctan, notice.
+
+    global variables:
+    s_ctan              string for Excel: ctan
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note"""
 
     # ctan --> bibfield_test
     
@@ -1293,7 +1425,8 @@ def ctan(k, t):                                   # function: processes element 
     xpath = k.get("path", empty)                  # get attribute path
     file  = k.get("file", empty)                  # get attribute file
 
-    if debugging: print("+++ctan")
+    if debugging:
+        print("+++ >CTANOut:ctan")
     
     if mode in ["LaTeX"] and not no_files:        # LaTeX
         out.write("\\item[on CTAN] \\url{{{0}}}\n".format(ctanUrl2 + xpath))
@@ -1310,14 +1443,25 @@ def ctan(k, t):                                   # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         s_ctan = ctanUrl2 + xpath
 
+    if debugging:
+        print("+++ <CTANOut:ctan")
+
 # ------------------------------------------------------------------
 def documentation(k):                             # function: processes element <documentation .../>
     """Processes the documentation elements.
 
+    parameter:
     k: current knot
 
     Fetches the local attributes details, href, language.
-    Rewrites the global notice, language_set, info_files, XML_toc."""
+    Rewrites the global notice, language_set, info_files, XML_toc.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    language_set        set: collect language
+    info_files          list of local PDF files
+    XML_toc             python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=(XML file, key, plain PDF file name)
+    s_documentation     string for Excel: documentation"""
 
     # documentation --> TeXchars
     
@@ -1328,7 +1472,8 @@ def documentation(k):                             # function: processes element 
                                                   # (XML file, key, plain PDF file name)
     global s_documentation                        # string for Excel: documentation
 
-    if debugging: print("+++documentation")
+    if debugging:
+        print("+++ >CTANOut:documentation")
     
     details  = k.get("details", empty)            # get attribute details
     href     = k.get("href", empty)               # get attribute href
@@ -1404,17 +1549,28 @@ def documentation(k):                             # function: processes element 
         else:
             s_documentation = details + ": " + href2
 
+    if debugging:
+        print("+++ <CTANOut:documentation")
+
 # -----------------------------------------------------------------
 def entry(k, t, p):                               # function: processes element <entry ...>...</entry>
     """Processes the main element entry.
 
+    parameters:
     k: current knot
     t: date
     p: current package
 
     Fetches the local attribute id.
     Fetches the embedded text.
-    Rewrites many global variables."""
+    Rewrites many global variables.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    package_id          string: package id
+    s_id, s_alias, s_also, s_author, s_caption, s_contact, s_copyright, s_ctan, s_date
+    s_documentation, s_home, s_install, s_keyval, s_language, s_license, s_miktex
+    s_name, s_texlive, s_version, s_year, s_lastchanges, s_lastaccess"""
 
     # entry --> leading
     # entry --> description
@@ -1442,7 +1598,8 @@ def entry(k, t, p):                               # function: processes element 
     global s_documentation, s_home, s_install, s_keyval, s_language, s_license, s_miktex
     global s_name, s_texlive, s_version, s_year, s_lastchanges, s_lastaccess
 
-    if debugging: print("+++entry")
+    if debugging:
+        print("+++ >CTANOut:entry")
     
     if mode in ["Excel"]:                         # initialize strings for Excel; id attribute in entry element
         s_id                    = k.get("id", empty) # get attribute id
@@ -1526,11 +1683,17 @@ def entry(k, t, p):                               # function: processes element 
                 home(child)
     trailing(k, t, p)
 
+    if debugging:
+        print("+++ <CTANOut:entry")
+
 # ------------------------------------------------------------------
 def first_lines():                                # function: creates the first lines of output.
-    """Creates the first lines of output"""
+    """Creates the first lines of output
 
-    if debugging: print("+++first_lines")
+    no parameter"""
+
+    if debugging:
+        print("+++ >CTANOut:first_lines")
 
     arguments   = empty
     tmp         = empty
@@ -1691,13 +1854,19 @@ def first_lines():                                # function: creates the first 
             out.write("\t" + f)
         out.write("\n")
 
+    if debugging:
+        print("+++ <CTANOut:first_lines")
+
 # ------------------------------------------------------------------
 def get_author_packages():                        # Function get_author_packages: Gets package names by specified author name template
     """Gets package names by specified author name template.
 
-    Returns a set (authors and associated packages)."""
+    Returns a set (authors and associated packages).
 
-    if debugging: print("+++get_author_packages")
+    no parameter"""
+
+    if debugging:
+        print("+++ -CTANOut:get_author_packages")
 
     author_pack = set()                           # initialize set
     tmp_set     = set()                           # initialize auxiliary set
@@ -1724,9 +1893,12 @@ def get_author_packages():                        # Function get_author_packages
 def get_name_packages():                          # Function get_name_packages: Gets package names by specified package name template.
     """Gets package names by specified package name template.
 
-    Reurns a set (name of packages)."""
+    Reurns a set (name of packages).
 
-    if debugging: print("+++get_name_packages")
+    no parameter"""
+
+    if debugging:
+        print("+++ -CTANOut:get_name_packages")
 
     name_pack = set()                             # initialize set
     
@@ -1742,9 +1914,12 @@ def get_name_packages():                          # Function get_name_packages: 
 def get_topic_packages():                         # Function get_topic_packages: Gets package names by specified topic template.
     """Gets package names by specified topic template.
 
-    Returns a set (used topics and related packages)."""
+    Returns a set (used topics and related packages).
 
-    if debugging: print("+++get_topic_packages")
+    no parameter"""
+
+    if debugging:
+        print("+++ -CTANOut:get_topic_packages")
 
     topic_pack = set()                            # initialize set
     
@@ -1761,9 +1936,12 @@ def get_topic_packages():                         # Function get_topic_packages:
 def get_license_packages():                       # Function get_license_packages: Gets package names by specified license template.
     """Gets package names by specified license template.
 
-    Returns a set (used licenses and related packages)."""
+    Returns a set (used licenses and related packages).
 
-    if debugging: print("+++get_license_packages")
+    no parameter"""
+
+    if debugging:
+        print("+++ -CTANOut:get_license_packages")
 
     license_pack = set()                          # initialize set
     
@@ -1786,17 +1964,23 @@ def get_license_packages():                       # Function get_license_package
 def home(k):                                      # function: processes element <home .../>
     """Processes the home element.
 
+    parameter:
     k: current knot
 
     Fetches the local attribute href.
-    Rewrites the global notice, s_home."""
+    Rewrites the global notice, s_home.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    s_home              string for Excel: home"""
 
     # home --> bibfield_test
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global s_home                                 # string for Excel: home
 
-    if debugging: print("+++home")
+    if debugging:
+        print("+++ >CTANOut:home")
 
     href = k.get("href", empty)                   # get attribute href
 
@@ -1815,21 +1999,30 @@ def home(k):                                      # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         s_home = href
 
+    if debugging:
+        print("+++ <CTANOut:home")
+
 # ------------------------------------------------------------------
 def install(k):                                   # function: processes element <install .../>
     """Processes the install element.
 
+    parameters:
     k: current knot
 
     Fetches the local attribute path.
-    Rewrites the global notice, s_install."""
+    Rewrites the global notice, s_install.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    s_install           string for Excel: install"""
 
     # install --> bibfield_test
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global s_install                              # string for Excel: install
 
-    if debugging: print("+++install")
+    if debugging:
+        print("+++ >CTANOut:install")
 
     xpath = k.get("path", empty)                  # get attribute path
 
@@ -1848,14 +2041,23 @@ def install(k):                                   # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         s_install = ctanUrl3 + xpath
 
+    if debugging:
+        print("+++ <CTANOut:install")
+
 # ------------------------------------------------------------------
 def keyval(k):                                    # function: processes element <keyval .../>
     """Processes the keyval elements.
 
+    parameter:
     k: current knot
 
     fetches the local attributes key, value.
-    Rewrites the global s_keyval, usedTopics, topics."""
+    Rewrites the global s_keyval, usedTopics, topics.
+
+    global variables:
+    s_keyval            string for Excel: keyval
+    usedTopics          dictionary for collecting topics
+    topics              dictionary with unknown topics"""
 
     # keyval --> TeXchars
     
@@ -1863,7 +2065,8 @@ def keyval(k):                                    # function: processes element 
     global usedTopics                             # dictionary for collecting topics
     global topics                                 # dictionary with unknown topics
 
-    if debugging: print("+++keyval")
+    if debugging:
+        print("+++ >CTANOut:keyval")
 
     key   = k.get("key", empty)                   # get attribute key
     value = k.get("value", empty)                 # get attribute value
@@ -1892,17 +2095,26 @@ def keyval(k):                                    # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         pass
 
+    if debugging:
+        print("+++ <CTANOut:keyval")
+
 # ------------------------------------------------------------------
 def leading(k, p, t):                                         # function: first lines for package output
     """Analyzes the first lines of each XML package file and print out some lines.
 
+    parameters:
     k: current knot (here entry)
     p: current package
     t: date of package
 
     Fetches the local attribute id.
     Inspects the elements caption, authorref.
-    Rewrites the global authorexists, s_lastaccess, s_author."""
+    Rewrites the global authorexists, s_lastaccess, s_author.
+
+    global variables:
+    authorexists        flag
+    s_lastaccess        string for Excel: Last access
+    s_author            string for Excel: authorref"""
 
     # leading --> TeXchars
     # leading --> get_year
@@ -1913,7 +2125,8 @@ def leading(k, p, t):                                         # function: first 
     global s_lastaccess                                       # string for Excel: Last access
     global s_author                                           # string for Excel: authorref
 
-    if debugging: print("+++leading")
+    if debugging:
+        print("+++ >CTANOut:leading")
 
     xname = k.get("id", empty)                                # get attribute id
     xpath = ctanUrl4 + p
@@ -2022,22 +2235,34 @@ def leading(k, p, t):                                         # function: first 
         s_lastaccess = t                                      #
     authorexists = False
 
+    if debugging:
+        print("+++ <CTANOut:leading")
+
 # ------------------------------------------------------------------
 def licenseT(k):                                  # function: processes element <license .../>
     """Processes the license elements.
 
+    parameter:
     k: current knot
 
     Fetches the embedded attibutes type, date.
-    Rewrites the global notice, license_str, s_license, usedLicenses, licenses."""
+    Rewrites the global notice, license_str, s_license, usedLicenses, licenses.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    license_str         string: collect license
+    s_license           string for Excel: license
+    usedLicenses        Python dictionary:  collect used licenses for all packages 
+    licenses            dictionary: lice nses[key]=(description, status)"""
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global license_str                            # string: collect license
     global s_license                              # string for Excel: license
-    global usedLicenses                           # 
+    global usedLicenses                           # Python dictionary:  collect used licenses for all packages
     global licenses                               # dictionary: lice nses[key]=(description, status)
 
-    if debugging: print("+++licenseT")
+    if debugging:
+        print("+++ >CTANOut:licenseT")
 
     typeT     = k.get("type", empty)              # get attribute type; get a license key
     tmp       = typeT
@@ -2089,15 +2314,22 @@ def licenseT(k):                                  # function: processes element 
         else:
             s_license = tmp2
 
+    if debugging:
+        print("+++ <CTANOut:licenseT")
+
 # ------------------------------------------------------------------
 def load_pickle1():                               # Function load_pickle1: loads/unpacks pickle file 1
     """Gets the structures authors, packages, topics, topicspackages, authorpackages, licensepackages (generated by CTANLoad.py).
 
-    Rewrites the global authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages."""
+    Rewrites the global authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages.
+
+    global variables:
+    authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages"""
 
     global authors, packages, topics, licenses, topicspackages, packagetopics, authorpackages, licensepackages, yearpackages
 
-    if debugging: print("+++load_pickle1")
+    if debugging:
+        print("+++ >CTANOut:load_pickle1")
 
     # authors: Python dictionary (sorted)
     #   each element: <author key>:<tuple with givenname and familyname> 
@@ -2126,16 +2358,25 @@ def load_pickle1():                               # Function load_pickle1: loads
         print("--- Error: pickle file '{0}' not found".format(pickle_name1))
         sys.exit("[CTANOut] Error: program is terminated")
 
+    if debugging:
+        print("+++ <CTANOut:load_pickle1")
+
 # ------------------------------------------------------------------
 def load_pickle2():                               # Function load_pickle2: loads/unpacks pickle file 2
     """Gets XML_toc (generated by CTANLoad.py).
 
-    Rewrites the global XML_toc."""
+    Rewrites the global XML_toc.
+
+    no parameter
+
+    global variable:
+    XML_toc             python dictionary:  list of XML and PDF files: XML_toc[CTAN address]= (XML file, key, plain PDF file name)"""
 
     global XML_toc                                # python dictionary:  list of XML and PDF files: XML_toc[CTAN address]=
                                                   # (XML file, key, plain PDF file name)
 
-    if debugging: print("+++load_pickle2")
+    if debugging:
+        print("+++ >CTANOut:load_pickle2")
 
     try:                                          # try to open second pickle file
         pickleFile2 = open(direc + pickle_name2, "br")
@@ -2145,9 +2386,14 @@ def load_pickle2():                               # Function load_pickle2: loads
         list_info_files = False
         print("--- Warning: pickle file '{0}' not found; local information files ignored".format(pickle_name2))
 
+    if debugging:
+        print("+++ <CTANOut:load_pickle2")
+
 # ------------------------------------------------------------------
 def main():                                       # function: Main function (calls the other functions)
-    """Main function (calls the other functions)"""
+    """Main function (calls the other functions)
+
+    no parameter"""
 
     # main --> biblatex_citationkey
     # main --> load_pickle1
@@ -2162,7 +2408,8 @@ def main():                                       # function: Main function (cal
     # main --> make_stat
     # main --> make_statistics
 
-    if debugging: print("+++main")
+    if debugging:
+        print("+++ >CTANOut:main")
 
     starttotal   = time.time()                    # set begin of total time
     startprocess = time.process_time()            # set begin of process time
@@ -2223,7 +2470,7 @@ def main():                                       # function: Main function (cal
         out.write(trailer)                        # output trailer
         out.close()                               # close output file
     if verbose:
-        print("[CTANOut] Info: CTANOut program successfully completed")
+        print("[CTANOut] Info: CTANOut program successfully completed.")
 
     # ------------------------------------------------------------------
     # Statistics on terminal
@@ -2238,11 +2485,20 @@ def main():                                       # function: Main function (cal
         print("total time (CTANOut): ".ljust(left + 3), str(round(endtotal-starttotal, 2)).rjust(pp), "s")
         print("process time (CTANOut): ".ljust(left + 3), str(round(endprocess-startprocess, 2)).rjust(pp), "s")
 
+    if debugging:
+        print("+++ <CTANOut:main")
+
 # ------------------------------------------------------------------
 def make_stat():                                  # function: generates statistics in the stat file (xyz.stat)
-    """Generates statistics in the stat file (xyz.stat)."""
+    """Generates statistics in the stat file (xyz.stat).
 
-    if debugging: print("+++make_stat")
+    no parameter"""
+
+    # 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+    # 2.61    2024-04-12 smaller changes in make_statistics
+
+    if debugging:
+        print("+++ >CTANOut:make_stat")
 
     # write statistics in the stat (.stat) file
 
@@ -2254,7 +2510,7 @@ def make_stat():                                  # function: generates statisti
     text6 = empty
     
     stat = open(direc + args.out_file + ".stat", encoding=file_encoding, mode="w")
-    stat.write("% file: '{0}.stat'\n".format(args.out_file))
+    stat.write("% file: '{0}.stat' (in LaTeX format)\n".format(args.out_file))
     stat.write("% date: {0}\n".format(actDate))
     stat.write("% time: {0}\n".format(actTime))
     stat.write("% is called by '{0}.tex'\n\n".format(args.out_file))
@@ -2309,24 +2565,30 @@ def make_stat():                                  # function: generates statisti
     stat.write("number of licenses, total on CTAN "      + r"&" + str(len(licenses)).rjust(6)  + r"\\" + "\n")
     stat.write("number of licenses, used here "          + r"&" + str(len(usedLicenses)).rjust(6)  + r"\\" + "\n")
     stat.write(r"\end{tabular}" + "\n")
-    stat.write(	"\\footnotetext{special lists: topics/licinses and their explanation + topics/authors/licenses and related packages(cross-reference lists)}\n")
+    stat.write(	"\\footnotetext{special lists: topics/licenses and their explanation -- topics/authors/licenses and related packages(cross-reference lists)}\n")
     stat.close()                                  # close statistics file 
     if verbose:
         print("--- Info: file '{0}' written: [statistics]".format(direc + args.out_file + ".stat"))
 
+    if debugging:
+        print("+++ <CTANOut:make_stat")
+
 # ------------------------------------------------------------------
 def make_statistics():                            # function: Generates statistics on terminal.
-    """Generates statistics on terminal."""
+    """Generates statistics on terminal.
 
-    if debugging: print("+++make_statistics")
+    no parameter"""
+
+    if debugging:
+        print("+++ >CTANOut:make_statistics")
 
     l = left + 3
     r = 6
     
     # Statistics on terminal
     print("\nStatistics:")
-    print("date/time:".ljust(l + 1), actDate, "/", actTime)
-    print("program/version/date:".ljust(l + 1), programname, "/", programversion, "/", programdate)
+    print("date | time:".ljust(l + 1), actDate, "|", actTime)
+    print("program | version | date:".ljust(l + 1), programname, "|", programversion, "|", programdate)
     if not no_files:
         print("target format:".ljust(l + 1), mode)
         print("output file:".ljust(l + 1), direc + out_file, "\n")
@@ -2352,26 +2614,33 @@ def make_statistics():                            # function: Generates statisti
     if year_template != year_template_default:
         print("no. of packages (based on years):".ljust(l),    str(no_ly).rjust(r))
 
+    if debugging:
+        print("+++ <CTANOut:make_statistics")
+
 # ------------------------------------------------------------------
 def make_tap():                                   # function: Generates the tap (xyz.tap) file.
     """Generates the tap (xyz.tap) file.
-    (Authors/Packages cross-reference)"""
+    (Authors/Packages cross-reference)
+
+    no parameter"""
 
     # 2.57    2024-02-28 Change in make_tap: enable processing of "_" in author names
+    # 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
 
-    if debugging: print("+++make_tap")
+    if debugging:
+        print("+++ >CTANOut:make_tap")
 
     # Authors/Packages cross-reference
         
     tap = open(direc + args.out_file + ".tap", encoding=file_encoding, mode="w")
-    tap.write("% file: '{0}.tap'\n".format(args.out_file))
+    tap.write("% file: '{0}.tap' (in LaTeX format)\n".format(args.out_file))
     tap.write("% date: {0}\n".format(actDate))
     tap.write("% time: {0}\n".format(actTime))
     tap.write("% is called by '{0}.tex'\n\n".format(args.out_file))
     tap.write(r"\section{Authors and associated packages}" + "\n\n")
     tap.write("\\textit{Note: The numbers do not refer to page numbers, but to section numbers. A click on this number leads to the corresponding package description.}\n\n")
     tap.write(r"\raggedright" + "\n")
-    tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
+    tap.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}" + "\n")
 
     tap.write("\n")
     for f in authors:                             # all authors
@@ -2400,19 +2669,27 @@ def make_tap():                                   # function: Generates the tap 
     tap.write(r"\end{labeling}" + "\n")
     tap.close()                                   # close file
     if verbose:
-        print("--- Info: file '{0}.tap' created: [list with authors and related packages (cross-reference list)]".format(direc + args.out_file))
+        print("--- Info: file '{0}.tap' created:  [list with authors and related packages (cross-reference list)]".format(direc + args.out_file))
+
+    if debugging:
+        print("+++ <CTANOut:make_tap")
 
 # ------------------------------------------------------------------
 def make_tlp():                                   # function: Generates the tlp (xyz.tlp) file
     """Generates the tlp (xyz.tlp) file.
-    (Licenses/Packages cross-reference)"""
+    (Licenses/Packages cross-reference)
 
-    if debugging: print("+++make_tlp")
+    no parameter"""
+
+    # 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+
+    if debugging:
+        print("+++ >CTANOut:make_tlp")
 
     # Authors/Packages cross-reference
         
     tlp = open(direc + args.out_file + ".tlp", encoding=file_encoding, mode="w")
-    tlp.write("% file: '{0}.tlp'\n".format(args.out_file))
+    tlp.write("% file: '{0}.tlp' (in LaTeX format)\n".format(args.out_file))
     tlp.write("% date: {0}\n".format(actDate))
     tlp.write("% time: {0}\n".format(actTime))
     tlp.write("% is called by '{0}.tex'\n\n".format(args.out_file))
@@ -2420,7 +2697,7 @@ def make_tlp():                                   # function: Generates the tlp 
     tlp.write("\\textit{Note: The numbers do not refer to page numbers, but to section numbers. A click on this number leads to the corresponding package description.}\n\n")
     tlp.write(r"\raggedright" + "\n")
 
-    tlp.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
+    tlp.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}" + "\n")
     for f in licenses:                            # loop: all licenses
         if f in usedLicenses:                     # license is used?
             tlp.write("\\item[\\texttt{" + f + "}]")
@@ -2445,25 +2722,33 @@ def make_tlp():                                   # function: Generates the tlp 
     
     tlp.close()                                   # close file
     if verbose:
-        print("--- Info: file '{0}.tlp' created: [list with licenses and related packages (cross-reference list)]".format(direc + args.out_file))
+        print("--- Info: file '{0}.tlp' created:  [list with licenses and related packages (cross-reference list)]".format(direc + args.out_file))
+
+    if debugging:
+        print("+++ <CTANOut:make_tlp")
 
 # ------------------------------------------------------------------
 def make_tops():                                  # function: Generates the tops (xyz.top) file.
-    """Generates the tops (xyz.top) file."""
+    """Generates the tops (xyz.top) file.
 
-    if debugging: print("+++make_tops")
+    no parameter"""
+
+    # 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+
+    if debugging:
+        print("+++ >CTANOut:make_tops")
 
     # Topic list
     tops = open(direc + args.out_file + ".top", encoding=file_encoding, mode="w")
     
-    tops.write("% file: {0}.top\n".format(args.out_file))
+    tops.write("% file: {0}.top (in LaTeX format)\n".format(args.out_file))
     tops.write("% date: {0}\n".format(actDate))
     tops.write("% time: {0}\n".format(actTime))
     tops.write("% is called by {0}.tex\n\n".format(args.out_file))
     
     tops.write(r"\section{Used topics, short explainations}" + "\n\n")
     tops.write(r"\raggedright" + "\n")
-    tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
+    tops.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}" + "\n")
   
     for f in topics:                              # all topics
         if f in usedTopics:                       #  all used topics
@@ -2473,26 +2758,34 @@ def make_tops():                                  # function: Generates the tops
     tops.write(r"\end{labeling}" + "\n")
     tops.close()                                  # close file
     if verbose:
-        print("--- Info: file '{0}.top' created: [topics and their explainations]".format(direc + args.out_file))
+        print("--- Info: file '{0}.top' created:  [topics and their explainations]".format(direc + args.out_file))
+
+    if debugging:
+        print("+++ <CTANOut:make_tops")
 
 # ------------------------------------------------------------------
 def make_lics():                                  # function: Generates the lics (xyz.lic) file.
     """Generates the tops (xyz.lic) file.
-    (License list)"""
+    (License list)
 
-    if debugging: print("+++make_lics")
+    no parameter"""
+
+    # 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+
+    if debugging:
+        print("+++ >CTANOut:make_lics")
 
     # License list
     lics = open(direc + args.out_file + ".lic", encoding=file_encoding, mode="w")
     
-    lics.write("% file: {0}.lic\n".format(args.out_file))
+    lics.write("% file: {0}.lic (in LaTeX format)\n".format(args.out_file))
     lics.write("% date: {0}\n".format(actDate))
     lics.write("% time: {0}\n".format(actTime))
     lics.write("% is called by {0}.tex\n\n".format(args.out_file))
     
     lics.write(r"\section{Used licenses, short explainations}" + "\n\n")
     lics.write(r"\raggedright" + "\n")
-    lics.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
+    lics.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}" + "\n")
   
     for f in licenses:                            # all topics
         if f in usedLicenses:                     #  all used topics
@@ -2506,26 +2799,34 @@ def make_lics():                                  # function: Generates the lics
     lics.write(r"\end{labeling}" + "\n")
     lics.close()                                  # close file
     if verbose:
-        print("--- Info: file '{0}.lic' created: [licenses and their explainations]".format(direc + args.out_file))
+        print("--- Info: file '{0}.lic' created:  [licenses and their explainations]".format(direc + args.out_file))
+
+    if debugging:
+        print("+++ <CTANOut:make_lics")
 
 # ------------------------------------------------------------------
 def make_xref():                                  # function: Generates the xref (xyz.xref) file.
     """Generates the xref (xyz.xref) file.
-    (Topics/Packages cross-reference)"""
+    (Topics/Packages cross-reference)
 
-    if debugging: print("+++make_xref")
+    no parameter"""
+
+    # 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+
+    if debugging:
+        print("+++ <CTANOut:make_xref")
 
     # Topics/Packages cross-reference
     xref = open(direc + args.out_file + ".xref", encoding=file_encoding, mode="w")
     
-    xref.write("% file: {0}.xref\n".format(args.out_file))
+    xref.write("% file: {0}.xref (in LaTeX format)\n".format(args.out_file))
     xref.write("% date: {0}\n".format(actDate))
     xref.write("% time: {0}\n".format(actTime))
     xref.write("% is called by '{0}.tex'\n\n".format(args.out_file))
     xref.write(r"\section{Used topics and related packages}" + "\n\n")
     xref.write("\\textit{Note: The numbers do not refer to page numbers, but to section numbers. A click on this number leads to the corresponding package description.}\n\n")
     xref.write(r"\raggedright" + "\n")
-    xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}" + "\n")
+    xref.write(r"\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}" + "\n")
     xref.write("\n")
     
     for f in topics:                              # loop: all topics
@@ -2555,10 +2856,15 @@ def make_xref():                                  # function: Generates the xref
 def miktex(k):                                    # function: processes element <miktex .../>
     """Processes the miktex element.
 
+    parameter:
     k: current knot
 
     Fetches the local attribute location.
-    Rewrites the global notice, s_miktex."""
+    Rewrites the global notice, s_miktex.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    s_miktex            string for Excel: miktex"""
 
     # Change: 2.55    2024-02-18 Mik\TeX escaped to Mik\\TeX
 
@@ -2567,7 +2873,8 @@ def miktex(k):                                    # function: processes element 
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global s_miktex                               # string for Excel: miktex
 
-    if debugging: print("+++miktex")
+    if debugging:
+        print("+++ >CTANOut:miktex")
 
     location = k.get("location", empty)           # get attribute location
 
@@ -2590,55 +2897,71 @@ def miktex(k):                                    # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         s_miktex = location
 
+    if debugging:
+        print("+++ <CTANOut:miktex")
+
 # ------------------------------------------------------------------
 def name(k):                                      # function: processes element <name>...</name>
     """Processes the name element.
 
+    parameter:
     k: current knot
 
     Fetches embedded text.
-    Rewrites the global s_name."""
+    Rewrites the global s_name.
+
+    global variable:
+    s_name              string for Excel: name"""
 
     # name --> TeXchars
     # name --> bibfield_test
     
     global s_name                                 # string for Excel: name
 
-    if debugging: print("+++name")
+    if debugging:
+        print("+++ >CTANOut:name")
 
     if len(k.text) > 0:                           # get embedded text
         tmp = k.text                              
     else:                                         #   k.text is empty
         tmp = default_text                        #   default text
 
-    if mode in ["LaTeX"] and not no_files:                         # LaTeX
+    if mode in ["LaTeX"] and not no_files:        # LaTeX
         tmp = TeXchars(tmp)                       #   clean-up embedded text
         out.write("\\item[name] \\texttt{{{0}}}\n".format(tmp))
-    elif mode in ["plain"] and not no_files:                       # plain
+    elif mode in ["plain"] and not no_files:      # plain
         out.write("\n" + "name: ".ljust(labelwidth) + tmp)
-    elif mode in ["RIS"] and not no_files:                         # RIS
+    elif mode in ["RIS"] and not no_files:        # RIS
         out.write("T1  - {0}\n".format(tmp))      #   main title
-    elif mode in ["BibLaTeX"] and not no_files:                    # BibLaTeX
+    elif mode in ["BibLaTeX"] and not no_files:   # BibLaTeX
         tmp = TeXchars(tmp)                       #   clean-up embedded text
         if bibfield_test(tmp, "title"):
             out.write("title".ljust(fieldwidth) + "= {" + tmp + "},\n")
     elif mode in ["Excel"]:                       # Excel
         s_name = k.text                           #   embedded text
 
+    if debugging:
+        print("+++ <CTANOut:name")
+
 # ------------------------------------------------------------------
 def onepackage(s, t):                             # function: loads a package XML file and start parsing
     """Loads a package XML file and starts parsing.
 
+    parameters:
     s: package name
     t: current package date
 
-    Rewrites the global counter."""
+    Rewrites the global counter.
+
+    global variable:
+    counter             counter for packages"""
 
     # onepackage --> entry
     
     global counter                                # counter for packages
 
-    if debugging: print("+++onepackage")
+    if debugging:
+        print("+++ >CTANOut:onepackage")
 
     left = 33
 
@@ -2658,16 +2981,18 @@ def onepackage(s, t):                             # function: loads a package XM
     onePackageRoot = onePackage.getroot()         # get XML root 
     entry(onePackageRoot, t, s)                   # begin with entry element
 
+    if debugging:
+        print("+++ <CTANOut:onepackage")
+
 # ------------------------------------------------------------------
 def process_packages():                           # function: Global loop (over alll selected packaged)
     """Global loop (over alll selected packages)
 
-    Rewrites the global no_package_processed, no_tp, no_ap, no_np, no_lp, no_ly."""
+    Rewrites the global no_package_processed, no_tp, no_ap, no_np, no_lp, no_ly.
 
-    global no_package_processed                   # Flag: if there is no correct XML file
-    global no_tp, no_ap, no_np, no_lp, no_ly
-
-    if debugging: print("+++process_packages")
+    global variables:
+    no_package_processed    Flag: if there is no correct XML file
+    no_tp, no_ap, no_np, no_lp, no_ly"""
 
     # process_packages --> onepackage
     # process_packages --> get_topic_packages
@@ -2676,6 +3001,12 @@ def process_packages():                           # function: Global loop (over 
     # process_packages --> get_local_packages
     # process_packages --> get_license_packages
     # process_packages --> get_year_packages
+
+    global no_package_processed                   # Flag: if there is no correct XML file
+    global no_tp, no_ap, no_np, no_lp, no_ly
+
+    if debugging:
+        print("+++ >CTANOut:process_packages")
     
     all_packages = set()                          # initialize set
     for f in packages:
@@ -2704,7 +3035,7 @@ def process_packages():                           # function: Global loop (over 
     for f in tmp_p:                               # all XML files in loop
         fext = f + ext                            # XML file name (with extension)
  
-        try:                                      # try to open file
+        try:                                     # try to open file
             ff       = open(direc + fext, encoding=file_encoding, mode="r")
             mod_time = time.strftime('%Y-%m-%d', time.gmtime(os.path.getmtime(fext)))
             onepackage(f, mod_time)               # process loaded XML file 
@@ -2725,27 +3056,36 @@ def process_packages():                           # function: Global loop (over 
         no_package_processed = True
 
     if verbose:
-        print("--- Info: packages processed")
+        print("--- Info: packages processed.")
+
+    if debugging:
+        print("+++ <CTANOut:process_packages")
 
 # ------------------------------------------------------------------
 def texlive(k):                                   # function: processes element <texlive .../>
     """Processes the texlive element.
 
+    parameter:
     k: current knot
 
     Fetches the local attribute loacation.
-    Rewrites the global notice, s_texlive."""
+    Rewrites the global notice, s_texlive.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    s_texlive           string for Excel: texlive"""
 
     # texlive --> TeXchars
     
     global notice                                 # string for RIS/BibLaTeX: collection for N1 a/o note
     global s_texlive                              # string for Excel: texlive
 
-    if debugging: print("+++texlive")
+    if debugging:
+        print("+++ >CTANOut:texlive")
 
     location = k.get("location", empty)           # get attribute location
 
-    if mode in ["LaTeX"] and not no_files:                         # LaTeX
+    if mode in ["LaTeX"] and not no_files:        # LaTeX
         tmp = TeXchars(location)
         out.write("\\item[on \\TeX Live] \\texttt{{{0}}}\n".format(tmp))
     elif mode in ["RIS"]:                         # RIS
@@ -2759,21 +3099,39 @@ def texlive(k):                                   # function: processes element 
             notice += ";\n" + blank * (fieldwidth + 2) + "on TeXLive: " + tmp
         else:
             notice = "on TeXLive: " + tmp
-    elif mode in ["plain"] and not no_files:                       # plain
+    elif mode in ["plain"] and not no_files:      # plain
         out.write("\n" + "on TeXLive: ".ljust(labelwidth) + location)
     elif mode in ["Excel"]:                       # Excel
         s_texlive = location
+
+    if debugging:
+        print("+++ <CTANOut:texlive")
 
 # ------------------------------------------------------------------
 def trailing(k, t, p):                            # function: last lines for the actual package
     """Completes the actual package.
 
+    parameters:
     k: current knot (here entry)
     t: current date
     p: current package
 
     Inspects the element keyval.
-    Rewrites many global variables."""
+    Rewrites many global variables.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    info_files          list of local PDF files
+    language_set        set: collect language
+    year_str            string: collect all year items for a package
+    version_str         string: collect all version items for a package
+    date_str            string: collect date
+    also_str            string: collect also
+    license_str         string: collect license
+    copyright_str       string: collect copyright
+    description_str     string: collect description
+    authorexists        flag
+    contact_str         string: collect contact"""
 
     # trailing --> bibfield_test
     
@@ -2790,7 +3148,8 @@ def trailing(k, t, p):                            # function: last lines for the
     global authorexists                           # flag
     global contact_str                            # string: collect contact
 
-    if debugging: print("+++trailing")
+    if debugging:
+        print("+++ >CTANOut:trailing")
 
     kw = []                                       # keywords
      
@@ -2807,7 +3166,7 @@ def trailing(k, t, p):                            # function: last lines for the
         else:
             lang_str = f
         if lang_str2 != empty:
-            lang_str2 = lang_str2 + "; " + languagecodes[f]
+           lang_str2 = lang_str2 + "; " + languagecodes[f]
         else:
             lang_str2 = languagecodes[f]
         if lang_str3 != empty:
@@ -2923,15 +3282,27 @@ def trailing(k, t, p):                            # function: last lines for the
     description_str = empty
     contact_str     = empty
 
+    if debugging:
+        print("+++ <CTANOut:trailing")
+
 # ------------------------------------------------------------------
 def version(k, p):                                # function: processes <version .../> element 
     """Processes the version element.
 
+    parameters:
     k: current knot
     p: current package
 
     Fetches the embedded attribues number, date.
-    Rewrites the global notice, date_str, version_str, s_version, s_lastchanges, s_year."""
+    Rewrites the global notice, date_str, version_str, s_version, s_lastchanges, s_year.
+
+    global variables:
+    notice              string for RIS/BibLaTeX: collection for N1 a/o note
+    date_str            string: collect date
+    version_str         string: collect all version items for a package
+    s_version           string for Excel: version
+    s_lastchanges       string for Excel: last changes
+    s_year              string for Eccel: year"""
 
     # version --> bibfield_test
     
@@ -2942,7 +3313,8 @@ def version(k, p):                                # function: processes <version
     global s_lastchanges                          # string for Excel: last changes
     global s_year                                 # string for Eccel: year
 
-    if debugging: print("+++version")
+    if debugging:
+        print("+++ >CTANOut:version")
 
     number = k.get("number", empty)               # get attribute number
     date   = k.get("date", empty)                 # get attribute date
@@ -2994,6 +3366,9 @@ def version(k, p):                                # function: processes <version
             if year != year_default:
                 s_year = year
 
+    if debugging:
+        print("+++ <CTANOut:version")
+
 
 # ======================================================================
 #  functions in the context of description
@@ -3016,20 +3391,27 @@ def version(k, p):                                # function: processes <version
 def description(k, pp):                           # function: processes element <description ...> ... </description>
     """Processes the description elements.
 
+    parameters:
     k: current knot
     pp: current package
 
     Fetches embedded text and the embbeded attribute language.
-    Rewrites the global language_set, description_str, level."""
+    Rewrites the global language_set, description_str, level.
+
+    global variables:
+    language_set        set: collect language
+    description_str     string: collect description
+    level               string: level of itemize/enumerate (<ol>, <ul>)"""
     
     # description --> innertext
     # description --> TeXchars_restore
 
     global language_set                           # set: collect language
     global description_str                        # string: collect description
-    global level
+    global level                                  # string: level of itemize/enumerate (<ol>, <ul>)
 
-    if debugging: print("+++version")
+    if debugging:
+        print("+++ >CTANOut:description")
 
     language = k.get("language", nls)             # get attribute language
 
@@ -3080,6 +3462,9 @@ def description(k, pp):                           # function: processes element 
     if mode in ["LaTeX", "RIS", "plain"] and not no_files:
         if tmptext != empty:
             out.write(tmptext.strip() + "\n")
+
+    if debugging:
+        print("+++ <CTANOut:description")
     
 # ------------------------------------------------------------------
 def innertext(k, start, pp):                      # function innertext: looks for embedded text and elements and returns an evaluated string
@@ -3087,15 +3472,20 @@ def innertext(k, start, pp):                      # function innertext: looks fo
     It scans the body of description and calls recursively other functions.
     It returns an evualated string.
 
+    parameters:
     k:     current knot
     pp:    current package
     start: start of scanning
 
-    Rewrites the global level."""
-    
-    global level
+    Rewrites the global level.
 
-    if debugging: print("+++innertext")
+    global variable:
+    level  string: level of itemize/enumerate (<ol>, <ul>)"""
+    
+    global level                                  # level of itemize/enumerate (<ol>, <ul>)
+
+    if debugging:
+        print("+++ >CTANOut:innertext")
 
     tmp = start
     
@@ -3174,16 +3564,21 @@ def innertext(k, start, pp):                      # function innertext: looks fo
             tmp += child.tail.strip()
     return tmp
 
+    if debugging:
+        print("+++ <CTANOut:innertext")
+
 # ------------------------------------------------------------------
 def mod_a(k, pp):                             # function: processes element <a ...> ... </a>
     """Processes the a elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text and the local attribute href."""
 
-    if debugging: print("+++mod_a")
+    if debugging:
+        print("+++ >CTANOut:mod_a")
 
     # mod_b --> innertext
     
@@ -3208,36 +3603,47 @@ def mod_a(k, pp):                             # function: processes element <a .
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excek do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_a")
+
 # ------------------------------------------------------------------
 def mod_b(k, pp):                             # function: processes element <b>...</b>
     """Processes the b elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text."""
 
-    if debugging: print("+++mod_b")
+    if debugging:
+        print("+++ >CTANOut:mod_b")
 
     # mod_b --> innertext
     
     tmp = innertext(k, k.text, pp).strip()    # get embedded text and sub-elements
     
     if mode in ["LaTeX", "BibLaTeX"]:         # LaTeX / BibLaTeX
-        k.text = "§§=1§§3textbf§§1{0}§§2§§=1".format(tmp) #   change embedded text
+        k.text = "§§=1§§3textbf§§1{0}§§2§§=1".format(tmp)
+                                              #   change embedded text
     elif mode in ["RIS", "plain"]:            # RIS / plain
         k.text = "§§=1'{0}'§§=1".format(tmp)  #   change embedded text
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_b")
+
 # ------------------------------------------------------------------
 def mod_br(k, pp):                            # function: processes element <br/>
     """Processes the br elements.
 
+    parameters:
     k:  current knot
     pp: current package"""
 
-    if debugging: print("+++mod_br")
+    if debugging:
+        print("+++ >CTANOut:mod_br")
 
     width = cases[mode]
     
@@ -3250,16 +3656,21 @@ def mod_br(k, pp):                            # function: processes element <br/
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_br")
+
 # ------------------------------------------------------------------
 def mod_code(k, pp):                          # function: processes element <code>...</code>
     """Processes the code elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text."""
 
-    if debugging: print("+++mod_code")
+    if debugging:
+        print("+++ >CTANOut:mod_code")
 
     # mod_pre --> mod_TeXchars2
     
@@ -3282,17 +3693,22 @@ def mod_code(k, pp):                          # function: processes element <cod
             k.text = "§§=1|{0}|§§=1".format(tmp.strip())
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
+
+    if debugging:
+        print("+++ <CTANOut:mod_code")
   
 # ------------------------------------------------------------------
 def mod_dd(k, pp):                                # function: processes element <dd>...</dd>
     """Processes the dd sub-elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches embedded text."""
 
-    if debugging: print("+++mod_dd")
+    if debugging:
+        print("+++ >CTANOut:mod_dd")
 
     # mod_dd --> innertext
     # mod_dd --> mod_TeXchars1
@@ -3313,16 +3729,21 @@ def mod_dd(k, pp):                                # function: processes element 
     if mode in ["Excel"]:                         # Excel
         pass                                      #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_dd")
+
 # ------------------------------------------------------------------
 def mod_dl(k, pp):                                # function: processes element <dl>...</dl>
     """Processes the ol elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches embedded text."""
 
-    if debugging: print("+++mod_dl")
+    if debugging:
+        print("+++ >CTANOut:mod_dl")
 
     # mod_dl --> innertext
 
@@ -3340,16 +3761,21 @@ def mod_dl(k, pp):                                # function: processes element 
     if mode in ["Excel"]:                         # Excel
         pass                                      #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_dl")
+
 # ------------------------------------------------------------------
 def mod_dt(k, pp):                                # function: processes element <dt>...</dt>
     """Processes the dt sub-elements.
 
+    parameters:
     k: current knot
     pp: current package
 
     Fetches embedded text."""
 
-    if debugging: print("+++mod_dt")
+    if debugging:
+        print("+++ >CTANOut:mod_dt")
 
     # mod_dt --> innertext
 
@@ -3363,17 +3789,22 @@ def mod_dt(k, pp):                                # function: processes element 
         k.text = "§§-" + tmpbl + "+ " + tmp + ": "                
     if mode in ["Excel"]:                         # Excel
         pass                                      #   for Excel do nothing
+
+    if debugging:
+        print("+++ <CTANOut:mod_dt")
     
 # ------------------------------------------------------------------
 def mod_em(k, pp):                            # function: processes element <em>...</em>
     """Processes the em elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text."""
 
-    if debugging: print("+++mod_em")
+    if debugging:
+        print("+++ >CTANOut:mod_em")
 
     # mod_em --> innertext
     
@@ -3385,11 +3816,15 @@ def mod_em(k, pp):                            # function: processes element <em>
         k.text = "§§=1'{0}'§§=1".format(tmp)          #   change embedded text
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
+
+    if debugging:
+        print("+++ <CTANOut:mod_em")
     
 # ------------------------------------------------------------------
 def mod_i(k, pp):                             # function: processes element <i>...</i>
     """Processes the i elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
@@ -3397,7 +3832,8 @@ def mod_i(k, pp):                             # function: processes element <i>.
 
     # mod_xref --> innertext
 
-    if debugging: print("+++mod_i")
+    if debugging:
+        print("+++ >CTANOut:mod_i")
 
     tmp = innertext(k, k.text, pp).strip()    # get embedded text and sub-elements
 
@@ -3408,24 +3844,32 @@ def mod_i(k, pp):                             # function: processes element <i>.
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_i")
+
 # ------------------------------------------------------------------
 def mod_li(k, pp):                                # function: processes element <li>...</li>
     """Processes the li elements.
 
+    parameters:
     k: current knot
     pp: current package
 
     Fetches embedded text.
-    Rewrites the global level."""
+    Rewrites the global level.
 
-    global level
-
-    if debugging: print("+++mod_li")
+    global variable:
+    level     string: level of itemize/enumerate (<ol>, <ul>)"""
 
     # mod_li --> innertext
     # mod_li --> mod_TeXchars1
     # mod_li --> test_embedded
     # mod_li --> gen_fold
+
+    global level                                  # level of itemize/enumerate (<ol>, <ul>)
+
+    if debugging:
+        print("+++ >CTANOut:mod_li")
 
     tmptext = innertext(k, k.text, pp).strip()    # get embedded text and sub-elements
     tmppref = empty
@@ -3461,18 +3905,23 @@ def mod_li(k, pp):                                # function: processes element 
     elif mode in ["Excel"] :                       # Excel
         pass
 
+    if debugging:
+        print("+++ <CTANOut:mod_li")
+
 # ------------------------------------------------------------------
 def mod_pre(k, pp):                           # function: processes element <pre>...</pre>
     """Processes the pre elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text."""
 
-    if debugging: print("+++mod_pre")
-
     # mod_pre --> mod_TeXchars2
+
+    if debugging:
+        print("+++ >CTANOut:mod_pre")
     
     tmp   = k.text
     tmp   = mod_TeXchars2(tmp)
@@ -3493,18 +3942,23 @@ def mod_pre(k, pp):                           # function: processes element <pre
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_pre")
+
 # ------------------------------------------------------------------
 def mod_small(k, pp):                         # function: processes element <small>...</small>
     """Processes the small elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text."""
 
-    if debugging: print("+++mod_small")
-
     # mod_small --> innertext
+
+    if debugging:
+        print("+++ >CTANOut:mod_small")
     
     tmp = innertext(k, k.text, pp).strip()    # get embedded text and sub-elements
 
@@ -3514,18 +3968,17 @@ def mod_small(k, pp):                         # function: processes element <sma
         k.text = "§§=1'{0}'§§=1".format(tmp)  #   change embedded text
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
+    if debugging:
+        print("+++ <CTANOut:mod_small")
 
 # ------------------------------------------------------------------
 def mod_TeXchars1(s):                                       # auxiliary function: prepares characters for LaTeX/BibLaTeX in a paragraph
     """auxilary function: Prepares characters for LaTeX/BibLaTeX (only for description - intended for to be printed).
 
+    parameter:
     s: string
 
     returns a changed string s."""
-
-    # change: 2.56    2024-02-18 "[\[] --> r"[\[]
-
-    if debugging: print("+++mod_TeXchars1")
 
     # $ ---> \$   ---> 
     # { ---> \{   ---> \textbraceleft
@@ -3541,6 +3994,11 @@ def mod_TeXchars1(s):                                       # auxiliary function
     # \ ---> §§3
     # { ---> §§1
     # } ---> §§2
+
+    # change: 2.56    2024-02-18 "[\[] --> r"[\[]
+
+    if debugging:
+        print("+++ >CTANOut:mod_TeXchars1")
 
     tmp = s
     tmp = re.sub(r"[\[]", "[", tmp)                         # change [
@@ -3562,17 +4020,22 @@ def mod_TeXchars1(s):                                       # auxiliary function
     tmp = re.sub("´", "'", tmp)                            # change	´
     return tmp
 
+    if debugging:
+        print("+++ <CTANOut:mod_TeXchars1")
+
 # ------------------------------------------------------------------
 def mod_TeXchars2(s):                                      # auxiliary function: prepares characters for LaTeX/BibLaTeX
     """auxiliary function: Prepares characters for LaTeX/BibLaTeX (only for description - intended for to be used by LaTeX).
 
+    parameter:
     s: string
 
     returns a changed string s."""
 
     # Change: 2.56    2024-02-18 "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]
 
-    if debugging: print("+++mod_TeXchars2")
+    if debugging:
+        print("+++ >CTANOut:mod_TeXchars2")
 
     tmp = s
     tmp = re.sub("{", "§§1", tmp)                          # change	{
@@ -3591,19 +4054,24 @@ def mod_TeXchars2(s):                                      # auxiliary function:
     tmp = re.sub("´", "'", tmp)                            # change	´
     return tmp
 
+    if debugging:
+        print("+++ <CTANOut:mod_TeXchars2")
+
 # ------------------------------------------------------------------
 def mod_tt(k, pp):                            # function: processes element <tt>...</tt>
     """Processes the tt elements.
 
+    parameters:
     k: current knot
     pp: current package
 
     Fetches embedded text."""
 
-    if debugging: print("+++mod_tt")
-
     # mod_tt --> innertext
     # mod_tt --> mod_TeXchars1
+
+    if debugging:
+        print("+++ >CTANOut:mod_tt")
 
     tmp = innertext(k, k.text, pp).strip()    # get embedded text and sub-elements
     
@@ -3615,19 +4083,23 @@ def mod_tt(k, pp):                            # function: processes element <tt>
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_tt")
 
 # ------------------------------------------------------------------
 def mod_xref(k, pp):                          # function: processes element <xref ...> ... </xref>
     """Processes the xref elements.
 
+    parameters:
     k: current knot
     pp: current package
 
     Fetches any embedded text and the attribute refid."""
 
-    if debugging: print("+++mod_xref")
-
     # mod_xref --> innertext
+
+    if debugging:
+        print("+++ >CTANOut:mod_xref")
         
     tmp  = k.get("refid", empty)              # get attribute refid
     tmp2 = ctanUrl4 + tmp                     # build the complete URL
@@ -3645,18 +4117,23 @@ def mod_xref(k, pp):                          # function: processes element <xre
     elif mode in ["Excel"]:                   # Excel
         pass                                  #   for Excek do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_xref")
+
 # ------------------------------------------------------------------
 def mod_ol(k, pp):                                # function: processes element <ol>...</ol>
     """Processes the ol elements.
 
+    parameters:
     k: current knot
     pp: current package
 
     Fetches embedded text."""
 
-    if debugging: print("+++mod_ol")
-
     # mod_ol --> innertext
+
+    if debugging:
+        print("+++ >CTANOut:mod_ol")
 
     tmp = innertext(k, k.text, pp).strip()        # get embedded text and sub-elements
     
@@ -3672,21 +4149,26 @@ def mod_ol(k, pp):                                # function: processes element 
     if mode in ["Excel"]:                         # Excel
         pass                                      #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_ol")
+
 # ------------------------------------------------------------------
 def mod_p(k, pp):                                 # function: processes element <p> ... </p>
     """Processes the p elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches embedded text."""
 
-    if debugging: print("+++mod_p")
-
     # mod_p --> innertext
     # mod_p --> mod_TeXchars1
     # mod_p --> test_embedded
     # mod_p --> gen_fold
+
+    if debugging:
+        print("+++ >CTANOut:mod_p")
 
     tmptext = innertext(k, k.text, pp).strip()    # get embedded text and sub-elements
     width   = cases[mode]
@@ -3708,18 +4190,23 @@ def mod_p(k, pp):                                 # function: processes element 
     elif mode in ["Excel"]:                       # Excel
         pass                                      #  do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_p")
+
 # ------------------------------------------------------------------
 def mod_ul(k, pp):                                # function: processes element <ul>...</ul>
     """Processes the ul elements.
 
+    parameters:
     k:  current knot
     pp: current package
 
     Fetches any embedded text."""
 
-    if debugging: print("+++mod_ul")
-
     # mod_ul --> innertext
+
+    if debugging:
+        print("+++ >CTANOut:mod_ul")
 
     tmp = innertext(k, k.text, pp).strip()        # get embedded text and sub-elements
     
@@ -3735,16 +4222,21 @@ def mod_ul(k, pp):                                # function: processes element 
     if mode in ["Excel"]:                         # Excel
         pass                                      #   for Excel do nothing
 
+    if debugging:
+        print("+++ <CTANOut:mod_ul")
+
 # ------------------------------------------------------------------
 def test_embedded(k, pp):                         # auxiliary function test_embedded: tests current knot for embedded material
     """auxiliary function: tests current knot for embedded material
 
+    parameters:
     k :  current knot
     pp : current package
 
     Resturns TRUE, if there are embedded elements in k."""
 
-    if debugging: print("+++test_embedded")
+    if debugging:
+        print("+++ -CTANOut:test_embedded")
 
     tmp = False
     for child in k:
@@ -3755,11 +4247,13 @@ def test_embedded(k, pp):                         # auxiliary function test_embe
 def TeXchars_restore(s):                                   # auxiliary function: restores characters for LaTeX/BibLaTeX
     """auxiliary function: Restores characters for LaTeX/BibLaTeX.
 
+    parameter:
     s: string
 
     returns a changed string s."""
 
-    if debugging: print("+++TeXchars_restore")
+    if debugging:
+        print("+++ -CTANOut:TeXchars_restore")
 
     tmp  = s
     tmp = re.sub("§§=12(§§=1)?", blank * 12, tmp)
@@ -3841,9 +4335,9 @@ else:
 # 1.76 2021-05-14 clean-up of variables
 # 1.77 2021-05-15 more details in verbose mode for -mt
 # 1.78 2021-05-15 output the call parameters in more details in verbose mode
-# 1.79 2021-05-20 directory separator improved
-# 1.80 2021-05-23 directory name improved
-# 1.81 2021-05-24 directory handling (existance, installation) improved
+# 1.79 2021-05-20 folder separator improved
+# 1.80 2021-05-23 folder name improved
+# 1.81 2021-05-24 folder handling (existance, installation) improved
 # 1.82 2021-05-26 structure of CTAN.pkl adapted
 # 1.83 2021-05-26 output of license information now with full text
 # 1.84 2021-05-26 output and interpretaion of language codes improved
@@ -3942,6 +4436,7 @@ else:
 # 2.15    2022-02-02 additional license information: now with free a/o not free
 # 2.16    2022-02-05 additional texts at the top of output files
 # 2.17    2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
+
 # 2.18    2022-02-15 new option -L (selection of packages by licenses)
 # 2.18.1  2022-02-15 new variables: license_template_text, license_template_default, license_template (used by argparse); licensepackages
 # 2.18.2  2022-02-15 new section for specifying -L by argparse
@@ -3950,12 +4445,15 @@ else:
 # 2.18.5  2022-02-15 new variable p9 [re.compile(license_template)]; allows filtering by license template
 # 2.18.6  2022-02-15 changes in first_lines, licenseT, process_packages, make_stat, make_statistics, and process_packages
 # 2.18.7  2022-02-16 shorttitlde and status can be used for -L, too
+
 # 2.19    2022-02-19 error in make_stat corrected
 # 2.20    2022-02-21 some corrections in make_stat
+
 # 2.21    2022-02-23 in LaTeX mode: output of licenses and related packages (tlp) + output of licenses and explainations (lic)
 # 2.21.1  2022-02-03 new function make_tlp; changes in main(); new file xyz.tlp; called in LaTeX document (option -mt)
 # 2.21.2  2022-02-23 new function make_lics; changes in main(); new file xyz.lic; called in LaTeX document (option -mt)
 # 2.21.3  2022-02-23 additions and corrections in make_tlp, make_tap, make_lics, make_xref
+
 # 2.22    2022-03-01 additions and corrections in make_stat
 # 2.23    2022-03-01 texts for argparse and terminal log changed
 # 2.24    2022-03-01 corrections in first_lines (plain, BibLaTeX)
@@ -3970,18 +4468,23 @@ else:
 # 2.33    2022-09-28 some enhancements in "Resettings and Settings" (if -nf is set)
 # 2.34    2022-09-30 processing of unknown/wrong language in description a/o documentation improved
 # 2.35    2023-06-11 due to -nf: changes in statistics output (parameter -stat)
+
 # 2.36    2023-06-11 changes in rendering of description content
 # 2.36.1  2023-06-11 interaction of §§= and TeXchars_restore improved   
 # 2.36.2  2023-06-11 indentation in description in some places corrected
 # 2.36.3  2023-06-11 line breaks in <pre> are removed; changes in mod_pre, mod_code
+
 # 2.37    2023-06-11 LaTeX procession
 # 2.37.1  2023-06-11 corrected: without -mt no proper file end for LaTeX
 # 2.37.2  2023-06-11 LaTeX header changed (fonts, languages)
+
 # 2.38    2023-06-11 Workaround if language key, topic key, author key, license key are unknown
 # 2.39    2023-06-11 Error in trailing function: if languagecode is unknown; workaround
+
 # 2.40    2023-06-11 new option -y (filtering on the base of year templates
 # 2.40.1  2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
 # 2.40.2  2023-06-11 related changes in the statistics part (option -stat)
+
 # 2.41    2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
 # 2.42    2023-06-15 output on terminal changed
 # 2.43    2023-06-15 new option -dbg/--debugging: debugging mode enabled
@@ -3992,12 +4495,14 @@ else:
 # 2.48    2023-07-07 variable year_default_template redefined
 # 2.49    2023-07-08 messages now with the signature [CTANOut]
 # 2.50    2023-07-08 \index entries in xyz.xref, xyz.lic, xyz.tlp removed
+
 # 2.51    2023-07-08 new concept for the handling of languages
 # 2.51.1  2023-07-08 new default language: nls
 # 2.51.2  2023-07-09 new concept for the language handling in documentation a/o descrpition
 # 2.51.3  2023-07-10 language \index entries in LaTeX mode improved
 # 2.51.4  2023-07-10 language \item entries in LaTeX mode improved
 # 2.51.5  2023-07-10 in RIS/plain/BibLaTeX mode: smaller errors in the output of documentation a/o description corrected
+
 # 2.52    2023-07-16 language en,ru now in languagecodes
 # 2.53    2023-07-28 output of -stat now with program date
 # 2.54    2024-02-18 new language codes: en,fr and es-pe
@@ -4005,6 +4510,15 @@ else:
 # 2.56    2024-02-18 "[\^s]+" changed to "r[\^]+"; "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]"
 # 2.57    2024-02-28 in make_tap: enable processing of "_" in author names
 # 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
+# 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+# 2.60    2024-03-28 all __doc__ texts of the functions completed (parameters and global variables)
+# 2.61    2024-04-12 smaller changes in make_statistics
+# 2.62    2024-07-26 some smaller text changes for argparse
+
+# 2.63    2024-07-26 argparse revised
+# 2.63.1  2024-07-26 additional parameter in .ArgumentParser: prog, epilog, formatter_class
+# 2.63.2  2024-07-26 subdivision into groups by .add_argument_group
+# 2.63.3  2024-07-26 additional arguments in .add_argument (if it makes sense): type, metavar, action, dest
 
 
 # ------------------------------------------------------------------
@@ -4026,7 +4540,7 @@ else:
 # - Fehler in @online{Tanguy2021: \\} ; (x)
 # - aufgerufene OPtionen normieren (nicht notwendig)
 
-# - korrigieren: URLs mit "+" laden (auch für andere unzulässige Zeichen)
+# - korrigieren: auch URLs mit "+" laden (auch für andere unzulässige Zeichen)
 # - bestimmte Ergebnisse in die zwischenablage liefern?
 # - Konzept der <year>-Suche überdenken
 # - m=LaTeX: mehr Texte in """-"""-Notation (x)
@@ -4037,5 +4551,5 @@ else:
 # - copyright im Index (-)
 # - Unzuzlänglichkeit bei LaTeX:  _ in <author>: Paket weiqi; Ms_yam;
 # - für BibLaTeX auch ?
-# - Text korrigieren: \footnotetext{special lists: topics/licinses and their explanation + topics/authors/licenses and related packages(cross-reference lists)}
-# - aall.tp, all.xref, all.tap, all.lic, all.tlp, all.stat mit Verweis auf LaTeX
+# - Text korrigieren: \footnotetext{special lists: topics/licinses and their explanation + topics/authors/licenses and related packages(cross-reference lists)} (x)
+# - aall.tp, all.xref, all.tap, all.lic, all.tlp, all.stat mit Verweis auf LaTeX (x)

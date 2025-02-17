@@ -1,6 +1,6 @@
 Messages (CTANOut)
 ==================
-2024-03-17
+2024-08-12
 
 Errors
 ------
@@ -10,37 +10,27 @@ Error: tried to use the program indirectly
 
 Infos
 -----
-Info: all package files analyzed and dictionary citation_keys created.
-Info: CTANOut program successfully completed
-Info: file '<.lic file>' created: [licenses and their explainations]
+Info: all package files analyzed and set citation_keys created.
+Info: CTANOut program successfully completed.
 Info: file '<.stat file>' written: [statistics]
-Info: file '<.tap file>' created: [list with authors and related packages (cross-reference list)]
-Info: file '<.tlp file>' created: [list with licenses and related packages (cross-reference list)]
-Info: file '<.top file>' created: [topics and their explainations]
+Info: file '<.lic file>' created:  [licenses and their explainations]
+Info: file '<.tap file>' created:  [list with authors and related packages (cross-reference list)]
+Info: file '<.tlp file>' created:  [list with licenses and related packages (cross-reference list)]
+Info: file '<.top file>' created:  [topics and their explainations]
 Info: file '<.xref file>' created: [list with topics and related packages (cross-reference list)]
 Info: packages processed
 Info: program call (with details): <program name>
-Info: Program call: <program name> <arguments>
-Info: Successfully the OS directory '<OS directory>' created.
+Info: Program call: <program name> <aoption(s)>
+Info: Successfully the OS folder '<folder>' created.
 
 Warnings
 --------
-Warning: '<option> "<value>" changed to '<value>' (due to '<reason>')
-Warning: Creation of the OS directory '<OS directory>' failed.
-Warning: no correct local XML file for any specified package found
-Warning: no file '<.lic file>' created
-Warning: no file '<.tap file>' created
-Warning: no file '<.tlp file>' created
-Warning: no file '<.top file>' created
-Warning: no file '<.xref file>' created
-Warning: no package found which matches the specified key template ' <key template>'
-Warning: no package found which matches the specified author template '<author template>'
-Warning: no package found which matches the specified license template '<license template>'
-Warning: no package found which matches the specified name template '<name template>'
-Warning: no package found which matches the specified topic template '<topic template>'
-Warning: no package found which matches the specified year template '<year template>'
-Warning: pickle file '<pickle file>' not found; local information files ignored
-Warning: unknown language code '<language code>' in 'description'; ignored
-Warning: unknown language code '<language code>' in 'documentation'; ignored
-Warning: XML file for package '<package>' not well-formed
-Warning: XML file for package '<XML file>' not found
+Warning '<option 1> <value 1>' changed to '<value 2>' (due to '<option 2>')
+Warning Creation of the OS folder '<folder>' failed.
+Warning no correct local XML file for any specified package found.
+Warning no file '<.lic|.top|.tap|.tlp|.xref file>' created)
+Warning no package found which matches the specified <year|author|name|topic|license> template '<year|author|name|topic|license file>'
+Warning pickle file '<pickle file>' not found; local information files ignored
+Warning unknown language code '<code>' in '<documentation|description>'; ignored
+Warning XML file for package '<package>' not found
+Warning XML file for package '<package>' not well-formed

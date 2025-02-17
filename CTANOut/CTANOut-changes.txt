@@ -1,174 +1,195 @@
-Changes (CTZANOut)
-==================
-2024-03-17
-
-1.75 2021-05-14 more types for -m
-1.76 2021-05-14 clean-up of variables
-1.77 2021-05-15 more details in verbose mode for -mt
-1.78 2021-05-15 output the call parameters in more details in verbose mode
-1.79 2021-05-20 directory separator improved
-1.80 2021-05-23 directory name improved
-1.81 2021-05-24 directory handling (existance, installation) improved
-1.82 2021-05-26 structure of CTAN.pkl adapted
-1.83 2021-05-26 output of license information now with full text
-1.84 2021-05-26 output and interpretaion of language codes improved
-1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
-1.86 2021-06-12 auxiliary function fold: shorten long option values for output
-1.87 2021-06-12 messages classified: Warnings, Error, Info; no package found which match
-1.88 2021-06-13 string method str.format used (if applicable)
-1.89 2021-06-18 some tiny improvements for output
-1.90 2021-06-22 misc. smaller corrections
-1.91 2021-06-24 additional minor corrections
-1.82 2021-07-05 function fold restructured
-1.93 2021-07-09 construct a unique author year string for BibLaTeX; two new auxiliary functions
-1.94 2021-07-11 new functions: load_pickle1() and load_pickle2()
-1.95 2021-07-12 new option -A; new functions: get_author_packages, get_name_packages, get_topic_packages; new procedure in process_packages
-1.96 2021-07-14 new set of messages; new message no package found which match the specified '<kind of template>' template '<template>'
-1.97 2021-07-15 error in make_xref() corrected
-1.98 2021-07-16 verbose output enhanced (prevent the listing of non-existing packages); new function get_local_packages()
-1.99 2021-07-19 make_stat, make_xref, make_tap respect option -A; output changed
-1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
-1.101 2021-07-20 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
-1.102 2021-07-21 results are sorted
-1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
-1.104 2021-07-21 only for LaTeX: output folded an 1st page of output; new function TeX_fold()
-1.105 2021-07-26 results now alphabetically sorted; output improved
-1.106 2021-09-25 output of year in BibLaTeX enhanced
-1.107 2021-10-10 changes in get_year: analyze element year, too
-1.108 2021-10-10 completion of language_keys
-1.109 2021-10-10 element documentation indexed
-1.110 2021-10-11 output in Hindi now possible
-1.111 2021-10-11 section headers (for LaTeX) improved
-1.112 2021-10-11 error messages actualized
-1.113 2021-10-12 output headers for LaTeX and BibLaTeX enhanced
-1.114 2021-10-12 new function biblatex_citationkey: generate valid citation keys + corresponding changes in 'leading', 'main', and 'also'
-1.115 2021-10-12 function 'leading' cleaned
-1.116 2021-10-12 comment blocks re-organized
-1.117 2021-10-12 document strings in functions enhanced
-1.118 2021-10-12 in comment block: list of functions and function tree actualized
-1.119 2021-10-13 RIS output: a) type changed to ICOMM; b) UR output: now for main document and CTAN element <documentation .../>
-1.120 2021-10-14 RIS output: field "PY  -" settled now with year (collected from <version.../> and <copyright ... />)
-1.121 2021-10-14 RIS output: "L4  -" changed to "L2  -"
-1.122 2021-10-15 RIS output: output "Y2  - " (from <version ... />); implements "last change"
-1.123 2021-10-15 RIS output: <also ...> mapped into notice (= "N1  -")
-1.124 2021-10-17 RIS output: LA output improved; BibLaTeX output: 'file' output improved
-1.125 2021-10-20 language codes es-mx, sl and zh-cn added
-1.126 2021-10-20 output of title/subtitle a/o T1/T2: output now harmonized in functions 'name'/'caption'
-1.127 2021-10-20 now harmonized: output of 'language' a/o 'LA' in function 'trailing'
-1.128 2021-10-21 Excel: output and processing extended, improved and enhanced; new call parameter -m csv
-1.129 2021-10-22 RIS: better values for 'PY' and 'LA'; mapping von <also .../>; better values for 'Y2' and 'Y3'
-1.130 2021-10-23 RIS: 'N1' re-arranged; fieldwidth (label width) changed; 'L1' output corrected
-1.131 2021-10-24 date of last access in RIS/BibLaTeX: 'Y2' and 'date' unified
-1.132 2021-10-24 output of URL and date of last access in RIS/BibLaTeX: 'UR' and 'Y3' a/o 'url' and 'urldate'
-1.133 2021-10-25 BibLaTeX: licenses collected and output in 'userb'; 'note' corrected; comment block at the beginning re-arranged; 'year' output improved
-1.134 2021-10-25 BibLaTeX: 'language' output enhanced
-1.135 2021-10-26 function 'leading': trimmed; determination of author(s) improved; 'userunknown' renamed to 'authorunknown'
-1.136 2021-10-27 TeX output: additionally URL of Web page on CTAN, year and last access date
-1.137 2021-10-28 plain output: additionally URL of Web page on CTAN, year and last access date
-1.138 2021-10-28 RIS and BibLaTeX output: unnecessary empty output lines suppressed
-1.139 2021-10-29 Excel output: some improvements and a few corrections
-1.140 2021-10-29 output of keywords, language(s), local file name(s), and 'note' a/o 'N1'  improved
-1.141 2021-11-01 supplementary notes at the beginning of xyz.xref and xyz.tap
-1.142 2021-11-01 aesthetic repairs for the processing of <description ...> ...</description> with 'language' attribute
-1.143 2021-11-02 function 'mod_xref' modified
-1.144 2021-11-02 full UTF-8 output on stdout enabled
-1.145 2021-11-03 function 'description', 'p', 'ul', and 'li': output of multiple spaces and empty lines revised
-1.146 2021-11-03 BibLaTeX: mapping of 'description' to 'abstract' improved
-1.147 2021-11-05 BibLaTeX: "@" substituted to 'at' in 'note' and 'usera' output
-1.148 2021-11-05 correct processing of multiple CTAN field 'also' for BibLaTeX/Excel; correct processing of multiple CTAN 'alias' for Excel
-1.149 2021-11-05 correct processing of multiple CTAN field 'description' for all modes
-1.150 2021-11-05 correction for option -b: '@online' as new default; '@electronic' as new choose
-1.151 2021-11-06 new option -sb (--skip_biblatex): additional function 'bibfield_test'; additional requests
-1.153 2021-11-06 BibLaTeX/plain/LaTeX/RIS/Excel: interaction between 'year' und 'date' harmonized
-1.154 2021-11-08 LaTeX: index for 'year' now; index for CTAN field documentation no longer in use
-1.155 2021-11-08 BibLaTeX: some items no longer collected in 'note', but in 'usera', 'userb', 'userc', 'userd', 'usere', 'userf'
-1.156 2021-11-11 new examples for option '-sb'
-1.157 2021-11-11 BibLaTeX: output of 'file' corrected; now jabref compatible
-1.158 2021-11-13 mapping CTAN --> BibLaTeX changed: now 'texlive', 'miktex' --> embedded in 'note'; ctan --> 'userc'; 'contact' --> collected in 'userd'
-1.159 2021-11-19 LaTeX output: "--local file" now with relativ path
-1.160 2021-11-20 'year' in LaTeX/plain: "without year" if it is appropiate
-1.161 2021-11-21 for all modes: empty output for abstract/description corrected
-1.162 2021-11-28 greater parts of comment blocks moved to external text files
-2.0     2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
-2.1     2022-01-02 functions mod_backslash and mod_TeXchars removed
-2.2     2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
-2.3     2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
-2.4     2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
-2.5     2022-01-04 new function: mod_small (processing of <small> ...</small>)
-2.6     2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
-2.7     2022-01-06 nested <ol>/<ul> can be processed
-2.8     2022-01-07 left indentation of <li> (mode dependant)
-2.9     2022-01-09 new function gen_fold (folds content of <li>)
-2.10    2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
-2.11    2022-01-11 new language code "zn,ja"
-2.12    2022-01-26 texts for the -h option changed
-2.13    2022-01-28 left indentation for all modes tuned
-2.14    2022-01-28 additionally: output of date and time in statistics on output (-stat)
-2.15    2022-02-02 additional license information: now with free a/o not free
-2.16    2022-02-05 additional texts at the top of output files
-2.17    2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
-2.18    2022-02-15 new option -L (selection of packages by licenses)
-2.18.1  2022-02-15 new variables: license_template_text, license_template_default, license_template (used by argparse); licensepackages
-2.18.2  2022-02-15 new section for specifying -L by argparse
-2.18.3  2022-02-15 new function get_license_packages (collecting packages for specified licenses)
-2.18.4  2022-02-15 changes in load_pickle1: new CTAN.pkl component licensepackages
-2.18.5  2022-02-15 new variable p9 [re.compile(license_template)]; allows filtering by license template
-2.18.6  2022-02-15 changes in first_lines, licenseT, process_packages, make_stat, make_statistics, and process_packages
-2.18.7  2022-02-16 shorttitlde and status can be used for -L, too
-2.19    2022-02-19 error in make_stat corrected
-2.20    2022-02-21 some corrections in make_stat
-2.21    2022-02-23 in LaTeX mode: output of licenses and related packages (tlp) + output of licenses and explainations (lic)
-2.21.1  2022-02-03 new function make_tlp; changes in main(); new file xyz.tlp; called in LaTeX document (option -mt)
-2.21.2  2022-02-23 new function make_lics; changes in main(); new file xyz.lic; called in LaTeX document (option -mt)
-2.21.3  2022-02-23 additions and corrections in make_tlp, make_tap, make_lics, make_xref
-2.22    2022-03-01 additions and corrections in make_stat
-2.23    2022-03-01 texts for argparse and terminal log changed
-2.24    2022-03-01 corrections in first_lines (plain, BibLaTeX)
-2.25    2022-03-15 LaTeX header/preambel changed (fonts, languages)
-2.26    2022-03-20 error in mod_pre and mod_code corrected
-2.27    2022-03-25 error in the processing of -mt option corrected
-2.28    2022-03-30 BibLaTeX: "1970" removed from BiobTeX key; get_authorkey changed
-2.29    2022-04-10 BibLaTeX: additional request in biblatex_citationkey, if id is unknown
-2.30    2022-09-25 list of language codes extended
-2.31    2022-09-26 error for index entry in description function repaired
-2.32    2022-09-27 new option --no:files: generate no files; new variable; changes in some functions
-2.33    2022-09-28 some enhancements in "Resettings and Settings" (if -nf is set)
-2.34    2022-09-30 processing of unknown/wrong language in description a/o documentation improved
-2.35    2023-06-11 due to -nf: changes in statistics output (parameter -stat)
-2.36    2023-06-11 changes in rendering of description content
-2.36.1  2023-06-11 interaction of §§= and TeXchars_restore improved   
-2.36.2  2023-06-11 indentation in description in some places corrected
-2.36.3  2023-06-11 line breaks in <pre> are removed; changes in mod_pre, mod_code
-2.37    2023-06-11 LaTeX procession
-2.37.1  2023-06-11 corrected: without -mt no proper file end for LaTeX
-2.37.2  2023-06-11 LaTeX header changed (fonts, languages)
-2.38    2023-06-11 Workaround if language key, topic key, author key, license key are unknown
-2.39    2023-06-11 Error in trailing function: if languagecode is unknown; workaround
-2.40    2023-06-11 new option -y (filtering on the base of year templates
-2.40.1  2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
-2.40.2  2023-06-11 related changes in the statistics part (option -stat)
-2.41    2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
-2.42    2023-06-15 output on terminal changed
-2.43    2023-06-15 new option -dbg/--debugging: debugging mode enabled
-2.44    2023-06-15 output on xyz.stat changed
-2.45    2023-06-26 some changes in statistics output
-2.46    2023-06-28 fold() changed to adjust protocoll output
-2.47    2023-07-06 xyz.lic, xyz.tap, xyz.tlp, xyz.top, xyz.xref now without any \index entry
-2.48    2023-07-07 variable year_default_template redefined
-2.49    2023-07-08 messages now with the signature [CTANOut]
-2.50    2023-07-08 \index entries in xyz.xref, xyz.lic, xyz.tlp removed
-2.51    2023-07-08 new concept for the handling of languages
-2.51.1  2023-07-08 new default language: nls
-2.51.2  2023-07-09 new concept for the language handling in documentation a/o descrpition
-2.51.3  2023-07-10 language \index entries in LaTeX mode improved
-2.51.4  2023-07-10 language \item entries in LaTeX mode improved
-2.51.5  2023-07-10 in RIS/plain/BibLaTeX mode: smaller errors in the output of documentation a/o description corrected
-2.52    2023-07-16 language en,ru now in languagecodes
-2.53    2023-07-28 output of -stat now with program date
-2.54    2024-02-18 new language codes: en,fr and es-pe
-2.55    2024-02-18 \inp ecaped to \\inp, Mik\TeX escaped to Mik\\TeX
-2.56    2024-02-18 "[\^s]+" changed to "r[\^]+"; "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]"
-2.57    2024-02-28 in make_tap: enable processing of "_" in author names
-2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
+Changes (CTANOut.py)
+--------------------
+(2024-08-12)
 
 
+# History
+# ------------------------------------------------------------------
+# 1.75 2021-05-14 more types for -m
+# 1.76 2021-05-14 clean-up of variables
+# 1.77 2021-05-15 more details in verbose mode for -mt
+# 1.78 2021-05-15 output the call parameters in more details in verbose mode
+# 1.79 2021-05-20 folder separator improved 
+# 1.80 2021-05-23 folder name improved
+# 1.81 2021-05-24 folder handling (existance, installation) improved
+# 1.82 2021-05-26 structure of CTAN.pkl adapted
+# 1.83 2021-05-26 output of license information now with full text
+# 1.84 2021-05-26 output and interpretaion of language codes improved
+# 1.85 2021-05-27 correction of source errors in <version .../> in licenses.xml
+# 1.86 2021-06-12 auxiliary function fold: shorten long option values for output
+# 1.87 2021-06-12 messages classified: Warnings, Error, Info; no package found which match
+# 1.88 2021-06-13 string method str.format used (if applicable)
+# 1.89 2021-06-18 some tiny improvements for output
+# 1.90 2021-06-22 misc. smaller corrections
+# 1.91 2021-06-24 additional minor corrections
+# 1.82 2021-07-05 function fold restructured
+# 1.93 2021-07-09 construct a unique author year string for BibLaTeX; two new auxiliary functions
+# 1.94 2021-07-11 new functions: load_pickle1() and load_pickle2()
+# 1.95 2021-07-12 new option -A; new functions: get_author_packages, get_name_packages, get_topic_packages; new procedure in process_packages
+# 1.96 2021-07-14 new set of messages; new message no package found which match the specified '<kind of template>' template '<template>'
+# 1.97 2021-07-15 error in make_xref() corrected
+# 1.98 2021-07-16 verbose output enhanced (prevent the listing of non-existing packages); new function get_local_packages()
+# 1.99 2021-07-19 make_stat, make_xref, make_tap respect option -A; output changed
+# 1.100 2021-07-19 comments in BibLaTeX/LaTeX respects option -A
+# 1.101 2021-07-20 new global variabel no_packages_processed: if set, all.tap,all.top,all.xref are not generated
+# 1.102 2021-07-21 results are sorted
+# 1.103 2021-07-21 only for LaTeX/BibLaTeX: output in comments is folded; new function comment_fold()
+# 1.104 2021-07-21 only for LaTeX: output folded an 1st page of output; new function TeX_fold()
+# 1.105 2021-07-26 results now alphabetically sorted; output improved
+# 1.106 2021-09-25 output of year in BibLaTeX enhanced
+# 1.107 2021-10-10 changes in get_year: analyze element year, too
+# 1.108 2021-10-10 completion of language_keys
+# 1.109 2021-10-10 element documentation indexed
+# 1.110 2021-10-11 output in Hindi now possible
+# 1.111 2021-10-11 section headers (for LaTeX) improved
+# 1.112 2021-10-11 error messages actualized
+# 1.113 2021-10-12 output headers for LaTeX and BibLaTeX enhanced
+# 1.114 2021-10-12 new function biblatex_citationkey: generate valid citation keys + corresponding changes in 'leading', 'main', and 'also'
+# 1.115 2021-10-12 function 'leading' cleaned
+# 1.116 2021-10-12 comment blocks re-organized
+# 1.117 2021-10-12 document strings in functions enhanced
+# 1.118 2021-10-12 in comment block: list of functions and function tree actualized
+# 1.119 2021-10-13 RIS output: a) type changed to ICOMM; b) UR output: now for main document and CTAN element <documentation .../>
+# 1.120 2021-10-14 RIS output: field "PY  -" settled now with year (collected from <version.../> and <copyright ... />)
+# 1.121 2021-10-14 RIS output: "L4  -" changed to "L2  -"
+# 1.122 2021-10-15 RIS output: output "Y2  - " (from <version ... />); implements "last change"
+# 1.123 2021-10-15 RIS output: <also ...> mapped into notice (= "N1  -")
+# 1.124 2021-10-17 RIS output: LA output improved; BibLaTeX output: 'file' output improved
+# 1.125 2021-10-20 language codes es-mx, sl and zh-cn added
+# 1.126 2021-10-20 output of title/subtitle a/o T1/T2: output now harmonized in functions 'name'/'caption'
+# 1.127 2021-10-20 now harmonized: output of 'language' a/o 'LA' in function 'trailing'
+# 1.128 2021-10-21 Excel: output and processing extended, improved and enhanced; new call parameter -m csv
+# 1.129 2021-10-22 RIS: better values for 'PY' and 'LA'; mapping von <also .../>; better values for 'Y2' and 'Y3'
+# 1.130 2021-10-23 RIS: 'N1' re-arranged; fieldwidth (label width) changed; 'L1' output corrected
+# 1.131 2021-10-24 date of last access in RIS/BibLaTeX: 'Y2' and 'date' unified
+# 1.132 2021-10-24 output of URL and date of last access in RIS/BibLaTeX: 'UR' and 'Y3' a/o 'url' and 'urldate'
+# 1.133 2021-10-25 BibLaTeX: licenses collected and output in 'userb'; 'note' corrected; comment block at the beginning re-arranged; 'year' output improved
+# 1.134 2021-10-25 BibLaTeX: 'language' output enhanced
+# 1.135 2021-10-26 function 'leading': trimmed; determination of author(s) improved; 'userunknown' renamed to 'authorunknown'
+# 1.136 2021-10-27 TeX output: additionally URL of Web page on CTAN, year and last access date
+# 1.137 2021-10-28 plain output: additionally URL of Web page on CTAN, year and last access date
+# 1.138 2021-10-28 RIS and BibLaTeX output: unnecessary empty output lines suppressed
+# 1.139 2021-10-29 Excel output: some improvements and a few corrections
+# 1.140 2021-10-29 output of keywords, language(s), local file name(s), and 'note' a/o 'N1'  improved
+# 1.141 2021-11-01 supplementary notes at the beginning of xyz.xref and xyz.tap
+# 1.142 2021-11-01 aesthetic repairs for the processing of <description ...> ...</description> with 'language' attribute
+# 1.143 2021-11-02 function 'mod_xref' modified
+# 1.144 2021-11-02 full UTF-8 output on stdout enabled
+# 1.145 2021-11-03 function 'description', 'p', 'ul', and 'li': output of multiple spaces and empty lines revised
+# 1.146 2021-11-03 BibLaTeX: mapping of 'description' to 'abstract' improved
+# 1.147 2021-11-05 BibLaTeX: "@" substituted to 'at' in 'note' and 'usera' output
+# 1.148 2021-11-05 correct processing of multiple CTAN field 'also' for BibLaTeX/Excel; correct processing of multiple CTAN 'alias' for Excel
+# 1.149 2021-11-05 correct processing of multiple CTAN field 'description' for all modes
+# 1.150 2021-11-05 correction for option -b: '@online' as new default; '@electronic' as new choose
+# 1.151 2021-11-06 new option -sb (--skip_biblatex): additional function 'bibfield_test'; additional requests
+# 1.153 2021-11-06 BibLaTeX/plain/LaTeX/RIS/Excel: interaction between 'year' und 'date' harmonized
+# 1.154 2021-11-08 LaTeX: index for 'year' now; index for CTAN field documentation no longer in use
+# 1.155 2021-11-08 BibLaTeX: some items no longer collected in 'note', but in 'usera', 'userb', 'userc', 'userd', 'usere', 'userf'
+# 1.156 2021-11-11 new examples for option '-sb'
+# 1.157 2021-11-11 BibLaTeX: output of 'file' corrected; now jabref compatible
+# 1.158 2021-11-13 mapping CTAN --> BibLaTeX changed: now 'texlive', 'miktex' --> embedded in 'note'; ctan --> 'userc'; 'contact' --> collected in 'userd'
+# 1.159 2021-11-19 LaTeX output: "--local file" now with relativ path
+# 1.160 2021-11-20 'year' in LaTeX/plain: "without year" if it is appropiate
+# 1.161 2021-11-21 for all modes: empty output for abstract/description corrected
+# 1.162 2021-11-28 greater parts of comment blocks moved to external text files
+# 2.0     2022-01-02 new concept for the processing of <description> ... </description>; content recursively processed
+# 2.1     2022-01-02 functions mod_backslash and mod_TeXchars removed
+# 2.2     2022-01-02 new functions: mod_TeXchars1, mod_TeXchars2, TeXchars_restore (change and restore the content of elements)
+# 2.3     2022-01-03 functions renamed: p --> mod_p; ol --> mod_ol; ul --> mod_ul; dl --> mod_dl; li --> mod_li; dd --> mod_dd; dt --> mod_dt
+# 2.4     2022-01-03 new function: innertext (scans the body of description and calls recursively other functions for the sub-elements)
+# 2.5     2022-01-04 new function: mod_small (processing of <small> ...</small>)
+# 2.6     2022-01-04 new functions: mod_dl, mod_dt, mod_dd (processing of <dl>, <dt>, and <dd>)
+# 2.7     2022-01-06 nested <ol>/<ul> can be processed
+# 2.8     2022-01-07 left indentation of <li> (mode dependant)
+# 2.9     2022-01-09 new function gen_fold (folds content of <li>)
+# 2.10    2022-01-10 new function test_embedded (controls the call of gen_fold in <p>, <li>, <dd>)
+# 2.11    2022-01-11 new language code "zn,ja"
+# 2.12    2022-01-26 texts for the -h option changed
+# 2.13    2022-01-28 left indentation for all modes tuned
+# 2.14    2022-01-28 additionally: output of date and time in statistics on output (-stat)
+# 2.15    2022-02-02 additional license information: now with free a/o not free
+# 2.16    2022-02-05 additional texts at the top of output files
+# 2.17    2022-02-07 messages in get_topic_packages, get_name_packages, and get_author_packages changed
+
+# 2.18    2022-02-15 new option -L (selection of packages by licenses)
+# 2.18.1  2022-02-15 new variables: license_template_text, license_template_default, license_template (used by argparse); licensepackages
+# 2.18.2  2022-02-15 new section for specifying -L by argparse
+# 2.18.3  2022-02-15 new function get_license_packages (collecting packages for specified licenses)
+# 2.18.4  2022-02-15 changes in load_pickle1: new CTAN.pkl component licensepackages
+# 2.18.5  2022-02-15 new variable p9 [re.compile(license_template)]; allows filtering by license template
+# 2.18.6  2022-02-15 changes in first_lines, licenseT, process_packages, make_stat, make_statistics, and process_packages
+# 2.18.7  2022-02-16 shorttitlde and status can be used for -L, too
+
+# 2.19    2022-02-19 error in make_stat corrected
+# 2.20    2022-02-21 some corrections in make_stat
+
+# 2.21    2022-02-23 in LaTeX mode: output of licenses and related packages (tlp) + output of licenses and explainations (lic)
+# 2.21.1  2022-02-03 new function make_tlp; changes in main(); new file xyz.tlp; called in LaTeX document (option -mt)
+# 2.21.2  2022-02-23 new function make_lics; changes in main(); new file xyz.lic; called in LaTeX document (option -mt)
+# 2.21.3  2022-02-23 additions and corrections in make_tlp, make_tap, make_lics, make_xref
+
+# 2.22    2022-03-01 additions and corrections in make_stat
+# 2.23    2022-03-01 texts for argparse and terminal log changed
+# 2.24    2022-03-01 corrections in first_lines (plain, BibLaTeX)
+# 2.25    2022-03-15 LaTeX header/preambel changed (fonts, languages)
+# 2.26    2022-03-20 error in mod_pre and mod_code corrected
+# 2.27    2022-03-25 error in the processing of -mt option corrected
+# 2.28    2022-03-30 BibLaTeX: "1970" removed from BiobTeX key; get_authorkey changed
+# 2.29    2022-04-10 BibLaTeX: additional request in biblatex_citationkey, if id is unknown
+# 2.30    2022-09-25 list of language codes extended
+# 2.31    2022-09-26 error for index entry in description function repaired
+# 2.32    2022-09-27 new option --no:files: generate no files; new variable; changes in some functions
+# 2.33    2022-09-28 some enhancements in "Resettings and Settings" (if -nf is set)
+# 2.34    2022-09-30 processing of unknown/wrong language in description a/o documentation improved
+# 2.35    2023-06-11 due to -nf: changes in statistics output (parameter -stat)
+
+# 2.36    2023-06-11 changes in rendering of description content
+# 2.36.1  2023-06-11 interaction of §§= and TeXchars_restore improved   
+# 2.36.2  2023-06-11 indentation in description in some places corrected
+# 2.36.3  2023-06-11 line breaks in <pre> are removed; changes in mod_pre, mod_code
+
+# 2.37    2023-06-11 LaTeX procession
+# 2.37.1  2023-06-11 corrected: without -mt no proper file end for LaTeX
+# 2.37.2  2023-06-11 LaTeX header changed (fonts, languages)
+
+# 2.38    2023-06-11 Workaround if language key, topic key, author key, license key are unknown
+# 2.39    2023-06-11 Error in trailing function: if languagecode is unknown; workaround
+
+# 2.40    2023-06-11 new option -y (filtering on the base of year templates
+# 2.40.1  2023-06-11 some changes in relevant functions (interaction of different filter operations improved)
+# 2.40.2  2023-06-11 related changes in the statistics part (option -stat)
+
+# 2.41    2023-06-15 CTANLoad-changes.txt, CTANLoad-examples.txt, CTANLoad-functions.txt changed
+# 2.42    2023-06-15 output on terminal changed
+# 2.43    2023-06-15 new option -dbg/--debugging: debugging mode enabled
+# 2.44    2023-06-15 output on xyz.stat changed
+# 2.45    2023-06-26 some changes in statistics output
+# 2.46    2023-06-28 fold() changed to adjust protocoll output
+# 2.47    2023-07-06 xyz.lic, xyz.tap, xyz.tlp, xyz.top, xyz.xref now without any \index entry
+# 2.48    2023-07-07 variable year_default_template redefined
+# 2.49    2023-07-08 messages now with the signature [CTANOut]
+# 2.50    2023-07-08 \index entries in xyz.xref, xyz.lic, xyz.tlp removed
+
+# 2.51    2023-07-08 new concept for the handling of languages
+# 2.51.1  2023-07-08 new default language: nls
+# 2.51.2  2023-07-09 new concept for the language handling in documentation a/o descrpition
+# 2.51.3  2023-07-10 language \index entries in LaTeX mode improved
+# 2.51.4  2023-07-10 language \item entries in LaTeX mode improved
+# 2.51.5  2023-07-10 in RIS/plain/BibLaTeX mode: smaller errors in the output of documentation a/o description corrected
+
+# 2.52    2023-07-16 language en,ru now in languagecodes
+# 2.53    2023-07-28 output of -stat now with program date
+# 2.54    2024-02-18 new language codes: en,fr and es-pe
+# 2.55    2024-02-18 \inp ecaped to \\inp, Mik\TeX escaped to Mik\\TeX
+# 2.56    2024-02-18 "[\^s]+" changed to "r[\^]+"; "\^" --> r"\^"; "[\^]" --> r"[\^]"; "[\[] --> r"[\[]"
+# 2.57    2024-02-28 in make_tap: enable processing of "_" in author names
+# 2.58    2024-02-28 in authorref and copyrighT: enable processing of "_" in author/owner names
+# 2.59    2024-03-26 in make_stat, make_tap, make_tlp, make_tops, make_lics, make_xref: Small additions to the output texts
+# 2.60    2024-03-28 all __doc__ texts of the functions completed (parameters and global variables)
+# 2.61    2024-04-12 smaller changes in make_statistics
+# 2.62    2024-07-26 some smaller text changes for argparse
+
+# 2.63    2024-07-26 argparse revised
+# 2.63.1  2024-07-26 additional parameter in .ArgumentParser: prog, epilog, formatter_class
+# 2.63.2  2024-07-26 subdivision into groups by .add_argument_group
+# 2.63.3  2024-07-26 additional arguments in .add_argument (if it makes sense): type, metavar, action, dest
