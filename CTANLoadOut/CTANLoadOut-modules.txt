@@ -1,13 +1,14 @@
-Modules (CTANLoad+Out)
-======================
-2022-03-04
+Modules (CTANLoadOut)
+=====================
+2024-08-15
 
-import argparse                    # argument parsing
-import sys                         # system calls
-import platform                    # get OS informations
-import subprocess                  # handling of sub-processes
-import re                          # regular expression
-import os                          # delete a file on disk, for instance
-from os import path                # path informations
-import codecs                      # needed for full UTF-8 output on stdout
-import time                        # get time/date of a file
+import argparse                              # argument parsing
+import sys                                   # system calls
+import platform                              # getting OS informations
+import subprocess                            # handling of sub-processes
+import re                                    # regular expression
+import os                                    # deleting a file on disk, for instance
+from os import path                          # path informations
+import codecs                                # needed for full UTF-8 output on stdout
+import time                                  # gets time/date of a file
+from tempfile import TemporaryFile           # temporary file for subprocess.run

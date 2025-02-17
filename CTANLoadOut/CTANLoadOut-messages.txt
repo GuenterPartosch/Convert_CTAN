@@ -1,51 +1,38 @@
-Messages (CTANLoad+Out)
-=======================
-2023-07-04
+Messages (CTANLoadOut)
+======================
+2024-08-15
+
+<program part>: [CTANLoadOut, check], [CTANLoadOut, compilation], [CTANLoadOut, index], 
+                [CTANLoadOut, load], [CTANLoadOut, output], [CTANLoadOut, regeneration], [CTANLoadOut]
 
 Fatal errors
 ------------
-[CTANLoad+Out] Error: Error in CTANLoad (Check)
-[CTANLoad+Out] Error: Error in CTANLoad (Load)
-[CTANLoad+Out] Error: Error in CTANLoad (Regeneration)
-[CTANLoad+Out] Error: Error in CTANOut
-[CTANLoad+Out] Error: Error in Makeindex
-[CTANLoad+Out] Error: Error in compilation
-[CTANLoad+Out] Error: tried to use the program indirectly
+<Program part> Error: tried to use the program indirectly
+<Program part> Error: any unspecified error <info>
+<Program part> Error: called process '<Python file>' not found <info>
+<Program part> Error: error in compilation
+<Program part> Error: file '<file>' not found <info>
+<Program part> Error: keyboard interrupt <info>
+<Program part> Error: program terminated
+<Program part> Error: timeout error <value>
+<Program part> Error: unicode decode error <info>
 
 Infos
 -----
-[CTANLoad+Out] Info: <index_processor>
-[CTANLoad+Out] Info: <latex_processor>
-[CTANLoad+Out] Info: CTANLoad (Check)
-[CTANLoad+Out] Info: CTANLoad (Check) completed
-[CTANLoad+Out] Info: CTANLoad (Check) to be executed
-[CTANLoad+Out] Info: CTANLoad (Load)
-[CTANLoad+Out] Info: CTANLoad (Load) completed
-[CTANLoad+Out] Info: CTANLoad (Load) to be executed
-[CTANLoad+Out] Info: CTANLoad (Regeneration)
-[CTANLoad+Out] Info: CTANLoad (Regeneration) completed
-[CTANLoad+Out] Info: CTANLoad (Regeneration) to be executed
-[CTANLoad+Out] Info: CTANLoad+Out
-[CTANLoad+Out] Info: CTANLoad+Out completed
-[CTANLoad+Out] Info: CTANOut
-[CTANLoad+Out] Info: CTANOut completed
-[CTANLoad+Out] Info: CTANOut to be executed
-[CTANLoad+Out] Info: Compilation
-[CTANLoad+Out] Info: Compilation OK
-[CTANLoad+Out] Info: LuaLaTeX and MakeIndex to be executed
-[CTANLoad+Out] Info: Makeindex OK
-[CTANLoad+Out] Info: Program call: <call>
-[CTANLoad+Out] Info: Program call: <call compile>
-[CTANLoad+Out] Info: Program call: <call index>
-[CTANLoad+Out] Info: more information in '<log file>'
-[CTANLoad+Out] Info: result in '<directory><output name>.pdf'
+<program part> Info: <latex/index processor>
+<program part> Info: <latex/index processor> OK
+<program part> Info: <process>
+<program part> Info: <process> completed
+<program part> Info: <process> is to be processed
+<program part> Info: Program call: <process>
+<program part> Info: more information in '<log file>'
+<program part> Info: result in '<file>.pdf'
 
 Warnings
 --------
-[CTANLoad+Out] Warning: '<option + value>' changed to '<value>' (due to '<option>')
-[CTANLoad+Out] Warning: LaTeX file '<latex file>' does not exist, no compilation
-[CTANLoad+Out] Warning: LaTeX file '<latex file>' removed
-[CTANLoad+Out] Warning: LaTeX file '<latex file>' without content, no compilation
-[CTANLoad+Out] Warning: file '<file>' removed
-
+<program part> Warning: '<Option 1 + value 1>' changed to '<value 2>' (due to '<option 2>')
+<program part> Warning: LaTeX file '<latex file>' does not exist, no compilation
+<program part> Warning: LaTeX file '<latex file>' removed
+<program part> Warning: LaTeX file '<latex file>' without content, no compilation
+<program part> Warning: file '<file>' removed
 

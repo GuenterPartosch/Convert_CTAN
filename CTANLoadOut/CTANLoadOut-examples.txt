@@ -1,14 +1,27 @@
-Examples (CTANLoad+Out)
-=======================
-2023-07-12
+Examples (CTANLoadOut)
+======================
+2024-08-13
+
+Call the Python program CTANLOadOut:
+
+The following possibilities are available for this:
+
+1. python -u CTANLoadOut.py <option(s)>
+-- always works
+2. CTANLoadOut.py <option(s)>
+-- if the OS knows how to handle Python files (files with the name extension .py)
+3. CTANLoadOut <option(s)>
+-- if there is an executable (in Windows a file with the name extension .exe)
+
+In the following examples we will use possibility 2.
 
 Steps:
 1st step: load XML a/o PDF files
 2nd step: process, -l, -r a/o -c
 3rd step: generate output
-4th step: compile LaTeX file
+4th step: compile LaTeX file by LuaLaTeX twice, process xyz.idx by makeindex, compile LaTeX file by LuaLaTeX
 
-CTANLoad+Out -r
+CTANLoadOut.py -r
   + without statistics
   + not verbose
   + no 1st step
@@ -19,7 +32,7 @@ CTANLoad+Out -r
   + no 3rd step
   + no 4th step
 
-CTANLoad+Out -r -v -stat
+CTANLoadOut.py -r -v -stat
   + with statistics                                                              [-stat]
   + verbose                                                                      [-v]
   + no 1st step
@@ -30,7 +43,7 @@ CTANLoad+Out -r -v -stat
   + no 3rd step
   + no 4th step
 
-CTANLoad+Out -l
+CTANLoadOut.py -l
   + without statistics
   + not verbose
   + no 1st step
@@ -40,7 +53,7 @@ CTANLoad+Out -l
   + no 3rd step
   + no 4th step
 
-CTANLoad+Out -l -v -stat
+CTANLoadOut.py -l -v -stat
   + with statistics                                                              [-stat]
   + verbose                                                                      [-v]
   + no 1st step
@@ -50,7 +63,7 @@ CTANLoad+Out -l -v -stat
   + no 3rd step
   + no 4th step
 
-CTANLoad+Out -mt -p
+CTANLoadOut.py -mt -p
   + without statistics
   + not verbose
   + no XML/PDF file from CTAN is downloaded
@@ -65,7 +78,7 @@ CTANLoad+Out -mt -p
   + all.tex is completely compiled                                               [-p]
   + output file is all.pdf
 
-CTANLoad+Out -mt -m latex -p -v -stat
+CTANLoadOut.py -mt -m latex -p -v -stat
   + with statistics                                                              [-stat]
   + verbose                                                                      [-v]
   + no 1st step:
@@ -80,7 +93,7 @@ CTANLoad+Out -mt -m latex -p -v -stat
   + all.tex is completely compiled                                               [-p]
   + output file is all.pdf
 
-CTANLoad+Out -to latex -m bib -v -stat
+CTANLoadOut.py -to latex -m bib -v -stat
   + with statistics                                                              [-stat]
   + verbose                                                                      [-v]
   + no 1st step
@@ -91,7 +104,7 @@ CTANLoad+Out -to latex -m bib -v -stat
   + output format is BibLaTeX
   + output file is all.bib                                                       [-m]
 
-CTANLoad+Out -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
+CTANLoadOut.py -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
   + with statistics                                                              [-stat]
   + verbose                                                                      [-v]
   + 1st step:
@@ -106,7 +119,7 @@ CTANLoad+Out -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
   + output file is all.tex
   + no 4th step
 
-CTANLoad+Out -t pgf -l -c -mt -p -v -stat
+CTANLoadOut.py -t pgf -l -c -mt -p -v -stat
   + with statistics                                                             [-stat]
   + verbose                                                                     [-v]
   + 1st step:
@@ -123,7 +136,7 @@ CTANLoad+Out -t pgf -l -c -mt -p -v -stat
   + all.tex is completely compiled                                              [-p]
   + output file is all.pdf
 
-CTANLoad+Out -k latex -m txt -v 
+CTANLoadOut.py -k latex -m txt -v 
   + without statistics
   + verbose                                                                     [-v]
   + 1st step:
@@ -136,7 +149,7 @@ CTANLoad+Out -k latex -m txt -v
   + output file is all.txt
   + no 4th step
 
-CTANLoad+Out -y 199[01] -v -stat
+CTANLoadOut.py -y 199[01] -v -stat
   + without statistics
   + verbose                                                                     [-v]
   + 1st step:
@@ -149,7 +162,7 @@ CTANLoad+Out -y 199[01] -v -stat
   + output file is all.ris
   + no 4th step
 
-CTANLoad+Out -k latex -f -v -stat -mt -p
+CTANLoadOut.py -k latex -f -v -stat -mt -p
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
   + 1st step:
@@ -166,7 +179,7 @@ CTANLoad+Out -k latex -f -v -stat -mt -p
   + all.tex is completely compiled                                              [-p]
   + output file is all.pdf
 
-CTANLoad+Out -k chinese -t "^zh" -f -v -stat
+CTANLoadOut.py -k chinese -t "^zh" -f -v -stat
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
   + 1st step:
@@ -182,7 +195,7 @@ CTANLoad+Out -k chinese -t "^zh" -f -v -stat
   + output file is all.ris
   + no 4th step
 
-CTANLoad+Out -ko "latex" -m bib -v
+CTANLoadOut.py -ko "latex" -m bib -v
   + verbose                                                                     [-v]
   + without statistics
   + no 1st step
@@ -193,7 +206,7 @@ CTANLoad+Out -ko "latex" -m bib -v
   + output file is all.bib
   + no 4th step
 
-CTANLoad+Out -Ao "Voß" -yo "2021|2022|2023" -m bib
+CTANLoadOut.py -Ao "Voß" -yo "2021|2022|2023" -m bib
   + not verbose                                                                     
   + without statistics
   + no 1st step
@@ -205,7 +218,7 @@ CTANLoad+Out -Ao "Voß" -yo "2021|2022|2023" -m bib
   + output file is all.bib
   + no 4th step
 
-CTANLoad+Out -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
+CTANLoadOut.py -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
   + verbose                                                                     [-v]
   + with statistics                                                             [-stat]
   + 1st step:
@@ -226,7 +239,7 @@ CTANLoad+Out -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
   + all.tex is completely compiled                                              [-p]
   + output file is all.pdf
 
-CTANLoad+Out -k class -v -m latex -mt -L lppl -p -f -A Mittelbach
+CTANLoadOut.py -k class -v -m latex -mt -L lppl -p -f -A Mittelbach
   + verbose                                                                     [-v]
   + without statistics
   + 1st step:
@@ -247,7 +260,7 @@ CTANLoad+Out -k class -v -m latex -mt -L lppl -p -f -A Mittelbach
   + compile all.tex by LuaLaTeX                                                 [-p]
   + output file is all.pdf
 
-CTANLoad+Out -k class -v -m latex -mt  -L lppl -A Kohm -t scr -p  -f
+CTANLoadOut.py -k class -v -m latex -mt  -L lppl -A Kohm -t scr -p  -f
   + verbose                                                                     [-v]
   + without statistics
   + 1st step:
@@ -270,7 +283,7 @@ CTANLoad+Out -k class -v -m latex -mt  -L lppl -A Kohm -t scr -p  -f
   + compile all.tex by LuaLaTeX                                                 [-p]
   + output file is all.pdf
 
-CTANLoad+Out -L lppl -A Fairbairns -k footnote -v 
+CTANLoadOut.py -L lppl -A Fairbairns -k footnote -v 
   + verbose                                                                     [-v]
   + without statistics
   + 1st step:
@@ -287,7 +300,7 @@ CTANLoad+Out -L lppl -A Fairbairns -k footnote -v
   + output file is all.ris
   + no 4th step
 
-CTANLoad+Out -k class -L lppl -A Kohm -t scr
+CTANLoadOut.py -k class -L lppl -A Kohm -t scr
   + not verbose                                                                 
   + without statistics
   + 1st step:
@@ -304,7 +317,7 @@ CTANLoad+Out -k class -L lppl -A Kohm -t scr
   + output file is all.ris
   + no 4th step
 
-CTANLoad+Out -L pd -A Knuth -t knuth -p -v -stat -f
+CTANLoadOut.py -L pd -A Knuth -t knuth -p -v -stat -f
   + with statistics                                                             [-stat]
   + verbose                                                                     [-v]
   + 1st step:
@@ -325,7 +338,7 @@ CTANLoad+Out -L pd -A Knuth -t knuth -p -v -stat -f
   + compile all.tex by LuaLaTeX (forced by -p)
   + output file is all.pdf
 
-CTANLoad+Out  -k font -A Tennent -y 202[0-3] -L lppl  -stat -p -v -f
+CTANLoadOut.py  -k font -A Tennent -y 202[0-3] -L lppl  -stat -p -v -f
   + with statistics                                                             [-stat]
   + verbose                                                                     [-v]
   + 1st step:
@@ -371,10 +384,13 @@ Filter options -L, -A, -k, -t, -y
 
 Regular expressions
 -------------------
-The options -t (a/o -to and -tl), -k (a/o -ko and -kl), -A (and/or -Al and -Ao), and -L (and/or -Ll and -Lo) need regular expressions as values.
+The options -t (a/o -to and -tl), -k (a/o -ko and -kl), -A (and/or -Al and -Ao),-y (and/or -yl and -yo),  
+and -L (and/or -Ll and -Lo) need regular expressions as values.
+
 such as
 
 -k latex                matches all topic names which contain "latex"
--t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3" or "t3"
--t "^.+$"               matches all file names
--t "^{a-b]"             matches all file names which begin with letters a-b
+-t "latex|ltx|l3|lt3"   matches all package names which contain "latex", "ltx", "l3" or "t3"
+-t "^.+$"               matches all package names
+-t "^{a-b]"             matches all package names which begin with letters a-b
+-y "20[0-2][0-9]"       matches all years between 2000 and 2029
