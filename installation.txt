@@ -1,6 +1,7 @@
-# Installation
+Installation
+============
 
-* Download the archive [programs.zip](./programs.zip ".exe and .py files") from Git
+* Download the archive [programs.zip] from Git
 * Unpack into an empty directory
 
-The programs can then be called up. See also [call.txt](./call.txt "call the Programms in the Convert_CTAN bundle")
+The programs can then be called up. See also [call.txt].
