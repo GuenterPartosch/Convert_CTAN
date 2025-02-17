@@ -1,0 +1,66 @@
+Fuctions (Menu_CTANLoadOut)
+===========================
+(2024-08-14)
+
+
+check_values()                                           check_values: Checks some option values and resets some.
+clear_fields()                                           clear_fields: Clears all entry fields.
+collect_values()                                         collect_values: Collects the values in the menu, compares them with the correspoinding defaults and generates a dictionary
+get_default(opt)                                         get_default: Returns the default value of a given option.
+get_option_line()                                        get_option_line: Generates a dictionary with assignments of options to lines.
+get_option_line_value(option)                            get_option_line_value: Generates a dictionary with assignments of options to lines.
+get_value(option)                                        get_value: Returns the value of a given option.
+help1()                                                  help1 (accumulated entry definitions): Shows an info text (accumulated entry definitions for text, listbox, list, and number).
+help2()                                                  help2 (accumulated checkbox definitions): Shows an info text (accumulated checkbox definitions).
+help3()                                                  help3 (accumulated button definitions): Shows an info text (accumulated button definitions).
+help4()                                                  help4 (accumulated examples): Shows an info text (accumulated examples).
+help5()                                                  help5 (accumulated combobox definitions): Shows an info text (accumulated combobox definitions).
+info_version()                                           info_version: Shows a version text.
+init_buttons()                                           init_buttons: Defines/initializes on the base of the "buttons" dictionary buttons.
+init_fields()                                            init_fields: Defines/initializes on the base of the "options" dictionary headers, labels, entry fields, checkboxes.
+listbox_b()                                              listbox_b
+listbox_m()                                              listbox_m
+make_call()                                              make_call: Generates the "call" list.
+quit()                                                   quit: Opens a dialogbox, whether the program should be terminated/finished.
+set_value(option, val)                                   set_value: Resets the value for a option with a specified value.
+set_value_combobox(opt, val)                             set_value_combobox: Resets the value for the option (-m" or "-b") with a specified value.
+show_log()                                               show_log: Shows the log file of the called subprocess.
+start()                                                  start: Prepares the processing.
+start_call()                                             start_call: Starts the processing.
+
+
+# The program essentially uses the tkinter module and its submodules:
+# + tkinter as tk
+# + tkinter.ttk as ttk
+# + tkinter.messagebox as tkm
+# + tkinter.scrolledtext
+
+# In particular, the following functions/methods are used:
+#
+# scrolledtext.ScrolledText
+#
+# tk.BooleanVar
+# tk.Button
+# tk.END
+# tk.StringVar
+# tk.Tk
+# tk.Toplevel
+# tk.W
+#
+# tkm.INFO
+# tkm.askyesno
+# tkm.showinfo
+# ttk.Checkbutton
+# ttk.Combobox
+# ttk.Button
+# ttk.Entry
+# ttk.Label
+#
+# xyz.get
+# xyz.grid
+# xyz.insert
+# xyz.mainloop
+# xyz.pack
+# xyz.set
+# xyz.title
+# xyz.current

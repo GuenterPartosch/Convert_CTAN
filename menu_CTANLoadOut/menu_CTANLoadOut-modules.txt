@@ -1,0 +1,48 @@
+Modules (Menu_CTANLoadOut):
+===========================
+(2024-08-14)
+
+import tkinter as tk                                                    basis for the most things
+import tkinter.ttk as ttk                                               an alternative
+import tkinter.messagebox as tkm                                        message output
+from tkinter import scrolledtext                                        show scrollable text
+import sys                                                              system calls
+import platform                                                         OS informations
+import subprocess                                                       handling of sub-processes
+from tempfile import TemporaryFile                                      temporary file for subprocess.run
+
+  The program essentially uses the tkinter module and its submodules:
+  + tkinter as tk
+  + tkinter.ttk as ttk
+  + tkinter.messagebox as tkm
+  + tkinter.scrolledtext
+
+  In particular, the following functions/methods are used:
+#
+  scrolledtext.ScrolledText
+#
+  tk.BooleanVar
+  tk.Button
+  tk.END
+  tk.StringVar
+  tk.Tk
+  tk.Toplevel
+  tk.W
+#
+  tkm.INFO
+  tkm.askyesno
+  tkm.showinfo
+  ttk.Checkbutton
+  ttk.Combobox
+  ttk.Button
+  ttk.Entry
+  ttk.Label
+#
+  xyz.get
+  xyz.grid
+  xyz.insert
+  xyz.mainloop
+  xyz.pack
+  xyz.set
+  xyz.title
+  xyz.current

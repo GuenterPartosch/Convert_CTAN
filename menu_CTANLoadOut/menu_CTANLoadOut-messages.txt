@@ -1,0 +1,16 @@
+Messages (menu_CTANLoadOut)
+===========================
+(2024-08-14)
+
+Errors:
+--------
+any unspecified error <more info>
+called process '<processor>' not found <more info>
+file '<file>' not found  <more info>
+keyboard interrupt <more info>
+timeout error <limit>
+unicode decode error <more info>
+
+Warning:
+------------
+‘<option 1> <value 1> changed to <value 2> (due to given <option 2>)
