@@ -30,8 +30,9 @@ Call: [CTANLoadOut.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/mas
 Examples for calls: [CTANLoadOut-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoadOut/CTANLoadOut-examples.txt "Examples for calls")
 
 ----------------------------------------------------------------
-## CTANLoadOut
+## menu_CTANLoadOut
 * GUI for CTANLoadOut
 * no manpage
+* no executable
 
 
