@@ -9,8 +9,11 @@ CTANLoad
 CTANOut
    converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel (tab separated)
 
-CTANLoad+Out
+CTANLoadOut
    combination of CTANLoad and CTANOut
+
+menu_CTANLoadOut
+   GUI for CTANLoadOut
 
 Some information files
 ======================

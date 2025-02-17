@@ -11,7 +11,7 @@
 
 Call: [CTANLoad.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoad/CTANLoad.man "manpage of CTANLoad")
 
-Examples for calls: [CTANLoad-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoad/CTANLoad-examples.txt "EXamples for calls")
+Examples for calls: [CTANLoad-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoad/CTANLoad-examples.txt "Examples for calls")
 
 ----------------------------------------------------------------
 ## CTANOut:
@@ -20,3 +20,18 @@ Examples for calls: [CTANLoad-examples.txt](https://github.com/GuenterPartosch/C
 Call: [CTANOut.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANOut/CTANOut.man "manpage of CTANOut")
 
 Examples for calls: [CTANOut-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANOut/CTANOut-examples.txt "Examples for calls")
+
+----------------------------------------------------------------
+## CTANLoadOut
+* combines the tasks of CTANLoad and CTANOut
+
+Call: [CTANLoadOut.man](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoadOut/CTANLoadOut.man "manpage of CTANLoadOut")
+
+Examples for calls: [CTANLoadOut-examples.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/CTANLoadOut/CTANLoadOut-examples.txt "Examples for calls")
+
+----------------------------------------------------------------
+## CTANLoadOut
+* GUI for CTANLoadOut
+* no manpage
+
+
