@@ -1,27 +1,19 @@
 Messages (CTANLoad)
 ===================
-2023-07-16
+2024-08-11
 
 Errors
 ------
-Error: '<file>' not downloaded
-Error: XML file '<XML file>' not downloaded
-Error: local file '<author package file>' cannot be loaded; please call ctanload -l ... before
-Error: local file '<license package file>' cannot be loaded; please call ctanload -l ... before
-Error: local file '<topic package file>' cannot be loaded; please call ctanload -l ... before
+Error: local file '<file>' cannot be loaded; please call ctanload -l ... before
 Error: programm terminated
 Error: standard XML file '<file>' empty or not well-formed
+Error: standard XML file '<file>' not found
 Error: tried to use the program indirectly
+Error: XML file '<file>' not downloaded
+Error: XML file '<file>' not downloaded ...    any unspecified error
 
 Infos
 -----
-Info: PDF documentation file '<PDF file>' downloaded
-Info: Program call
-Info: Program call (with more details)
-Info: Regeneration of '<pickle file>'
-Info: Successfully created the directory '<OS directory>' 
-Info: XML file '<file>' downloaded ('<directory><file>.xml' on PC)
-Info: XML file for package '<package name>' downloaded ('<directory><file>.xml' on PC)
 Info: authors downloaded
 Info: file '<.lap file>' (list of authors and associated packages) generated
 Info: file '<.llp file>' (list of licenses and associated packages) generated
@@ -29,44 +21,52 @@ Info: file '<.loa file>' (list of authors) generated
 Info: file '<.lok file>' (list of topics) generated
 Info: file '<.lol file>' (list of licenses) generated
 Info: file '<.lop file>' (list of packages) generated
-Info: file '<.lpt file>' (list of topics and associated packages) generated
+Info: file '<,lpt file>' (list of topics and associated packages) generated
 Info: integrity check
 Info: licenses downloaded
-Info: local XML file '<directory><local file name>'
+Info: local XML file '<local file>'
 Info: no error with integrity check
 Info: packages downloaded
 Info: packagetopics, topicspackages, authorpackage, yearpackages collected
+Info: PDF documentation file '<PDF file>' downloaded
 Info: pickle file '<pickle file>' written
+Info: Program call (with more details): CTANLoad.py
+Info: Program call: <call>
 Info: program successfully completed
-Info: summary: file not well-formed or empty: <XML file>
-Info: summary: inconsistencies with PDF files for : <package>
-Info: summary: package not found: <package>
-Info: summary: PDF could not be loaded: <PDF file>
+Info: Regeneration of '<pickle file>'
+Info: Successfully created the OS folder '<folder>' 
+Info: summary: file not well-formed or empty: <file(s)>
+Info: summary: inconsistencies with PDF files for <file(s)>
+Info: summary: package not found: <file(s)>
+Info: summary: PDF could not be loaded: <file(s)>
 Info: topics downloaded
-Info: unique local file name: '<local file name>'
+Info: unique local file name: '<unique name>'
+Info: XML file '<XML file>' downloaded ('<xml>.xml' on PC)
+Info: XML file for package '<package>' downloaded ('<package>.xml' 
 
 Warnings
 --------
-Warning: '<value>' reset to <value> (due to <reason>)
-Warning: Creation of the directory '<OS directory>' failed
-Warning: PDF documentation file '<PDF file>' not downloaded
-Warning: PDF file '<PDF file>' in OS deleted
-Warning: PDF file '<PDF file>' without associated XML file
-Warning: XML file '<XML file>' in OS deleted
-Warning: XML file for package '<package name>' not downloaded
-Warning: entry '<entry>' (<entry>) in dictionary, but OS file is empty
-Warning: entry '<entry>' (<entry>) in dictionary, but PDF file not found
-Warning: entry '<entry>' in dictionary deleted
-Warning: entry '<entry>' in dictionary, but OS file is empty
-Warning: entry '<entry>' in dictionary, but OS file not found
-Warning: local XML file for package '<package>' empty or not well-formed
+Warning: '{0}' reset to {1} (due to {2})"
+Warning: '{0}' reset to {1} (due to {2})"
+Warning: An error occured:
+Warning: Creation of the OS folder '<folder>' failed
+Warning: entry '<entry>' 
+Warning: entry '<PDF file>' (<local file>) in dictionary, but OS file is empty
+Warning: entry '<PDF name>' (<local file>) in dictionary, but PDF file not found
+Warning: entry '<PDF file>' in dictionary deleted
+Warning: entry '<local file>' in dictionary, but OS file not found
+Warning: local XML file '<file>' not found".format(file2))
 Warning: local XML file for package '<package>' not found
-Warning: maximum number (<number>) of downloaded XML+PDF files exceeded
+Warning: local XML file for package '<package>' empty or not well-formed
+Warning: maximum number (<counter>) of downloaded XML+PDF files exceeded
 Warning: no correct XML file for any specified package found
-Warning: no package found which matches the specified author template '<author template>'
-Warning: no package found which matches the specified license template '<license template>'
-Warning: no package found which matches the specified name template '<name template>'
-Warning: no package found which matches the specified topic template '<topic template>'
-Warning: no package found which matches the specified year template '<year template>'
+Warning: no package found which matches the specified <license|name|author|topic|year> template '<template>'
+Warning: PDF documentation file '<name>' not downloaded
+Warning: PDF file '<PDF file>' in OS deleted
+Warning: PDF file <PDF file>' without associated XML file
 Warning: pickle file '<pickle file>' cannot be loaded a/o written
+Warning: processor '<processor>' not found
+Warning: XML file '<XML file>' in OS deleted
+Warning: XML file '<XML file>' not downloaded
+Warning: XML file '<XML file>' not downloaded …    any unspecified error
 

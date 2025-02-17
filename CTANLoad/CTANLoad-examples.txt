@@ -1,6 +1,19 @@
 Examples (CTANLoad)
 ===================
-2023-06-13
+2024-08-13
+
+Call the Python program CTANLOad:
+
+The following possibilities are available for this:
+
+1. python -u CTANLoad.py <option(s)>
+-- always works
+2. CTANLoad.py <option(s)>
+-- if the OS knows how to handle Python files (files with the name extension .py)
+3. CTANLoad <option(s)>
+-- if there is an executable (in Windows a file with the name extension .exe)
+
+In the following examples we will use possibility 3.
 
 CTANLoad -h
 - help, show the options
@@ -29,6 +42,12 @@ CTANLoad -v -l
 - verbose output                                             [-v]
 
 CTANLoad -v -l -c -stat
+- generate some special lists, and prepare files for CTANLoad [-l]
+- verbose output                                             [-v]
+- with integrity check                                       [-c]
+- with statistics                                            [-stat]
+
+CTANLoad -vlc -stat
 - generate some special lists, and prepare files for CTANLoad [-l]
 - verbose output                                             [-v]
 - with integrity check                                       [-c]

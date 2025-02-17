@@ -1,46 +1,54 @@
-usage: CTANLoad.py [-h] [-a] [-A AUTHOR_TEMPLATE] [-c] [-d DIREC] [-f] [-l]
-                   [-L LICENSE_TEMPLATE] [-k KEY_TEMPLATE] [-n NUMBER]
-                   [-o OUTPUT_NAME] [-r] [-t NAME_TEMPLATE] [-stat] [-v] [-V]
-                   [-y YEAR_TEMPLATE]
+usage: CTANLoad [-h] [-a] [-stat] [-v] [-V] [-A <author template>] [-f]
+                [-k <key template>] [-d <directory>] [-L <license template>]
+                [-n <number>] [-o <output>] [-t <name template>]
+                [-y <year template>] [-c] [-l] [-r]
 
-Program loads XLM and PDF documentation files from CTAN a/o generates some
-special lists, and prepares data for CTANOut [CTANLoad.py; Version: 2.39
-(2024-03-17)]
+CTANLoad
+Version: 2.44.3 (2024-07-26)
 
-Optional parameters:
+Program loads XLM and PDF documentation files from CTAN a/o
+generates some special lists, and prepares data for CTANOut.
+
+Global options (without any processing):
   -h, --help            show this help message and exit
   -a, --author          Author of the program
-  -A AUTHOR_TEMPLATE, --author_template AUTHOR_TEMPLATE
-                        Author template for package XML files to be loaded -
-                        Default:
-  -c, --check_integrity
-                        Flag: Checks the integrity of the 2nd .pkl file. -
-                        Default: False
-  -d DIREC, --directory DIREC
-                        Directory for output files in the OS - Default: .\
-  -f, --download_files  Flag: Downloads associated documentation files [PDF].
-                        - Default: False
-  -l, --lists           Flag: Generates some special lists and prepare files
-                        for CTANOut. - Default: False
-  -L LICENSE_TEMPLATE, --license_template LICENSE_TEMPLATE
-                        License template for package XML files to be loaded -
-                        Default:
-  -k KEY_TEMPLATE, --key_template KEY_TEMPLATE
-                        Key template for package XML files to be loaded -
-                        Default:
-  -n NUMBER, --number NUMBER
-                        Maximum number of file downloads - Default: 250
-  -o OUTPUT_NAME, --output OUTPUT_NAME
-                        Generic file name for output files - Default: all
-  -r, --regenerate_pickle_files
-                        Flag: Regenerates the two pickle files. - Default:
-                        False
-  -t NAME_TEMPLATE, --name_template NAME_TEMPLATE
-                        Name template for package XML files to be loaded -
-                        Default:
-  -stat, --statistics   Flag: Prints statistics. - Default: False
-  -v, --verbose         Flag: Output is verbose. - Default: False
+  -stat, --statistics   Flag: Prints statistics. -- Default: False
+  -v, --verbose         Flag: Output is verbose. -- Default: False
   -V, --version         Version of the program
-  -y YEAR_TEMPLATE, --year_template YEAR_TEMPLATE
-                        Template for output filtering on the base of years -
+
+Options related to loading:
+  -A <author template>, --author_template <author template>
+                        Author template for package XML files to be loaded --
+                        Default:
+  -f, --download_files  Flag: Downloads associated documentation files [PDF].
+                        -- Default: False
+  -k <key template>, --key_template <key template>
+                        Key template for package XML files to be loaded --
+                        Default:
+  -d <directory>, --directory <directory>
+                        Folder for output files in the OS -- Default: .\
+  -L <license template>, --license_template <license template>
+                        License template for package XML files to be loaded --
+                        Default:
+  -n <number>, --number <number>
+                        Maximum number of file downloads -- Default: 250
+  -o <output>, --output <output>
+                        Generic file name for output files -- Default: all
+  -t <name template>, --name_template <name template>
+                        Name template for package XML files to be loaded --
+                        Default:
+  -y <year template>, --year_template <year template>
+                        Template for output filtering on the base of years --
                         Default: ^19[89][0-9]|20[012][0-9]$
+
+Options for special actions:
+  -c, --check_integrity
+                        Flag: Checks the integrity of the 2nd .pkl file. --
+                        Default: False
+  -l, --lists           Flag: Generates some special lists and prepare files
+                        for CTANOut. -- Default: False
+  -r, --regenerate_pickle_files
+                        Flag: Regenerates the two pickle files. -- Default:
+                        False
+
+Thanks for using CTANLoad!
