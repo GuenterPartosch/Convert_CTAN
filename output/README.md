@@ -1,6 +1,6 @@
 # Overview
 
-For all XML files for packages found on CTAN (https://www.ctan.org/pkg/) and downloaded 
+For all package XML files found on CTAN (https://www.ctan.org/pkg/) and downloaded 
 into the current directory I have generated some output files:
 
 ## Main output files:

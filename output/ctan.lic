@@ -1,12 +1,12 @@
-% file: all.lic
-% date: 2024-08-15
-% time: 21:10:59
-% is called by all.tex
+% file: CTAN.lic (in LaTeX format)
+% date: 2025-02-17
+% time: 10:46:13
+% is called by CTAN.tex
 
 \section{Used licenses, short explainations}
 
 \raggedright
-\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}
+\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}
 \item[\texttt{apache2}] Apache License, version 2.0 (free)
 \item[\texttt{artistic}] Perl Artistic License (not free)
 \item[\texttt{artistic2}] Perl Artistic License, version 2 (free)

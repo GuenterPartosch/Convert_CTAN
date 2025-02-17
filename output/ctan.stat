@@ -1,7 +1,7 @@
-% file: 'all.stat'
-% date: 2024-08-15
-% time: 21:10:59
-% is called by 'all.tex'
+% file: 'CTAN.stat' (in LaTeX format)
+% date: 2025-02-17
+% time: 10:46:13
+% is called by 'CTAN.tex'
 
 \minisec{Parameters and statistics}
 
@@ -9,12 +9,12 @@
 \begin{tabular}{lll}
 
 program name & \verb§CTANOut.py§\\
-program version &2.58 (2024-02-28)\\
+program version &2.63.3 (2024-07-26)\\
 program author &Günter Partosch\\\\
-program date &2024-02-28\\\\
+program date &2024-07-26\\\\
 
-date of program execution &2024-08-15\\
-time of program execution &21:10:59\\\\
+date of program execution &2025-02-17\\
+time of program execution &10:46:13\\\\
 mode & \verb§LaTeX§\\
 special lists used\footnotemark{} &True\\
 skipped CTAN fields & \verb§[]§  (no fields skipped = default)\\
@@ -25,13 +25,13 @@ template for author names & \verb§^.+$§  (all authors = default)\\
 template for licenses & \verb§^.+$§  (all licenses = default)\\
 template for years & \verb§^19[89][0-9]|§\verb§20[012][0-9]$§  (all years = default)\\\\
 
-number of authors, total on CTAN &  3005\\
-number of authors, cited here &  2932\\
-number of packages, total on CTAN &  6625\\
-number of packages, processed locally &  6624\\
+number of authors, total on CTAN &  3038\\
+number of authors, cited here &  2963\\
+number of packages, total on CTAN &  6709\\
+number of packages, processed locally &  6709\\
 number of topics, total on CTAN &   609\\
 number of topics, used here &   603\\
 number of licenses, total on CTAN &    67\\
 number of licenses, used here &    52\\
 \end{tabular}
-\footnotetext{special lists: topics/licinses and their explanation + topics/authors/licenses and related packages(cross-reference lists)}
+\footnotetext{special lists: topics/licenses and their explanation -- topics/authors/licenses and related packages(cross-reference lists)}

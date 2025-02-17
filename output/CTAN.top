@@ -1,12 +1,12 @@
-% file: all.top
-% date: 2024-08-15
-% time: 21:10:59
-% is called by all.tex
+% file: CTAN.top (in LaTeX format)
+% date: 2025-02-17
+% time: 10:46:13
+% is called by CTAN.tex
 
 \section{Used topics, short explainations}
 
 \raggedright
-\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxx}
+\begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}
 \item[\texttt{abbrev}] macros for defining abbreviations in documents
 \item[\texttt{abstract}] typeset abstracts of documents
 \item[\texttt{accessible}] accessibility support
