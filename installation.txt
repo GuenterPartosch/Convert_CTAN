@@ -1,7 +1,10 @@
 Installation
 ============
+2025-02-18
 
-* Download the archive [programs.zip] from Git
-* Unpack into an empty directory
+* Download the archive [programs.zip] from Git.
+* Unpack the Archive into an empty Directory.
 
-The programs can then be called up. See also [call.txt].
+The programs can then be called. See also [call.txt].
+
+
