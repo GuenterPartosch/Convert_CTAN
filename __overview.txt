@@ -19,7 +19,13 @@ Some information files
 ======================
 CTAN-corrected-files.txt
 CTAN-elements.txt
+installation.txt
+call.txt
 wget.txt
+
+Python files and executables
+============================
+programs.zip
 
 all together in
 ===============
