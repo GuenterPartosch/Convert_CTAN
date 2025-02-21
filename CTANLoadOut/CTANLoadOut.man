@@ -14,12 +14,11 @@ usage: CTANLoadOut [-h] [-a] [-V] [-d <directory>] [-mo] [-o <output name>]
                    [-l] [-p] [-r]
 
 CTANLoadOut
-Version: 1.55.3 (2024-07-20)
+Version: 1.57 (2025-02-12)
 
 Combines the tasks of CTANLoad  and CTANOut:
-CTANLoad: Loads XLM and PDF documentation files from CTAN a/o generates some special lists,
-          and prepares data for CTANOut.
-CTANOut:  Converts CTAN XLM package files to some formats.  
+ CTANLoad: Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut.
+ CTANOut:  Converts CTAN XLM package files to some formats.  
 
 Global options (without any processing):
   -h, --help            show this help message and exit
@@ -112,8 +111,8 @@ Options for special actions:
   -c, --check_integrity
                         [CTANLoad, check] Flag: Check the integrity of the 2nd
                         .pkl file. -- Default: False
-  -l, --lists           [CTANLoad, Check] Flag: Generate some special lists
-                        and prepare files for CTANOut. -- Default: False
+  -l, --lists           [CTANLoad, Check] Flag: Generate some speciallists and
+                        prepare files for CTANOut. -- Default: False
   -p, --pdf_output      [CTANOut] Flag: Generate PDF output viua LuaLaTeX. --
                         Default: False
   -r, --regenerate_pickle_files
