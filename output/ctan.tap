@@ -1,11 +1,13 @@
 % file: 'CTAN.tap' (in LaTeX format)
-% date: 2025-02-17
-% time: 10:46:13
+% date: 2025-02-21
+% time: 18:23:18
 % is called by 'CTAN.tex'
 
 \section{Authors and associated packages}
 
-\textit{Note: The numbers do not refer to page numbers, but to section numbers. A click on this number leads to the corresponding package description.}
+\textit{Note: The numbers do not refer to page numbers, but to
+              section numbers. A click on this number leads to the corresponding
+              package description.}
 
 \raggedright
 \begin{labeling}{xxxxxxxxxxxxxxxxxxxxxxxx}
@@ -358,7 +360,7 @@
 \item[Cadiou, Aurélien] 1 package: \texttt{ladder}~(\ref{pkg:ladder}); 
 \item[Cagnol, John] 1 package: \texttt{mrcheckbib}~(\ref{pkg:mrcheckbib}); 
 \item[Caignaert, Christophe] 1 package: \texttt{kpfonts}~(\ref{pkg:kpfonts}); 
-\item[Cain, Alan J.] 1 package: \texttt{timechart}~(\ref{pkg:timechart}); 
+\item[Cain, Alan J.] 2 packages: \texttt{marginalia}~(\ref{pkg:marginalia}); \texttt{timechart}~(\ref{pkg:timechart}); 
 \item[Callegari, Sergio] 4 packages: \texttt{draftwatermark}~(\ref{pkg:draftwatermark}); \texttt{everypage}~(\ref{pkg:everypage}); \texttt{flippdf}~(\ref{pkg:flippdf}); \texttt{rotpages}~(\ref{pkg:rotpages}); 
 \item[Callil-Soares, Pedro] 1 package: \texttt{tikzviolinplots}~(\ref{pkg:tikzviolinplots}); 
 \item[Calvani, Massimo] 1 package: \texttt{prepr}~(\ref{pkg:prepr}); 
@@ -620,7 +622,7 @@
 \item[Dudebout, Nicolas] 1 package: \texttt{matrix-skeleton}~(\ref{pkg:matrix-skeleton}); 
 \item[Dübendorfer, Marco] 1 package: \texttt{grafik}~(\ref{pkg:grafik}); 
 \item[Duggan, Angus] 7 packages: \texttt{dvibook}~(\ref{pkg:dvibook}); \texttt{moreverb}~(\ref{pkg:moreverb}); \texttt{pbmtopk}~(\ref{pkg:pbmtopk}); \texttt{pictexsum}~(\ref{pkg:pictexsum}); \texttt{psmerge}~(\ref{pkg:psmerge}); \texttt{psutils}~(\ref{pkg:psutils}); \texttt{vplutils}~(\ref{pkg:vplutils}); 
-\item[julinux60] 1 package: \texttt{callouts-box}~(\ref{pkg:callouts-box}); 
+\item[Dujardin, Julien] 1 package: \texttt{callouts-box}~(\ref{pkg:callouts-box}); 
 \item[Dumas, Patrice] 1 package: \texttt{texi2html}~(\ref{pkg:texi2html}); 
 \item[Dumont, Bastien] 1 package: \texttt{crossrefenum}~(\ref{pkg:crossrefenum}); 
 \item[Dungs, Kevin] 1 package: \texttt{fontmfizz}~(\ref{pkg:fontmfizz}); 
@@ -1363,6 +1365,7 @@
 \item[Kołodziejska, Hanna] 2 packages: \texttt{go}~(\ref{pkg:go}); \texttt{plhyph}~(\ref{pkg:plhyph}); 
 \item[Kolorenc, Jindrich] 1 package: \texttt{simplewick}~(\ref{pkg:simplewick}); 
 \item[Komarath, Balagopal] 1 package: \texttt{tex-label}~(\ref{pkg:tex-label}); 
+\item[Kondratenko, Danila A.] 1 package: \texttt{omgtudoc-asoiu}~(\ref{pkg:omgtudoc-asoiu}); 
 \item[Konecny, Michal] 1 package: \texttt{plnfss}~(\ref{pkg:plnfss}); 
 \item[Kopecky, Felix] 2 packages: \texttt{langsci-affiliations}~(\ref{pkg:langsci-affiliations}); \texttt{langsci-avm}~(\ref{pkg:langsci-avm}); 
 \item[Kopp, Oliver] 7 packages: \texttt{biblatex-lni}~(\ref{pkg:biblatex-lni}); \texttt{coverpage}~(\ref{pkg:coverpage}); \texttt{jabref}~(\ref{pkg:jabref}); \texttt{luabibentry}~(\ref{pkg:luabibentry}); \texttt{plantuml}~(\ref{pkg:plantuml}); \texttt{refenums}~(\ref{pkg:refenums}); \texttt{scientific-thesis-cover}~(\ref{pkg:scientific-thesis-cover}); 
