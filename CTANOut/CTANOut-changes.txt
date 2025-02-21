@@ -1,6 +1,6 @@
 Changes (CTANOut.py)
 --------------------
-(2024-08-12)
+(2025-02-13)
 
 
 # History
@@ -193,3 +193,9 @@ Changes (CTANOut.py)
 # 2.63.1  2024-07-26 additional parameter in .ArgumentParser: prog, epilog, formatter_class
 # 2.63.2  2024-07-26 subdivision into groups by .add_argument_group
 # 2.63.3  2024-07-26 additional arguments in .add_argument (if it makes sense): type, metavar, action, dest
+
+# 2.64    2025-01-27 languages "en,zh", "yue", "zh-tw" now in languagecodes
+# 2.65    2025-02-06 wherever appropriate: string interpolation with f-strings instead of .format
+# 2.66    2025-02-06 everywhere: all source code lines wrapped at a maximum of 80 characters
+# 2.67    2025-02-11 more f-strings
+# 2.68    2025-02-12 no test: __name__ == "__main__; ==> CTANLoad.py can be imported 

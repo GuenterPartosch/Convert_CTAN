@@ -4,10 +4,10 @@ usage: CTANLoad [-h] [-a] [-stat] [-v] [-V] [-A <author template>] [-f]
                 [-y <year template>] [-c] [-l] [-r]
 
 CTANLoad
-Version: 2.44.3 (2024-07-26)
+Version: 2.50 (2025-02-12)
 
-Program loads XLM and PDF documentation files from CTAN a/o
-generates some special lists, and prepares data for CTANOut.
+Program loads XLM and PDF documentation files from
+CTAN a/o generates some special lists, and prepares data for CTANOut.
 
 Global options (without any processing):
   -h, --help            show this help message and exit
