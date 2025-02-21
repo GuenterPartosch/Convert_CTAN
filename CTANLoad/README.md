@@ -1,4 +1,5 @@
 ## Overview (files in the CTANLoad folder)
+(2025-02-21)
 
 * [ctanload.exe](./ctanload.exe "Windows executable of CTANLoad.py"):
    Windows executable of CTANLoad.py
@@ -12,8 +13,11 @@
 * [ctanload.spec](./ctanload.spec "specification file for ctanload.exe"):
    specification file for ctanload.exe
 
-* [CTANLoad-examples.txt](./CTANLoad-examples.txt "examples for calls of CTANLoad"):
+* [CTANLoad-examples.txt](./CTANLoad-examples.txt "examples for calls of CTANLoad"): for
    examples for calls of CTANLoad
+
+* [CTANLoad-examples.bat](./CTANLoad-examples.bat "Windows batch filefor CTANLoad calls"):
+   examples: Windows batch file for CTANLoad calls
 
 * [CTANLoad-messages.txt](./CTANLoad-messages.txt "messages in CTANLoad"):
    messages in CTANLoad 
