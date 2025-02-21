@@ -4,10 +4,9 @@ usage: CTANOut [-h] [-a] [-stat] [-v] [-V] [-A <author template>] [-b <btype>]
                [-sb <skip biblatex>] [-t <name template>] [-y <year template>]
 
 CTANOut
-Version: 2.63.3 (2024-07-26)
+Version: 2.68 (2025-02-12)
 
-Converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX,
-Excel [tab separated].
+Converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 
 Global options (without any actions):
   -h, --help            show this help message and exit
@@ -34,8 +33,8 @@ Options related to output:
   -m <mode>, --mode <mode>
                         Target format -- Default: RIS
   -mt, --make_topics    Flag: Generates topic lists [meaning of
-                        topics/licenses + cross-reference (topics/packages,
-                        authors/packages, licenses/packages); only for -m
+                        topics|licenses + cross-references (topics|packages,
+                        uthors|packages, licenses|packages); only for -m
                         LaTeX]). -- Default: False
   -nf, --no_files       Flag: Do not generate output files. -- Default: False
   -o <output>, --output <output>
@@ -46,7 +45,7 @@ Options related to output:
   -sb <skip biblatex>, --skip_biblatex <skip biblatex>
                         Skips specified BibLaTeX fields. -- Default: []
   -t <name template>, --name_template <name template>
-                        Template for output filtering on the base of package
+                        emplate for output filtering on the base ofpackage
                         names -- Default: ^.+$
   -y <year template>, --year_template <year template>
                         Template for output filtering on the base of years --
