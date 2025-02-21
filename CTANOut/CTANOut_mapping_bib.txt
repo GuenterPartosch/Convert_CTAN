@@ -1,0 +1,29 @@
+CTANOut_mapping_bib.txt
+=======================
+(Günter Partosch, 2024-05-10)
+
+% actual mapping CTAN --> BibLaTeX fields
+% alias         --> embedded in 'note'
+% also          --> 'related'
+% authorref     --> collected in 'author'
+% caption       --> 'subtitle'
+% contact       --> collected in 'userd'
+% copyright     --> 'usera'; 'year' (if applicable)
+% ctan          --> 'userc'
+% description   --> 'abstract'; collected in 'language' (if applicable)
+% documentation --> embedded in 'note'; local download in 'file' (if applicable); collected in 'language' (if applicable)
+% home          --> 'usere'
+% install       --> 'userf'
+% keyval        --> collected in 'keywords'
+% license       --> 'userb'
+% miktex        --> embedded in 'note'
+% name          --> 'title'
+% texlive       --> embedded in 'note'
+% version       --> 'version'; 'year' (if applicable)
+
+% a) If available, the program outputs the following BibLaTex fields:
+%    abstract,author,date,file,keywords,language,note,related,subtitle,title,url,
+%    urldate,usera,userb,userc,userd,usere,userf,version,year
+% b) The BibLaTeX field 'note' is used for collecting the following CTAN items:
+%    alias, contact, documentation, home, install, license, miktex, texlive
+% c) The program uses the optional BibLaTeX fields usera, userb, userc, userd, usere, userf
