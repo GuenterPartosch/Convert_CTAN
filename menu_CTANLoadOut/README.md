@@ -1,9 +1,13 @@
 ## Overview (files in the menu_CTANLoadOut folder)
+(2025-02-21)
 
 * [menu_CTANLoadOut.py](./menu_CTANLoadOut.py "Python program"):
    Python program
 
 * [menu_CTANLoadOut-examples.txt](./menu_CTANLoadOut-examples.txt "examples for calls of menu_CTANLoadOut"):
+   examples for calls of menu_CTANLoadOut
+
+* [menu_CTANLoadOut-examples.bat](./menu_CTANLoadOut-examples.bat "Windows batch file for menu_CTANLoadOut calls"):
    examples for calls of menu_CTANLoadOut
 
 * [menu_CTANLoadOut-messages.txt](./menu_CTANLoadOut-messages.txt "messages in menu_CTANLoadOut"):
