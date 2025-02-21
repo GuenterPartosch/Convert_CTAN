@@ -95,7 +95,7 @@ Case 5
 ------
 All steps in case 3 should be combinded.
 
-CTANLoadOut -A "Mittelbach|Voß"  -y "2024|2025" -f  -m tex -mt -p -v -stat
+CTANLoadOut.py -A "Mittelbach|Voß"  -y "2024|2025" -f  -m tex -mt -p -v -stat
 
 - verbose output                                          [-v]
 - with statistics                                         [-stat]
