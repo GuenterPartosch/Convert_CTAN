@@ -6,6 +6,7 @@
 
 ----------------------------------------------------------------
 ## CTANLoad
+
 most important tasks: 
 * loads XML files from CTAN             [option -t]
 * loads PDF files from CTAN             [option -f]
@@ -42,7 +43,8 @@ most important tasks:
 ----------------------------------------------------------------
 ## Some other files
 * [installation.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/installation.txt "installation of the Convert_CTAN bundle") installation of the Convert_CTAN bundle
-* [call.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/call.txt "Calling the individual programs of the Convert_CTAN bundle") Calling the individual programs of the Convert_CTAN bundle
+* [call.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/call.txt "Calling the individual programs of the Convert_CTAN bundle") Calling the individual programs of the 
+  Convert_CTAN bundle
 * [firststeps.txt](https://github.com/GuenterPartosch/Convert_CTAN/blob/master/firststeps.txt "First steps") First steps
 
 
