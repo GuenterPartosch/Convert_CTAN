@@ -4,7 +4,7 @@
 
 """
 menu_CTANLoadOut.py
-(C) Günter Partosch 2024|2025
+(C) Günter Partosch 2024|2025/2026
 
 CTANLoadOut.py is part of the CTAN bundle (CTANLoad.py, CTANOut.py,
 CTANLoadOut.py, menu_CTANLoadOut.py).
@@ -14,8 +14,9 @@ CTANLoadOut.py program via a menu.
 
  ---------------------------------------------------------------
  Requirements:
- + operating system windows 10/11 or Linux (like Linux Mint or Ubuntu or Debian)
- + wget a/o wget2 installed
+ + operating system windows 10/11 or Linux (like Linux Mint or Ubuntu or
+   Debian)
+ + wget a/o wget2 is installed
  + Python installation 3.10 or newer
  + a series of Python modules (see the import instructions below)
 
@@ -28,13 +29,14 @@ CTANLoadOut.py      ==> CTANLoad.py
 
 CTANLoadOut.py:  It combines the tasks of CTANLoayd.py and CTANOut.py:
 
-CTANLoad.py:     Loads XLM and PDF documentation files from CTAN a/o generates
-                 some special lists, and prepares data for CTANOut.
-CTANOut.py:      Converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX,
-                 Excel [tab separated].
+CTANLoad.py:     Loads XLM and PDF documentation files from CTAN a/o
+                 generates some special lists, and prepares data for
+                 CTANOut.
+CTANOut.py:      Converts CTAN XLM package files to LaTeX, RIS, plain,
+                 BibLaTeX, Excel [tab separated].
 
-menu_CTANLoadOut.py must be located in the same OS directory as CTANLoad.py, 
-CTANOut.py, and CTANLoadOut.py.
+menu_CTANLoadOut.py must be located in the same OS directory as
+CTANLoad.py, CTANOut.py, and CTANLoadOut.py.
 
 --------------------------------------------------------------------
 The program essentially uses the tkinter module and its submodules:
@@ -72,81 +74,115 @@ xyz.pack
 xyz.set
 xyz.title
 xyz.current
+
+ ---------------------------------------------------------------
+menu_CTANLoadOut.py needs the programs CTANLoad.py, CTANOut.py, and CTANLoadOut.py.
+
+see also menu_CTANLoadOut-changes.txt
+         menu_CTANLoadOut-messages.txt
+         menu_CTANLoadOut-modules.txt
+         CTAN-files.txt
+         call.txt
+         installation.txt
 """
 
 
 # ====================================================================
 # some imports
 
-import tkinter as tk                            # basis for the most things
-import tkinter.ttk as ttk                       # an alternative
-import tkinter.messagebox as tkm                # message output
-from tkinter import scrolledtext                # show scrollable text
-import sys                                      # system calls
-import platform                                 # OS informations
-import subprocess                               # handling of sub-processes
-from tempfile import TemporaryFile              # temporary file for
-                                                # subprocess.run
-from CTANLoad import prg_version as l_vers      # version of CTANLoad.py
-from CTANLoad import prg_date as l_date         # date of CTANLoad.py
-from CTANOut import programversion as o_vers    # version of CTANOut.py
-from CTANOut import programdate as o_date       # date of CTANOut.py
-from CTANLoadOut import programversion as lo_vers
-                                                # version of CTANLoadOut.py
-from CTANLoadOut import programdate as lo_date  # date of CTANLoadOut.py
+# 2.2.1  2026-04-13 import textwrap
+
+import tkinter as tk                                                    # basis for the most things
+import tkinter.ttk as ttk                                               # an alternative
+import tkinter.messagebox as tkm                                        # message output
+from tkinter import scrolledtext                                        # show scrollable text
+import sys                                                              # system calls
+import platform                                                         # OS informations
+import subprocess                                                       # handling of sub-processes
+from tempfile import TemporaryFile                                      # subprocess.run
+import textwrap                                                         # wrapping of texts
+
+# 2.1    2026-04-10 date and version of CTANLoad, CTANOut und CTANLoadOut via Import
+
+from CTANLoad import PRG_VERSION as CTANLOAD_VERSION                    # version of CTANLoad.py
+from CTANLoad import PRG_DATE as CTANLOAD_DATE                          # date of CTANLoad.py
+from CTANOut import PROGRAM_VERSION as CTANOUT_VERSION                  # version of CTANOut.py
+from CTANOut import PROGRAM_DATE as CTANOUT_DATE                        # date of CTANOut.py
+from CTANLoadOut import PROGRAM_VERSION as CTANLOADOUT_VERSION          # version of CTANLoadOut.py
+from CTANLoadOut import PROGRAM_DATE  as CTANLOADOUT_DATE               # date of CTANLoadOut.py
+from CTANLoadOut import ALL_DEF1, ALL_DEF2, ALL_DEF3                    # import some values of CTANLoadOut
+
+# --------------------------------------------------------------------
+# unbundle the imported ALL_DEF1, All_DEF2, and ALL_DEf3
+
+# 2.1    2026-04-10 date and version of CTANLoad, CTANOut und CTANLoadOut via Import
+
+(AUTHOR_TEMPLATE_DEFAULT, AUTHOR_LOAD_TEMPLATE_DEFAULT,
+AUTHOR_OUT_TEMPLATE_DEFAULT, LICENSE_TEMPLATE_DEFAULT,
+LICENSE_LOAD_TEMPLATE_DEFAULT, LICENSE_OUT_TEMPLATE_DEFAULT,
+KEY_TEMPLATE_DEFAULT, KEY_LOAD_TEMPLATE_DEFAULT,
+KEY_OUT_TEMPLATE_DEFAULT, NAME_TEMPLATE_DEFAULT,
+NAME_LOAD_TEMPLATE_DEFAULT, NAME_OUT_TEMPLATE_DEFAULT,
+YEAR_TEMPLATE_DEFAULT, YEAR_LOAD_TEMPLATE_DEFAULT,
+YEAR_OUT_TEMPLATE_DEFAULT)                                  = ALL_DEF1  # unbundle ALL_DEf1
+
+(BTYPE_DEFAULT, MODE_DEFAULT, NUMBER_DEFAULT,
+OUTPUT_NAME_DEFAULT, SKIP_DEFAULT, SKIP_BIBLATEX_DEFAULT,
+TIMEOUT_DEFAULT)                                            = ALL_DEF2  # unbundle ALL_DEf2
+
+(DOWNLOAD_DEFAULT, INTEGRITY_DEFAULT, LISTS_DEFAULT,
+MAKE_OUTPUT_DEFAULT, MAKE_TOPICS_DEFAULT, NO_FILES_DEFAULT,
+PDF_OUTPUT_DEFAULT, REGENERATE_DEFAULT, STATISTICS_DEFAULT,
+VERBOSE_DEFAULT, DEBUGGING_DEFAULT)                         = ALL_DEF3  # unbundle ALL_DEf3
 
 # --------------------------------------------------------------------
 # some settings
 
-# 1.11  2024-07-08: as far as possible and useful: string interpolation via
-#                   .format replaced by f-strings
+# 1.11  2024-07-08: as far as possible and useful: string interpolation
+#                   via .format replaced by f-strings
 
-mm = tk.Tk()                                    # start of menu
-mm.title("Menu for CTANLoadOut (a combination of CTANLoad + CTANOut)")
-                                                # title of menu
+mm = tk.Tk()                                                            # start of menu
+mm.title("Menu for CTANLoadOut (a combination of CTANLoad + CTANOut)")  # title of menu
+
 # --------------------------------------------------------------------
-menu_CTANLoadOut_date    = "2025-02-06"         # menu_CTANLoadOut.py
-menu_CTANLoadOut_version = "1.14"
-CTANLoadOut_date         = lo_date              # CTANLoadOut.py
-CTANLoadOut_version      = lo_vers
-CTANLoad_date            = l_date               # CTANLoad.py
-CTANLoad_version         = l_vers
-CTANOut_date             = o_date               # CTANOut.py
-CTANOut_version          = o_vers
+MENU_CTANLOADOUT_DATE    = "2026-04-13"                                 # menu_CTANLoadOut.py
+MENU_CTANLOADOUT_VERSION = "2.2.3"
 
-program_name             = "menu_CTANLoadOut.py"
-                                                # name of the program 
-author_program           = "Günter Partosch"
-author_email             = "Guenter.Partosch@web.de\n(formerly " +\
+PROGRAM_NAME             = "menu_CTANLoadOut.py"                        # name of the program 
+AUTHOR_PROGRAM           = "Günter Partosch"
+AUTHOR_EMAIL             = "Guenter.Partosch@web.de\n(formerly " +\
                            "Guenter.Partosch@hrz.uni-giessen.de)"
-author_inst              = "formerly " + \
-                           "Justus-Liebig-Universität, Hochschulrechenzentrum"
-operatingsys             = platform.system()    # operating system on which the
-                                                # program runs
-remote_program_name      = "CTANLoadOut.py"     # program to be processed
+AUTHOR_INST              = "formerly Justus-Liebig-Universität, " +\
+                           "Hochschulrechenzentrum"
+OPERATINGSYS             = platform.system()                            # operating system on which the program runs
+REMOTE_PROGRAM_NAME      = "CTANLoadOut.py"                             # program to be processed
 
 # --------------------------------------------------------------------
-empty                    = ""
-blank                    = " "
-values                   = {}                   # values found in menu;
-                                                # collected by collect_values
-option_line              = {}                   # option <--> line; set by
-                                                # get_option_line
-call                     = []                   # parameters for the call of
-                                                # CTANLoadOut.py
-nr                       = 0                    # number of elements in
-                                                # sequence; will be set later
-log                      = empty                # to be used for log data
+EMPTY                    = ""
+BLANK                    = " "
+values:dict              = {}                                           # values found in menu; collected by collect_values
+option_line:dict         = {}                                           # option <--> line; set by get_option_line
+call:list                = []                                           # parameters for the call of CTANLoadOut.py
+nr:int                   = 0                                            # number of elements in SEQUENCE; will be se:t later
+log:str                  = EMPTY                                        # to be used for log data
+changes:str              = EMPTY                                        # corrections made
+
+# 1.20   2025-12-05: better colors
+
+COLOR1                   = "#FEE4BE"                                    # [B0]: Start; [B1]: Reset fields; [B2]: Clear menu; [B3]: Close menu (Quit)
+COLOR2                   = "#DAFBC1"                                    # [B4]: Entries; [B5]: Checkboxe; [B6]: Buttons; [B7]: Comboboxes; [B8]: Entries; [B9]: Version
+COLOR3                   = "#B0EEF6"                                    # [B10]: Log File
+COLOR4                   = "red"                                        # header
 
 # --------------------------------------------------------------------
-warn_text                = "+ '{0}' '{1}' changed to '{2}' (due to given {3})\n"
-                                                # template for warning texts
-timeout10                = 1000                 # timeout (in sec) for the main
-                                                # subprocess
+WARN_TEXT                = "+ '{0}' '{1}' changed to '{2}' " +\
+                           "(due to {3})\n"                             # template for warning texts
+TIMEOUT                  = 1000                                         # timeout (in sec) for the main subprocess
 
 # --------------------------------------------------------------------
-if operatingsys == "Windows":                   # the directory separator
-                                                # depends on the OS
+# 1.15   2025-10-02: -d adapted to different operating systems
+
+if OPERATINGSYS == "Windows":                                           # the directory separator depends on the OS
     dir_sep = "\\"
     act_dir = ".\\"
 else:
@@ -163,13 +199,14 @@ CTANLoadOut.py      ==> calls ==> CTANLoad.py
 
 Versions:
 ========
-+ Menu_CTANLoadOut.py ({menu_CTANLoadOut_date},
-                      version {menu_CTANLoadOut_version})
-+ CTANLoadOut.py      ({CTANLoadOut_date}, version {CTANLoadOut_version})
-+ CTANLoad.py         ({CTANLoad_date}, version {CTANLoad_version})
-+ CTANOut.py          ({CTANOut_date}, version {CTANOut_version})
++ Menu_CTANLoadOut.py ({MENU_CTANLOADOUT_DATE},
+                      version {MENU_CTANLOADOUT_VERSION})
++ CTANLoadOut.py      ({CTANLOADOUT_DATE}, version {
+                      CTANLOADOUT_VERSION})
++ CTANLoad.py         ({CTANLOAD_DATE}, version {CTANLOAD_VERSION})
++ CTANOut.py          ({CTANOUT_DATE}, version {CTANOUT_VERSION})
 
-{author_program}; E-Mail: {author_email}
+{AUTHOR_PROGRAM}; _E-Mail: {AUTHOR_EMAIL}
 """
 
 
@@ -196,26 +233,34 @@ Versions:
 # quit()
 # start()
 # start_call()
+# text_wrap(text, ident, length)
 
 # --------------------------------------------------------------------
-def check_values():                             # check_values:
-                                                # Checks some option values
-                                                # and resets some.
+def check_values():                                                     # function check_values
     """
     Checks some option values and resets some.
     This is to avoid collisions and contradictions between the options.
 
     no parameters
 
-    global variable: V
+    global variable:
+    + _V
+    + changes
+
+    no messages
     """
     
-    # 1.1   2024-05-30: in check_value: Errors corrected and inconsistencies
-    #                   eliminated
+    # 1.1   2024-05-30: in check_value: Errors corrected and 
+    #                   inconsistencies eliminated
     # 1.4   2024-06-11: additional values for -m: tsv, csv
-    # 1.9.9 2024-06-19: former special handling of -m deactivated + resettings
-    #                   of -m now by set_value_combobox
-
+    # 1.9.9 2024-06-19: former special handling of -m deactivated + 
+    #                   resettings of -m now by set_value_combobox
+    # 1.16.1 2025-10-14: a prompt before the actual execution
+    # 1.17   2025-11-18: changes in check_values
+    # 1.17.1 2025-11-18: for certain changes made by check_values:
+    #                    warnings are issued
+    # 1.17.2 2025-11-18: check_values cleaned up 
+    # 1.17.3 2025-11-18: "Short circuits" removed
 
     # check_value ==> get_value
     #             ==> get_option_line_value
@@ -224,9 +269,9 @@ def check_values():                             # check_values:
 
     # (1)  check -m
     # (2)  ckeck -b 
-    # (3)  check -A, -L, -t, -k, -y
+    # (3)  check -A, -_L, -t, -k, -y
     # (3a) check -A 
-    # (3b) check -L 
+    # (3b) check -_L 
     # (3c) check -t 
     # (3d) check -k
     # (3e) check -y
@@ -237,124 +282,141 @@ def check_values():                             # check_values:
     # (8)  check -mt
     # (9)  check -mo
     
-    global V                                    # list with tk variables
+    global _V                                                           # list with tk variables
+    global changes                                                      # changes made
 
-    message_text = empty                        # initialize message text
-    changed      = set()                        # collect changed values to
-                                                # prevent collissions
+    message_text:str = EMPTY                                            # initialize message text
+    changed:set      = set()                                            # collect changed values to prevent collissions
+    changes          = "changes made:\n"
 
-    # (1) check -m (one of LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,biblatex,
-    #               bib,Excel,excel,csv,tsv)
+# ....................................................................
+# (1) check -m (one of LaTeX,latex,tex,RIS,ris,plain,txt,BibLaTeX,
+    #               biblatex, bib,Excel,excel,csv,tsv)
     
-##    value, line, kind, default = get_option_line_value("-m")          
-##    if value in ["LaTeX", "RIS", "plain", "BibLaTeX", "Excel"]:       # LaTeX, RIS, plain, BibLaTeX, Excel
-##        pass
-##    elif value in ["latex", "tex"]:                                   # latex, tex
-##        message_text += warn_text.format("-m", value, "LaTeX", "-m (1)")
-##        V[line].set("LaTeX")                                          
-##    elif value == "ris":                                              # ris
-##        message_text += warn_text.format("-m", value, "RIS", "-m (1)")
-##        V[line].set("RIS")                                           
-##    elif value == "txt":                                              # txt
-##        message_text += warn_text.format("-m", value, "plain", "-m (1)")
-##        V[line].set("plain")
-##    elif value in ["biblatex", "bib"]:                                # biblatex, bib
-##        message_text += warn_text.format("-m", value, "BibLaTeX", "-m (1)")
-##        V[line].set("BibLaTeX")
-##    elif value in  ["excel", "csv", "tsv"]:                           # excel, tsv, csv
-##        message_text += warn_text.format("-m", value, "Excel", "-m (1)")
-##        V[line].set("Excel")
-##    else:
-##        message_text += warn_text.format("-m", value, "RIS", "-m (1)")
-##        V[line].set("RIS")                                            # set default
+    value, line, kind, default = get_option_line_value("-m")          
+    if value in ["LaTeX", "RIS", "plain", "BibLaTeX", "Excel"]:         # LaTeX, RIS, plain, BibLaTeX, Excel
+        pass
+    elif value in ["latex", "tex"]:                                     # latex, tex
+        message_text += WARN_TEXT.format("-m", value, "LaTeX", "-m (1)")
+        _V[line].set("LaTeX")                                          
+    elif value == "ris":                                                # ris
+        message_text += WARN_TEXT.format("-m", value, "RIS", "-m (1)")
+        _V[line].set("RIS")                                           
+    elif value == "txt":                                                # txt
+        message_text += WARN_TEXT.format("-m", value, "plain", "-m (1)")
+        _V[line].set("plain")
+    elif value in ["biblatex", "bib"]:                                  # biblatex, bib
+        message_text += WARN_TEXT.format("-m", value, "BibLaTeX",
+                                         "-m (1)")
+        _V[line].set("BibLaTeX")
+    elif value in  ["excel", "csv", "tsv"]:                             # excel, tsv, csv
+        message_text += WARN_TEXT.format("-m", value, "Excel", "-m (1)")
+        _V[line].set("Excel")
+    else:
+        message_text += WARN_TEXT.format("-m", value, "RIS", "-m (1)")
+        _V[line].set("RIS")                                             # set default
 
-    # (2) ckeck -b (one of @online,@software,@misc,@ctan,@www
-                                                # option -b
+# ....................................................................
+    # (2) ckeck -b (one of @online,@software,@misc,@ctan,@www           # option -b
     
     value, line, kind, default = get_option_line_value("-b")
-    if value in ["@online", "@software", "@misc", "@ctan", "@www", empty]:
+    if value in ["@online", "@software", "@misc", "@ctan", "@www",
+                 EMPTY]:
         pass
-    else:                                       # reset -b
-        message_text += warn_text.format("-b", value, "@online", "-b (2)")
-        V[line].set("@online")
+    else:                                                               # reset -b
+        message_text += WARN_TEXT.format("-b", value, "@online",
+                                         "-b (2)")
+        _V[line].set("@online")
 
+# ....................................................................
     # (3) check -A, -L, -t, -k, -y
     
-    # (3a) check -A                             # option -A
+    # (3a) check -A                                                     # option -A
     # -A ==> -Al ...
     #    ==> -Ao ...
     value, line, kind, default = get_option_line_value("-A")
     if value != default:
         value_Al = get_value("-Al")
         value_Ao = get_value("-Ao")
-        if value_Al != value:                   # reset -Al
-            message_text += warn_text.format("-Al", value_Al, value, "-A (3a)")
+        if value_Al != value:                                           # reset -Al
+            message_text += WARN_TEXT.format("-Al", value_Al, value,
+                                             "-A (3a)")
             set_value("-Al", value)
-        if value_Ao != value:                   # reset -Ao
-            message_text += warn_text.format("-Ao", value_Ao, value, "-A (3a)")
+        if value_Ao != value:                                           # reset -Ao
+            message_text += WARN_TEXT.format("-Ao", value_Ao, value,
+                                             "-A (3a)")
             set_value("-Ao", value)
     
-    # (3b) check -L                             # option -L
+    # (3b) check -L                                                     # option -L
     # -L ==> -Ll ...
     #    ==> -Lo ...
     value, line, kind, default = get_option_line_value("-L")
     if value != default:
         value_Ll = get_value("-Ll")
         value_Lo = get_value("-Lo")
-        if value_Ll != value:                   # reset -Ll
-            message_text += warn_text.format("-Ll", value_Ll, value, "-L (3b)")
+        if value_Ll != value:                                           # reset -Ll
+            message_text += WARN_TEXT.format("-Ll", value_Ll, value,
+                                             "-L (3b)")
             set_value("-Ll", value)
-        if value_Lo != value:                   # reset -Lo
-            message_text += warn_text.format("-Lo", value_Lo, value, "-L (3b)")
+        if value_Lo != value:                                           # reset -Lo
+            message_text += WARN_TEXT.format("-Lo", value_Lo, value,
+                                             "-L (3b)")
             set_value("-Lo", value)
     
-    # (3c) check -t                             # option -t
+    # (3c) check -t                                                     # option -t
     # -t ==> -tl ...
     #    ==> -to ...
     value, line, kind, default = get_option_line_value("-t")
     if value != default:
         value_tl = get_value("-tl")
         value_to = get_value("-to")
-        if value_tl != value:                   # reset -tl
-            message_text += warn_text.format("-tl", value_tl, value, "-t (3c)")
+        if value_tl != value:                                           # reset -tl
+            message_text += WARN_TEXT.format("-tl", value_tl, value,
+                                             "-t (3c)")
             set_value("-tl", value)
-        if value_to != value:                   # reset -to
-            message_text += warn_text.format("-to", value_to, value, "-t (3c)")
+        if value_to != value:                                           # reset -to
+            message_text += WARN_TEXT.format("-to", value_to, value,
+                                             "-t (3c)")
             set_value("-to", value)
     
-    # (3d) check -k                             # option -k
+    # (3d) check -k                                                     # option -k
     # -k ==> -kl ...
     #    ==> -ko ...
     value, line, kind, default = get_option_line_value("-k")
     if value != default:
         value_kl = get_value("-kl")
         value_ko = get_value("-ko")
-        if value_kl != value:                   # reset -kl
-            message_text += warn_text.format("-kl", value_kl, value, "-k (3d)")
+        if value_kl != value:                                           # reset -kl
+            message_text += WARN_TEXT.format("-kl", value_kl, value,
+                                             "-k (3d)")
             set_value("-kl", value)
-        if value_ko != value:                   # reset -ko
-            message_text += warn_text.format("-ko", value_ko, value, "-k (3d)")
+        if value_ko != value:                                           # reset -ko
+            message_text += WARN_TEXT.format("-ko", value_ko, value,
+                                             "-k (3d)")
             set_value("-ko", value)
 
-    # (3e) check -y                             # option -y
+    # (3e) check -y                                                     # option -y
     # -y ==> -yl ...
     #    ==> -yo ...
     value, line, kind, default = get_option_line_value("-y")
     if value != default:
         value_yl = get_value("-yl")
         value_yo = get_value("-yo")
-        if value_yl != value:                   # reset -yl
-            message_text += warn_text.format("-yl", value_yl, value, "-y (3e)")
+        if value_yl != value:                                           # reset -yl
+            message_text += WARN_TEXT.format("-yl", value_yl, value,
+                                             "-y (3e)")
             set_value("-yo", value)
-        if value_yo != value:                   # reset -yo
-            message_text += warn_text.format("-yo", value_yo, value, "-y (3e)")
+        if value_yo != value:                                           # reset -yo
+            message_text += WARN_TEXT.format("-yo", value_yo, value,
+                                             "-y (3e)")
             set_value("-yo", value)
 
     # To prevent inconsistencies for the following option, there are
     # certain priorities:
     # -nf > -b|-sb > p > mt
     
-    # (4) check -nf                             # option -nf
+# ....................................................................
+    # (4) check -nf                                                     # option -nf
     # -nf ==> -mt False
     #     ==> -p False
     #     ==> -f False
@@ -363,58 +425,63 @@ def check_values():                             # check_values:
     value_p  = get_value("-p")
     value_f  = get_value("-f")
 
-    if value_nf and value_mt:                   # reset -mt
+    if value_nf and value_mt:                                           # reset -mt
         changed.add("-mt")
-        message_text += warn_text.format("-mt", value_mt, False, "-nf (4)")
+        message_text += WARN_TEXT.format("-mt", value_mt, False,
+                                         "-nf (4)")
         set_value("-mt", False)
-    if value_nf and value_p:                    # reset -p
+    if value_nf and value_p:                                            # reset -p
         changed.add("-p")
-        message_text += warn_text.format("-p", value_p, False, "-nf (4)")
+        message_text += WARN_TEXT.format("-p", value_p, False,
+                                         "-nf (4)")
         set_value("-p", False)
-    if value_nf and value_f:                    # reset -f
+    if value_nf and value_f:                                            # reset -f
         changed.add("-f")
-        message_text += warn_text.format("-f", value_f, False, "-nf (4)")
+        message_text += WARN_TEXT.format("-f", value_f, False,
+                                         "-nf (4)")
         set_value("-f", False)
 
-    # (5+6) check -b | -sb                      # option -b | -sb
+# ....................................................................
+    # (5+6) check -b | -sb                                              # option -b | -sb
     # -b  ==> -m BibLaTeX 
     #     ==> -mt False
     #     ==> -p False
     # -sb ==> -p False
     #     ==> -mt False
     #     ==> -m BibLateX
-    if (not ("-b" in changed)) or (not ("-sb" in changed)):
-        value_b  = get_value("-b");  default_b  = get_default("-b")
-        value_sb = get_value("-sb"); default_sb = get_default("-sb")
-        value_m  = get_value("-m")
-        value_mt = get_value("-mt")
-        value_p  = get_value("-p")
-
-        a = value_b != default_b
-        b = value_sb != default_sb
-        c = value_m != "BibLaTeX"
-        d = value_mt
-        e = value_p
-
-        if (a or b) and c:                      # reset -m
-            changed.add("-m")
-            message_text += warn_text.format("-m", value_m,
-                                             "BibLaTeX", "-b|-sb (5+6)")
-            set_value_combobox("-m", "BibLaTeX")
-                                                # set value for the combobox
+    # (5) check -b                                                      # option -b
+    if not ("-b" in changed):
+        value, line, kind, default = get_option_line_value("-b")
+        if value != default:
             set_value("-m", "BibLaTeX")
-        if (a or b) and d:                      # reset -mt
-            changed.add("-mt")
-            message_text += warn_text.format("-mt", value_mt,
-                                             False, "-b|-sb (5+6)")
             set_value("-mt", False)
-        if (a or b) and e:                      # reset -p
-            changed.add("-p")
-            message_text += warn_text.format("-p", value_mt,
-                                             False, "-b-sb (5+6)")
             set_value("-p", False)
+            changed.add("-m"); changed.add("-mt"); changed.add("-p")
+            message_text += WARN_TEXT.format("-m", get_value("-m"),
+                                             "BibLaTeX", "-b")
+            message_text += WARN_TEXT.format("-mt", get_value("-mt"),
+                                             False, "-b")
+            message_text += WARN_TEXT.format("-p", get_value("-p"),
+                                             False, "-b")
+
+# ....................................................................
+    # (6) check -sb                                                     # option -sb                                           
+    if not("-sb" in changed):
+        value, line, kind, default = get_option_line_value("-sb")
+        if value != default:
+            set_value("-m", "BibLaTeX")
+            set_value("-mt", False)
+            set_value("-p", False)
+            changed.add("-m"); changed.add("-mt"); changed.add("-p")
+            message_text += WARN_TEXT.format("-m", get_value("-m"),
+                                             "BibLaTeX", "-sb")
+            message_text += WARN_TEXT.format("-mt", get_value("-mt"),
+                                             False, "-sb")
+            message_text += WARN_TEXT.format("-p", get_value("-p"),
+                                             False, "-sb")
             
-    # (7) check -p                              # option -p
+# ....................................................................
+    # (7) check -p                                                      # option -p
     # -p ==> -m LaTeX
     #    ==> -mt True
     if not ("-p" in changed):
@@ -426,17 +493,20 @@ def check_values():                             # check_values:
         b = value_mt
         c = value_p
         
-        if c and not a:                         # reset -m
+        if c and not a:                                                 # reset -m
             changed.add("-m")
-            message_text += warn_text.format("-m", value_m, "LaTeX", "-p (7)")
-            set_value_combobox("-m", "LaTeX")   # set value for the combobox
+            message_text += WARN_TEXT.format("-m", value_m, "LaTeX",
+                                             "-p (7)")
+            set_value_combobox("-m", "LaTeX")                           # set value for the combobox
             set_value("-m", "LaTeX")
-        if not b and c:                         # reset -mt
+        if not b and c:                                                 # reset -mt
             changed.add("-mt")
-            message_text += warn_text.format("-mt", value_mt, True, "-p (7)")
+            message_text += WARN_TEXT.format("-mt", value_mt, True,
+                                             "-p (7)")
             set_value("-mt", True)
 
-    # (8) check -mt                             # option -mt
+# ....................................................................
+    # (8) check -mt                                                     # option -mt
     # -mt ==> -m LaTeX
     if not ("-mt" in changed):
         value_m  = get_value("-m")
@@ -445,189 +515,185 @@ def check_values():                             # check_values:
         a = value_m == "LaTeX"
         b = value_mt
         
-        if b and not a:                         # reset -m
+        if b and not a:                                                 # reset -m
             changed.add("-m")
-            message_text += warn_text.format("-m", value_m, "LaTeX", "-p (8)")
-            set_value_combobox("-m", "LaTeX")   # set value for the combobox
+            message_text += WARN_TEXT.format("-m", value_m, "LaTeX",
+                                             "-p (8)")
+            set_value_combobox("-m", "LaTeX")                           # set value for the combobox
             set_value("-m", "LaTeX")
 
-    # (9) check -mo                             # option -mo
+# ....................................................................
+    # (9) check -mo                                                     # option -mo
     # -mo ==> -f
     value_f  = get_value("-f")
     value_mo = get_value("-mo")
 
-    if value_mo and value_f:                    # reset -f
-        message_text += warn_text.format("-f", value_f, False, "-mo (9)")
+    if value_mo and value_f:                                            # reset -f
+        message_text += WARN_TEXT.format("-f", value_f, False,
+                                         "-mo (9)")
         set_value("-f", False)
 
-    # (10) show changes                         # message
-    if message_text != empty:                                         
+    # (10) show changes                                                 # message
+    if message_text != EMPTY:
+        changes += message_text
         message_text = "Warnings:\n\n" + message_text
         tkm.showinfo(mm, message_text, icon=tkm.WARNING)
-        message_text = empty
+        message_text = EMPTY
 
     changed = set()
     
 # --------------------------------------------------------------------
-def clear_fields():                             # clear_fields: Clears all
-                                                # entry fields.
+def clear_fields():                                                     # function clear_fields
     """
-    The function requires the "sequence" tuple
+    The function requires the "SEQUENCE" tuple
     and the "options" dictionary.
 
     no parameters
 
-    global Variable: V, call, values
+    global Variables:
+    + _V
+    + call
+    + values
+
+    no merssages
     """
 
     # 1.9.6 2024-06-19: clear_fields, collect_values, get_default,
     #                   get_option_line_value, get_value: extended for
     #                   type combobox
 
-    global V                                    # list with tk variables
-    global call                                 # list: parameters for the
-                                                # call of CTANLoadOut.py
-    global values                               # values found in menu;
-                                                # collected by collect_values
-    global option_line                          # option <--> line; set by
-                                                # get_option_line
+    global _V                                                           # list with tk variables
+    global call                                                         # list: parameters for the call of CTANLoadOut.py
+    global values                                                       # values found in menu; collected by collect_values
+    global option_line                                                  # option <--> line; set by get_option_line
     
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items
-                                                # from options
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]
+        kind, text1, default, text2, action = options[m]                # get the relevant items from options
         if kind in ["number", "listbox", "combobox", "text"]:
-##            E[line].delete(0, tk.END)
-            V[line].set(empty)                  # initialize with empty string
+##            _E[line].delete(0, tk.END)
+            _V[line].set(EMPTY)                                         # initialize with EMPTYstring
         elif kind == "checkbox":
-            V[line].set(False)                  # initialize with False
+            _V[line].set(False)                                         # initialize with False
 
-    values      = {}                            # re-initialize the values list
-    call        = []                            # re-initialize the call list
-    option_line = {}                            # option <--> line; set by
-                                                # get_option_line
+    values      = {}                                                    # re-initialize the values list
+    call        = []                                                    # re-initialize the call list
+    option_line = {}                                                    # option <--> line; set by get_option_line
     
 # --------------------------------------------------------------------
-def collect_values():                           # collect_values: Collects the
-                                                # values in the menu, compares
-                                                # them with the correspoinding
-                                                # defaults and generates a
-                                                # dictionary
+def collect_values():                                                   # function collect_values
     """
     Collects the values in the menu, compares them with the
     correspoinding defaults and generates a dictionary with
     option <--> value
-    THe function requires the "sequence" tuple and the "options" dictionary.
+    THe function requires the "SEQUENCE" tuple and the "options"
+    dictionary.
 
     no parameters
 
-    global variable: values
+    global variable:
+    + values
+
+    no messages
     """
 
     # 1.9.6 2024-06-19: clear_fields, collect_values, get_default,
     #                   get_option_line_value, get_value: extended for
     #                   type combobox
 
-    global values                               # values found in menu;
-                                                # collected by collect_values
+    global values                                                       # values found in menu; collected by collect_values
     
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items from
-                                                # options
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]
+        kind, text1, default, text2, action = OPTIONS[m]                # get the relevant items from OPTIONS
         if kind in ["text", "listbox"]:
-            value = E[line].get()
+            value = _E[line].get()
             if value != str(default):
-                values[m] = value               # get the value of a text or
-                                                # listbox option
+                values[m] = value                                       # get the value of a text or# listbox option
         elif kind == "combobox":
-            value = CB[line].get()
+            value = _CB[line].get()
             if value != str(default):
-                values[m] = value               # get the value of a combobox
-                                                # option 
+                values[m] = value                                       # get the value of a combobox option 
         elif kind == "number":
-            value = E[line].get()
+            value = _E[line].get()
             if value != str(default):
-                values[m] = value               # get the value of a number
-                                                # option 
+                values[m] = value                                       # get the value of a number option 
         elif kind == "list":
-            value = E[line].get()
+            value = _E[line].get()
             if value != str(default):
-                values[m] = value               # get the value of a list option
+                values[m] = value                                       # get the value of a list option
         elif kind == "checkbox":
-            value = V[line].get()
+            value = _V[line].get()
             if value != default:
-                values[m] = value               # get the value of a checkbox
-                                                # option
+                values[m] = value                                       # get the value of a checkbox option
 
 # --------------------------------------------------------------------
-def get_default(opt):                           # get_default: Returns the
-                                                # default value of a given option.
+def get_default(opt:str) ->str:                                         # function get_default
     """
-    Returns the default value of a given option.
-    The function requires the "options" dictionary.
+    Returns the default value (str) of a given option.
+    
+    The function requires the "OPTIONS" dictionary.
 
     parameter:
     opt : option to be inspected
 
     The function returns None:
-    + the option is not in ["text", "listbox", "number", "combobox", "list",
-      "checkbox"]
-    + the option is not in the sequence disctionary
+    + the option is not in ["text", "listbox", "number", "combobox",
+      "list", "checkbox"]
+    + the option is not in the SEQUENCE disctionary
+
+    no messages
     """
 
     # 1.9.6 2024-06-19: clear_fields, collect_values, get_default,
     #                   get_option_line_value, get_value: extended for
     #                   type combobox
 
-    if opt in sequence:
-        kind = options[opt][0]
-        if kind in ["text", "listbox", "number", "combobox", "list", "checkbox"]:
-                                                # headers excluded
-            return options[opt][2]              # get the default of opt
+    if opt in SEQUENCE:
+        kind = OPTIONS[opt][0]
+        if kind in ["text", "listbox", "number", "combobox", "list",
+                    "checkbox"]:                                        # headers excluded
+            return OPTIONS[opt][2]                                      # get the default of opt
         else:
             return None
     else:
         return None
 
 # --------------------------------------------------------------------
-def get_option_line():                          # get_option_line: Generates a
-                                                # dictionary with assignments of
-                                                # options to lines.
+def get_option_line():                                                  # function get_option_line
     """
-    Generates a dictionary with assignments of options to lines.
-    The function requires the "sequence" dictionary.
+    Generates a dictionary with assignments of OPTIONS to lines.
+    The function requires the "SEQUENCE" dictionary.
 
     no parameters
 
-    global variable: option_line
+    global variable:
+    + option_line
+
+    no messages
     """
 
-    global option_line                          # option <--> line;
-                                                # set by get_option_line
+    global option_line                                                  # option <--> line; set by get_option_line
     
-    for line in range(nr):                      # loop over all elements of sequence
-        m = sequence[line]
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]
         option_line[m] = line
 
 # --------------------------------------------------------------------
-def get_option_line_value(option):              # get_option_line_value:
-                                                # Generates a dictionary with
-                                                # assignments of options to lines.
+def get_option_line_value(option:str) ->tuple:                          # function get_option_line_value
     """
     Returns the tuple (value, line, kind, default) for a given option.
-    The function requires the option_line and options dictionary,
+    
+    The function requires the option_line and OPTIONS dictionary.
 
     parameter:
     option : option to be inspected
     
     The function returns None:
-    + the option is not in ["text", "listbox", "number", "list", "combobox",
-      "checkbox"]
+    + the option is not in ["text", "listbox", "number", "list",
+      "combobox", "checkbox"]
+
+    no messages
     """
 
     # 1.9.6 2024-06-19: clear_fields, collect_values, get_default,
@@ -635,43 +701,43 @@ def get_option_line_value(option):              # get_option_line_value:
     #                   type combobox
 
     line = option_line[option]
-    kind, text1, default, text2, action = options[option]
-                                                # get the relevant items from
-                                                # options
-    if kind in ["text", "listbox", "list", "combobox", "checkbox", "number"]:
-                                                # headers excluded
-        value = V[line].get()
+    kind, text1, default, text2, action = OPTIONS[option]               # get the relevant items from# OPTIONS
+    if kind in ["text", "listbox", "list", "combobox", "checkbox",
+                "number"]:                                              # headers excluded
+        value = _V[line].get()
         return (value, line, kind, default)
     else:
         return None
    
 # --------------------------------------------------------------------
-def get_value(option):                          # get_value: Returns the value
-                                                # of a given option.
+def get_value(option:str) ->str|bool|int:                               # function get_value
     """
-    Returns the value of a given option.
-    The function requires the "sequence" tuple, the "option_line" and "options"
-    dictionary.
+    Returns the value (str|bool|int) of a given option.
+    
+    The function requires the "SEQUENCE" tuple, the "option_line" and
+    "OPTIONS" dictionary.
 
     parameter:
     option : option to be inspected
 
     THe function returns None:
-    + the option is not in ["text", "listbox", "number", "list", "checkbox",
-      "combobox"]
-    + the option is not in the sequence disctionary
+    + the option is not in ["text", "listbox", "number", "list",
+      "checkbox", "combobox"]
+    + the option is not in the SEQUENCE disctionary
+
+    no messages
     """
 
     # 1.9.6 2024-06-19: clear_fields, collect_values, get_default,
     #                   get_option_line_value, get_value: extended for
     #                   type combobox
     
-    if option in sequence:
-        tmp  = option_line[option]              # get line number of option
-        kind = options[option][0]               # get type of option
-        if kind in ["text", "listbox", "number", "list", "checkbox", "combobox"]:
-                                                # headers excluded
-            value = V[tmp].get()                # read value
+    if option in SEQUENCE:
+        tmp  = option_line[option]                                      # get line number of option
+        kind = OPTIONS[option][0]                                       # get type of option
+        if kind in ["text", "listbox", "number", "list", "checkbox",
+                    "combobox"]:                                        # headers excluded
+            value = _V[tmp].get()                                       # read value
             return value
         else:
             return None
@@ -679,421 +745,418 @@ def get_value(option):                          # get_value: Returns the value
         return None
 
 # --------------------------------------------------------------------
-def help1():                                    # help1 (accumulated entry
-                                                # definitions): Shows an info
-                                                # text (accumulated entry
-                                                # definitions for text, listbox,
-                                                # list, and number).
+def help1():                                                            # function help1 
     """
     Shows an info text (accumulated entry definitions for text, listbox,
     list, and number).
-    The function requires the "sequence" tuple and the "options" dictionary.
+    
+    The function requires the "SEQUENCE" tuple and the "OPTIONS"
+    dictionary.
 
     no parameters
+
+    no messages
     """
 
-    # 1.11   2024-07-08: as far as possible and useful: string interpolation via
-    #                    .format replaced by f-strings
-    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5, and
-    #                    info_version changed
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
+    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, 
+    #                    help5, and info_version changed
     # 1.12.1 2024-07-08: showinfo now with the keywords master, message,
     #                    and title
-    # 1.12.2 2024-07-08: messagetexts now without any additional top line
-    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, and start
-    #                    improved
+    # 1.12.2 2024-07-08: messagetexts now without any additional top
+    #                    line
+    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, 
+    #                    and start improved
     
-    tmp = empty                                 # title of the info box
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]                      # get option
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items for the
-                                                # option
+    tmp:str = EMPTY
+    INDENT  = 8                                                         # indentation of wrapped texts
+    LENGTH  = 55                                                        # max. length of wrapped texts
+    
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]                                              # get option
+        kind, text1, default, text2, action = OPTIONS[m]                # get the relevant items for the option
         if kind in ["text", "listbox", "list"]:
-            act_value = V[line].get()           # get actual value of option
-            tmp += f"[E{line}] {text1} ({m}); \n{10*blank}Default: {default};" +\
-                   f"\n{10*blank}actual value: {act_value}\n"
-                                                # construct one line of the
-                                                # message text
+            act_value = _V[line].get()                                  # get actual value of option
+            tmp0 = f"[E{line}] {text1} ({m}); Default: {default}; " +\
+                   f"actual value: {act_value}\n"
+            tmp2 = text_wrap(tmp0, INDENT, LENGTH)                      # construct one line of the message text
+            tmp += tmp2 + "\n"                                          # collect
+##            tmp += f"[E{line}] {text1} ({m}); \n{10*BLANK}Default: " +\
+##                   f"{default};\n{10*BLANK}actual value: {act_value}\n" 
         elif kind == "number":
-            tmp += f"[E{line}] {text1} ({m}); \n{10*blank}Default: {default}\n"
-                                                # construct one line of the
-                                                # message text
+            tmp0 = f"[E{line}] {text1} ({m}); Default: {default}\n"
+            tmp2 = text_wrap(tmp0, INDENT, LENGTH)                      # construct one line of the message text
+            tmp += tmp2 + "\n"                                          # collect
+##            tmp += f"[E{line}] {text1} ({m}); \n{10*BLANK}Default: " +\
+##                   f"{default}\n"                                       # construct one line of the message text
     tkm.showinfo(master=mm, message=tmp, icon=tkm.INFO,
-                 title="Description: Entries")
-                                                # show message text
+                 title="Description: Entries")                          # show message text
 
 # --------------------------------------------------------------------
-def help2():                                    # help2 (accumulated checkbox
-                                                # definitions): Shows an info
-                                                # text (accumulated checkbox
-                                                # definitions).
+def help2():                                                            # function help2
     """
     Shows an info text (accumulated checkbox definitions).
-    The function requires the "sequence" tuple and the "options" dictionary.
+    
+    The function requires the "SEQUENCE" tuple and the "OPTIONS"
+    dictionary.
+
+    no parameters
+
+    no messages
     """
 
     # 1.7    2024-06-18: small error in help2 corrected
-    # 1.11   2024-07-08: as far as possible and useful: string interpolation via
-    #                    .format replaced by f-strings
-    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5,
-    #                    and info_version changed
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
+    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, 
+    #                    help5, and info_version changed
     # 1.12.1 2024-07-08: showinfo now with the keywords master, message,
     #                    and title
-    # 1.12.2 2024-07-08: messagetexts now without any additional top line
+    # 1.12.2 2024-07-08: messagetexts now without any additional top
+    #                    line
     
-    tmp = empty                                 # title of the info box
+    tmp:str = EMPTY
+    INDENT  = 8                                                         # indentation of wrapped texts
+    LENGTH  = 55                                                        # max. length of wrapped texts
     
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]                      # get the option
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items for the
-                                                # option
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]                                              # get the option
+        kind, text1, default, text2, action = OPTIONS[m]                # get the relevant items for the option
         if kind in ["checkbox"]:
-            act_value = V[line].get()           # get actual value of the option
-            tmp += f"[C{line}] {text1} ({m}); \n{10*blank}Default:" +\
-                   f"{default}; \n{10*blank}actual value: {default}\n"
-                                                # construct one line of the
-                                                # message text
+            act_value = _V[line].get()                                  # get actual value of the option
+            tmp0 = f"[C{line}] {text1} ({m}); Default: {default}; " +\
+                   f"actual value: {default}\n"
+            tmp2 = text_wrap(tmp0, INDENT, LENGTH)                      # construct one line of the message text
+            tmp += tmp2 + "\n"                                          # collect
+           
+##            tmp += f"[C{line}] {text1} ({m}); \n{10*BLANK}Default:" +\
+##                   f"{default}; \n{10*BLANK}actual value: {default}\n"  
     tkm.showinfo(master=mm, message=tmp, icon=tkm.INFO,
-                 title="Description: Checkboxes")
-                                                # show message text
+                 title="Description: Checkboxes")                       # show message text
 
 # --------------------------------------------------------------------
-def help3():                                    # help3 (accumulated button
-                                                # definitions): Shows an info
-                                                # text (accumulated button
-                                                # definitions).
+def help3():                                                            # function help3
     """
     Shows an info text (accumulated button definitions).
-    The function requires the "buttons" tuple.
+    
+    The function requires the "BUTTONS" tuple.
 
     no parameters
+
+    no messages
     """
 
-    # 1.11   2024-07-08: as far as possible and useful: string interpolation via
-    #                    .format replaced by f-strings
-    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5, and
-    #                    info_version changed
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
+    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, 
+    #                    help5, and info_version changed
     # 1.12.1 2024-07-08: showinfo now with the keywords master, message,
     #                    and title
-    # 1.12.2 2024-07-08: messagetexts now without any additional top line
-    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, and
-    #                    start improved
+    # 1.12.2 2024-07-08: messagetexts now without any additional top
+    #                    line
+    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, 
+    #                    and start improved
 
-    tmp = empty                                 # title of the info box
+    tmp:str = EMPTY                                                     
 
-    for line in range(len(buttons)):            # loop over all elements of
-                                                # buttons
-        text, action, color = buttons[line]     # get the relevant items from
-                                                # buttons
-        tmp += f"[B{line}] {text}; color: {color}\n"
-                                                # construct one line of the
-                                                # message text
+    for line in range(len(BUTTONS)):                                    # loop over all elements of BUTTONS
+        text, action, color = BUTTONS[line]                             # get the relevant items from BUTTONS
+        tmp += f"[B{line}] {text}; color: {color}\n"                    # construct one line of the message text
     tkm.showinfo(master=mm, message=tmp, icon=tkm.INFO,
-                 title="Description: Buttons")
-                                                # show message text
+                 title="Description: Buttons")                          # show message text
 
 # --------------------------------------------------------------------
-def help4():                                    # help4 (accumulated examples):
-                                                # Shows an info text
-                                                # (accumulated examples).
+def help4():                                                            # function help4
     """
     Shows an info text (accumulated examples).
-    The function requires the "sequence" tuple, the "examples" and
-    "options" dictionary.
+    
+    The function requires the "SEQUENCE" tuple, the "EXAMPLES" and
+    "OPTIONS" dictionary.
 
     no parameters
+
+    no messages
     """
 
-    # 1.11   2024-07-08: as far as possible and useful: string interpolation via
-    #                    .format replaced by f-strings
-    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5, and
-    #                    info_version changed
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
+    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, 
+    #                    help5, and info_version changed
     # 1.12.1 2024-07-08: showinfo now with the keywords master, message,
     #                    and title
-    # 1.12.2 2024-07-08: messagetexts now without any additional top line
-    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, and
-    #                    start improved
+    # 1.12.2 2024-07-08: messagetexts now without any additional top
+    #                    line
+    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, 
+    #                    and start improved
     
-    tmp = empty                                 # title of the info box
+    tmp:str = EMPTY                                                     
 
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items for
-                                                # the option
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]
+        kind, text1, default, text2, action = OPTIONS[m]                # get the relevant items for the option
         if kind in ["text", "listbox", "list", "number"]:
-            example = examples[m]
-            tmp += f"[E{line}] {example}\n"     # construct one line of the
-                                                # message text
-    tkm.showinfo(master=mm, message=tmp, icon=tkm.INFO, title="Examples")
-                                                # show message text
+            example = EXAMPLES[m]
+            tmp    += f"[E{line}] {example}\n"                          # construct one line of the message text
+    tkm.showinfo(master=mm, message=tmp, icon=tkm.INFO,
+                 title="Examples")                                      # show message text
 
 # --------------------------------------------------------------------
-def help5():                                    # help5 (accumulated combobox
-                                                # definitions): Shows an info
-                                                # text (accumulated combobox
-                                                # definitions).
+def help5():                                                            # function help5 
     """
     Shows an info text (accumulated combobox definitions).
-    The function requires the "sequence" tuple and the "options" dictionary.
+    
+    The function requires the "SEQUENCE" tuple and the "OPTIONS"
+    dictionary.
 
     no parameters
+
+    no messages
     """
     
-    # 1.9.7  2024-06-19: new: function help5 (accumulated combobox defintions)
-    # 1.11   2024-07-08: as far as possible and useful: string interpolation via
-    #                    .format replaced by f-strings
-    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5, and
-    #                    info_version changed
+    # 1.9.7  2024-06-19: new: function help5 (accumulated combobox
+    #                    defintions)
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
+    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, 
+    #                    help5, and info_version changed
     # 1.12.1 2024-07-08: showinfo now with the keywords master, message,
     #                    and title
-    # 1.12.2 2024-07-08: messagetexts now without any additional top line
-    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, and
-    #                    start improved
+    # 1.12.2 2024-07-08: messagetexts now without any additional top
+    #                    line
+    # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, 
+    #                    and start improved
        
-    tmp = empty                                 # title of the info box
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]                      # get the option
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items from
-                                                # options
+    tmp:str = EMPTY                                                    
+    
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]                                              # get the option
+        kind, text1, default, text2, action = OPTIONS[m]                # get the relevant items from OPTIONS
         if kind in ["combobox"]:
-            act_value = V[line].get()           # get actual value of the option
-            tmp += f"[CB{line}] {text1} ({m}); \n{10*blank}Default:" +\
-                   f" {default}; \n{10*blank}actual value: {act_value}\n"
-                                                # construct one line of the
-                                                # message text
+            act_value = _V[line].get()                                  # get actual value of the option
+            tmp += f"[CB{line}] {text1} ({m}); \n{10*BLANK}Default:" +\
+                   f" {default}; \n{10*BLANK}actual value: " +\
+                   f"{act_value}\n"                                     # construct one line of the message text
     tkm.showinfo(master=mm, message=tmp, icon=tkm.INFO,
-                 title="Description: comboboxes")
-                                                # show message text
+                 title="Description: comboboxes")                       # show message text
 
 # --------------------------------------------------------------------
-def info_version():                             # info_version: Shows a
-                                                # version text.
+def info_version():                                                     # function info_version
     """
     Shows a version text.
+
+    no parameters
+
+    no messages
     """
 
-    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5,
-    #                    and info_version changed
+    # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, 
+    #                    help5, and info_version changed
     # 1.12.1 2024-07-08: showinfo now with the keywords master, message,
     #                    and title
-    # 1.12.2 2024-07-08: messagetexts now without any additional top line
+    # 1.12.2 2024-07-08: messagetexts now without any additional top
+    #                    line
     
-    tkm.showinfo(master=mm, message=version, icon=tkm.INFO, title="Version(s)")
-                                                # show message text
+    tkm.showinfo(master=mm, message=version, icon=tkm.INFO,
+                 title="Version(s)")                                    # show message text
 
 # --------------------------------------------------------------------
-def init_buttons():                             # init_buttons:
-                                                # Defines/initializes on the
-                                                # base of the "buttons"
-                                                # dictionary buttons.
+def init_buttons():                                                     # function init_buttons
     """
-    Defines/initializes on the base of the "buttons" dictionary
-    buttons. The function requires the "buttons" dictionary.
+    Defines/initializes on the base of the "BUTTONS" tuple  buttons.
+
+    The function requires the "BUTTONS" dictionary.
 
     no parameter
 
-    global variable: B
+    global variable:
+    + _B
+
+    no messages
     """
 
-    # 1.11  2024-07-08: as far as possible and useful: string interpolation via
-    #                   .format replaced by f-strings
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
     
-    global B
+    global _B
     
-    for i in range(len(buttons)):               # loop over all elements of
-                                                # buttons
-        text, action, color = buttons[i]        # get the relevant items from
-                                                # buttons
-        tmp = f"[B{i}] {text}"                  # construct the text for
-                                                # this button
-        B[i] = tk.Button(mm, text=tmp, command=action, bg=color,
-                         font=('calibri', 10))
-                                                # define a new button
-        B[i].grid(row=3*i, column=2, rowspan=3, sticky=tk.W, padx=7)
-                                                # position the new button
+    for i in range(len(BUTTONS)):                                       # loop over all elements of BUTTONS
+        text, action, color = BUTTONS[i]                                # get the relevant items from BUTTONS
+        tmp = f"[B{i}] {text}"                                          # construct the text for this button
+        _B[i] = tk.Button(mm, text=tmp, command=action, bg=color,
+                         font=('calibri', 10))                          # define a new button
+        _B[i].grid(row=3*i, column=2, rowspan=3, sticky=tk.W, padx=7)   # position the new button
 
 # --------------------------------------------------------------------
-def init_fields():                              # init_fields:
-                                                # Defines/initializes on the
-                                                # base of the "options"
-                                                # dictionary headers, labels,
-                                                # entry fields, checkboxes.
+def init_fields():                                                      # function init_fields
     """
-    Defines/initializes on the base of the "options" dictionary
+    Defines/initializes on the base of the "OPTIONS" dictionary
     headers, labels, entry fields, checkboxes.
-    The function requires the "sequence" tuple and the "options" dictionary.
+    The function requires the "SEQUENCE" tuple and the "OPTIONS"
+    dictionary.
 
-    no parameter
+    no parameters
 
-    global variables: L, V, E, C, CB
+    global variables: _L, _V, _E, _C, _CB
     global variables: values, call, option_line
+
+    no messages
     """
 
-    # 1.9.4 2024-06-19: in init_fields: special handling of -m deactivated
+    # 1.9.4 2024-06-19: in init_fields: special handling of
+    #                   -m deactivated
     # 1.9.5 2024-06-19: in init_fields: new settings for opion -m now by
     #                   set_value_combobox
-    # 1.11  2024-07-08: as far as possible and useful: string interpolation via
-    #                   .format replaced by f-strings
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
+    # 1.20   2025-12-05: better colors
 
     # types of fields:
-    # + header: only label with text
+    # + header:   only label with text
     # + checkbox: label with text, boolean variable, checkbox
-    # + text: label with text, string variable, text field
-    # + number: label with text, string variable, text field
-    # + list: label with text, string variable, text field
-    # + listbox: label with text, string variable, text field
+    # + text:     label with text, string variable, text field
+    # + number:   label with text, string variable, text field
+    # + list:     label with text, string variable, text field
+    # + listbox:  label with text, string variable, text field
     # + combobox: label with text, string variable, combobox
     
-    global L                                    # list for ttk.Label
-    global V                                    # list with tk variables
-    global E                                    # list for ttk.Entry
-    global C                                    # list for ttk.Checkbox
-    global CB                                   # list for ttk.Combobox
-    global values                               # values found in menu;
-                                                # collected by collect_values
-    global call                                 # list: parameters for the call
-                                                # of CTANLoadOut.py
-    global option_line                          # option <--> line; set by
-                                                # get_option_line
+    global _L                                                           # list for ttk.Label
+    global _V                                                           # list with tk variables
+    global _E                                                           # list for ttk.Entry
+    global _C                                                           # list for ttk.Checkbox
+    global _CB                                                          # list for ttk.Combobox
+    global values                                                       # dictionary: values found in menu; collected by collect_values
+    global call                                                         # list: parameters for the call of CTANLoadOut.py
+    global option_line                                                  # dictionary: option <--> line; set by get_option_line
 
-    values      = {}                            # re-initialize values
-    call        = []                            # re-initialize call
-    option_line = {}                            # option <--> line; set by
-                                                # get_option_line
+    values      = {}                                                    # re-initialize values
+    call        = []                                                    # re-initialize call
+    option_line = {}                                                    # option <--> line; set by get_option_line
 
-    for line in range(nr):                      # loop over all elements of
-                                                # sequence
-        m = sequence[line]
-        kind, text1, default, text2, action = options[m]
-                                                # get the relevant items from
-                                                # options
-        if kind == "header":                    # header   
-            L[line] = ttk.Label(mm, text=text1, foreground="red") 
-            L[line].grid(row=line, column=0, sticky="w", columnspan=3, pady=3)
-        elif kind == "checkbox":                # checkbox
-            tmp = f"[C{line}] {text1} ({m})"    # text of label for checkbo
-            L[line] = ttk.Label(mm, text=tmp)   # label creation 
-            L[line].grid(row=line, column=0, sticky="w", padx=5, pady=0)
-                                                # label position
-            V[line] = tk.BooleanVar()           # boolean variable 
-            C[line] = ttk.Checkbutton(mm, variable=V[line])
-                                                # checkbox creation
-            C[line].grid(row=line, column=1, sticky="w")
-                                                # checkbox position
-            V[line].set(str(default))           # variable initialization
-                                                # (default)
-        elif kind == "text":                    # text
+    for line in range(nr):                                              # loop over all elements of SEQUENCE
+        m = SEQUENCE[line]
+        kind, text1, default, text2, action = OPTIONS[m]                # get the relevant items from OPTIONS
+        if kind == "header":                                            # type is header   
+            _L[line] = ttk.Label(mm, text=text1, foreground=COLOR4) 
+            _L[line].grid(row=line, column=0, sticky="w", columnspan=3,
+                         pady=3)
+        elif kind == "checkbox":                                        # type is checkbox
+            tmp = f"[C{line}] {text1} ({m})"                            # text of label for checkbo
+            _L[line] = ttk.Label(mm, text=tmp)                          # label creation 
+            _L[line].grid(row=line, column=0, sticky="w", padx=5,
+                         pady=0)                                        # label position
+            _V[line] = tk.BooleanVar()                                  # boolean variable 
+            _C[line] = ttk.Checkbutton(mm, variable=_V[line])           # checkbox creation
+            _C[line].grid(row=line, column=1, sticky="w")               # checkbox position
+            _V[line].set(str(default))                                  # variable initialization (default)
+        elif kind == "text":                                            # type is text
             tmp = f"[E{line}] {text1} ({m})"
-            L[line] = ttk.Label(mm, text=tmp)
-            L[line].grid(row=line, column=0, sticky="w", padx=5, pady=0)
-            V[line] = tk.StringVar()
-            E[line] = ttk.Entry(mm, textvariable=V[line])
-            E[line].grid(row=line, column=1, sticky="w", ipadx=5)
-##            E[line].insert(10, default)
-            V[line].set(str(default))
-        elif kind == "number":                  # number
+            _L[line] = ttk.Label(mm, text=tmp)
+            _L[line].grid(row=line, column=0, sticky="w", padx=5,
+                          pady=0)
+            _V[line] = tk.StringVar()
+            _E[line] = ttk.Entry(mm, textvariable=_V[line])
+            _E[line].grid(row=line, column=1, sticky="w", ipadx=5)
+##            _E[line].insert(10, default)
+            _V[line].set(str(default))
+        elif kind == "number":                                          # type is number
             tmp = f"[E{line}] {text1} ({m})"
-            L[line] = ttk.Label(mm, text=tmp)
-            L[line].grid(row=line, column=0, sticky="w", padx=5, pady=0)
-            V[line] = tk.StringVar()
-            E[line] = ttk.Entry(mm, textvariable=V[line])
-            E[line].grid(row=line, column=1, sticky="w", ipadx=5)
-            V[line].set(str(default))
-        elif kind == "list":                    # list
+            _L[line] = ttk.Label(mm, text=tmp)
+            _L[line].grid(row=line, column=0, sticky="w", padx=5,
+                          pady=0)
+            _V[line] = tk.StringVar()
+            _E[line] = ttk.Entry(mm, textvariable=_V[line])
+            _E[line].grid(row=line, column=1, sticky="w", ipadx=5)
+            _V[line].set(str(default))
+        elif kind == "list":                                            # type is list
             tmp = f"[E{line}] {text1} ({m})"
-            L[line] = ttk.Label(mm, text=tmp)
-            L[line].grid(row=line, column=0, sticky="w", padx=5, pady=0)
-            V[line] = tk.StringVar()
-            E[line] = ttk.Entry(mm, textvariable=V[line])
-            E[line].grid(row=line, column=1, sticky="w", ipadx=5)
-            V[line].set(str(default))
-        elif kind == "listbox":                 # listbox       
+            _L[line] = ttk.Label(mm, text=tmp)
+            _L[line].grid(row=line, column=0, sticky="w", padx=5,
+                          pady=0)
+            _V[line] = tk.StringVar()
+            _E[line] = ttk.Entry(mm, textvariable=_V[line])
+            _E[line].grid(row=line, column=1, sticky="w", ipadx=5)
+            _V[line].set(str(default))
+        elif kind == "listbox":                                         # type is listbox       
             tmp = f"[E{line}] {text1} ({m})"
-            L[line] = ttk.Label(mm, text=tmp)
-            L[line].grid(row=line, column=0, sticky="w", padx=5, pady=0)
-            V[line] = tk.StringVar()
-            E[line] = ttk.Entry(mm, textvariable=V[line])
-            E[line].grid(row=line, column=1, sticky="w", ipadx=5)
-            V[line].set(str(default))
-        elif kind == "combobox":                # combobox       
+            _L[line] = ttk.Label(mm, text=tmp)
+            _L[line].grid(row=line, column=0, sticky="w", padx=5,
+                          pady=0)
+            _V[line] = tk.StringVar()
+            _E[line] = ttk.Entry(mm, textvariable=_V[line])
+            _E[line].grid(row=line, column=1, sticky="w", ipadx=5)
+            _V[line].set(str(default))
+        elif kind == "combobox":                                        # type is combobox       
             tmp = f"[CB{line}] {text1} ({m})"
-            L[line] = ttk.Label(mm, text=tmp)
-            L[line].grid(row=line, column=0, sticky="w", padx=5, pady=0)
-            V[line] = tk.StringVar()
-            CB[line] = ttk.Combobox(mm, textvariable=V[line], values=action,
-                                    text=text2, state="readonly")
+            _L[line] = ttk.Label(mm, text=tmp)
+            _L[line].grid(row=line, column=0, sticky="w", padx=5,
+                          pady=0)
+            _V[line] = tk.StringVar()
+            _CB[line] = ttk.Combobox(mm, textvariable=_V[line],
+                         values=action, text=text2, state="readonly")
             if default in list_m:
                 ind = list_m.index(default)
-            CB[line].current(ind)
-            CB[line].grid(row=line, column=1, sticky="w", ipadx=5)
+            _CB[line].current(ind)
+            _CB[line].grid(row=line, column=1, sticky="w", ipadx=5)
  
 # --------------------------------------------------------------------
-def listbox_b():                                # listbox_b
+def listbox_b():                                                        # function listbox_b
     # intended for the use with list boxes
     # not yet realized
     pass
 
 # --------------------------------------------------------------------
-def listbox_m():                                # listbox_m
+def listbox_m():                                                        # function listbox_m
     # intended for the use with list boxes
     # not yet realized
     pass
 
 # --------------------------------------------------------------------
-def make_call():                                # make_call: Generates the
-                                                # "call" list.
+def make_call():                                                        # function make_call
     """
     Generates the "call" list. The function requires the "values"
     dictionary.
 
     no parameters
 
-    global variable: call
+    global variable:
+    + call
+
+    no messages
     """
     
-    global call                                 # list: parameters for the call
-                                                # of CTANLoadOut.py
+    global call                                                         # list: parameters for the call of CTANLoadOut.py
     
-    call = [sys.executable]                     # name of the python processor
-    call.append(remote_program_name)            # the actual program
-    for op in values:                           # loop over all items of values
-        val = values[op]                        # fetch one item of values
-        if val == False:                        # the checkbox has not been
-                                                # clicked
-            pass                                # do not append nothing
-        elif val == True:                       # the checkbox has been clicked
-            call.append(op)                     # append option
-        else:                                   # another kind of options
-            call.append(op)                     # append option
-            call.append(val)                    # append cooresponding value
+    call = [sys.executable]                                             # name of the python processor
+    call.append(REMOTE_PROGRAM_NAME)                                    # the actual program
+    for op in values:                                                   # loop over all items of values
+        val = values[op]                                                # fetch one item of values
+        if val == False:                                                # the checkbox has not been clicked
+            pass                                                        # do not append nothing
+        elif val == True:                                               # the checkbox has been clicked
+            call.append(op)                                             # append option
+        else:                                                           # another kind of OPTIONS
+            call.append(op)                                             # append option
+            call.append(val)                                            # append cooresponding value
 
 # --------------------------------------------------------------------
-def quit():                                     # quit: Opens a dialogbox,
-                                                # whether the program should be
-                                                # terminated/finished.
+def quit():                                                             # function quit
     """
-    Opens a dialogbox, whether the program should be terminated/finished.
+    Opens a dialogbox, whether the program should be
+    terminated/finished.
 
     no parameters
+
+    no messages
     """
     
     stat = tkm.askyesno(message="Should the program be terminated??",
-                        title="Quit")
-                                                # yes/no message box
-    if stat:                                    # if the answer is "yes"
-        mm.destroy()                            # the menu is closed
+                        title="Quit")                                   # yes/no message box
+    if stat:                                                            # if the answer is "yes"
+        mm.destroy()                                                    # the menu is closed
 
 # --------------------------------------------------------------------
-def set_value(option, val):                     # set_value: Resets the value
-                                                # for a option with a specified
-                                                # value.
+def set_value(option:str, val:str):                                     # function set_value
     """
     Resets the value for a option with a specified value.
 
@@ -1101,105 +1164,123 @@ def set_value(option, val):                     # set_value: Resets the value
     option : option to be set
     val    : value
 
-    global variable: V
+    global variable:
+    + _V
 
     The function returns None:
-    + the given option is not in sequence
+    + the given option is not in SEQUENCE
+
+    no messages
     """
 
     # 1.8  2024-06-19: security question added to set_value
     
     # set_value ==> get_option_line_value
     
-    global V                                    # list with tk variables
+    global _V                                                           # list with tk variables
     
-    if option in sequence:
-        value, line, kind, default = get_option_line_value(option)
-                                                # get the line of the option
-        V[line].set(val)                        # set the value
+    if option in SEQUENCE:
+        value, line, kind, default = get_option_line_value(option)      # get the line of the option
+        _V[line].set(val)                                               # set the value
     else:
         return None
 
 # --------------------------------------------------------------------
-def set_value_combobox(opt, val):               # set_value_combobox: Resets
-                                                # the value for the option
-                                                # (-m" or "-b") with a
-                                                # specified value.
+def set_value_combobox(opt:str, val:str):                               # function set_value_combobox
     """
-    Resets the value for the option (-m" or "-b") with a specified value.
+    Resets the value for the option (-m" or "-b") with a
+    specified value.
 
     parameters:
     opt : option to be set
     val : value
 
-    global variable: CB
+    global variable:
+    + _CB
 
     The function returns None:
     + val ist not in list_m
     + val ist not in list_b
     + opt is not -m or -b
-    # opt is not in sequence
+    + opt is not in SEQUENCE
+
+    no messages
     """
     
-    # 1.9.8 2024-06-19: new: set_value_combobox: set value for comboboxes
+    # 1.9.8 2024-06-19: new: set_value_combobox: set value for
+    #                   comboboxes
+    # 1.19  2025-11-30: Combobox for the handling of -m
+    #                   (https://www.tutorialspoint.com/
+    #                   combobox-widget-in-python-tkinter)
     
-    global CB                                   # list with CB entries
+    global _CB                                                          # list with _CB entries
     
-    if opt in sequence:
-        if opt == "-m":                         # option -m
+    if opt in SEQUENCE:
+        if opt == "-m":                                                 # option -m
             if val in list_m:
-                opt_ind = list_m.index(val)     # get the number of val in list_m
+                opt_ind = list_m.index(val)                             # get the number of val in list_m
             else:
                 return None
-        elif opt == "-b":                       # option -b
+        elif opt == "-b":                                               # option -b
             if val in list_b:
-                opt_ind = list_b.index(val)     # get the number of val in list_b
+                opt_ind = list_b.index(val)                             # get the number of val in list_b
             else:
                 return None
         else:
             return None
-        ind = sequence.index(opt)               # get the line of the opti
-        CB[ind].current(opt_ind)                # set he value
+        ind = SEQUENCE.index(opt)                                       # get the line of the opti
+        _CB[ind].current(opt_ind)                                       # set he value
     else:
         return None
 
 # --------------------------------------------------------------------
-def show_log():                                 # show_log: Shows the log file
-                                                # of the called subprocess.
+def show_log():                                                         # function show_log
     """
     Shows the log file of the called subprocess.
+    
     The function requires the "log" variable (text).
 
     no parameters
+
+    no messages
     """
 
-    window = tk.Toplevel(mm)                    # open new window
-    window.title("Log file for menu_CTANLoadOut")
-                                                # title of the new window
+    # 1.18   2025-11-29: log output in a clickable scrolledtext-Box
 
-    text_area = scrolledtext.ScrolledText(window, wrap=tk.WORD, width=50,
-                                          height=20)
-                                                # ScrolledText widget
+    window = tk.Toplevel(mm)                                            # open new window
+    window.title("Log file for menu_CTANLoadOut")                       # title of the new window
+
+    text_area = scrolledtext.ScrolledText(window, wrap=tk.WORD,
+                                          width=50, height=20)          # ScrolledText widget
     text_area.pack(expand=True, fill="both")
 
-    message = "Log file of menu_CTANLoadOut\n" + log
-                                                # add a title to the log variable
-    text_area.insert(tk.END, message)           # output the message
+    message = "Log file of the menu_CTANLoadOut program:\n\n"           # add a title to the log variable
+    message += changes + log
+    text_area.insert(tk.END, message)                                   # output the message
 
 # --------------------------------------------------------------------
-def start():                                    # start: Prepares the processing.
+def start():                                                            # function start
     """
-    Prepares the processing. The function requires the "options" dictionary.
+    Prepares the processing. The function requires the "OPTIONS"
+    dictionary.
 
     no parameters.
 
-    global variable: call
+    global variable:
+    + call
+
+    no messages
     """
 
-    # 1.11  2024-07-08: as far as possible and useful: string interpolation via
-    #                   .format replaced by f-strings
+    # 1.11  2024-07-08: as far as possible and useful: string 
+    #                   interpolation via .format replaced by f-strings
     # 1.13  2024-07-08: output in help1, help2, help3, help4, help5, and
     #                   start improved
+    # 1.16   2025-10-14: changes in Start-Box
+    # 1.16.1 2025-10-14: a prompt before the actual execution
+    # 1.16.1 2025-10-14: Start-Box simplified 
+    # 2.2    2026-04-13 formatting of collected texts
+    # 2.2.3  2026-04-13 text_wraöp used in start, help1 und help2
 
     # start ==> get_option_line
     #       ==> check_values
@@ -1207,98 +1288,120 @@ def start():                                    # start: Prepares the processing
     #       ==> make_call
     #       ==> start_call
 
-    global call                                 # list: parameters for the call
-                                                # of CTANLoadOut.py
+    global call                                                         # list: parameters for the call of CTANLoadOut.py
     
-    get_option_line()                           # preparation: option <--> line
-    check_values()                              # check all possible values 
-    collect_values()                            # collect all Useful options
-                                                # with values
-    make_call()                                 # construct the call
+    get_option_line()                                                   # preparation: option <--> line
+    check_values()                                                      # check all possible values 
+    collect_values()                                                    # collect all Useful OPTIONS with values
+    make_call()                                                         # construct the call
     
-    msg = "The following options were determined.\nShould the actual" + \
-          " processing be started?\n\n"
+    msg = "The following OPTIONS were determined.\nShould " +\
+          "processing be started using the current values?\n\n"
 
     tmp = call[2:]
-    for f in range(len(tmp)):                   # construct message text
+    INDENT  = 2                                                         # indentation of wrapped texts
+    LENGTH  = 55                                                        # max. length of wrapped texts
+
+    for f in range(len(tmp)):                                           # construct message text
         tmp_f = tmp[f]
-        if tmp_f in ["-c", "-f", "-l", "-mo", "-mt", "-nf", "-p", "-r", "-s",
-                     "-stat", "-v"]:
-            msg += f"{tmp_f}  --  \n{10*blank}({options[tmp_f][1]})\n"
-        elif tmp_f == empty:
+        if tmp_f in ["-c", "-f", "-l", "-mo", "-mt", "-nf", "-p", "-r",
+                     "-s", "-stat", "-v"]:
+            tmp0 = f"{tmp_f} -- {OPTIONS[tmp_f][1]})"
+##            msg += f"{tmp_f}  --  \n{10*BLANK}({OPTIONS[tmp_f][1]})\n"
+            tmp2 = text_wrap(tmp0, INDENT, LENGTH)                      # construct one line of the message text
+            msg += tmp2 + "\n"                                          # collect
+        elif tmp_f == EMPTY:
             continue
         elif tmp_f[0] == "-":
-            msg += f"{tmp_f}  {tmp[f+1]}  --  " +\
-                   f" \n{10*blank}({options[tmp_f][1]})\n"
+            tmp0 = f"{tmp_f} {tmp[f+1]} -- ({OPTIONS[tmp_f][1]})"
+            tmp2 = text_wrap(tmp0, INDENT, LENGTH)                      # construct one line of the message text
+            msg += tmp2 + "\n"                                          # collect
+##            msg += f"{tmp_f}  {tmp[f+1]}  --  " +\
+##                   f" \n{10*BLANK}({OPTIONS[tmp_f][1]})\n"
         else:
             pass
     
-    stat = tkm.askyesno(title="Start", message=msg)
-                                                # message with question
-    if stat:                                    # if OK ==> start_call
+    stat = tkm.askyesno(title="Start", message=msg)                     # message with question
+    if stat:                                                            # if OK ==> start_call
         start_call()
 
 # --------------------------------------------------------------------
-def start_call():                               # start_call: Starts the
-                                                # processing.
+def start_call():                                                       # function start_call
     """
-    Starts the processing. The function requires the "call" list.
+    Starts the processing.
 
-    no parameters.
+    The function requires the "call" list.
+
+    no parameters
+
+    no messages
     """
 
-    # 1.11  2024-07-08: as far as possible and useful: string interpolation via
-    #                   .format replaced by f-strings
+    # 1.11   2024-07-08: as far as possible and useful: string 
+    #                    interpolation via .format replaced by f-strings
 
-    global log                                  # to be used for log data
+    global log                                                          # to be used for log data
 
-    log = empty
+    log = EMPTY
     
-    try:                                        # start the subprocess in a
-                                                # try/except constrauct
-        with TemporaryFile("r+", encoding="utf-8", errors="ignore") as f:
-                                                # temporary file
-            process_load = subprocess.run(call, check=True, timeout=timeout10,
-                                          encoding="utf-8", stdout=f,
-                                          stderr=subprocess.PIPE,
-                                          universal_newlines=True)
-            f.seek(0)                           # rewind file
-            for line in f.readlines():          # line by line
+    try:                                                                # start the subprocess in a try/except constrauct
+        with TemporaryFile("r+", encoding="utf-8",
+                           errors="ignore") as f:                       # temporary file
+            process_load = subprocess.run(call, check=True,
+                              timeout=TIMEOUT, encoding="utf-8",
+                              stdout=f, stderr=subprocess.PIPE,
+                              universal_newlines=True)
+            f.seek(0)                                                   # rewind file
+            for line in f.readlines():                                  # line by line
                 log += line 
-            load_errormessage = process_load.stderr
-                                                # possible error message
+            load_errormessage = process_load.stderr                     # possible error message
             if len(load_errormessage) > 0:
                 print(load_errormessage)
-    except subprocess.CalledProcessError as exc:
-                                                # process not found
-        print(f"[CTANLoadOut] Error: called process '{call[1]}' not found,",
-              sys.exc_info()[0])
-        sys.exit("[CTANLoadOut] Error: program terminated")
-                                                # program terminated    
-    except FileNotFoundError as exc:            # file not found
+    except subprocess.CalledProcessError as exc:                        # process error
+        print(f"[CTANLoadOut] Error: called process '{call[1]}' " +\
+              "not found,", sys.exc_info()[0])
+        sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated    
+    except FileNotFoundError as exc:                                    # file not found
         print(f"[CTANLoadOut] Error: file '{call[0]}' not found", exc)
-        sys.exit("[CTANLoadOut] Error: program terminated")
-                                                # program terminated
-    except subprocess.TimeoutExpired as exc:    # timeout
-        print("[CTANLoadOut] Error: timeout error", timeout10)
-        sys.exit("[CTANLoadOut] Error: program terminated")
-                                                # program terminated
-    except KeyboardInterrupt as exc:            # keyboard interrupt
+        sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
+    except subprocess.TimeoutExpired as exc:                            # timeout
+        print("[CTANLoadOut] Error: timeout error", TIMEOUT)
+        sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
+    except KeyboardInterrupt as exc:                                    # keyboard interrupt
         print("[CTANLoadOut] Error: keyboard interrupt", exc)
-        sys.exit("[CTANLoadOut] Error: program terminated")
-                                                # program terminated
-    except UnicodeDecodeError as exc:           # unicode decode error
+        sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
+    except UnicodeDecodeError as exc:                                   # unicode decode error
         print("[CTANLoadOut] Error: unicode decode error", exc)
-        sys.exit("[CTANLoadOut] Error: program terminated")
-                                                # program terminated
-    except:                                     # any unspecified error
-        print("[CTANLoadOut] Error: any unspecified error", sys.exc_info())
-        sys.exit("[CTANLoadOut] Error: program terminated")
-                                                # program terminated
+        sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
+    except:                                                             # any unspecified error
+        print("[CTANLoadOut] Error: any unspecified error",
+              sys.exc_info())
+        sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
 
     tkm.showinfo(mm,
-                 message="Finished!\n\nFor more informations read the log file.",
-                 icon=tkm.INFO)    
+                 message="Finished!\n\nFor more informations read " +\
+                 "the log file.", icon=tkm.INFO)
+
+# --------------------------------------------------------------------
+def text_wrap(text:str, ident:int=5, length:int=30) ->str:              # function text_wrap
+    """
+    auxiliary function: Wrapes a given text.
+
+    parameters:
+    text   : text to be wrapped (str)
+    indent : indentation of the 2nd and all following lines (int); default: 5
+    length : maximal length of lines (int); default: 30
+
+    It returns a wrapped text.
+
+    no messages
+    """
+    
+    # 2.2    2026-04-13 formatting of collected texts
+    # 2.2.2  2026-04-13 new function text_wrap
+
+    tmp = BLANK * ident
+    return ('\n' + tmp).join(textwrap.wrap(text, length))
 
 
 # ====================================================================
@@ -1306,245 +1409,254 @@ def start_call():                               # start_call: Starts the
 # --------------------------------------------------------------------
 # Currently not used; intended for working with list boxes
 
-list_m   = ["LaTeX", "RIS", "plain", "BibLaTeX", "Excel"]
-                                                # possible values for -m
-list_b   = ["@online", "@software", "@misc", "@ctan", "@www"]
-                                                # possible values for -b
+list_m   = ["LaTeX", "RIS", "plain", "BibLaTeX", "Excel"]               # possible values for -m
+list_b   = ["@online", "@software", "@misc", "@ctan", "@www"]           # possible values for -b
 
 # --------------------------------------------------------------------
-# tuple "sequence":
-# defines the sequence of menu rows (on the base of CTANLoad / CTAMOut options)
-# will be used in clear_fields, collect_values, collect_values, get_option_line,
-#   get_value, help1, help2, help4, help5, init_fields
+# tuple "SEQUENCE":
+# defines the sequence of menu rows (on the base of CTANLoad /
+# CTAMOut options) will be used in clear_fields, collect_values,
+# collect_values, get_option_line, get_value, help1, help2, help4,
+# help5, init_fields
 
 # h1, h2, h3, h4, h5 for headers
 
-sequence = ("h1", "-o", "-d", "-tout", "-stat", "-v", "-mo",
+SEQUENCE = ("h1", "-o", "-d", "-tout", "-stat", "-v", "-mo",
             "h2", "-t", "-A", "-k", "-L", "-y",
             "h3", "-tl", "-Al", "-kl", "-Ll", "-yl", "-n", "-f",
             "h4", "-to", "-Ao", "-ko", "-Lo", "-yo", "-m", "-b", "-sb",
             "-s", "-mt", "-nf", "h5", "-p", "-c", "-l", "-r")
 
 # --------------------------------------------------------------------
-# dictionary "options":
-# defines the look of menu items; on the base of CTANLoad / CTAMOut options
-# will be used in clear_fields, collect_values, get_option_line_value,
-# get_value, help1, help2, help4, init_fields, start
+# dictionary "OPTIONS":
+# defines the look of menu items; on the base of CTANLoad /
+# CTAMOut options will be used in clear_fields, collect_values,
+# get_option_line_value, get_value, help1, help2, help4, init_fields,
+# start
 
 # + each element is a tuple with 5 components:
-#   (0) type of row in the menu: header, text, number, checkbox, listbox, list
+#   (0) type of row in the menu: header, text, number, checkbox,
+#       listbox, list
 #   (1) text in the label
 #   (2) default (found in CTANLoadOut)
 #   (3) text of the combobox 
 #   (4) action associated with the combobox
 
-# 1.2   2024-05-02: default for -b changed to "@online"
-# 1.5   2024-06-11: some texts changed in options
-# 1.6   2024-06-17: some texts changed in options
-# 1.9.3 2024-06-19: option -m in options dictionary: new type combobox,
-#                   new action
 
-options = {
-    "h1"   : ("header",
+# 1.2   2024-05-02: default for -b changed to "@online"
+# 1.5   2024-06-11: some texts changed in OPTIONS
+# 1.6   2024-06-17: some texts changed in OPTIONS
+# 1.9.3 2024-06-19: option -m in OPTIONS dictionary: new type combobox,
+#                   new action
+# 1.15  2025-10-02: -d adapt to different operating systems
+# 1.19  2025-11-30: Combobox for the handling of -m
+#                   (https://www.tutorialspoint.com/
+#                   combobox-widget-in-python-tkinter)
+
+OPTIONS = {
+    "h1"   : ("header",                                                 # header                      
               "Global options",
               None,
               None,
               None),
-    "-o"   : ("text",
+    "-o"   : ("text",                                                   # -o
               "[CTANLoad+CTANOut] Generic name for output files" +\
-              " [without extensions]",
-              "all",
+              "[without extensions]",
+              OUTPUT_NAME_DEFAULT,
               None,
               None),
-    "-d"   : ("text",
+    "-d"   : ("text",                                                   # -d
               "[CTANLoad+CTANOut] OS folder (directory) for input" +\
               " and output files",
               act_dir,
               None,
               None),
-    "-tout": ("number",
+    "-tout": ("number",                                                 # -tout
               "[CTANLoadOut] default timeout (sec) for subprocesses ",
-              "60",
+              TIMEOUT_DEFAULT,
               None,
               None),
-    "-stat": ("checkbox",
+    "-stat": ("checkbox",                                               # -stat
               "[CTANLoad+CTANOut] Flag: statistics on terminal",
-              False,
+              STATISTICS_DEFAULT,
               None,
               None),
-    "-v"   : ("checkbox",
+    "-v"   : ("checkbox",                                               # -v
               "[CTANLoad+CTANOut] Flag: Output is verbose",
-              False,
+              VERBOSE_DEFAULT,
               None,
               None),
-    "-mo"  : ("checkbox",
+    "-mo"  : ("checkbox",                                               # -mo
               "[CTANLoadOut] Flag: Do not activate CTANLoad",
               False,
               None,
               None),
 
-    "h2"   : ("header",
+    "h2"   : ("header",                                                 # header
               "Options for CTANLoad and CTANOut",
               None,
               None,
               None),
-    "-A"   : ("text",
+    "-A"   : ("text",                                                   # -A
               "[CTANLoad+CTANOut] Name template for authors",
-              "^.+$",
-              None, None),
-    "-L"   : ("text",
+              AUTHOR_TEMPLATE_DEFAULT,
+              None,
+              None),
+    "-L"   : ("text",                                                   # -L
               "[CTANLoad+CTANOut] Name template for licenses",
-              "^.+$",
+              LICENSE_TEMPLATE_DEFAULT,
               None,
               None),
-    "-k"   : ("text",
+    "-k"   : ("text",                                                   # -k
               "[CTANLoad+CTANOut] Template for keys",
-              "^.+$",
+              KEY_TEMPLATE_DEFAULT,
               None,
               None),
-    "-t"   : ("text",
+    "-t"   : ("text",                                                   # -t
               "[CTANLoad+CTANOut] Template for package names",
-              "^.+$",
+              NAME_TEMPLATE_DEFAULT,
               None,
               None),
-    "-y"   : ("text",
+    "-y"   : ("text",                                                   # -y
               "[CTANLoad+CTANOut] Template for years",
-              "^19[89][0-9]|20[012][0-9]$",
+              YEAR_TEMPLATE_DEFAULT,
               None,
               None),
 
-    "h3"   : ("header",
+    "h3"   : ("header",                                                 # header
               "Options for CTANLoad",
               None,
               None,
               None),
-    "-Ll"  : ("text",
+    "-Ll"  : ("text",                                                   # -Ll
               "[CTANLoad] Name template for licenses",
-              empty,
+              LICENSE_LOAD_TEMPLATE_DEFAULT,
               None,
               None),
-    "-kl"  : ("text",
+    "-kl"  : ("text",                                                   # -kl
               "[CTANLoad] Template for keys",
-              empty,
+              KEY_LOAD_TEMPLATE_DEFAULT,
               None,
               None),
-    "-tl"  : ("text",
+    "-tl"  : ("text",                                                   # -tl
               "[CTANLoad] Template for package names",
-              empty,
+              NAME_LOAD_TEMPLATE_DEFAULT,
               None,
               None),
-    "-yl"  : ("text",
+    "-yl"  : ("text",                                                   # -yl
               "[CTANLoad] Template for years",
-              empty,
+              YEAR_LOAD_TEMPLATE_DEFAULT,
               None,
               None),
-    "-Al"  : ("text",
+    "-Al"  : ("text",                                                   # -Al
               "[CTANLoad} Name template for authors",
-              empty,
+              AUTHOR_LOAD_TEMPLATE_DEFAULT,
               None,
               None),
-    "-n"   : ("number",
+    "-n"   : ("number",                                                 # -n
               "[CTANLoad] Maximum number of XML and PDF file downloads",
-              "250",
+              NUMBER_DEFAULT,
               None,
               None),
-    "-f"   : ("checkbox",
-              "[CTANLoad] Flag: Download associated documentation files [PDF]",
-              False,
+    "-f"   : ("checkbox",                                               # -f
+              "[CTANLoad] Flag: Download associated documentation " +\
+              "files [PDF]",
+              DOWNLOAD_DEFAULT,
               None,
               None),
 
-    "h4"   : ("header",
+    "h4"   : ("header",                                                 # header
               "Options for CTANOut",
               None,
               None,
               None),
-    "-Lo"  : ("text",
+    "-Lo"  : ("text",                                                   # -Lo
               "[CTANOut] Name template for licenses",
-              "^.+$",
+              LICENSE_OUT_TEMPLATE_DEFAULT,
               None,
               None),
-    "-ko"  : ("text",
+    "-ko"  : ("text",                                                   # -ko
               "[CTANOut] Template for keys",
-              "^.+$",
+              KEY_OUT_TEMPLATE_DEFAULT,
               None,
               None),
-    "-to"  : ("text",
+    "-to"  : ("text",                                                   # -to
               "[CTANOut] Template for package names",
-              "^.+$",
+              NAME_OUT_TEMPLATE_DEFAULT,
               None,
               None),
-    "-yo"  : ("text",
+    "-yo"  : ("text",                                                   # -yo
               "[CTANOut] Template for years",
-              empty,
+              YEAR_OUT_TEMPLATE_DEFAULT,
               None,
               None),
-    "-Ao"  : ("text",
+    "-Ao"  : ("text",                                                   # -Ao
               "[CTANOut} Name template for authors",
-              "^.+$",
+              AUTHOR_OUT_TEMPLATE_DEFAULT,
               None,
               None),
-    "-m"   : ("combobox",
+    "-m"   : ("combobox",                                               # -m
               "[CTANOut} Target format",
-              "RIS",
+              MODE_DEFAULT,
               "…search",
               list_m),
-    "-b"   : ("listbox",
+    "-b"   : ("listbox",                                                # -b
               "[CTANOut} Type of BibLaTex entries to be generated",
-              "@online",
+              BTYPE_DEFAULT,
               None,
               None),
-    "-sb"  : ("list",
+    "-sb"  : ("list",                                                   # -sb
               "[CTANOut} Skip specified BibLaTeX fields",
-              "[]",
+              SKIP_BIBLATEX_DEFAULT,
               None,
               None),
-    "-s"   : ("list",
+    "-s"   : ("list",                                                   # -s
               "[CTANOut} Skip specified CTAN fields",
-              "[]",
+              SKIP_DEFAULT,
               None,
               None),
-    "-mt"  : ("checkbox",
+    "-mt"  : ("checkbox",                                               # -mt
               "[CTANOut} Flag: Generate topic lists ",
-              False,
+              MAKE_OUTPUT_DEFAULT,
               None,
               None),
-    "-nf"  : ("checkbox",
+    "-nf"  : ("checkbox",                                               # -nf
               "[CTANOut} Flag: Do not generate output files",
-              False,
+              NO_FILES_DEFAULT,
               None,
               None),
 
-    "h5"   : ("header",
+    "h5"   : ("header",                                                 # header
               "Options for special actions",
               None,
               None,
               None),
-    "-p"   : ("checkbox",
+    "-p"   : ("checkbox",                                               # -p
               "[CTANOut} Flag: Generate PDF output",
-              False,
+              PDF_OUTPUT_DEFAULT,
               None,
               None),
-    "-c"   : ("checkbox",
-              "[CTANLoad} Flag: Check the integrity of the 2nd .pkl file",
-              False,
+    "-c"   : ("checkbox",                                               # -c 
+              "[CTANLoad} Flag: Check the integrity of the " + \
+              "2nd .pkl file",
+              INTEGRITY_DEFAULT,
               None,
               None),
-    "-l"   : ("checkbox",
+    "-l"   : ("checkbox",                                               # -l
               "[CTANLoad} Flag: Generate some special lists and" +\
               " prepare files for CTANOut",
-              False,
+              LISTS_DEFAULT,
               None,
               None),
-    "-r"   : ("checkbox",
+    "-r"   : ("checkbox",                                               # -r
               "[CTANLoad} Flag: Regenerate the two pickle files",
-              False,
+              REGENERATE_DEFAULT,
               None,
               None),
 }
 
 # --------------------------------------------------------------------
-# tuple "buttons" (definitions):
+# tuple "BUTTONS" (definitions):
 # will be used in help3, init_buttons
 
 # each entry:
@@ -1553,32 +1665,35 @@ options = {
 # (3) color
 
 # 1.3   2024-06-06: color of the "Log file" button changed
-# 1.9.1 2024-06-19: new in buttons tuple: function help5
-# 1.10  2024-07-08: some texts in buttons changed
+# 1.9.1 2024-06-19: new in BUTTONS tuple: function help5
+# 1.10  2024-07-08: some texts in BUTTONS changed
+# 1.20  2025-12-05: better colors
 
-buttons = (
-    ("Start",                     start,        "#FEE4BE"),
-    ("Reset fields",              init_fields,  "#FEE4BE"),
-    ("Clear menu",                clear_fields, "#FEE4BE"),
-    ("Close menu (Quit)",         quit,         "#FEE4BE"),
-    ("Description: Entries",      help1,        "#DAFBC1"),
-    ("Description: Checkboxes",   help2,        "#DAFBC1"),
-    ("Description: Buttons",      help3,        "#DAFBC1"),
-    ("Description: Comboboxes",   help5,        "#DAFBC1"),
-    ("Examples: Entries",         help4,        "#DAFBC1"),
-    ("Version",                   info_version, "#DAFBC1"),
-    ("Log file",                  show_log,     "#B0EEF6"),
+BUTTONS = (
+    ("Start",                     start,        COLOR1),
+    ("Reset fields",              init_fields,  COLOR1),
+    ("Clear menu",                clear_fields, COLOR1),
+    ("Close menu (Quit)",         quit,         COLOR1),
+    ("Description: Entries",      help1,        COLOR2),
+    ("Description: Checkboxes",   help2,        COLOR2),
+    ("Description: Buttons",      help3,        COLOR2),
+    ("Description: Comboboxes",   help5,        COLOR2),
+    ("Examples: Entries",         help4,        COLOR2),
+    ("Version",                   info_version, COLOR2),
+    ("Log file",                  show_log,     COLOR3),
     )
 
 # --------------------------------------------------------------------
-# dictionary "examples":
+# dictionary "EXAMPLES":
 # will be used in help4
 
-examples = {
+EXAMPLES = {
     "-A"   : "author template (according to the rules of a regular" +\
-             " expression); see authors.xml\n          for example:  Mittelbach",
+             " expression); see authors.xml\n          for example: " +\
+             "Mittelbach",
     "-Al"  : "author template (according to the rules of a regular" +\
-             " expression); see authors.xml\n          for example:  Voß",
+             " expression); see authors.xml\n          for " +\
+             "example:  Voß",
     "-Ao"  : "author template (according to the rules of a regular" +\
              " expression); see authors.xml\n          for example:" +\
              " Mittelbach|Voß",
@@ -1587,22 +1702,27 @@ examples = {
     "-c"   : "flag: without any value",
     "-d"   : "corect directory name\n          for example:  .\\result",
     "-f"   : "flag: without any value",
-    "-k"   : "key template (according to the rules of a regular expression);" +\
-             " see topics.xml\n          for example:  font",
-    "-kl"  : "key template (according to the rules of a regular expression);" +\
-             " see topics.xml\n          for example:  graphics",
-    "-ko"  : "key template (according to the rules of a regular expression);" +\
-             " see topics.xml\n          for example:  german|french",
+    "-k"   : "key template (according to the rules of a regular " +\
+             "expression); see topics.xml\n          for example:  font",
+    "-kl"  : "key template (according to the rules of a regular " +\
+             "expression); see topics.xml\n          for " +\
+             "example:  graphics",
+    "-ko"  : "key template (according to the rules of a regular " +\
+             "expression); see topics.xml\n          for example:  " +\
+             "german|french",
     "-L"   : "license template (according to the rules of a regular" +\
-             " expression); see licenses.xml\n          for example:  gpl",
+             " expression); see licenses.xml\n          for " +\
+             "example:  gpl",
     "-l"   : "flag: without any value",
     "-Ll"  : "license template (according to the rules of a regular" +\
-             " expression); see licenses.xml\n          for example:  cc-by-nd",
+             " expression); see licenses.xml\n          for " +\
+             "example:  cc-by-nd",
     "-Lo"  : "license template (according to the rules of a regular" +\
              " expression); see licenses.xml" +\
              "\n          for example:  lppl|gpl",
-    "-m"   : "one of LaTeX, latex, tex, RIS, ris, plain, txt, BibLaTeX," +\
-             " biblatex, bib, Excel, excel\n          for example:  LaTeX",
+    "-m"   : "one of LaTeX, latex, tex, RIS, ris, plain, txt, " +\
+             "BibLaTeX, biblatex, bib, Excel, excel\n          for " +\
+             "example:  LaTeX",
     "-mo"  : "flag: without any value",
     "-mt"  : "flag: without any value",
     "-n"   : "positive integer number\n          for example:  500",
@@ -1614,8 +1734,8 @@ examples = {
     "-s"   : "list with CTAN fields; correct names can be found in" +\
              " CTAN-elements.txt" +\
              "\n          for example:  [description, documentation]",
-    "-sb"  : "list with BibLaTeX fields; correct names can be found in" +\
-             " CTANOut_mapping_bib.txt" +\
+    "-sb"  : "list with BibLaTeX fields; correct names can " +\
+             "be found in CTANOut_mapping_bib.txt" +\
              "\n          for example:  [abstract, related, note]",
     "-stat": "flag: without any value",
     "-t"   : "package template (according to the rules of a regular" +\
@@ -1629,31 +1749,31 @@ examples = {
     "-v"   : "flag: without any value",
     "-y"   : "year template (according to the rules of a regular" +\
              " expression)\n for example:  2024|2023",
-    "-yl"  : "year template (according to the rules of a regular expression)" +\
-             "\n          for example:  20[0-2][0-9]",
-    "-yo"  : "year template (according to the rules of a regular expression)" +\
-             "\n          for example:  202[12]",
+    "-yl"  : "year template (according to the rules of a regular " +\
+             "expression)\n          for example:  20[0-2][0-9]",
+    "-yo"  : "year template (according to the rules of a regular " +\
+             "expression)\n          for example:  20[0-2][0-9]",
     }
 
 # --------------------------------------------------------------------
 # Initializations of some lists:
 
-# 1.9.2 2024-06-19: new: list CB defined and initialized
+# 1.9.2 2024-06-19: new: list _CB defined and initialized
 
-# V : tkinter variables
-# E : tkinter entry fields
-# L : tkinter labels
-# C : tkinter checkboxes
-# B : tkinter buttons
-# CB: tkinter comboboxes
+# _V : tkinter variables
+# _E : tkinter entry fields
+# _L : tkinter labels
+# _C : tkinter checkboxes
+# _B : tkinter buttons
+# _CB: tkinter comboboxes
 
-nr = len(sequence)                              # number of elements in sequence
-E  = [None for f in range(nr)]                  # list for ttk.Entry
-L  = [None for f in range(nr)]                  # list for ttk.Label
-V  = [None for f in range(nr)]                  # list for tk variables
-C  = [None for f in range(nr)]                  # list for ttk.Checkbox
-CB = [None for f in range(nr)]                  # list for ttk Combobox
-B  = [None for f in range(len(buttons))]        # list for tk.Button
+nr = len(SEQUENCE)                                                      # number of elements in SEQUENCE
+_E  = [None for f in range(nr)]                                         # list for ttk.Entry
+_L  = [None for f in range(nr)]                                         # list for ttk.Label
+_V  = [None for f in range(nr)]                                         # list for tk variables
+_C  = [None for f in range(nr)]                                         # list for ttk.Checkbox
+_CB = [None for f in range(nr)]                                         # list for ttk Combobox
+_B  = [None for f in range(len(BUTTONS))]                               # list for tk.Button
 
 
 # ====================================================================
@@ -1665,11 +1785,9 @@ B  = [None for f in range(len(buttons))]        # list for tk.Button
 
 # the menu will be started by a click on the "start" button
 
-init_fields()                                   # preparation: initialization
-                                                # of fields
-init_buttons()                                  # preparation: initialization
-                                                # of buttons
-mm.mainloop()                                   # main loop
+init_fields()                                                           # preparation: initialization of fields
+init_buttons()                                                          # preparation: initialization of BUTTONS
+mm.mainloop()                                                           # main loop
 
 
 # ====================================================================
@@ -1687,8 +1805,8 @@ mm.mainloop()                                   # main loop
 # 1.8    2024-06-19: security question added to set_value
 
 # 1.9    2024-06-19: handling of option -m changed for combobox
-# 1.9.1  2024-06-19: new in buttons tuple: function help5
-# 1.9.2  2024-06-19: new: list CB defined and initialized
+# 1.9.1  2024-06-19: new in BUTTONS tuple: function help5
+# 1.9.2  2024-06-19: new: list _CB defined and initialized
 # 1.9.3  2024-06-19: option -m in options dictionary: new type combobox, new action
 # 1.9.4  2024-06-19: in init_fields: special handling of -m deactivated
 # 1.9.5  2024-06-19: in init_fields: new settings for option -m now by set_value_combobox
@@ -1697,7 +1815,7 @@ mm.mainloop()                                   # main loop
 # 1.9.8  2024-06-19: new: set_value_combobox: set value for comboboxes
 # 1.9.9  2024-06-19: former special handling of -m deactivated + resettings of -m now by set_value_combobox
 
-# 1.10   2024-07-08: some texts in buttons changed
+# 1.10   2024-07-08: some texts in BUTTONS changed
 # 1.11   2024-07-08: as far as possible and useful: string interpolation via .format replaced by f-strings
 
 # 1.12   2024-07-08: tkm.showinfo in help1, help2, help3, help4, help5, and info_version changed
@@ -1706,37 +1824,59 @@ mm.mainloop()                                   # main loop
 
 # 1.13   2024-07-08: output in help1, help2, help3, help4, help5, and start improved
 # 1.14   2025-02-06: everywhere: all source code lines wrapped at a maximum of 80 characters
+# 1.15   2025-10-02: -d adapted to different operating systems
+
+# 1.16   2025-10-14: changes in Start-Box
+# 1.16.1 2025-10-14: a prompt before the actual execution
+# 1.16.1 2025-10-14: Start-Box simplified 
+
+# 1.17   2025-11-18: changes in check_values
+# 1.17.1 2025-11-18: for certain changes made by check_values: warnings are issued
+# 1.17.2 2025-11-18: check_values cleaned up 
+# 1.17.3 2025-11-18: "Short circuits" removed
+
+# 1.18   2025-11-29: log output in a clickable scrolledtext-Box
+# 1.19   2025-11-30: Combobox for the handling of -m (https://www.tutorialspoint.com/combobox-widget-in-python-tkinter)
+# 1.20   2025-12-05: better colors
+
+# 2.0    2026-04-01 Complete revision (too many changes to list in the code)
+# 2.0.1  2026-04-01 Functions with type annotations
+# 2.0.2  2026-04-01 Variable annotations (where appropriate and possible)
+# 2.0.3  2026-04-01 Constants in uppercase
+# 2.0.4  2026-04-01 .format replaced with f-strings (where appropriate)
+# 2.0.5  2026-04-01 __doc__ texts supplemented and standardised
+# 2.0.6  2026-04-01 Standardised: Code up to a maximum of column 71
+# 2.0.7  2026-04-01 Standardised: Comments from column 72 onwards
+
+# 2.1    2026-04-10 date and version of CTANLoad, CTANOut und CTANLoadOut via Import
+
+# 2.2    2026-04-13 formatting of collected texts
+# 2.2.1  2026-04-13 import textwrap
+# 2.2.2  2026-04-13 new function text_wrap
+# 2.2.3  2026-04-13 text_wrap used in start, help1 und help2
+
 
 # ====================================================================
-# Wünsche/Fehler
-# --------------
-# + besseres Konzept für buttons und tk.Buttons
-# + vielleic ht mit zusätzlichen Spalten: Typ und Text (ggf. per Funktion)
-# + make_call mit return (-) 
-# + Protokoll-Ausgabe in scrolledtext-Box (anklickbar?) (x)
-# + Mono-Font an manchen Stellen (geht nicht)
-# + ZUordnung Option <--> Zeile global festlegen (-)
-# + Funktionen entsprechend umbauen (-)
-# + -d anpassen an verschiedene OS (x)
-# + bessere Farben (x)
-# + bei manchen Änderungen durch check_values: Warnungen ausgeben (x)
 # + Änderungen an Optionswerten einfacher machen; z.B. set_value("-m") (x)
-# + vielleicht deshalb neue Tabelle; option: zeile, wert, default (-)
-# + vor der eigentlichen Ausführung noch eine Abfrage (x)
-# + Kurzschlüsse in check_values vermeiden (x)
-# + askyesno mit englichen Texten (- geht nicht einfach)
 # + alte werte werden verwendet bei mehrfachen Aufrufen des Menüs (x)
-# + muss log global sein? (ja)
-# + start-Box vereinfachen (x)
-# + messagebox verbreitern (geht nichtdirekt; vielleicht aber mit Message?)
-# + in start_call: print-Anweisungen an log anhängen 
 # + Warnings sparsamer einsetzen (x)
 # + wie sieht es mit -nf oder -mo aus? (x)
-# + check_values bereinigen (x)
-# + (5) und (6) zusammenfassen (x)
 # + überprüfen: -m != LaTeX (x)
-# + Combobox für -m (https://www.tutorialspoint.com/combobox-widget-in-python-tkinter) (x)
+
+# Wünsche/Fehler
+# --------------
+# + besseres Konzept für BUTTONS und tk.Buttons
+# + vielleicht mit zusätzlichen Spalten: Typ und Text (ggf. per Funktion)
+# + make_call mit return (-) 
+# + Mono-Font an manchen Stellen (geht nicht)
+# + Zuordnung Option <--> Zeile global festlegen (-)
+# + Funktionen entsprechend umbauen (-)
+# + vielleicht deshalb neue Tabelle; option: zeile, wert, default (-)
+# + askyesno mit englichen Texten (- geht nicht einfach)
+# + muss log global sein? (ja)
+# + messagebox verbreitern (geht nichtdirekt; vielleicht aber mit Message?)
+# + in start_call: print-Anweisungen an log anhängen 
 # + Combobox für -b (https://www.tutorialspoint.com/combobox-widget-in-python-tkinter) funktioniert nicht
 # + Forschrittsanzeige (https://www.tutorialspoint.com/progressbar-widget-in-python-tkinter)?
 # + Antwortboxen auf englisch
-
+# + Parameter an SupProzess mittels Bytes?

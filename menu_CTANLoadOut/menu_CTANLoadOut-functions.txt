@@ -1,6 +1,6 @@
 Fuctions (Menu_CTANLoadOut)
 ===========================
-(2024-08-14)
+(2026-04-18)
 
 
 check_values()                                           check_values: Checks some option values and resets some.
@@ -27,6 +27,7 @@ set_value_combobox(opt, val)                             set_value_combobox: Res
 show_log()                                               show_log: Shows the log file of the called subprocess.
 start()                                                  start: Prepares the processing.
 start_call()                                             start_call: Starts the processing.
+text_wrap(text, ident, length)				 Wrapes a given text.
 
 
 # The program essentially uses the tkinter module and its submodules:
