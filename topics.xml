@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE topics SYSTEM 'http://www.ctan.org/xml/2.0/catalogue.dtd'>
+<topics>
+  <topic name="abbrev" details="macros for defining abbreviations in documents" />
+  <topic name="abstract" details="typeset abstracts of documents" />
+  <topic name="accessible" details="accessibility support" />
+  <topic name="acrobat" details="relies on availability of Adobe Acrobat, etc." />
+  <topic name="acronym" details="define and use acronyms" />
+  <topic name="addr-list" details="lists of addresses, for a personal directory (or the like)" />
+  <topic name="adobe-distiller" details="convert PostScript to PDF using Adobe Distiller" />
+  <topic name="advert" details="small advertisements, fly sheets, etc." />
+  <topic name="albanian" details="support for typesetting Albanian" />
+  <topic name="alignment" details="tables, tab structures, etc" />
+  <topic name="alignment-supp" details="ancillary code for tables, tab structures, etc" />
+  <topic name="amharic" details="support for typesetting Amharic" />
+  <topic name="amusements" details="jokes, distractions, tongue-in-cheek packages, and other entertainment material" />
+  <topic name="android" details="usable under Android" />
+  <topic name="apa" details="typesetting according to the rules of the American Psychological Association" />
+  <topic name="appendix" details="typesetting and using appendices" />
+  <topic name="arabic" details="documentation in and support for typesetting Arabic" />
+  <topic name="arch-tree" details="root directory of a (sub-)tree of the archive" />
+  <topic name="archival" details="creating archival copies, or copies for distribution" />
+  <topic name="arithmetic" details="perform and typeset arithmetic problems" />
+  <topic name="armenian" details="support for typesetting Armenian" />
+  <topic name="article-like" details="LaTeX article classes and their developments" />
+  <topic name="astrology" details="fonts and typesetting for astrologers" />
+  <topic name="astronomy" details="astronomy articles, astronomical charts" />
+  <topic name="automata" details="finite-state machines, automata, labelled graphs, etc." />
+  <topic name="azerbaijani" details="support for typesetting Azerbaijani" />
+  <topic name="background" details="decorate/confuse text by adding a background" />
+  <topic name="bahasa-indonesia+malaysia" details="support for typesetting Bahasa Indonesia/Malaysia" />
+  <topic name="barcode" details="barcodes and other machine-readable tags" />
+  <topic name="basque" details="support for typesetting Basque" />
+  <topic name="belarusian" details="support for typesetting Belarusian" />
+  <topic name="bengali" details="support for typesetting Bengali" />
+  <topic name="bib-use" details="place non-bibliography material in the bibliography" />
+  <topic name="biblatex" details="BibLaTeX bibliography support" />
+  <topic name="biblio" details="bibliography processor" />
+  <topic name="biblio-supp" details="support for manually-written bibliographies" />
+  <topic name="bibtex-annote" details="BibTeX annotation styles" />
+  <topic name="bibtex-doc" details="documentation of BibTeX, etc., on their own" />
+  <topic name="bibtex-gen" details="derive BibTeX data from resources other than BibTeX libraries" />
+  <topic name="bibtex-lib" details="collection of BibTeX citations" />
+  <topic name="bibtex-multi" details="multiple BibTeX bibliographies in a document" />
+  <topic name="bibtex-supp" details="BibTeX citation support" />
+  <topic name="bibtex-util" details="utilities for managing BibTeX files" />
+  <topic name="bidi" details="support bidirectional typesettting" />
+  <topic name="biology" details="typeset biological data" />
+  <topic name="biomedical" details="support for documents in biomedical research" />
+  <topic name="blank-page" details="control of blank pages in a document" />
+  <topic name="book-ex" details="copies of examples from a published book" />
+  <topic name="book-pub" details="preparing a book for publication" />
+  <topic name="book-src" details="source of a published book" />
+  <topic name="bosnian" details="support for typesetting in Bosnian" />
+  <topic name="botany" details="typeset botanical data" />
+  <topic name="box-breaking" details="breaking boxes over a page boundary, etc" />
+  <topic name="box-manip" details="manipulating boxes" />
+  <topic name="boxing" details="creating boxes" />
+  <topic name="breton" details="support for typesetting in Breton" />
+  <topic name="bugfix" details="correct a problem, ahead of the &#8220;proper&#8221; fix" />
+  <topic name="bulgarian" details="support for typesetting and documentation in Bulgarian" />
+  <topic name="bundle" details="pack files up for distribution or archiving" />
+  <topic name="burmese" details="support for typesetting Burmese" />
+  <topic name="bus-study" details="typeset material for Business Studies" />
+  <topic name="calculation" details="perform calculations within TeX" />
+  <topic name="calendar" details="typeset calendars, diaries, planning charts, etc." />
+  <topic name="callback" details="call external code and process the result" />
+  <topic name="caption" details="typesetting captions" />
+  <topic name="card-flash" details="typesetting &#8216;flash&#8217; cards for teaching and learning" />
+  <topic name="card-gen" details="cards for miscellaneous purposes" />
+  <topic name="cartography" details="map production and geographical data usage" />
+  <topic name="catalan" details="documentation in and support for typesetting Catalan" />
+  <topic name="catalogue" details="typeset catalogue data" />
+  <topic name="cgi-latex" details="support for LaTeX(-alike) on the web, or feeding into other applications" />
+  <topic name="chemistry" details="chemistry document support" />
+  <topic name="cherokee" details="support for typesetting Cherokee" />
+  <topic name="chess" details="chess game" />
+  <topic name="chinese" details="support for typesetting Chinese languages" />
+  <topic name="chinese-doc" details="documentation in Chinese languages" />
+  <topic name="chords" details="chord notations, as for song books" />
+  <topic name="chunks" details="extract chunks of a document for separate processing" />
+  <topic name="churchslavonic" details="support for typesetting Church Slavonic" />
+  <topic name="cite-foot" details="citations in footnotes" />
+  <topic name="cite-supp" details="citation support" />
+  <topic name="class" details="alternative LaTeX class(es)" />
+  <topic name="class-ext" details="export features from a class for use elsewhere" />
+  <topic name="class-supp" details="support for class (and package) development" />
+  <topic name="code-layout" details="improve the appearance of LaTeX code" />
+  <topic name="collection" details="a collection of packages" />
+  <topic name="colour" details="typesetting in colour" />
+  <topic name="comp-mgmt" details="control TeX&#8217;s behaviour during compilation" />
+  <topic name="comp-net" details="typeset computer network concepts" />
+  <topic name="comp-sci" details="typeset computer-science related material" />
+  <topic name="comp-supp" details="support for preparing documents" />
+  <topic name="comp-theory" details="typeset theoretical computer science material" />
+  <topic name="compact-print" details="compact output, typically multiple pages/sheet" />
+  <topic name="compilation" details="the document compilation process" />
+  <topic name="cond-comp" details="conditional typesetting" />
+  <topic name="confproc" details="typesetting conference proceedings" />
+  <topic name="context" details="macros of, or for use with, ConTeXt" />
+  <topic name="context-doc" details="documentation of ConTeXt" />
+  <topic name="cooking" details="typesetting cooking recipes, etc" />
+  <topic name="coptic" details="support for typesetting coptic" />
+  <topic name="counter-mgmt" details="management of counters" />
+  <topic name="course-material" details="course material" />
+  <topic name="covers" details="typeset badges, covers or labels for things (or people)" />
+  <topic name="crit-ed" details="typeset scholarly editions of texts" />
+  <topic name="croatian" details="support for typesetting Croatian" />
+  <topic name="crystallography" details="typeset material to do with crystallography" />
+  <topic name="csv-support" details="read, process and convert CSV data" />
+  <topic name="ctan" details="support for work with the CTAN archive" />
+  <topic name="cv" details="curriculum vitae/Resum&#233;" />
+  <topic name="cvt-html" details="generate HTML from TeX-ish sources" />
+  <topic name="cvt-other" details="convert TeX-ish sources to some other markup (than HTML)" />
+  <topic name="cwpuzzle" details="crossword puzzle" />
+  <topic name="cyrillic" details="support languages written using Cyrillic alphabets" />
+  <topic name="czech" details="support for typesetting Czech" />
+  <topic name="czech-doc" details="documentation in Czech" />
+  <topic name="danish" details="support for typesetting, or documentation in Danish" />
+  <topic name="data-disp" details="visualisation of data sets" />
+  <topic name="data-import" details="importing data into documents" />
+  <topic name="data-manip" details="manipulate data within TeX" />
+  <topic name="data-prep" details="prepare data for use within TeX" />
+  <topic name="data-sel" details="select data from sets in the TeX file" />
+  <topic name="date-time" details="manipulate dates and/or times" />
+  <topic name="db-access" details="access database for document contents" />
+  <topic name="debug-supp" details="support for package or document debugging" />
+  <topic name="decoration" details="highlighting typeset material, fancy frames, watermarks, etc." />
+  <topic name="defer-stuff" details="saving things for later use" />
+  <topic name="demo-code" details="code that serves as examples of TeX programming" />
+  <topic name="diagram" details="diagrams" />
+  <topic name="diagram-block" details="block diagrams" />
+  <topic name="diagram-circ" details="circuit diagrams" />
+  <topic name="diagram-comm" details="commutative diagrams" />
+  <topic name="diagram-ctrl" details="control diagrams" />
+  <topic name="diagram-flow" details="flow (and similar) diagrams, including Nassi-Shneiderman" />
+  <topic name="diagram-lab" details="schematic details of laboratory work" />
+  <topic name="diagram-maths" details="diagrams used in mathematics" />
+  <topic name="diagram-tmg" details="timing diagrams" />
+  <topic name="dictionary" details="macros that support preparation of dictionaries, lexicons, etc" />
+  <topic name="dissertation" details="typesetting dissertations, theses, etc." />
+  <topic name="distribution" details="components (or support) of TeX distribution" />
+  <topic name="doc-debug" details="tools, etc., for &#8220;debugging&#8221; documents" />
+  <topic name="doc-errata" details="lists of errata in published books" />
+  <topic name="doc-gen" details="generate a document by collating other text" />
+  <topic name="doc-mgmt" details="support for keeping track of document development" />
+  <topic name="doc-style" details="LaTeX 2.09 document style" />
+  <topic name="doc-supp" details="macros and tools for preparing documentation" />
+  <topic name="doc-templ" details="template to guide document development" />
+  <topic name="doc-tool" details="document development tools" />
+  <topic name="docu-pkg" details="documentation of another package" />
+  <topic name="documentation" details="&#8216;stand-alone&#8217; documentation" />
+  <topic name="drama-script" details="typeset scripts for plays, etc." />
+  <topic name="dummy-gen" details="dummy text generator for tests and examples" />
+  <topic name="dutch" details="support for typesetting Dutch" />
+  <topic name="dutch-doc" details="documentation in Dutch" />
+  <topic name="dvi-bit" details="generate graphic bitmaps from DVI files" />
+  <topic name="dvi-pdf" details="convert DVI files to PDF" />
+  <topic name="dvi-prev" details="preview DVI files" />
+  <topic name="dvi-print" details="convert DVI files for (direct) printing, etc." />
+  <topic name="dvi-proc" details="DVI processor" />
+  <topic name="dvi-struc" details="create and/or process text representation of a DVI file" />
+  <topic name="dvi-text" details="DVI output to plain text" />
+  <topic name="dvips-special" details="use dvips \special commands" />
+  <topic name="ebook" details="support for preparing e-books" />
+  <topic name="editor" details="editor designed (or adapted) for use with (La)TeX" />
+  <topic name="editor-extn" details="plug-ins for editors, for better (La)TeX and Meta* support" />
+  <topic name="editorial" details="editor&#8217;s marks, highlights, etc." />
+  <topic name="editorial-consistency" details="ensure consistency of usage" />
+  <topic name="electronic" details="support of electronic design" />
+  <topic name="emphasis" details="emphasising text" />
+  <topic name="emulation" details="code to emulate &#8220;other things&#8221;" />
+  <topic name="enc-juggle" details="conversion between encodings" />
+  <topic name="endnote" details="notes typeset at end document" />
+  <topic name="engine" details="TeX (or TeX-alike) typesetting engine" />
+  <topic name="engineering" details="typesetting associated with engineering of whatever sort" />
+  <topic name="english" details="typesetting specific to English" />
+  <topic name="env-query" details="examine the TeX programming environment" />
+  <topic name="epigram" details="short quotation typically associated with the start of a chapter" />
+  <topic name="error-supp" details="control of LaTeX error messages" />
+  <topic name="esperanto" details="support for typesetting Esperanto" />
+  <topic name="essay" details="course work essays, assignments, etc." />
+  <topic name="estonian" details="support for typesetting Estonian" />
+  <topic name="etex" details="requires e-TeX" />
+  <topic name="exam" details="exams, quizzes, etc." />
+  <topic name="exec-foreign" details="execute &#8216;other types&#8217; of language" />
+  <topic name="exercise" details="exercises, problems for solution, etc." />
+  <topic name="experimental" details="offer of a facility that may never make its way to production use" />
+  <topic name="ext-code" details="run an external program from within a document" />
+  <topic name="ext-svc" details="link to a service not on CTAN" />
+  <topic name="fac-survey" details="survey of TeX-related facilities" />
+  <topic name="fake-glyph" details="provide a glyph by construction, rather than from a font" />
+  <topic name="faq" details="frequently asked questions, with answers" />
+  <topic name="file-card" details="typeset cards for business, filing, etc." />
+  <topic name="file-control" details="manipulation of TeX macro file i/o" />
+  <topic name="file-mgmt" details="TeX-related-file management" />
+  <topic name="finnish" details="support for typesetting Finnish" />
+  <topic name="finnish-doc" details="documentation written in Finnish" />
+  <topic name="fit-to-size" details="set up things to fit in a given space" />
+  <topic name="float" details="typesetting floats" />
+  <topic name="font" details="fonts themselves" />
+  <topic name="font-abnormal" details="font in an irregular format" />
+  <topic name="font-absent" details="support is for a font not available on CTAN" />
+  <topic name="font-adhoc" details="font distributed in an ad-hoc fashion" />
+  <topic name="font-arabic" details="fonts for typesetting arabic" />
+  <topic name="font-archaic" details="fonts reproducing archaic scripts or inscriptions" />
+  <topic name="font-armenian" details="fonts for typesetting armenian" />
+  <topic name="font-bbd" details="doublestroke (blackboard bold) fonts" />
+  <topic name="font-body" details="font designed for use as body font for Latin-based script documents" />
+  <topic name="font-bookhand" details="fonts of scripts used for manuscript books" />
+  <topic name="font-calligraphic" details="calligraphic (or handwriting) fonts" />
+  <topic name="font-canadian-aboriginal" details="fonts for Canadian Aboriginal" />
+  <topic name="font-chess" details="fonts for typesetting chess problems and diagrams" />
+  <topic name="font-cjk" details="fonts for far eastern languages (Chinese, Japanese and Korean)" />
+  <topic name="font-cm" details="font serving Computer Modern-style shapes" />
+  <topic name="font-collection" details="listing a set of related fonts" />
+  <topic name="font-coptic" details="fonts for coptic script" />
+  <topic name="font-cvt" details="convert a font to a form usable with TeX" />
+  <topic name="font-cyrillic" details="fonts for Cyrillic and related scripts" />
+  <topic name="font-decor" details="decorative or initial fonts" />
+  <topic name="font-devel" details="support for font development, testing and characterisation" />
+  <topic name="font-display" details="display-style font" />
+  <topic name="font-doc" details="documentation about choosing installing and using fonts" />
+  <topic name="font-egyptian" details="hieroglyph fonts" />
+  <topic name="font-georgian" details="fonts for typesetting georgian" />
+  <topic name="font-gothic" details="font for gothic or blackletter shapes" />
+  <topic name="font-greek" details="font for Greek (archaic, classical and modern)" />
+  <topic name="font-hebrew" details="font for Hebrew script" />
+  <topic name="font-historical" details="fonts for a script or language now obsolete" />
+  <topic name="font-index" details="lists of glyphs available from font(s)" />
+  <topic name="font-indic" details="fonts for languages of the Indian subcontinent" />
+  <topic name="font-invented" details="font for an &#8216;invented&#8217; language or script" />
+  <topic name="font-maths" details="fonts for use in mathematics" />
+  <topic name="font-medieval" details="fonts for Medieval script" />
+  <topic name="font-mf" details="fonts distributed as Metafont source" />
+  <topic name="font-mgmt" details="management of fonts" />
+  <topic name="font-mono" details="monospaced font" />
+  <topic name="font-multilingual" details="font with adaptations to several languages" />
+  <topic name="font-music" details="fonts of music symbols" />
+  <topic name="font-nonroman" details="fonts for &#8220;other&#8221; non-Roman scripts" />
+  <topic name="font-novelty" details="fonts designed more for fun than for actual use" />
+  <topic name="font-ornmnt" details="fonts of typographic ornaments" />
+  <topic name="font-otf" details="font in OpenType format" />
+  <topic name="font-proc" details="process fonts for use with TeX (includes installation)" />
+  <topic name="font-proportional" details="variable-spaced font" />
+  <topic name="font-rune" details="fonts for runic inscriptions" />
+  <topic name="font-sample" details="samples of font usage" />
+  <topic name="font-sans" details="sans-serif font" />
+  <topic name="font-sel" details="font selection schemes" />
+  <topic name="font-serif" details="serif font" />
+  <topic name="font-sfd" details="FontForge font file" />
+  <topic name="font-specialist" details="fonts with specific small application areas" />
+  <topic name="font-supp" details="metrics, macro incantations and other font support" />
+  <topic name="font-supp-maths" details="metrics, macro incantations and other support for maths fonts" />
+  <topic name="font-supp-misc" details="metrics, macro incantations and other support for miscellaneous fonts (not on CTAN)" />
+  <topic name="font-supp-symbol" details="metrics, macro incantations and other support for symbol fonts" />
+  <topic name="font-symbol" details="fonts that provide collections of symbols" />
+  <topic name="font-symbol-maths" details="collections of mathematical symbols" />
+  <topic name="font-t1enc" details="font providing LaTeX T1 encoding support" />
+  <topic name="font-thai" details="font for typesetting Thai script" />
+  <topic name="font-ttf" details="font available in TrueType format" />
+  <topic name="font-type1" details="font available in Adobe Type 1 format" />
+  <topic name="font-use" details="font selection, mapping, etc." />
+  <topic name="font-util" details="manipulate or examine fonts" />
+  <topic name="font-virtual" details="virtual font(s) using existing fonts" />
+  <topic name="fontenc" details="support for font encodings" />
+  <topic name="footnote" details="footnote support" />
+  <topic name="foreign-import" details="import files in a non-TeX (or different TeX) format" />
+  <topic name="form-fillin" details="design forms for information collection" />
+  <topic name="formal-spec" details="typeset formal specification languages" />
+  <topic name="format" details="macros to build a format" />
+  <topic name="format-cvt" details="convert one format of file to another" />
+  <topic name="french" details="support for typesetting French" />
+  <topic name="french-doc" details="documentation in French" />
+  <topic name="frivolous" details="TeX code as a source of humour" />
+  <topic name="games" details="process game diagrams, gamebooks, and other amusements" />
+  <topic name="gantt" details="real-time scheduling Gantt charts" />
+  <topic name="gen-paper" details="paper (simply) for communication, not necessarily for publication" />
+  <topic name="genchart" details="drawing bar- or pie-charts" />
+  <topic name="genealogy" details="typesetting genealogical information" />
+  <topic name="gentex" details="generate (La)TeX from other sorts of sources" />
+  <topic name="geometry" details="change geometry of page layout" />
+  <topic name="geometry-adj" details="temporarily adjust page layout" />
+  <topic name="georgian" details="support for typesetting Georgian" />
+  <topic name="german" details="support for typesetting German" />
+  <topic name="german-doc" details="documentation in German" />
+  <topic name="glossary" details="glossary and nomenclature support" />
+  <topic name="go" details="go game" />
+  <topic name="graphics" details="graphics (support packages)" />
+  <topic name="graphics-3d" details="graphics with 3-dimensional output" />
+  <topic name="graphics-curve" details="draw (parametric) curves" />
+  <topic name="graphics-doc" details="documentation of techniques for using graphics" />
+  <topic name="graphics-drv" details="&#8216;driver&#8217; for output from graphics &#8216;kernel&#8217; packages" />
+  <topic name="graphics-editor" details="graphics editor whose output is good for TeX" />
+  <topic name="graphics-engn" details="graphics generator whose output is good for use with TeX" />
+  <topic name="graphics-epspdf" details="converting graphics files from MetaPost output or (E)PS to embeddable PDF" />
+  <topic name="graphics-fill-tile" details="graphics filling or tiling an area" />
+  <topic name="graphics-import" details="convert a foreign graphics format for use with TeX" />
+  <topic name="graphics-in-tex" details="graphics produced by one of the *TeX engines" />
+  <topic name="graphics-incl" details="include external graphics" />
+  <topic name="graphics-inline" details="graphics inline for external processing" />
+  <topic name="graphics-manip" details="manipulate graphics and/or related text" />
+  <topic name="graphics-motion" details="motion graphics" />
+  <topic name="graphics-mpost" details="graphics generated using MetaPost" />
+  <topic name="graphics-plot" details="plot data" />
+  <topic name="graphics-plotfn" details="plot a representation of a function" />
+  <topic name="graphics-prep" details="prepare graphics for use with *TeX" />
+  <topic name="graphics-subpic" details="generate parts of pictures" />
+  <topic name="graphics-supp" details="support for other packages or for drivers" />
+  <topic name="graphics-symb" details="create symbols, rather than select from a font" />
+  <topic name="graphics-text" details="text within graphics (drawn or overlaid)" />
+  <topic name="graphics-use" details="graphics (typesetting actual pictures)" />
+  <topic name="greek" details="support for typesetting Greek" />
+  <topic name="greek-doc" details="documentation in Greek" />
+  <topic name="headings" details="chapter, section, etc., heading styles" />
+  <topic name="hebrew" details="documentation in and support for typesetting Hebrew" />
+  <topic name="humanities" details="support for studies in the humanities" />
+  <topic name="hungarian" details="support for typesetting Hungarian" />
+  <topic name="hyper" details="support for hypertext" />
+  <topic name="hyph-gen" details="support for generating or improving hyphenation tables" />
+  <topic name="hyph-pseudo" details="splitting without benefit of hyphenation" />
+  <topic name="hyphenation" details="macros or tables for hyphenation" />
+  <topic name="icelandic" details="support for typesetting the Icelandic language" />
+  <topic name="ide" details="integrated development environments" />
+  <topic name="image-supp" details="manipulating images for inclusion in documents" />
+  <topic name="index" details="index support" />
+  <topic name="index-auth" details="index of referenced authors" />
+  <topic name="index-multi" details="multiple indexes in a document" />
+  <topic name="index-proc" details="process and/or generate index material" />
+  <topic name="indic" details="support for languages of the Indian subcontinent" />
+  <topic name="inputenc" details="input encoding support for TeX engines" />
+  <topic name="install-mgmt" details="support for (La)TeX installations" />
+  <topic name="interlingua" details="support for typesetting interlingua" />
+  <topic name="invoice" details="typesetting and calculating invoices" />
+  <topic name="io-mgmt" details="manage TeX&#8217;s limited i/o streams" />
+  <topic name="irish-gaelic" details="support for typesetting the Irish (gaelic) language" />
+  <topic name="italian" details="support for typesetting Italian" />
+  <topic name="italian-doc" details="documentation in Italian" />
+  <topic name="japanese" details="support for typesetting Japanese" />
+  <topic name="japanese-doc" details="documentation in Japanese" />
+  <topic name="journ-digest" details="digests/partial information about journals" />
+  <topic name="journ-extract" details="selections of journals, etc." />
+  <topic name="journ-personal" details="personal journals, diaries, etc." />
+  <topic name="journ-src" details="sources and/or old copies of journals" />
+  <topic name="journalpub" details="typesetting journals, etc" />
+  <topic name="keyval" details="key-value argument systems" />
+  <topic name="korean" details="support for typesetting Korean" />
+  <topic name="korean-doc" details="documentation in Korean" />
+  <topic name="kurdish" details="support for typesetting Kurdish" />
+  <topic name="kurmanji" details="support for typesetting Kurmanji" />
+  <topic name="label-ref" details="label and reference systems" />
+  <topic name="labels" details="typeset sets of labels (for cutting out, etc.)" />
+  <topic name="landscape" details="print landscape orientation, manipulate landscape material" />
+  <topic name="lang-invented" details="support for typesetting invented language(s)" />
+  <topic name="latex-devel" details="LaTeX experimental developments &#8216;in the wild&#8217;" />
+  <topic name="latex-qual" details="encourage quality in LaTeX markup" />
+  <topic name="latex209" details="package only known to work with LaTeX 2.09" />
+  <topic name="latex3" details="work done for the project to upgrade LaTeX" />
+  <topic name="latin" details="support for typesetting Latin (ancient, medieval and &#8216;modern&#8217;)" />
+  <topic name="latvian" details="support for typesetting Latvian" />
+  <topic name="layout" details="layout of objects on the page" />
+  <topic name="layout-page" details="page trim marks and decorations" />
+  <topic name="layout-show" details="display details of page layout" />
+  <topic name="layout-supp" details="provide marks to assist in layout design" />
+  <topic name="leaders" details="typeset leaders, etc." />
+  <topic name="legal" details="typesetting legal documents or study material" />
+  <topic name="letter" details="typesetting letters, envelopes, faxes, etc" />
+  <topic name="letterspace" details="change space between characters" />
+  <topic name="lettrine" details="drop capitals and flow text around them" />
+  <topic name="licence-mgmt" details="manage application of licence information" />
+  <topic name="line-nos" details="number the typeset lines" />
+  <topic name="line-patt" details="patterning lines (dashes, etc)" />
+  <topic name="line-space" details="leading between lines of text" />
+  <topic name="line-weight" details="control the weight of rules, etc., in text" />
+  <topic name="linguistic" details="support for linguistics" />
+  <topic name="list" details="list: general" />
+  <topic name="list-bull" details="list: items bulleted" />
+  <topic name="list-descr" details="list: items described" />
+  <topic name="list-enum" details="list: items enumerated" />
+  <topic name="list-supp" details="list support" />
+  <topic name="listing" details="computer code listing" />
+  <topic name="lithuanian" details="support for typesetting Lithuanian" />
+  <topic name="litprog" details="literate programming" />
+  <topic name="log-manip" details="analyse or otherwise manipulate logs" />
+  <topic name="logic" details="typesetting logician&#8217;s discussions" />
+  <topic name="logo" details="symbols or drawings to specify an object, including icons" />
+  <topic name="lua-supp" details="support for using Lua code" />
+  <topic name="luatex" details="LuaTeX and packages that require it" />
+  <topic name="luatex-doc" details="documentation of LuaTeX and related packages" />
+  <topic name="lyx" details="adapted for use with lyx" />
+  <topic name="macedonian" details="documentation in, and support for typesetting Macedonian" />
+  <topic name="macro-def" details="alternative ways of defining macros" />
+  <topic name="macro-demo" details="print (La)TeX code verbatim alongside the rendered result" />
+  <topic name="macro-gen" details="macros that are independent of the (TeX) format in use" />
+  <topic name="macro-iterate" details="repeat TeX material" />
+  <topic name="macro-sort" details="sort data within TeX macros" />
+  <topic name="macro-supp" details="support for development of (La)TeX macros" />
+  <topic name="magazine" details="magazines, newspapers and other ephemeral publications" />
+  <topic name="mail-list" details="digests, etc., of mailing lists" />
+  <topic name="mailing" details="mail merge, etc" />
+  <topic name="maltese" details="support for typesetting Maltese" />
+  <topic name="manju" details="support for typesetting Manju" />
+  <topic name="marathi" details="support for typesetting Marathi" />
+  <topic name="marginal" details="marginal notes, etc." />
+  <topic name="markup" details="alternative markup scheme" />
+  <topic name="mat-sci" details="typeset matter relevant to Materials Science" />
+  <topic name="maths" details="support for typesetting mathematics" />
+  <topic name="maths-doc" details="documentation of typesetting mathematics" />
+  <topic name="maths-symbol" details="construction or application of mathematical symbols" />
+  <topic name="maths-syseqn" details="systems of equations" />
+  <topic name="maths-tabvar" details="mathematical tables of signs and variations" />
+  <topic name="maths-theorem" details="typeset mathematical theorems" />
+  <topic name="matrix" details="typeset matrices" />
+  <topic name="measure" details="measure and report details of a document" />
+  <topic name="medical" details="typesetting medical material" />
+  <topic name="meeting-admin" details="calls, agendas, minutes of meetings" />
+  <topic name="memorandum" details="typeset memorandum or other short note" />
+  <topic name="messages" details="manage messages to the user" />
+  <topic name="metadata" details="process document metadata" />
+  <topic name="mf-doc" details="documentation for Metafont users" />
+  <topic name="micro-layout" details="paragraph shapes, margin adjustments, etc." />
+  <topic name="misc-conv" details="miscellaneous conversions" />
+  <topic name="misc-paper" details="discussion/working paper (rather than journal paper)" />
+  <topic name="misc-support" details="miscellaneous support stuff" />
+  <topic name="mobile" details="support for mobile use" />
+  <topic name="molbio" details="support for typesetting molecular biology" />
+  <topic name="mongolian" details="support for typesetting Mongolian" />
+  <topic name="mongolian-doc" details="documentation in Mongolian" />
+  <topic name="mp-doc" details="documentation for MetaPost users" />
+  <topic name="mp-supp" details="support tools and macros for MetaPost programming" />
+  <topic name="mp-use" details="use, and support for use, of MetaPost" />
+  <topic name="multicol" details="more than one column on the page" />
+  <topic name="multilingual" details="support for more than one (natural) language" />
+  <topic name="multilingual-addon" details="extra language &#8216;drivers&#8217; for existing multilingual packages" />
+  <topic name="multimedia" details="support for multimedia in documents" />
+  <topic name="music" details="typesetting music and related stuff" />
+  <topic name="music-extinp" details="external input sources for music" />
+  <topic name="neuro" details="typesetting neuroscience material" />
+  <topic name="non-bibtex" details="support for bibliographies created without using a biblio processor" />
+  <topic name="norwegian" details="support for typesetting Norwegian" />
+  <topic name="notes" details="general notes (not including endnotes or footnotes)" />
+  <topic name="novelty" details="packages with little obvious application" />
+  <topic name="numbers" details="formatting numbers, etc" />
+  <topic name="obscurity" details="simple rotation or substitution ciphers" />
+  <topic name="obsolete" details="package declared obsolete" />
+  <topic name="occitan" details="support for typesetting Occitan" />
+  <topic name="off" details="use of opentype font features" />
+  <topic name="omega" details="Omega and packages that use it" />
+  <topic name="optics" details="diagrams of optical systems" />
+  <topic name="optimise" details="optimise part of a TeX system" />
+  <topic name="other-lang" details="support for a language whose support is not otherwise catalogued" />
+  <topic name="outline" details="document outlining tools" />
+  <topic name="package-devel" details="support for package development" />
+  <topic name="package-doc" details="markup for documenting package sources" />
+  <topic name="package-mgmt" details="support for managing packages within documents" />
+  <topic name="package-supp" details="support for other packages" />
+  <topic name="page-control" details="select pages to be output, etc." />
+  <topic name="page-hf" details="page head- and foot-lines" />
+  <topic name="page-nos" details="control sequence and typesettting of page numbers" />
+  <topic name="para-deco" details="decorating paragraphs (lettrines, etc.)" />
+  <topic name="parallel" details="parallel columns" />
+  <topic name="paren-mgmt" details="match and otherwise manage parentheses" />
+  <topic name="parser" details="parser application" />
+  <topic name="parshape" details="non-standard paragraph shapes" />
+  <topic name="patent" details="prepare a patent application" />
+  <topic name="pdf-feat" details="access PDF features" />
+  <topic name="pdf-forms" details="create pdf form fields, use form fields as an integral part of the package" />
+  <topic name="pdf-view" details="view, or control viewing of, PDF" />
+  <topic name="pdfprocess" details="process PDF files" />
+  <topic name="persian" details="support for typesetting Persian" />
+  <topic name="persian-doc" details="documentation in Persian" />
+  <topic name="pgf-tikz" details="package uses PGF-TikZ" />
+  <topic name="philosophy" details="support for typesetting philosophy" />
+  <topic name="phonetic" details="support for phonetic notation" />
+  <topic name="physics" details="support for typesetting physics documents" />
+  <topic name="piedmontese" details="support for typesetting Piedmontese" />
+  <topic name="plain-ext" details="extensions to Plain TeX for higher-level constructs" />
+  <topic name="plain-text" details="derive plain text from a TeX document" />
+  <topic name="planning" details="construct diagrams, etc., for planning" />
+  <topic name="polish" details="support for typesetting Polish" />
+  <topic name="polish-doc" details="documentation in Polish" />
+  <topic name="portuguese" details="support for typesetting Portuguese" />
+  <topic name="portuguese-br" details="support for typesetting Brazilian Portuguese" />
+  <topic name="portuguese-doc" details="documentation in Portuguese" />
+  <topic name="poster" details="typeset posters, etc." />
+  <topic name="pre-release" details="developing version of new software" />
+  <topic name="preamble-admin" details="construction of a LaTeX document preamble" />
+  <topic name="prepress" details="fine-tuning details of output, for printing" />
+  <topic name="preprocessor" details="preprocesses source before using TeX" />
+  <topic name="presentation" details="slides, beamers, handouts, etc." />
+  <topic name="previewer" details="application for viewing a typeset document on screen" />
+  <topic name="print-app" details="application for printing documents" />
+  <topic name="probability" details="typeset reports, etc., of probability" />
+  <topic name="production" details="support for production printing, etc" />
+  <topic name="program-doc" details="support for programming documentation" />
+  <topic name="project-mgmt" details="TeX-related project management" />
+  <topic name="proof" details="typeset proofs and proof diagrams" />
+  <topic name="proposal" details="typeset proposals to funding bodies, etc" />
+  <topic name="protection" details="manipulate the LaTeX &#8216;\protect&#8217; mechanism" />
+  <topic name="ps-manip" details="manipulate PostScript files" />
+  <topic name="pseudocode" details="typeset languages for expressing algorithms" />
+  <topic name="pstricks" details="package using PStricks for graphical output" />
+  <topic name="psychology" details="support for typesetting texts relating to psychology" />
+  <topic name="publicity" details="press releases, etc" />
+  <topic name="publisher" details="prepare documents for a specific publisher" />
+  <topic name="puzzle" details="problems and puzzles, and their solutions" />
+  <topic name="qrcode" details="typeset quick response codes" />
+  <topic name="quotation" details="displayed text" />
+  <topic name="quotation-imp" details="import text from other documents" />
+  <topic name="quotation-mgmt" details="organisation of displayed text" />
+  <topic name="quote-marks" details="manage (possibly language dependent) quote marks" />
+  <topic name="random" details="generate and/or use pseudo-random numbers" />
+  <topic name="record-keep" details="formatting material that constitutes records" />
+  <topic name="ref-latex" details="LaTeX reference documents" />
+  <topic name="report-like" details="regularly-formatted reports" />
+  <topic name="review-document" details="document reviewing subjects relevant for TeX users" />
+  <topic name="romanian" details="support for typesetting Romanian" />
+  <topic name="rotation" details="rotate typeset objects on their page" />
+  <topic name="rule" details="produce rules within a document" />
+  <topic name="russian" details="support for typesetting Russian" />
+  <topic name="russian-doc" details="documentation in Russian" />
+  <topic name="safety-notice" details="risk and safety (etc.) notices" />
+  <topic name="samin" details="support for typesetting samin" />
+  <topic name="sanskrit" details="support for typesetting Sanskrit" />
+  <topic name="scientific-docs" details="support for writers of scientific documents" />
+  <topic name="scottish" details="support for typesetting Gaidhlig (Scottish Gaelic)" />
+  <topic name="security" details="document security measures" />
+  <topic name="semproc" details="typesetting seminar proceedings" />
+  <topic name="serbian" details="documentation in, and support for typesetting Serbian" />
+  <topic name="shortcut" details="shortcuts when typing" />
+  <topic name="simplified" details="simplified markup" />
+  <topic name="slovak" details="support for typesetting, and documentation in Slovak" />
+  <topic name="slovenian" details="support for typesetting, and documentation in Slovenian" />
+  <topic name="somali" details="support for typesetting Somali" />
+  <topic name="sorbian" details="support for typesetting Sorbian" />
+  <topic name="spanish" details="support for typesetting Spanish" />
+  <topic name="spanish-doc" details="documentation in Spanish" />
+  <topic name="spec-alphabet" details="specialised versions of alphabets" />
+  <topic name="spell" details="TeX-aware spelling checker" />
+  <topic name="statistics" details="typeset reports, diagrams, etc., of statistics" />
+  <topic name="std-conform" details="support conformance to standards" />
+  <topic name="std-spec" details="standards, or other normative documents, about TeX and friends" />
+  <topic name="string" details="text string searches and manipulation" />
+  <topic name="struc-mkup" details="structured markup" />
+  <topic name="subdocs" details="include complete documents in other documents" />
+  <topic name="subfloat" details="internal structure within a float" />
+  <topic name="subsup-pos" details="position sub- and superscripts (left and right sides)" />
+  <topic name="sudoku" details="sudoku game" />
+  <topic name="swedish" details="support for typesetting Swedish" />
+  <topic name="swiss" details="typesetting as done in Switzerland" />
+  <topic name="symbol-supp" details="manage symbols in a document" />
+  <topic name="synt-hlt" details="highlight syntax of computer code, etc." />
+  <topic name="syntax" details="syntax of computer science constructs" />
+  <topic name="sys-supp" details="os-level support facilities for TeX" />
+  <topic name="table" details="table typesetting" />
+  <topic name="table-long" details="typeset tables that may be too big for a page" />
+  <topic name="table-rule" details="rules within tables" />
+  <topic name="tagged-pdf" details="tagged PDF compatible" />
+  <topic name="tagged-pdf-incompatible" details="tagged PDF incompatible" />
+  <topic name="tagged-pdf-partially" details="tagged PDF partially compatible" />
+  <topic name="tagged-pdf-unsupported" details="tagged PDF unsupported" />
+  <topic name="teaching" details="support for teachers and teaching administrators" />
+  <topic name="test-bed" details="environment for testing (La)TeX code" />
+  <topic name="test-dist" details="proposed additions to other packages" />
+  <topic name="text-flow" details="flow text round an insertion in the paragraph" />
+  <topic name="text-layout" details="layout of text within paragraphs" />
+  <topic name="text-manip" details="manipulate strings (typically in token lists)" />
+  <topic name="text-symbol" details="symbols for use in text" />
+  <topic name="thai" details="support for typesetting, and documentation in Thai" />
+  <topic name="theology" details="typeset devotional texts and other material of interest to theologians" />
+  <topic name="tibetan" details="support for typesetting Tibetan" />
+  <topic name="timetable" details="schedules of operations, courses, etc." />
+  <topic name="titlepage" details="typesetting title pages for documents" />
+  <topic name="toc-etc" details="deal with Tables of Contents, and of other such things" />
+  <topic name="translation" details="translation of material from the archive, to another language" />
+  <topic name="tree" details="mechanisms for drawing trees" />
+  <topic name="turkish" details="documentation in, and support for typesetting Turkish" />
+  <topic name="turkmen" details="documentation in, and support for typesetting Turkmen" />
+  <topic name="tut-cheat" details="tutorial &#8220;cheat-sheet&#8221;" />
+  <topic name="tut-latex" details="tutorial material for LaTeX" />
+  <topic name="tut-latex-prg" details="tutorial material for LaTeX programming" />
+  <topic name="tut-plaintex" details="tutorial material for Plain TeX" />
+  <topic name="tutorial" details="tutorial material (general)" />
+  <topic name="typeset-grid" details="typeset, snapping lines of text to a grid" />
+  <topic name="typeset-std" details="typeset documents about standards, or the standards themselves" />
+  <topic name="typeset-tool" details="tools supporting or evaluating typesetting," />
+  <topic name="typesetting" details="support for variations of typographic style" />
+  <topic name="typo-archaic" details="typography to match ancient practices" />
+  <topic name="ukrainian" details="documentation in, and support for typesetting Ukrainian" />
+  <topic name="uml" details="support for Universal Modelling Language diagrams" />
+  <topic name="underline" details="underlining/overlining text (including other decorations)" />
+  <topic name="unicode" details="Unicode, material supporting it, and packages requiring it" />
+  <topic name="units" details="uniform typesetting of units" />
+  <topic name="urdu" details="support for typesetting Urdu" />
+  <topic name="use-lua" details="package requires availability of lua" />
+  <topic name="use-luatex" details="package will use LuaTeX facilities if available" />
+  <topic name="use-sample" details="sample of use of macro collections, etc." />
+  <topic name="use-xetex" details="package will use XeTeX facilities if available" />
+  <topic name="utf8-adapt" details="adaptation of existing packages to UTF-8 input" />
+  <topic name="verbatim" details="verbatim typesetting, etc." />
+  <topic name="verse" details="typeset verse, etc." />
+  <topic name="version-control" details="version control details" />
+  <topic name="vietnamese" details="support for typesetting of Vietnamese" />
+  <topic name="vietnamese-doc" details="documentation in Vietnamese" />
+  <topic name="view-app" details="application for viewing documents" />
+  <topic name="view-doc" details="application for viewing documentation" />
+  <topic name="visual-supp" details="support for typesetting with low-vision readers in mind" />
+  <topic name="watermark" details="separate printing, under (or over) the page as a whole" />
+  <topic name="welsh" details="support for typesetting Welsh" />
+  <topic name="word-count" details="count the &#8216;words&#8217; in a document" />
+  <topic name="word-proc" details="dealing with word processors" />
+  <topic name="xetex" details="XeTeX, material supporting it, and packages requiring it" />
+</topics>

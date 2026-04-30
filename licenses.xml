@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE licenses SYSTEM 'http://www.ctan.org/xml/2.0/catalogue.dtd'>
+<licenses>
+  <license key="0bsd" name="Zero-Clause BSD" free="true" />
+  <license key="agpl3" name="GNU Affero General Public License, version 3" free="true" />
+  <license key="apache2" name="Apache License, version 2.0" free="true" />
+  <license key="artistic" name="Perl Artistic License" free="false" />
+  <license key="artistic2" name="Perl Artistic License, version 2" free="true" />
+  <license key="bsd" name="BSD Style License" free="true" />
+  <license key="bsd2" name="Simplified BSD License" free="true" />
+  <license key="bsd3" name="3-clause BSD License" free="true" />
+  <license key="bsd4" name="BSD License" free="true" />
+  <license key="cc-by-1" name="CC BY 1.0" free="true" />
+  <license key="cc-by-2" name="CC BY 2.0" free="true" />
+  <license key="cc-by-3" name="CC BY 3.0" free="true" />
+  <license key="cc-by-4" name="CC BY 4.0" free="true" />
+  <license key="cc-by-nc-1" name="CC BY-NC 1.0" free="false" />
+  <license key="cc-by-nc-2" name="CC BY-NC 2.0" free="false" />
+  <license key="cc-by-nc-3" name="CC BY-NC 3.0" free="false" />
+  <license key="cc-by-nc-4" name="CC BY-NC 4.0" free="false" />
+  <license key="cc-by-nc-nd-1" name="CC BY-NC-ND 1.0" free="false" />
+  <license key="cc-by-nc-nd-2" name="CC BY-NC-ND 2.0" free="false" />
+  <license key="cc-by-nc-nd-2.5" name="CC BY-NC-ND 2,5" free="false" />
+  <license key="cc-by-nc-nd-3" name="CC BY-NC-ND 3.0" free="false" />
+  <license key="cc-by-nc-nd-4" name="CC BY-NC-ND 4.0" free="false" />
+  <license key="cc-by-nc-sa4" name="CC BY-NC-SA 4.0" free="false" />
+  <license key="cc-by-nd-1" name="CC BY-ND 1.0" free="false" />
+  <license key="cc-by-nd-2" name="CC BY-ND 2.0" free="false" />
+  <license key="cc-by-nd-3" name="CC BY-ND 3.0" free="false" />
+  <license key="cc-by-nd-4" name="CC BY-ND 4.0" free="false" />
+  <license key="cc-by-sa-1" name="CC BY-SA 1.0" free="true" />
+  <license key="cc-by-sa-2" name="CC BY-SA 2.0" free="true" />
+  <license key="cc-by-sa-3" name="CC BY-SA 3.0" free="true" />
+  <license key="cc-by-sa-4" name="CC BY-SA 4.0" free="true" />
+  <license key="cc0" name="CC0 1.0" free="true" />
+  <license key="eupl" name="European Union Public License 1.2" free="true" />
+  <license key="fdl" name="Free Documentation License" free="true" />
+  <license key="gfl" name="The GUST Font License (GFL)" free="true" />
+  <license key="gfsl" name="The GUST Font Source License (GFSL)" free="true" />
+  <license key="gpl" name="GNU General Public License" free="true" />
+  <license key="gpl1" name="GNU General Public License, version 1" free="true" />
+  <license key="gpl1+" name="GNU General Public License, version 1 or newer" free="true" />
+  <license key="gpl2" name="GNU General Public License, version 2" free="true" />
+  <license key="gpl2+" name="GNU General Public License, version 2 or newer" free="true" />
+  <license key="gpl3" name="GNU General Public License, version 3" free="true" />
+  <license key="gpl3+" name="GNU General Public License, version 3 or newer" free="true" />
+  <license key="gpl3+fe" name="GNU General Public License 3 with font exception" free="true" />
+  <license key="isc" name="ISC License" free="true" />
+  <license key="knuth" name="Knuth License" free="true" />
+  <license key="lgpl" name="GNU Lesser General Public License" free="true" />
+  <license key="lgpl2.1" name="GNU Lesser General Public License 2.1" free="true" />
+  <license key="lgpl3" name="GNU Lesser General Public License 3" free="true" />
+  <license key="lppl" name="The LaTeX Project Public License" free="true" />
+  <license key="lppl1" name="The LaTeX Project Public License 1" free="true" />
+  <license key="lppl1.2" name="The LaTeX Project Public License 1.2" free="true" />
+  <license key="lppl1.3" name="The LaTeX Project Public License 1.3" free="true" />
+  <license key="lppl1.3a" name="The LaTeX Project Public License 1.3a" free="true" />
+  <license key="lppl1.3b" name="The LaTeX Project Public License 1.3b" free="true" />
+  <license key="lppl1.3c" name="The LaTeX Project Public License 1.3c" free="true" />
+  <license key="mit" name="MIT License" free="true" />
+  <license key="nocommercial" name="No Commercial Use" free="false" />
+  <license key="nosell" name="Do Not Sell Except by Arrangement" free="false" />
+  <license key="nosource" name="No Source Available" free="false" />
+  <license key="ofl" name="The SIL Open Font License" free="true" />
+  <license key="opl" name="Open Publication License" free="true" />
+  <license key="other-free" name="Free license not otherwise listed" free="true" />
+  <license key="other-nonfree" name="License that prevents distribution" free="false" />
+  <license key="pd" name="Public Domain Software" free="true" />
+  <license key="shareware" name="Shareware: A fee is required" free="false" />
+  <license key="x11" name="X11 License" free="true" />
+</licenses>
