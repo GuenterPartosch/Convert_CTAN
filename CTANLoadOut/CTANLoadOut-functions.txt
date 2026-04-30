@@ -1,14 +1,30 @@
-Functions (CTANLoad+out)
-========================
-2023-06-30
+Functions (CTANLoadout)
+=======================
+2026-04-18
 
-fold(s):                    # auxiliary function: shortens long option values for output
-func_call_check():          # CTANLoad (Check) is processed.
-func_call_compile():        # Compiles the generated LaTeX file.
-func_call_load():           # CTANLoad is processed.
-func_call_output():         # CTANOut is processed.
-func_call_regeneration():   # CTANLoad (Regeneration) is processed.
-head():                     # shows the given options
-main():                     # main function
-remove_LaTeX_file(t):       # auxiliary function: removes named LaTeX file.
-remove_other_file(t):       # auxiliary function: removes named other file.
+fold(s)                                  function foldauxiliary functionshortens/foldens long option lists for output
+func_call_load()                         function func_call_load()CTANLoad is processed.            
+func_call_check()                        function func_call_check()CTANLoad (Check) is processed.
+func_call_regeneration()                 function func_call_regeneration()CTANLoad (Regeneration) is processed.
+func_call_output()                       function func_call_output()CTANOut is processed.
+func_call_compile()                      Compiles the generated LaTeX file
+head()                                   function headshows the called options
+main()                                   main function
+remove_LaTeX_file(t)                     auxiliary function remove_LaTeX_fileremoves named LaTeX file.
+remove_other_file(t)                     auxiliary function remove_other_fileremoves named other file
+
+
+main()
+    ---> head
+    ---> func_call_regeneration
+    ---> func_call_load
+    ---> func_call_check
+    ---> func_call_output
+    ---> func_call_compile
+head()                                                            
+    ---> folddef 
+func_call_compile
+    ---> remove_LaTeX_file
+func_call_output
+    ---> remove_other_file
+    ---> remove_LaTeX_file

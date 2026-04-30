@@ -1,22 +1,420 @@
-:: Examples for CTANLoadOut.py
-:: 2025-02-12
+Examples (CTANLoadOut)
+======================
+2026-04-18
 
-:: CTANLoadOut.py -r
-:: CTANLoadOut.py -r -v -stat
-:: CTANLoadOut.py -l
-:: CTANLoadOut.py -l -v -stat
-:: CTANLoadOut.py -mt -p
+Call the Python program CTANLOadOut:
+
+There are the following ways to call CTANLoadOut :
+
+1. python -u CTANLoadOut.py <option(s)>
+-- always works
+2. CTANLoadOut.py <option(s)>
+-- if the OS knows how to handle Python files (files with the name extension .py)
+3. CTANLoadOut <option(s)>
+-- if there is an executable (in Windows a file with the name extension .exe)
+
+In the following examples we will use possibility 2.
+
+Steps:
+1st step: load XML a/o PDF files
+2nd step: process, -l, -r a/o -c
+3rd step: generate output
+4th step: compile LaTeX file by LuaLaTeX twice, process xyz.idx by makeindex, compile LaTeX file by LuaLaTeX
+
+CTANLoadOut.py -r
+  + (2025-02-10: 6703)
+  + without statistics
+  + not verbose
+  + no 1st step
+  + 2nd step:
+  + regeneration of the 2 pickle files                                           [-r]
+  + a lot of new PDF files
+  + results in CTAN.pkl and CTAN2.pkl
+  + no 3rd step
+  + no 4th step
+
+CTANLoadOut.py -r -v -stat
+  + (2025-02-10: 6703)
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
+  + no 1st step
+  + 2nd step:
+  + regeneration of the 2 pickle files                                           [-r]
+  + a lot of new PDF files
+  + results in CTAN.pkl and CTAN2.pkl
+  + no 3rd step
+  + no 4th step
+
+CTANLoadOut.py -l
+  + (2025-02-10: 6703)
+  + without statistics
+  + not verbose
+  + no 1st step
+  + 2nd step:
+  + CTAN.pkl rewritten
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten               [-l]
+  + no 3rd step
+  + no 4th step
+
+CTANLoadOut.py -l -v -stat
+  + (2025-02-10: 6703)
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
+  + no 1st step
+  + 2nd step:
+  + CTAN.pkl rewritten
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten               [-l]
+  + no 3rd step
+  + no 4th step
+
+CTANLoadOut.py -mt -p
+  + (2025-02-10: 6703)
+  + without statistics
+  + not verbose
+  + no XML/PDF file from CTAN is downloaded
+  + no 1st step
+  + no 2nd step
+  + 3rd step:
+  + all XML/PDF files in the current directory are processed
+  + output format is LaTeX (forced by -p)                                      
+  + output file is all.tex
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (called in all.tex)   [-mt]
+  + 4th step:
+  + all.tex is completely compiled                                               [-p]
+  + output file is all.pdf
+
 CTANLoadOut.py -mt -m latex -p -v -stat
-CTANLoadOut.py -to latex -m bib -v -stat
-CTANLoadOut.py -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
-CTANLoadOut.py -t pgf -l -c -mt -p -v -stat
-CTANLoadOut.py -k latex -m txt -v 
-CTANLoadOut.py -k latex -f -v -stat -mt -p
-CTANLoadOut.py -k chinese -t "^zh" -f -v -stat
-CTANLoadOut.py -ko "latex" -m bib -v
-CTANLoadOut.py -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
-CTANLoadOut.py -k class -v -m latex -mt  -L lppl  -p  -f -A Mittelbach
-CTANLoadOut.py -k class -v -m latex -mt  -L lppl -A Kohm -t scr -p  -f
-CTANLoadOut.py -L lppl -A Fairbairns -k footnote -v 
-CTANLoadOut.py -k class -L lppl -A Kohm -t scr
+  + (2025-02-10: 113)
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
+  + no 1st step:
+  + no XML/PDF file from CTAN is downloaded
+  + no 2nd step
+  + 3rd step:
+  + all XML files in the current directory are processed
+  + output format is LaTeX                                                       [-m]
+  + output file is all.tex
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (called in all.tex)   [-mt]
+  + 4th step:
+  + all.tex is completely compiled                                               [-p]
+  + output file is all.pdf
 
+CTANLoadOut.py -to latex -m bib -v -stat
+  + (2025-02-10: 113)
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
+  + no 1st step
+  + no XML/PDF file from CTAN is downloaded
+  + no 2nd step
+  + 3rd step:
+  + all local XML fies which match the name template "latex" are processed       [-to]
+  + output format is BibLaTeX
+  + output file is all.bib                                                       [-m]
+
+CTANLoadOut.py -t "latex|ltx|l3|lt3" -f -m tex -mt -v -stat
+  + (2025-02-10: 123)
+  + with statistics                                                              [-stat]
+  + verbose                                                                      [-v]
+  + 1st step:
+  + XML file with the name template "latex|ltx|l3|lt3" are downloaded from CTAN  [-t]
+  + associated PDF files are downloaded, too                                     [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + all local XML files with the name template "latex|ltx|l3|lt3" are processed  [-t]
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)       [-mt]
+  + output format is LaTeX                                                       [-m]
+  + output file is all.tex
+  + no 4th step
+
+CTANLoadOut.py -t pgf -l -c -mt -p -v -stat
+  + (2025-02-10: 23)
+  + with statistics                                                             [-stat]
+  + verbose                                                                     [-v]
+  + 1st step:
+  + XML file with the name template "pgf" are downloaded from CTAN              [-t]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten              [-l]
+  + a consistency check is done                                                 [-c]
+  + 3rd step:
+  + all local XML files wwith the template "pgf" are processed                  [-t]
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (called in all.tex)  [-mt]
+  + output format is LaTeX (implicitely)                                                                 
+  + output file is all.tex
+  + 4th step:
+  + all.tex is completely compiled                                              [-p]
+  + output file is all.pdf
+
+CTANLoadOut.py -k latex -m txt -v 
+  + (2025-02-10: 113)
+  + without statistics
+  + verbose                                                                     [-v]
+  + 1st step:
+  + download all XML packages which match the topic "latex"                     [-k] 
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + all local XML files with the topic "latex" are processed                    [-k]
+  + output format is plain                                                      [-m]
+  + output file is all.txt
+  + no 4th step
+
+CTANLoadOut.py -y 199[01] -v -stat
+  + (2025-02-10: 103)
+  + without statistics
+  + verbose                                                                     [-v]
+  + 1st step:
+  + download all XML packages which match the year template "199[01]"           [-y] 
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process all XML packages which match the year template "199[01]"            [-y] 
+  + output format is RIS (default)
+  + output file is all.ris
+  + no 4th step
+
+CTANLoadOut.py -k latex -f -v -stat -mt -p
+  + (2025-02-10: 113)
+  + verbose                                                                     [-v]
+  + with statistics                                                             [-stat]
+  + 1st step:
+  + download all XML packages which match the topic "LaTeX"                     [-k]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process all local XML files with the topic "latex"                          [-k]
+  + output format is LaTeX (implicitely)                                                                 
+  + output file is all.tex
+  + all.top, all.xref, all.tap are generated (will be included in all.tex)      [-mt]
+  + 4th step:
+  + all.tex is completely compiled                                              [-p]
+  + output file is all.pdf
+
+CTANLoadOut.py -k chinese -t "^zh" -f -v -stat
+  + (2025-02-10: 8)
+  + verbose                                                                     [-v]
+  + with statistics                                                             [-stat]
+  + 1st step:
+  + download all XML packages which match the topic "chinese"                   [-k]
+  + load only CTAN XML files with the name template "^zh"                       [-t]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process all local XML packages which match the topic "chinese"              [-k]
+  + process only local XML files with the name template "^zh"                   [-t]
+  + output format is RIS (default)                                                                 
+  + output file is all.ris
+  + no 4th step
+
+CTANLoadOut.py -ko "latex" -m bib -v
+  + (2025-02-10: 113)
+  + verbose                                                                     [-v]
+  + without statistics
+  + no 1st step
+  + no 2nd step
+  + 3rd step:
+  + process all XML files in the current directory with the topic "latex"       [-ko]
+  + output format is BibLaTeX                                                   [-m]                                                           
+  + output file is all.bib
+  + no 4th step
+
+CTANLoadOut.py -Ao "Voß" -yo "2021|2022|2023" -m bib
+  + (2025-02-10: 35)
+  + not verbose                                                                     
+  + without statistics
+  + no 1st step
+  + no 2nd step
+  + 3rd step:
+  + process all XML files with the author template "Voß"                        [-Ao]
+  + process all XML files with the year template "2021|2022|2023"               [-yo]
+  + output format is BibLaTeX                                                   [-m]                                                           
+  + output file is all.bib
+  + no 4th step
+
+CTANLoadOut.py -A "Knuth" -f -v -stat -m latex -mt -p -k "collection" -t "knuth"
+  + (2025-02-10: 4)
+  + verbose                                                                     [-v]
+  + with statistics                                                             [-stat]
+  + 1st step:
+  + download all XML packages which match the topic "collection"                [-k]
+  + download only packages which match the author name template "Knuth"         [-A]
+  + download only packages with the name template "knuth"                       [-t]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process all local XML files which match the topic "collection"              [-k]
+  + process local XML files which match the author template "Knuth"             [-A]
+  + process local XML files with the name template "knuth"                      [-t]
+  + output format is LaTeX                                                      [-m]            
+  + output file is all.tex
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (called in all.tex)  [-mt]
+  + 4th step:
+  + all.tex is completely compiled                                              [-p]
+  + output file is all.pdf
+
+CTANLoadOut.py -k class -v -m latex -mt -L lppl -p -f -A Mittelbach
+  + (2025-02-10: 4)
+  + verbose                                                                     [-v]
+  + without statistics
+  + 1st step:
+  + download only packages which match the author template "Mittelbach"         [-A]
+  + download all XML packages which match the topic template"class"             [-k]
+  + download local XML files with the license template "lppl"                   [-L]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process only packages which match the author template "Mittelbach"          [-A]
+  + process all XML packages which match the topic template"class"              [-k]
+  + process local XML files with the license template "lppl"                    [-L]
+  + output format is LaTeX                                                      [-m]            
+  + output file is all.tex 
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (called in all.tex)  [-mt]
+  + 4th step:
+  + compile all.tex by LuaLaTeX                                                 [-p]
+  + output file is all.pdf
+
+CTANLoadOut.py -k class -v -m latex -mt  -L lppl -A Kohm -t scr -p  -f
+  + (2025-02-10: 5)
+  + verbose                                                                     [-v]
+  + without statistics
+  + 1st step:
+  + download only packages which match the author name template "Kohm"          [-A]
+  + download all XML packages which match the topic "class"                     [-k]
+  + download local XML files with the name template "scr"                       [-t]
+  + download local XML files with the license name template "lppl"              [-L]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process only packages which match the author name template "Kohm"           [-A]
+  + process all XML packages which match the topic "class"                      [-k]
+  + process local XML files with the name template "scr"                        [-t]
+  + process local XML files with the license name template "lppl"               [-L]
+  + output format is LaTeX                                                      [-m]            
+  + output file is all.tex
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (called in all.tex)  [-mt]
+  + 4th step:
+  + compile all.tex by LuaLaTeX                                                 [-p]
+  + output file is all.pdf
+
+CTANLoadOut.py -L lppl -A Fairbairns -k footnote -v 
+  + (2025-02-10: 2)
+  + verbose                                                                     [-v]
+  + without statistics
+  + 1st step:
+  + download only packages which match the author name template "Fairbairns"    [-A]
+  + download all XML packages which match the topic "footnote"                  [-k]
+  + download local XML files with the license name template "lppl"              [-L]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process only packages which match the author name template "Fairbairns"     [-A]
+  + process all XML packages which match the topic "footnote"                   [-k]
+  + process local XML files with the license name template "lppl"               [-L]
+  + output format is RIS (default)
+  + output file is all.ris
+  + no 4th step
+
+CTANLoadOut.py -k class -L lppl -A Kohm -t scr
+  + (2025-02-10: 5)
+  + not verbose                                                                 
+  + without statistics
+  + 1st step:
+  + download only packages which match the author name template "Kohm"          [-A]
+  + download all XML packages which match the topic "class"                     [-k]
+  + download local XML files with the name template "scr"                       [-t]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by step 1+3) [-l]
+  + 3rd step:
+  + process only packages which match the author name template "Kohm"           [-A]
+  + process all XML packages which match the topic "class"                      [-k]
+  + process local XML files with the name template "scr"                        [-t]
+  + output format is RIS (default)
+  + output file is all.ris
+  + no 4th step
+
+CTANLoadOut.py -L pd -A Knuth -t knuth -p -v -stat -f
+  + (2025-02-10: 2)
+  + with statistics                                                             [-stat]
+  + verbose                                                                     [-v]
+  + 1st step:
+  + download only packages which match the author template "Knuth"              [-A]
+  + download all XML packages which match the name template "knuth"             [-k]
+  + download local XML files with the license template "pd"                     [-t]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by -p) [-l]
+  + 3rd step:
+  + process only packages which match the author template "Knuth"               [-A]
+  + process all XML packages which match the name template "knuth"              [-k]
+  + process local XML files with the license template "pd"                      [-t]
+  + output format is LaTeX (forced by -p)
+  + output file is all.tex
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (forced by -p)       [-mt]
+  + 4th step:
+  + compile all.tex by LuaLaTeX (forced by -p)
+  + output file is all.pdf
+
+CTANLoadOut.py  -k font -A Tennent -y 202[0-3] -L lppl  -stat -p -v -f
+  + (2025-02-10: 21)
+  + with statistics                                                             [-stat]
+  + verbose                                                                     [-v]
+  + 1st step:
+  + download only packages which match the author template "Tennent"            [-A]
+  + download all XML packages which match the topic template "font"             [-k]
+  + download local XML files with the license template "lppl"                   [-t]
+  + download local XML files with the year template "202[0-3]"                  [-y]
+  + load the associated information files (PDF)                                 [-f]
+  + 2nd step:
+  + all.loa, all.lop, all.lok, all.lol, all.lpt, all.lap rewritten (forced by -p) [-l]
+  + 3rd step:
+  + process only packages which match the author template "Tennent"             [-A]
+  + process all XML packages which match the topic template "font"              [-k]
+  + process local XML files with the license template "lppl"                    [-t]
+  + process local XML files with the year template "202[0-3]"                   [-y]
+  + output format is LaTeX (forced by -p)
+  + output file is all.tex
+  + generate all.top, all.xref, all.tap, all.lic, all.tlp  (forced by -p)       [-mt]
+  + 4th step:
+  + compile all.tex by LuaLaTeX (forced by -p)
+  + output file is all.pdf
+
+CTANLoadOut.py  -k font -A Tennent -y 202[0-3] -L lppl  -stat -lvp
+  + (2026-04-18)
+  + the same as above, but with the combined options -l, -v and -p
+
+Filter options -L, -A, -k, -t, -y
+-----------------------------
+(and -Ll, -Lo; -Al, -Ao; -kl, -ko; -tl, -to; -yl, -yo)
+
+		    unforced            CTANLoad   forced (+)  CTANOut   forced (++)
+-L    -Ll    -Lo    CTANLoad  CTANOut	CTANLoad   CTANOut     CTANLoad  CTANOut
+
+-L A  -Ll B  -Lo C  B	      C     	B	   C           B	 C
+-L A		    A	      A	        A	   A	       A	 A
+-L A  -Ll B	    B         A	        B	   A	       B	 A
+-L A	     -Lo C  A	      C	        A          C	       A	 C
+      -Ll B  -Lo C  B	      C     	B	   C	       B	 C
+      -Ll B	    B	      ---	B	   ---	       B	 default
+	     -Lo C  ---	      C	        default    C	       ---       C
+
+(+) options -f, -n, ... for instance
+(++) options -m, -mo, -mt, ... for instance
+
+
+Regular expressions
+-------------------
+The options -t (a/o -to and -tl), -k (a/o -ko and -kl), -A (and/or -Al and -Ao),-y (and/or -yl and -yo),  
+and -L (and/or -Ll and -Lo) need regular expressions as values.
+
+such as
+
+-k latex                matches all topic names which contain "latex"
+-t "latex|ltx|l3|lt3"   matches all package names which contain "latex", "ltx", "l3" or "t3"
+-t "^.+$"               matches all package names
+-t "^{a-b]"             matches all package names which begin with letters a-b
+-y "20[0-2][0-9]"       matches all years between 2000 and 2029
