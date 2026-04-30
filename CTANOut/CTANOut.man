@@ -16,38 +16,35 @@ Global options (without any actions):
   -V, --version         Shows version of the program and exit.
 
 Options related to output:
-  -A <author template>, --author_template <author template>
+  -A, --author_template <author template>
                         Template for output filtering on the base of author
                         names -- Default: ^.+$
-  -b <btype>, --btype <btype>
-                        Type of BibLaTex entries to be generated [only for
+  -b, --btype <btype>   Type of BibLaTex entries to be generated [only for
                         BibLateX mode] -- Default: @online
-  -d <directory>, --directory <directory>
+  -d, --directory <directory>
                         Folder for input and output files -- Default: .\
-  -k <key template>, --key_template <key template>
+  -k, --key_template <key template>
                         Template for output filtering on the base of keys --
                         Default: ^.+$
-  -L <license template>, --license_template <license template>
+  -L, --license_template <license template>
                         Template for output filtering on the base of license
                         names -- Default: ^.+$
-  -m <mode>, --mode <mode>
-                        Target format -- Default: RIS
+  -m, --mode <mode>     Target format -- Default: RIS
   -mt, --make_topics    Flag: Generates topic lists [meaning of
                         topics|licenses + cross-references (topics|packages,
                         uthors|packages, licenses|packages); only for -m
                         LaTeX]). -- Default: False
   -nf, --no_files       Flag: Do not generate output files. -- Default: False
-  -o <output>, --output <output>
+  -o, --output <output>
                         Generic name [without extensions] for output files --
                         Default: all
-  -s <skip>, --skip <skip>
-                        Skips specified CTAN fields. -- Default: []
-  -sb <skip biblatex>, --skip_biblatex <skip biblatex>
+  -s, --skip <skip>     Skips specified CTAN fields. -- Default: []
+  -sb, --skip_biblatex <skip biblatex>
                         Skips specified BibLaTeX fields. -- Default: []
-  -t <name template>, --name_template <name template>
-                        emplate for output filtering on the base ofpackage
+  -t, --name_template <name template>
+                        Template for output filtering on the base of package
                         names -- Default: ^.+$
-  -y <year template>, --year_template <year template>
+  -y, --year_template <year template>
                         Template for output filtering on the base of years --
                         Default: ^19[89][0-9]|20[012][0-9]$
 
