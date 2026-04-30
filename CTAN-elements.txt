@@ -4,49 +4,49 @@ Elements of CTAN XML files
 CTAN file 'authors' ('authors.xml' on pc)
 =========================================
 <authors> ... </authors>
-       <author .../>	attributes: id, givenname, familyname
+       <author .../>	 attributes: id, givenname, familyname
 
 CTAN file 'topics' ('topics.xml' on pc)
 =======================================
 <topics> ... </topics>
-       <topic .../>	attribute; name, details
+       <topic .../>	 attribute; name, details
 
 CTAN file 'packages' ('packages.xml' on pc)
 ===========================================
 <packages> ... </packages>
-       <package .../>	attributes: key, name, caption
+       <package .../>	 attributes: key, name, caption
 
 CTAN file 'licenses' ('licenses.xml' on pc)
 ===========================================
 <licenses> ... </licenses>
-       <license .../>	attributes: key, name, free
+       <license .../>	 attributes: key, name, free
 
 Package descriptions on CTAN
 ============================
 First-level
 -----------
-<alias .../>	attribute: id
-<also .../>	attribute: refid
-<authorref .../>	attributes: key, id, givenname, familyname, active
+<alias .../>	         attribute: id
+<also .../>	         attribute: refid
+<authorref .../>	 attributes: key, id, givenname, familyname, active
 <caption> ... </caption>
-<contact .../>	attributes: type, href
-<copyright .../>	attributes: owner, year
-<ctan .../>	attributes: path, file
+<contact .../>	         attributes: type, href
+<copyright .../>	 attributes: owner, year
+<ctan .../>	         attributes: path, file
 <description ...> ... </description>	attribute: language
-<documentation .../>	attributes: details, href, language
-<entry ...> ... </entry>	attribute: id
-<home .../>	attribute: href
-<install .../>	attribute: path
-<keyval .../>	attributes: key, value
-<license .../>	attributes: type, date
-<miktex .../>	attribute: location
+<documentation .../>	 attributes: details, href, language
+<entry ...> ... </entry> attribute: id
+<home .../>	         attribute: href
+<install .../>	         attribute: path
+<keyval .../>	         attributes: key, value
+<license .../>	         attributes: type, date
+<miktex .../>	         attribute: location
 <name> ... </name>
-<texlive .../>	attributes: location
-<version .../>	attributes: number, date
+<texlive .../>	         attributes: location
+<version .../>	         attributes: number, date
 
 Elements in <documentation> ... </documentation>
 ------------------------------------------------
-<a ...> ... </a>	attribute: href
+<a ...> ... </a>	 attribute: href
 <b> ... </b>
 <br/>
 <code> ... </code>
@@ -61,5 +61,5 @@ Elements in <documentation> ... </documentation>
 <small> ... </small>
 <tt> ... </tt>
 <ul> ... </ul>
-<xref ...> ... </xref>	attribute: refid
+<xref ...> ... </xref> 	attribute: refid
 

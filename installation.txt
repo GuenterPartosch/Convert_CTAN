@@ -1,9 +1,16 @@
 Installation
 ============
-2025-02-18
+2026-04-29
 
 * Download the archive [programs.zip] from Git.
 * Unpack the Archive into an empty Directory.
+* Make sure you have a programme installed on your computer that allows you to 
+  download files from the internet (such as [wget2]).
+** Note 1: You can find wget2 as [wget2] in the CTAN_Convert bundle, and after 
+   installation in the CTAN_Convert folder.
+** Note 2: If you are using a different compatible programme, you will need to 
+   amend the relevant lines in the CTANLoad.py script: 
+   WGET = "wget2"
 
 The programs can then be called. See also [call.txt].
 

@@ -1,6 +1,6 @@
 Call
 ====
-2025-02-18
+2026-04-30
 
 Python must be available on the computer so that the programmes in the bundle can be called at all.
 
@@ -10,20 +10,20 @@ Then the following cases are conceivable in the command line (in Windows: comman
    Always works if Python is installed.
 
    <program>:  CTANLoad-py  | CTANOut.py | CTANLoadOut.py | menu_CTANLoadOut.py
-   <option(s): see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man]
+   <option(s): see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man].
    menu_CTANLoadOut.py is called without parameters.
 
 2) <program> <option(s)>
    Always works if the operating system knows how to handle .py files.
 
    <program>:  CTANLoad-py | CTANOut.py | CTANLoadOut.py | menu_CTANLoadOut.py
-   <option(s): see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man]
+   <option(s): see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man].
    menu_CTANLoadOut.py is called without parameters.
 
 3) <executable> <opition(s)>
    Works if there is an executable program (in Windows: .exe file).
 
-   <program>:  CTANLoad-exe | CTANOut.exe 
+   <executable>:  CTANLoad.exe | CTANOut.exe 
    <option(s): see [CTANLoad.man] or [CTANOut.man]
    	
    

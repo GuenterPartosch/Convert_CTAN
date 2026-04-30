@@ -1,6 +1,6 @@
 XML files to be corrected
 =========================
-2024-03-24
+2026-04-19
 
 Sometimes there are CTAN XML files with some deficiencies. These file are to be corrected locally-
 
@@ -9,6 +9,7 @@ not well-formed:
 (for instance: no entity for &)
 
 graphpaper
+jpeg2ps
 luximono
 oriya
 psnfssx-em
@@ -20,5 +21,5 @@ xpdf
 attribute "year" with wrong content:
 ------------------------------------
 preview
-
+pdftex
 

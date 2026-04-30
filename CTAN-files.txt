@@ -1,8 +1,18 @@
-CTANLoad + CTANOut, Files; 2022-03-04
-==================
+CTANLoad + CTANOut + CTANLoadOut + menu_CTANLoadOut
+===================================================
+files in the context of CTANLoad.py, CTANOut.py, CTANLoadOut.py, and menu_CTANLoadOut
+2026-04-30
+
 xyz   is a generic file name (option -o in CTANLoad or CTANOut)
 abc   is a name of a CTAN package
-012   is a unique 10-digit part of PDF file names
+ddd   is a unique 10-digit part of PDF file names
+ppp   name of a CTAN-related program (CTANLoad, CTANOut, CTANLoadOut, menu_CTANLoadOut)
+
+call.txt         methods for calling the programmes in the Convert_CTAN bundle
+CTAN-files.txt   this file
+firststeps.txt   getting started with the Convert_CTAN bundle
+installation.txt notes on installing the Convert_CTAN bundle
+wget.txt         notes on wget a/o wget2
 
 authors.xml   local XML file; downloaded by CTANLoad from CTAN
 topics.xml    local XML file; downloaded by CTANLoad from CTAN
@@ -13,7 +23,7 @@ CTAN.pkl      1st pickle file; created by CTANLoad
 CTAN2.pkl     2nd pickle file; created by CTANLoad
 
 abc.xml       local XML package file; downloaded by CTANLoad
-012-abc.pdf   local PDF file; downloaded by CTANLoad
+ddd-abc.pdf   local PDF file; downloaded by CTANLoad
 
 xyz.loa       list of authors; created by CTANLoad (option -l)
 xyz.lok       list of keys; created by CTANLoad (option -l)
@@ -41,3 +51,16 @@ xyz.idx       raw index file created by LuaLaTeX
 xyz.ilg       log file created by makeindex
 xyz.ind       index file created by makeindex
 xyz.log       log file created by LuaLatex
+
+program-specific files (CTANLoad, CTANOut, CTANLoadOut, menu_CTANLoadOut)
+-------------------------------------------------------------------------
+ppp.py            Python program (CTANLoad, CTANOut, CTANLoadOut, menu_CTANLoadOut)
+ppp.exe           executable for ppp (CTANLoad, CTANOut; only for Windows)
+ppp.man           manpage for ppp (CTANLoad, CTANOut, CTANLoadOut)
+ppp-changes.txt   changes for ppp (CTANLoad, CTANOut, CTANLoadOut, menu_CTANLoadOut)
+ppp-examples.txt  ppp examples (CTANLoad, CTANOut, CTANLoadOut)
+ppp-examples.bat  bat file for ppp examples (CTANLoad, CTANOut, CTANLoadOut); only Windows
+ppp-functions.txt functionsfor ppp
+ppp-messages.txt  Messages for ppp [infos, errors, warnings] (CTANLoad, CTANOut, CTANLoadOut, menu_CTANLoadOut)
+ppp-modules.txt   modules to be imported (CTANLoad, CTANOut, CTANLoadOut, menu_CTANLoadOut) by ppp
+

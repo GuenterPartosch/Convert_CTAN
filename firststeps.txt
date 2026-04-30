@@ -1,6 +1,6 @@
 First steps
 ===========
-2025-02-20
+2026-04-29
 
 If the Convert_CTAN bundle is installed (see [installation.txt] and [programs.zip]), the individual programmes can be called.
 
@@ -76,7 +76,7 @@ lualatex all.tex
 
 Case 4
 ------
-The two steps in case 2 should be combined.
+The two steps in case 2 could be combined.
 
 CTANLoadOut.py -k "biomedical|medical" -f  -m bib -v -stat
 
@@ -93,7 +93,7 @@ CTANLoadOut.py -k "biomedical|medical" -f  -m bib -v -stat
 
 Case 5
 ------
-All steps in case 3 should be combinded.
+All steps in case 3 could be combinded.
 
 CTANLoadOut.py -A "Mittelbach|Voß"  -y "2024|2025" -f  -m tex -mt -p -v -stat
 
