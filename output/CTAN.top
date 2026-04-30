@@ -1,7 +1,7 @@
-% file: CTAN.top (in LaTeX format)
-% date: 2025-02-21
-% time: 18:23:18
-% is called by CTAN.tex
+% file: all.top (in LaTeX format)
+% date: 2026-04-29
+% time: 19:51:54
+% is called by all.tex
 
 \section{Used topics, short explainations}
 
@@ -22,9 +22,9 @@
 \item[\texttt{amusements}] jokes, distractions, tongue-in-cheek packages, and other entertainment material
 \item[\texttt{android}] usable under Android
 \item[\texttt{apa}] typesetting according to the rules of the American Psychological Association
-\item[\texttt{appendix}] Typsetting and using appendices
+\item[\texttt{appendix}] typesetting and using appendices
 \item[\texttt{arabic}] documentation in and support for typesetting Arabic
-\item[\texttt{arch-tree}] Root directory of a (sub-)tree of the archive
+\item[\texttt{arch-tree}] root directory of a (sub-)tree of the archive
 \item[\texttt{archival}] creating archival copies, or copies for distribution
 \item[\texttt{arithmetic}] perform and typeset arithmetic problems
 \item[\texttt{armenian}] support for typesetting Armenian
@@ -48,9 +48,8 @@
 \item[\texttt{bibtex-gen}] derive BibTeX data from resources other than BibTeX libraries
 \item[\texttt{bibtex-lib}] collection of BibTeX citations
 \item[\texttt{bibtex-multi}] multiple BibTeX bibliographies in a document
-\item[\texttt{bibtex-sty}] BibTeX style or style generator
 \item[\texttt{bibtex-supp}] BibTeX citation support
-\item[\texttt{bibtex-util}] utility for managing BibTeX files
+\item[\texttt{bibtex-util}] utilities for managing BibTeX files
 \item[\texttt{bidi}] support bidirectional typesettting
 \item[\texttt{biology}] typeset biological data
 \item[\texttt{biomedical}] support for documents in biomedical research
@@ -81,6 +80,7 @@
 \item[\texttt{cgi-latex}] support for LaTeX(-alike) on the web, or feeding into other applications
 \item[\texttt{chemistry}] chemistry document support
 \item[\texttt{cherokee}] support for typesetting Cherokee
+\item[\texttt{chess}] chess game
 \item[\texttt{chinese}] support for typesetting Chinese languages
 \item[\texttt{chinese-doc}] documentation in Chinese languages
 \item[\texttt{chords}] chord notations, as for song books
@@ -113,7 +113,7 @@
 \item[\texttt{crit-ed}] typeset scholarly editions of texts
 \item[\texttt{croatian}] support for typesetting Croatian
 \item[\texttt{crystallography}] typeset material to do with crystallography
-\item[\texttt{csv-support}] Read, process and convert CSV data
+\item[\texttt{csv-support}] read, process and convert CSV data
 \item[\texttt{ctan}] support for work with the CTAN archive
 \item[\texttt{cv}] curriculum vitae/Resumé
 \item[\texttt{cvt-html}] generate HTML from TeX-ish sources
@@ -192,7 +192,6 @@
 \item[\texttt{exec-foreign}] execute ‘other types’ of language
 \item[\texttt{exercise}] exercises, problems for solution, etc.
 \item[\texttt{experimental}] offer of a facility that may never make its way to production use
-\item[\texttt{expl3}] package uses experimental LaTeX 3
 \item[\texttt{ext-code}] run an external program from within a document
 \item[\texttt{ext-svc}] link to a service not on CTAN
 \item[\texttt{fac-survey}] survey of TeX-related facilities
@@ -211,10 +210,12 @@
 \item[\texttt{font-adhoc}] font distributed in an ad-hoc fashion
 \item[\texttt{font-arabic}] fonts for typesetting arabic
 \item[\texttt{font-archaic}] fonts reproducing archaic scripts or inscriptions
+\item[\texttt{font-armenian}] fonts for typesetting armenian
 \item[\texttt{font-bbd}] doublestroke (blackboard bold) fonts
 \item[\texttt{font-body}] font designed for use as body font for Latin-based script documents
 \item[\texttt{font-bookhand}] fonts of scripts used for manuscript books
 \item[\texttt{font-calligraphic}] calligraphic (or handwriting) fonts
+\item[\texttt{font-canadian-aboriginal}] fonts for Canadian Aboriginal
 \item[\texttt{font-chess}] fonts for typesetting chess problems and diagrams
 \item[\texttt{font-cjk}] fonts for far eastern languages (Chinese, Japanese and Korean)
 \item[\texttt{font-cm}] font serving Computer Modern-style shapes
@@ -224,9 +225,10 @@
 \item[\texttt{font-cyrillic}] fonts for Cyrillic and related scripts
 \item[\texttt{font-decor}] decorative or initial fonts
 \item[\texttt{font-devel}] support for font development, testing and characterisation
-\item[\texttt{font-display}] Display-style font
+\item[\texttt{font-display}] display-style font
 \item[\texttt{font-doc}] documentation about choosing installing and using fonts
 \item[\texttt{font-egyptian}] hieroglyph fonts
+\item[\texttt{font-georgian}] fonts for typesetting georgian
 \item[\texttt{font-gothic}] font for gothic or blackletter shapes
 \item[\texttt{font-greek}] font for Greek (archaic, classical and modern)
 \item[\texttt{font-hebrew}] font for Hebrew script
@@ -249,9 +251,9 @@
 \item[\texttt{font-proportional}] variable-spaced font
 \item[\texttt{font-rune}] fonts for runic inscriptions
 \item[\texttt{font-sample}] samples of font usage
-\item[\texttt{font-sans}] Sans-serif font
+\item[\texttt{font-sans}] sans-serif font
 \item[\texttt{font-sel}] font selection schemes
-\item[\texttt{font-serif}] Serif font
+\item[\texttt{font-serif}] serif font
 \item[\texttt{font-sfd}] FontForge font file
 \item[\texttt{font-specialist}] fonts with specific small application areas
 \item[\texttt{font-supp}] metrics, macro incantations and other font support
@@ -289,6 +291,7 @@
 \item[\texttt{german}] support for typesetting German
 \item[\texttt{german-doc}] documentation in German
 \item[\texttt{glossary}] glossary and nomenclature support
+\item[\texttt{go}] go game
 \item[\texttt{graphics}] graphics (support packages)
 \item[\texttt{graphics-3d}] graphics with 3-dimensional output
 \item[\texttt{graphics-curve}] draw (parametric) curves
@@ -296,7 +299,7 @@
 \item[\texttt{graphics-drv}] ‘driver’ for output from graphics ‘kernel’ packages
 \item[\texttt{graphics-editor}] graphics editor whose output is good for TeX
 \item[\texttt{graphics-engn}] graphics generator whose output is good for use with TeX
-\item[\texttt{graphics-epspdf}] converting graphics files from Metapost output or (E)PS to embeddable PDF
+\item[\texttt{graphics-epspdf}] converting graphics files from MetaPost output or (E)PS to embeddable PDF
 \item[\texttt{graphics-fill-tile}] graphics filling or tiling an area
 \item[\texttt{graphics-import}] convert a foreign graphics format for use with TeX
 \item[\texttt{graphics-in-tex}] graphics produced by one of the *TeX engines
@@ -304,7 +307,7 @@
 \item[\texttt{graphics-inline}] graphics inline for external processing
 \item[\texttt{graphics-manip}] manipulate graphics and/or related text
 \item[\texttt{graphics-motion}] motion graphics
-\item[\texttt{graphics-mpost}] graphics generated using Metapost
+\item[\texttt{graphics-mpost}] graphics generated using MetaPost
 \item[\texttt{graphics-plot}] plot data
 \item[\texttt{graphics-plotfn}] plot a representation of a function
 \item[\texttt{graphics-prep}] prepare graphics for use with *TeX
@@ -356,7 +359,6 @@
 \item[\texttt{landscape}] print landscape orientation, manipulate landscape material
 \item[\texttt{lang-invented}] support for typesetting invented language(s)
 \item[\texttt{latex-devel}] LaTeX experimental developments ‘in the wild’
-\item[\texttt{latex-doc}] LaTeX documentation
 \item[\texttt{latex-qual}] encourage quality in LaTeX markup
 \item[\texttt{latex209}] package only known to work with LaTeX 2.09
 \item[\texttt{latex3}] work done for the project to upgrade LaTeX
@@ -385,7 +387,6 @@
 \item[\texttt{listing}] computer code listing
 \item[\texttt{lithuanian}] support for typesetting Lithuanian
 \item[\texttt{litprog}] literate programming
-\item[\texttt{litprog-tools}] literate programming tools
 \item[\texttt{log-manip}] analyse or otherwise manipulate logs
 \item[\texttt{logic}] typesetting logician’s discussions
 \item[\texttt{logo}] symbols or drawings to specify an object, including icons
@@ -400,7 +401,7 @@
 \item[\texttt{macro-iterate}] repeat TeX material
 \item[\texttt{macro-sort}] sort data within TeX macros
 \item[\texttt{macro-supp}] support for development of (La)TeX macros
-\item[\texttt{magazine}] magazines, newspapers and other ephemeral pubications
+\item[\texttt{magazine}] magazines, newspapers and other ephemeral publications
 \item[\texttt{mail-list}] digests, etc., of mailing lists
 \item[\texttt{mailing}] mail merge, etc
 \item[\texttt{maltese}] support for typesetting Maltese
@@ -416,6 +417,7 @@
 \item[\texttt{maths-tabvar}] mathematical tables of signs and variations
 \item[\texttt{maths-theorem}] typeset mathematical theorems
 \item[\texttt{matrix}] typeset matrices
+\item[\texttt{measure}] measure and report details of a document
 \item[\texttt{medical}] typesetting medical material
 \item[\texttt{meeting-admin}] calls, agendas, minutes of meetings
 \item[\texttt{memorandum}] typeset memorandum or other short note
@@ -430,9 +432,9 @@
 \item[\texttt{molbio}] support for typesetting molecular biology
 \item[\texttt{mongolian}] support for typesetting Mongolian
 \item[\texttt{mongolian-doc}] documentation in Mongolian
-\item[\texttt{mp-doc}] documentation for Metapost users
-\item[\texttt{mp-supp}] support tools and macros for Metapost programming
-\item[\texttt{mp-use}] use, and support for use, of Metapost
+\item[\texttt{mp-doc}] documentation for MetaPost users
+\item[\texttt{mp-supp}] support tools and macros for MetaPost programming
+\item[\texttt{mp-use}] use, and support for use, of MetaPost
 \item[\texttt{multicol}] more than one column on the page
 \item[\texttt{multilingual}] support for more than one (natural) language
 \item[\texttt{multilingual-addon}] extra language ‘drivers’ for existing multilingual packages
@@ -501,7 +503,7 @@
 \item[\texttt{proof}] typeset proofs and proof diagrams
 \item[\texttt{proposal}] typeset proposals to funding bodies, etc
 \item[\texttt{protection}] manipulate the LaTeX ‘\textbackslash protect’ mechanism
-\item[\texttt{ps-manip}] manipulate Postscript files
+\item[\texttt{ps-manip}] manipulate PostScript files
 \item[\texttt{pseudocode}] typeset languages for expressing algorithms
 \item[\texttt{pstricks}] package using PStricks for graphical output
 \item[\texttt{psychology}] support for typesetting texts relating to psychology
@@ -549,6 +551,7 @@
 \item[\texttt{subdocs}] include complete documents in other documents
 \item[\texttt{subfloat}] internal structure within a float
 \item[\texttt{subsup-pos}] position sub- and superscripts (left and right sides)
+\item[\texttt{sudoku}] sudoku game
 \item[\texttt{swedish}] support for typesetting Swedish
 \item[\texttt{swiss}] typesetting as done in Switzerland
 \item[\texttt{symbol-supp}] manage symbols in a document
@@ -558,7 +561,10 @@
 \item[\texttt{table}] table typesetting
 \item[\texttt{table-long}] typeset tables that may be too big for a page
 \item[\texttt{table-rule}] rules within tables
-\item[\texttt{tagged-pdf}] support for tagged pdf
+\item[\texttt{tagged-pdf}] tagged PDF compatible
+\item[\texttt{tagged-pdf-incompatible}] tagged PDF incompatible
+\item[\texttt{tagged-pdf-partially}] tagged PDF partially compatible
+\item[\texttt{tagged-pdf-unsupported}] tagged PDF unsupported
 \item[\texttt{teaching}] support for teachers and teaching administrators
 \item[\texttt{test-bed}] environment for testing (La)TeX code
 \item[\texttt{test-dist}] proposed additions to other packages
@@ -583,7 +589,7 @@
 \item[\texttt{tutorial}] tutorial material (general)
 \item[\texttt{typeset-grid}] typeset, snapping lines of text to a grid
 \item[\texttt{typeset-std}] typeset documents about standards, or the standards themselves
-\item[\texttt{typeset-tool}] tool supporting or evaluating typesetting,
+\item[\texttt{typeset-tool}] tools supporting or evaluating typesetting,
 \item[\texttt{typesetting}] support for variations of typographic style
 \item[\texttt{typo-archaic}] typography to match ancient practices
 \item[\texttt{ukrainian}] documentation in, and support for typesetting Ukrainian
@@ -610,4 +616,8 @@
 \item[\texttt{word-count}] count the ‘words’ in a document
 \item[\texttt{word-proc}] dealing with word processors
 \item[\texttt{xetex}] XeTeX, material supporting it, and packages requiring it
+\item[\texttt{bibtex-sty}] bibtex-sty(unknown)
+\item[\texttt{expl3}] expl3(unknown)
+\item[\texttt{latex-doc}] latex-doc(unknown)
+\item[\texttt{litprog-tools}] litprog-tools(unknown)
 \end{labeling}
