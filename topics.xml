@@ -343,6 +343,7 @@
   <topic name="journ-personal" details="personal journals, diaries, etc." />
   <topic name="journ-src" details="sources and/or old copies of journals" />
   <topic name="journalpub" details="typesetting journals, etc" />
+  <topic name="kazakh" details="support for typesetting Kazakh" />
   <topic name="keyval" details="key-value argument systems" />
   <topic name="korean" details="support for typesetting Korean" />
   <topic name="korean-doc" details="documentation in Korean" />

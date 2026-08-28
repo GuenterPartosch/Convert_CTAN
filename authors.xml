@@ -25,7 +25,8 @@
 <author id="akhmadeeva" givenname="Leila" familyname="Akhmadeeva" />
 <author id="akkerman" givenname="Igor" familyname="Akkerman" />
 <author id="akopian" givenname="Vardan" familyname="Akopian" />
-<author id="akpoue" givenname="Kouamé Josué" familyname="Akpoué" />
+<author id="akpoue" givenname="Josué Kouamé" familyname="Akpoué" />
+<author id="aksaray" givenname="Gorkem" familyname="Aksaray" />
 <author id="alabau" givenname="Miguel" familyname="Alabau" />
 <author id="alamnehe" givenname="Abass B." familyname="Alamnehe" />
 <author id="aldrich" givenname="Daniel R." familyname="Aldrich" />
@@ -35,6 +36,7 @@
 <author id="alexander-jc" givenname="James" familyname="Alexander" />
 <author id="alfonsi" givenname="Bernard" familyname="Alfonsi" />
 <author id="algaba" givenname="Manuel Gutierrez" familyname="Algaba" />
+<author id="aljaroudi" givenname="Nadeer" familyname="Aljaroudi" />
 <author id="all" givenname="Timothy" familyname="All" />
 <author id="allais" givenname="Raphaël" familyname="Allais" />
 <author id="allen" givenname="Matthew" familyname="Allen" />
@@ -47,6 +49,7 @@
 <author id="alvarez-zavala" givenname="Roberto" familyname="Alvarez Zavala" />
 <author id="alver" givenname="Morten" familyname="Alver" />
 <author id="alyahya" givenname="Kamal" familyname="Al-Yahya" />
+<author id="alzahab" givenname="Nibras Abo" familyname="Alzahab" />
 <author id="alziyadi" givenname="Mohammed Obaid" familyname="Alziyadi" />
 <author id="amberg" givenname="Brian" familyname="Amberg" />
 <author id="amets" givenname="American Meteorological Society" />
@@ -57,12 +60,14 @@
 <author id="anderson" givenname="Michael" familyname="Anderson" />
 <author id="ando" givenname="Ryoya" familyname="Ando" />
 <author id="andrade" givenname="Lenimar N." familyname="Andrade" />
+<author id="andre" givenname="Jacques" familyname="André" />
 <author id="andreev" givenname="Aleksandr" familyname="Andreev" />
 <author id="andrews" givenname="Avery D" familyname="Andrews" />
 <author id="andrews-p" givenname="Phil" familyname="Andrews" />
 <author id="andronic" givenname="Liviu" familyname="Andronic" />
 <author id="andrus" givenname="Ivan" familyname="Andrus" />
 <author id="angulo" givenname="Pablo" familyname="Angulo" />
+<author id="anjos" givenname="Andre" familyname="Anjos" />
 <author id="ankargren" givenname="Sebastian" familyname="Ankargren" />
 <author id="annagurban" givenname="Nazar" familyname="Annagurban" />
 <author id="antener" givenname="Alex" familyname="Antener" />
@@ -150,7 +155,6 @@
 <author id="baruchel" givenname="Thomas" familyname="Baruchel" />
 <author id="basso" givenname="Pierre" familyname="Basso" />
 <author id="bastos" givenname="Fernando" familyname="de Souza Bastos" />
-<author id="basum" givenname="Christoph" familyname="von Basum" />
 <author id="batada" givenname="Nizar" familyname="Batada" />
 <author id="batchelder" givenname="Ned" familyname="Batchelder" />
 <author id="batista" givenname="Facundo" familyname="Batista" />
@@ -227,6 +231,7 @@
 <author id="bidi-tex" givenname="bidi-tex GitHub Organisation" />
 <author id="bien" givenname="Janusz Stanisław" familyname="Bień" />
 <author id="bigelow" givenname="Charles" familyname="Bigelow" />
+<author id="bihari" givenname="Zsolt" familyname="Bihari" />
 <author id="bilger" givenname="Matthias" familyname="Bilger" />
 <author id="bilke" givenname="Andreas" familyname="Bilke" />
 <author id="billauer" givenname="Eli" familyname="Billauer" />
@@ -238,10 +243,12 @@
 <author id="bischoff" givenname="Dominik" familyname="Bischoff" />
 <author id="bitouze" givenname="Denis" familyname="Bitouzé" />
 <author id="bitstream" givenname="Bitstream" />
+<author id="bittihn" givenname="Philip" familyname="Bittihn" />
 <author id="bitzl" givenname="Marcus" familyname="Bitzl" />
 <author id="blackmore" givenname="Brian" familyname="Blackmore" />
 <author id="blair" givenname="Charles" familyname="Blair" />
 <author id="blanco" givenname="Max" familyname="Blanco" />
+<author id="blayer" givenname="Vaibhav" familyname="Blayer" />
 <author id="blazek" givenname="Robert" familyname="Blazek" />
 <author id="bleser" givenname="Joachim" familyname="Bleser" />
 <author id="bless" givenname="Roland" familyname="Bless" />
@@ -337,7 +344,8 @@
 <author id="brown" givenname="Terry" familyname="Brown" />
 <author id="brown-c" givenname="Christopher" familyname="Brown" />
 <author id="brown-k" givenname="Ken" familyname="Brown" />
-<author id="brown-s" givenname="Silas" familyname="Brown" />
+<author id="brown-s" givenname="Silas S." familyname="Brown" />
+<author id="broz" givenname="Rostislav" familyname="Brož" />
 <author id="brucker" givenname="Achim D." familyname="Brucker" />
 <author id="brueggemann-klein" givenname="Anne" familyname="Brueggemann-Klein" />
 <author id="brunet" givenname="Charles-Antoine" familyname="Brunet" />
@@ -374,6 +382,7 @@
 <author id="cagnol" givenname="John" familyname="Cagnol" />
 <author id="caignaert" givenname="Christophe" familyname="Caignaert" />
 <author id="cain" givenname="Alan J." familyname="Cain" />
+<author id="calisti" givenname="Lorenzo" familyname="Calisti" />
 <author id="callegari" givenname="Sergio" familyname="Callegari" />
 <author id="callil-soares" givenname="Pedro" familyname="Callil-Soares" />
 <author id="calvani" givenname="Massimo" familyname="Calvani" />
@@ -416,18 +425,21 @@
 <author id="charpentier" givenname="Jean-Côme" familyname="Charpentier" />
 <author id="chase" givenname="Brian" familyname="Chase" />
 <author id="chatham" givenname="Hood" familyname="Chatham" />
+<author id="chatzichristos" givenname="Aris" familyname="Chatzichristos" />
 <author id="chavan" givenname="Bhagyashree" familyname="Chavan" />
 <author id="cheang" givenname="Miles Min Yin" familyname="Cheang" />
 <author id="checkoway" givenname="Stephen" familyname="Checkoway" />
 <author id="chen" givenname="Pehong" familyname="Chen" />
 <author id="chen-d" givenname="Dennis" familyname="Chen" />
 <author id="chen-hy" givenname="Hung-Yih" familyname="Chen" />
+<author id="chen-k" givenname="u6771"/>
 <author id="chen-lt" givenname="Liang-Ting" familyname="Chen" />
 <author id="chen-r" givenname="Raymond" familyname="Chen" />
 <author id="chen-rong" givenname="Rong" familyname="Chen" />
 <author id="chen-y" givenname="Yuanhao" familyname="Chen" />
 <author id="chen-zh" givenname="Zhichu" familyname="Chen" />
 <author id="cheng" givenname="Xu" familyname="Cheng" />
+<author id="cheng-c" givenname="Che" familyname="Cheng" />
 <author id="cheong" givenname="Otfried" familyname="Cheong" />
 <author id="cherem" givenname="Youssef" familyname="Cherem" />
 <author id="chernoff" givenname="Max" familyname="Chernoff" />
@@ -444,7 +456,6 @@
 <author id="cholewo" givenname="Tomasz J." familyname="Cholewo" />
 <author id="chopde" givenname="Avinash" familyname="Chopde" />
 <author id="chou" givenname="Yukai" familyname="Chou" />
-<author id="christensson" givenname="Magnus" familyname="Christensson" />
 <author id="christlieb" givenname="Norbert" familyname="Christlieb" />
 <author id="christoph" givenname="Christoph" />
 <author id="chupin" givenname="Maxime" familyname="Chupin" />
@@ -487,6 +498,7 @@
 <author id="cons" givenname="Lionel" familyname="Cons" />
 <author id="contini" givenname="Francesco" familyname="Contini" />
 <author id="copernicus" givenname="Copernicus GmbH" />
+<author id="corbal" givenname="J. A." familyname="Corbal" />
 <author id="coretta" givenname="Stefano" familyname="Coretta" />
 <author id="corff" givenname="Oliver" familyname="Corff" />
 <author id="coriasco" givenname="Sandro" familyname="Coriasco" />
@@ -624,6 +636,7 @@
 <author id="dorj" givenname="Dorjpalam" familyname="Dorj" />
 <author id="dorner" givenname="Fernando" familyname="Dorner" />
 <author id="doron" givenname="Eyal" familyname="Doron" />
+<author id="dorr" givenname="Cian" familyname="Dorr" />
 <author id="dossena" givenname="Riccardo" familyname="Dossena" />
 <author id="downes" givenname="Michael J." familyname="Downes" />
 <author id="doyle" givenname="Mark" familyname="Doyle" />
@@ -640,6 +653,7 @@
 <author id="dryllerakis" givenname="K J" familyname="Dryllerakis" />
 <author id="du" givenname="Sicheng" familyname="Du" />
 <author id="duan" givenname="Charles" familyname="Duan" />
+<author id="dubard" givenname="Gérard" familyname="Dubard" />
 <author id="duchi" givenname="Claudio" familyname="Duchi" />
 <author id="duchier" givenname="Denys" familyname="Duchier" />
 <author id="dudebout" givenname="Nicolas" familyname="Dudebout" />
@@ -675,6 +689,7 @@
 <author id="ejiri" givenname="Haruki" familyname="Ejiri" />
 <author id="ekola" givenname="Tommy" familyname="Ekola" />
 <author id="eldering" givenname="Jaap" familyname="Eldering" />
+<author id="elhadi" givenname="Khaldi Mohammed" familyname="Elhadi" />
 <author id="elkind" givenname="Landon D. C." familyname="Elkind" />
 <author id="ellis" givenname="Joshua" familyname="Ellis" />
 <author id="ellison" givenname="Chris" familyname="Ellison" />
@@ -842,6 +857,7 @@
 <author id="gajdosik" givenname="Libor" familyname="Gajdosik" />
 <author id="gall" givenname="Diane" familyname="Gall" />
 <author id="galland" givenname="Stéphane" familyname="Galland" />
+<author id="gallo" givenname="Federico" familyname="Gallo" />
 <author id="galvan" givenname="Ignacio" familyname="Fernández Galván" />
 <author id="gamm" givenname="GAMM Juniors" />
 <author id="gamvetas" givenname="Ioannis" familyname="Gamvetas" />
@@ -849,6 +865,7 @@
 <author id="ganguly" givenname="Soumendra" familyname="Ganguly" />
 <author id="gankevich" givenname="Ivan" familyname="Gankevich" />
 <author id="garavelli" givenname="John" familyname="Garavelli" />
+<author id="garbe" givenname="Jonathan" familyname="Garbe" />
 <author id="garcia" givenname="Federico" familyname="Garcia-De Castro" />
 <author id="garcia-matarredona" givenname="Alejandro" familyname="García Matarredona" />
 <author id="gardner" givenname="David" familyname="Gardner" />
@@ -945,7 +962,6 @@
 <author id="goulet" givenname="Vincent" familyname="Goulet" />
 <author id="goutelle" givenname="Mathieu" familyname="Goutelle" />
 <author id="govindaraj" givenname="T." familyname="Govindaraj" />
-<author id="graham" givenname="Graham" familyname="Williams" />
 <author id="graham-c" givenname="Colin C." familyname="Graham" />
 <author id="grahn" givenname="Alexander" familyname="Grahn" />
 <author id="granade" givenname="Christopher" familyname="Granade" />
@@ -991,6 +1007,7 @@
 <author id="grunwald" givenname="Dirk" familyname="Grunwald" />
 <author id="gueheneuc" givenname="Yann-Gaël" familyname="Guéhéneuc" />
 <author id="guenther" givenname="Dean" familyname="Guenther" />
+<author id="guenther-k" givenname="Kai" familyname="Günther" />
 <author id="guerquin-kern" givenname="Matthieu" familyname="Guerquin-Kern" />
 <author id="guillaumin" givenname="Matthieu" familyname="Guillaumin" />
 <author id="guit" givenname="GuIT (Gruppo Utilizzatori Italiani di TeX)" />
@@ -1103,7 +1120,6 @@
 <author id="heldoorn" givenname="Marcel" familyname="Heldoorn" />
 <author id="hellgren" givenname="Timo" familyname="Hellgren" />
 <author id="hellingman" givenname="Jeroen" familyname="Hellingman" />
-<author id="hellkvist" givenname="Stefan" familyname="Hellkvist" />
 <author id="hellman" givenname="Sten" familyname="Hellman" />
 <author id="hellstrom" givenname="Lars" familyname="Hellström" />
 <author id="helvensteijn" givenname="Michiel" familyname="Helvensteijn" />
@@ -1118,6 +1134,7 @@
 <author id="hennings" givenname="Wilfried" familyname="Hennings" />
 <author id="henningsen" givenname="Arne" familyname="Henningsen" />
 <author id="hensel" givenname="Martin" familyname="Hensel" />
+<author id="herbst" givenname="Thiemo" familyname="Herbst" />
 <author id="herpers" givenname="Sascha" familyname="Herpers" />
 <author id="herrb" givenname="Mathieu" familyname="Herrb" />
 <author id="herz-fischler" givenname="Roger" familyname="Herz-Fischler" />
@@ -1139,7 +1156,6 @@
 <author id="hinque" givenname="Christian" familyname="Hinque" />
 <author id="hinrichs" givenname="Adrian C." familyname="Hinrichs" />
 <author id="hirata" givenname="Shunsaku" familyname="Hirata" />
-<author id="hirsch" givenname="Studienrat Andreas" familyname="Hirsch" />
 <author id="hirschhorn" givenname="Philip S." familyname="Hirschhorn" />
 <author id="hitomi" givenname="Shoma" familyname="Hitomi" />
 <author id="hlavacek" givenname="Jan" familyname="Hlavacek" />
@@ -1191,6 +1207,7 @@
 <author id="hotta" givenname="Kohsaku" familyname="Hotta" />
 <author id="housley" givenname="Brian" familyname="Housley" />
 <author id="howard" givenname="Gary A." familyname="Howard" />
+<author id="howard-j" givenname="James P. II" familyname="Howard" />
 <author id="howell" givenname="Dave" familyname="Howell" />
 <author id="howlett" givenname="Bob" familyname="Howlett" />
 <author id="hu" givenname="Zou" familyname="Hu" />
@@ -1237,6 +1254,7 @@
 <author id="isambert" givenname="Paul" familyname="Isambert" />
 <author id="island-of-tex" givenname="Island of TeX" />
 <author id="isozaki" givenname="Hideki" familyname="Isozaki" />
+<author id="ivo" givenname="Guilherme" familyname="Ivo" />
 <author id="izaola" givenname="Zunbeltz" familyname="Izaola" />
 <author id="jabref" givenname="The JabRef Project" />
 <author id="jabri" givenname="Youssef" familyname="Jabri" />
@@ -1263,6 +1281,7 @@
 <author id="janthong" givenname="Abhabongse" familyname="Janthong" />
 <author id="jantzen" givenname="Bernd" familyname="Jantzen" />
 <author id="jaquina" givenname="Jo" familyname="Jaquina" />
+<author id="jaret" givenname="Camille" familyname="Jaret" />
 <author id="jeffrey" givenname="Alan" familyname="Jeffrey" />
 <author id="jelanak" givenname="Aleksandar" familyname="Jelenak" />
 <author id="jeltsch" givenname="Wolfgang" familyname="Jeltsch" />
@@ -1291,7 +1310,6 @@
 <author id="jones-p" givenname="Peter" familyname="Jones" />
 <author id="jonge" givenname="J. H. M." familyname="de Jonge" />
 <author id="jorssen" givenname="Christophe" familyname="Jorssen" />
-<author id="josue" givenname="Akpoué Kouamé" familyname="Josué" />
 <author id="joulin" givenname="Jean-Luc" familyname="Joulin" />
 <author id="jud" givenname="Roger" familyname="Jud" />
 <author id="juhasz" givenname="Robert" familyname="Juhasz" />
@@ -1374,7 +1392,6 @@
 <author id="kim-k" givenname="Kangsoo" familyname="Kim" />
 <author id="kime" givenname="Philip" familyname="Kime" />
 <author id="kinch" givenname="Richard" familyname="Kinch" />
-<author id="king" givenname="Susan" familyname="King" />
 <author id="kingston" givenname="Jeff" familyname="Kingston" />
 <author id="kirillova" givenname="Dariya" familyname="Kirillova" />
 <author id="kirsch" givenname="Sebastian Marius" familyname="Kirsch" />
@@ -1432,7 +1449,6 @@
 <author id="kornai" givenname="András" familyname="Kornai" />
 <author id="korop" givenname="Sergey" familyname="Korop" />
 <author id="kort" givenname="Eric" familyname="Kort" />
-<author id="kositsurungkakul" givenname="Payoungsak" familyname="Kositsurungkakul" />
 <author id="kosowsky" givenname="Conrad" familyname="Kosowsky" />
 <author id="kostin" givenname="Alexei" familyname="Kostin" />
 <author id="kotelnikov" givenname="Igor A." familyname="Kotelnikov" />
@@ -1449,7 +1465,6 @@
 <author id="kramer" givenname="Mark R." familyname="Kramer" />
 <author id="kraml" givenname="Willibald" familyname="Kraml" />
 <author id="kramm" givenname="Sebastien" familyname="Kramm" />
-<author id="krause" givenname="Roland" familyname="Krause" />
 <author id="krause-d" givenname="Dirk" familyname="Krause" />
 <author id="kreherd" givenname="Donald L." familyname="Kreher" />
 <author id="kremer" givenname="Sebastian" familyname="Kremer" />
@@ -1491,6 +1506,7 @@
 <author id="kumar-a" givenname="Anagha" familyname="Kumar" />
 <author id="kumar-s" givenname="Shanu" familyname="Kumar" />
 <author id="kummer" givenname="Olaf" familyname="Kummer" />
+<author id="kundu" givenname="Aurghyadip" familyname="Kundu" />
 <author id="kunert" givenname="Volker" familyname="Kunert" />
 <author id="kurtz" givenname="Markus" familyname="Kurtz" />
 <author id="kurz" givenname="Vladislav" familyname="Kurz" />
@@ -1509,6 +1525,7 @@
 <author id="lachnit" givenname="Stephan" familyname="Lachnit" />
 <author id="lackas" givenname="Christian" familyname="Lackas" />
 <author id="ladner" givenname="Tobias" familyname="Ladner" />
+<author id="lafarge" givenname="Jonathan" familyname="Lafarge" />
 <author id="lagally" givenname="Klaus" familyname="Lagally" />
 <author id="lago" givenname="Nelson" familyname="Lago" />
 <author id="lagogarcia" givenname="Jesus" familyname="Lago Garcia" />
@@ -1557,11 +1574,11 @@
 <author id="law" givenname="Simon" familyname="Law" />
 <author id="lawrence" givenname="Scott" familyname="Lawrence" />
 <author id="leadbetter" givenname="David" familyname="Leadbetter" />
+<author id="leahnu" givenname="Teodor Filip" familyname="Leahnu" />
 <author id="leangsuksun" givenname="Chokchai" familyname="Leangsuksun" />
 <author id="lecic" givenname="Nikola" familyname="Lečić" />
 <author id="leclaire" givenname="Maurice" familyname="Leclaire" />
 <author id="ledger" givenname="Buddy" familyname="Ledger" />
-<author id="lee" givenname="Kong Hoon" familyname="Lee" />
 <author id="lee-g" givenname="Greg" familyname="Lee" />
 <author id="lee-j" givenname="John J." familyname="Lee" />
 <author id="lee-ja" givenname="Jay" familyname="Lee" />
@@ -1611,6 +1628,7 @@
 <author id="liang" givenname="Franklin M." familyname="Liang" />
 <author id="liang-m" givenname="Moyan" familyname="Liang" />
 <author id="liang-y" givenname="Yifan" familyname="Liang" />
+<author id="liang-yuqi" givenname="Yuqi" familyname="Liang" />
 <author id="lichti" givenname="Roland" familyname="Lichti" />
 <author id="lichti-d" givenname="David" familyname="Lichti" />
 <author id="lickert" givenname="Knut" familyname="Lickert" />
@@ -1618,9 +1636,11 @@
 <author id="liebl" givenname="Armin" familyname="Liebl" />
 <author id="lienhard" givenname="John H." familyname="Lienhard" />
 <author id="likonen" givenname="Teemu" familyname="Likonen" />
+<author id="lilia" givenname="Lilia"/>
 <author id="lillqvist" givenname="Tor" familyname="Lillqvist" />
 <author id="lim" givenname="Drahoslav" familyname="Lím" />
 <author id="lim-l" givenname="LianTze" familyname="Lim" />
+<author id="lin" givenname="Frank" familyname="Lin" />
 <author id="linares" givenname="Pedro" familyname="Linares" />
 <author id="lindahl" givenname="Svante" familyname="Lindahl" />
 <author id="lindenberg" givenname="Norbert" familyname="Lindenberg" />
@@ -1635,7 +1655,6 @@
 <author id="liu" givenname="Leo" familyname="Liu" />
 <author id="liu-c" givenname="Changxin" familyname="Liu" />
 <author id="liu-y" givenname="Yi" familyname="Liu" />
-<author id="ljung" givenname="Magnus" familyname="Ljung" />
 <author id="llopis" givenname="Ignacio" familyname="Llopis" />
 <author id="loeffler" givenname="Andreas" familyname="Löffler" />
 <author id="loeh" givenname="Andres" familyname="Löh" />
@@ -1655,6 +1674,7 @@
 <author id="lorenzen" givenname="Klaus F." familyname="Lorenzen" />
 <author id="loretan" givenname="Mico" familyname="Loretan" />
 <author id="loreti" givenname="Maurizio" familyname="Loreti" />
+<author id="lorig" givenname="Matthew" familyname="Lorig" />
 <author id="lotz" givenname="Wolfhard" familyname="Lotz" />
 <author id="lotz-m" givenname="Manfred" familyname="Lotz" />
 <author id="lotze" givenname="Thomas" familyname="Lotze" />
@@ -1687,9 +1707,9 @@
 <author id="lupton" givenname="Robert" familyname="Lupton" />
 <author id="luque" givenname="Manuel" familyname="Luque" />
 <author id="luque-jg" givenname="Jean-Gabriel" familyname="Luque" />
-<author id="lursinsap" givenname="Chidchanok" familyname="Lursinsap" />
 <author id="luttinen" givenname="Jaakko" familyname="Luttinen" />
 <author id="luz" givenname="Saturnino" familyname="Luz" />
+<author id="lyaudet" givenname="Laurent" familyname="Lyaudet" />
 <author id="lyu" givenname="Jianrui" familyname="Lyu" />
 <author id="lyubashenko" givenname="Volodymyr" familyname="Lyubashenko" />
 <author id="ma" givenname="Zheng" familyname="Ma" />
@@ -1733,6 +1753,7 @@
 <author id="markevitch" givenname="Maxim" familyname="Markevitch" />
 <author id="markey" givenname="Nicolas" familyname="Markey" />
 <author id="markgraf" givenname="Norman" familyname="Markgraf" />
+<author id="markham" givenname="Alex" familyname="Markham" />
 <author id="marmotghost" givenname="marmotghost"/>
 <author id="marques" givenname="Daniel B." familyname="Marques" />
 <author id="marris" givenname="Luke" familyname="Marris" />
@@ -1773,6 +1794,7 @@
 <author id="mayer-s" givenname="Steve" familyname="Mayer" />
 <author id="mazoit" givenname="Frédéric" familyname="Mazoit" />
 <author id="mazzamuto" givenname="Giacomo" familyname="Mazzamuto" />
+<author id="mbaye" givenname="Adama" familyname="Mbaye" />
 <author id="mcbane" givenname="George" familyname="McBane" />
 <author id="mccarthy" givenname="Adrian" familyname="McCarthy" />
 <author id="mccauley" givenname="James Darrell" familyname="McCauley" />
@@ -1825,6 +1847,7 @@
 <author id="merz" givenname="Thomas" familyname="Merz" />
 <author id="messineo" givenname="Grazia" familyname="Messineo" />
 <author id="metapost" givenname="The MetaPost Team" />
+<author id="metelka" givenname="Ondřej" familyname="Metelka" />
 <author id="metzinger" givenname="Jochen" familyname="Metzinger" />
 <author id="meyer" givenname="Johannes Jakob" familyname="Meyer" />
 <author id="meyer-lerbs" givenname="Lothar" familyname="Meyer-Lerbs" />
@@ -1868,6 +1891,8 @@
 <author id="molt" givenname="Aaron" familyname="Molt" />
 <author id="molteno" givenname="Tim" familyname="Molteno" />
 <author id="mondal" givenname="Agnibho" familyname="Mondal" />
+<author id="mondal-s" givenname="Shukla" familyname="Mondal" />
+<author id="monette" givenname="Kyle" familyname="Monette" />
 <author id="monsarrat" givenname="Jonathan" familyname="Monsarrat" />
 <author id="moor" givenname="Thomas" familyname="Moor" />
 <author id="moore" givenname="Ross" familyname="Moore" />
@@ -1917,7 +1942,6 @@
 <author id="mulligan" givenname="Brian W." familyname="Mulligan" />
 <author id="mulvey" givenname="Rod" familyname="Mulvey" />
 <author id="munch" givenname="Guillaume" familyname="Munch-Maccagnoni" />
-<author id="munger" givenname="David" familyname="Munger" />
 <author id="munn" givenname="Alan" familyname="Munn" />
 <author id="munoz" givenname="José Manuel Sánchez" familyname="Muñoz" />
 <author id="munson" givenname="Ethan V." familyname="Munson" />
@@ -1948,16 +1972,17 @@
 <author id="neteler" givenname="Markus" familyname="Neteler" />
 <author id="netherton" givenname="Lee" familyname="Netherton" />
 <author id="neto" givenname="Vilar da Camara" familyname="Neto" />
+<author id="neto-fm" givenname="Francisco Mariano" familyname="Neto" />
 <author id="nettles" givenname="William G." familyname="Nettles" />
 <author id="neugebauer" givenname="Gerd" familyname="Neugebauer" />
 <author id="neukam" givenname="Frank" familyname="Neukam" />
 <author id="neumann" givenname="Walter D." familyname="Neumann" />
 <author id="neumann-c" givenname="Christoph P." familyname="Neumann" />
-<author id="neumann-g" givenname="Gustaf" familyname="Neumann" />
 <author id="neumann-j" givenname="Johannes" familyname="Neumann" />
 <author id="neves" givenname="Florêncio" familyname="Neves" />
 <author id="neves-a" givenname="Antero" familyname="Neves" />
 <author id="nguyen" givenname="Tan Khoa" familyname="Nguyen" />
+<author id="nguyen-p" givenname="Phuc" familyname="Nguyen" />
 <author id="nguyenngoc" givenname="Laurent" familyname="Nguyen-Ngoc" />
 <author id="nice" givenname="Jasper" familyname="Nice" />
 <author id="nicholson" givenname="Thomas" familyname="Nicholson" />
@@ -2001,7 +2026,6 @@
 <author id="nyaupane" givenname="Hari" familyname="Nyaupane" />
 <author id="nyqvist" givenname="Robert" familyname="Nyqvist" />
 <author id="oberdiek" givenname="Heiko" familyname="Oberdiek" />
-<author id="oberdiekgroup" givenname="Oberdiek Package Support Group" />
 <author id="obrecht" givenname="Christian" familyname="Obrecht" />
 <author id="ochoa" givenname="Geri" familyname="Ochoa" />
 <author id="oetiker" givenname="Tobias" familyname="Oetiker" />
@@ -2099,6 +2123,7 @@
 <author id="peeters" givenname="Kasper" familyname="Peeters" />
 <author id="peischl" givenname="Marei" familyname="Peischl" />
 <author id="peise" givenname="Elmar" familyname="Peise" />
+<author id="pellegrini" givenname="Alessandro" familyname="Pellegrini" />
 <author id="penninga" givenname="Marc" familyname="Penninga" />
 <author id="pepping" givenname="Simon" familyname="Pepping" />
 <author id="peregoudov" givenname="Iliya" familyname="Peregoudov" />
@@ -2107,7 +2132,6 @@
 <author id="pereira-g" givenname="Gilles" familyname="Pereira" />
 <author id="perez-duarte" givenname="Sebastien" familyname="Perez-Duarte" />
 <author id="peri" givenname="Lorenzo" familyname="Peri" />
-<author id="perichon" givenname="Pascal" familyname="Perichon" />
 <author id="peron" givenname="Jacques" familyname="Peron" />
 <author id="perren" givenname="Jonatán" familyname="Perren" />
 <author id="perrone" givenname="Michael P." familyname="Perrone" />
@@ -2136,6 +2160,7 @@
 <author id="pignalberi" givenname="Gianluca" familyname="Pignalberi" />
 <author id="pilzecker" givenname="Markus" familyname="Pilzecker" />
 <author id="pind" givenname="Jörgen" familyname="Pind" />
+<author id="pinkse" givenname="Joris" familyname="Pinkse" />
 <author id="pinson" givenname="Raphaël" familyname="Pinson" />
 <author id="piotrowski" givenname="Michael" familyname="Piotrowski" />
 <author id="pipping" givenname="Sebastian" familyname="Pipping" />
@@ -2202,9 +2227,10 @@
 <author id="qrrbrbirlbel" givenname="Qrrbrbirlbel"/>
 <author id="quan" givenname="Le Phuong" familyname="Quan" />
 <author id="quanstrom" givenname="Erik" familyname="Quanstrom" />
-<author id="quantum-journal" givenname="Quantum — the open journal for quantum science" />
+<author id="quantum-journal" givenname="Quantum – the open journal for quantum science" />
 <author id="quaresma" givenname="Pedro" familyname="Quaresma" />
 <author id="quentin" givenname="Lars" familyname="Quentin" />
+<author id="quigley" givenname="Daniel" familyname="Quigley" />
 <author id="quong" givenname="Russell" familyname="Quong" />
 <author id="quy" givenname="Nguyen-Dai" familyname="Quy" />
 <author id="raaijmakers" givenname="Stijn" familyname="Raaijmakers" />
@@ -2225,7 +2251,6 @@
 <author id="ralet" givenname="Thibault" familyname="Ralet" />
 <author id="rama" givenname="Rama" familyname="Porrat" />
 <author id="ramachandra" givenname="Ramkumar" familyname="Ramachandra" />
-<author id="ramasubramanian" givenname="R." familyname="Ramasubramanian" />
 <author id="ramek" givenname="Michael" familyname="Ramek" />
 <author id="ramm" givenname="Henning Hraban" familyname="Ramm" />
 <author id="ramsdell" givenname="John D" familyname="Ramsdell" />
@@ -2248,6 +2273,7 @@
 <author id="ray" givenname="Koushik" familyname="Ray" />
 <author id="rayside" givenname="Derek" familyname="Rayside" />
 <author id="razavian" givenname="Seiied-Mohammad-Javad" familyname="Razavian" />
+<author id="realdentalcosts" givenname="Real Dental Costs Data and Research Team" />
 <author id="reckdahl" givenname="Keith" familyname="Reckdahl" />
 <author id="redaelli" givenname="Massimo" familyname="Redaelli" />
 <author id="reed" givenname="Mark" familyname="Reed" />
@@ -2297,6 +2323,7 @@
 <author id="ridgeway" givenname="Thomas" familyname="Ridgeway" />
 <author id="rigido" givenname="Mileto" familyname="Rigido" />
 <author id="riley" givenname="Geoff" familyname="Riley" />
+<author id="rindfrey" givenname="Klaus" familyname="Rindfrey" />
 <author id="ristow" givenname="Alan" familyname="Ristow" />
 <author id="rivaud" givenname="Julien" familyname="Rivaud" />
 <author id="rivera" givenname="Luis" familyname="Rivera" />
@@ -2323,6 +2350,7 @@
 <author id="rogard" givenname="Erwann" familyname="Rogard" />
 <author id="rogers" givenname="Alan" familyname="Rogers" />
 <author id="rohner" givenname="M." familyname="Rohner" />
+<author id="rojo-tanzi" givenname="Boris N." familyname="Rojo Tanzi" />
 <author id="rokicki" givenname="Tom" familyname="Rokicki" />
 <author id="rolland" givenname="Christian" familyname="Rolland" />
 <author id="romanenko" givenname="Alex" familyname="Romanenko" />
@@ -2375,6 +2403,7 @@
 <author id="sacchetto" givenname="Mauro" familyname="Sacchetto" />
 <author id="sachs" givenname="Christian" familyname="Sachs" />
 <author id="saigre" givenname="Thomas" familyname="Saigre" />
+<author id="saintcriq" givenname="Anthony" familyname="Saint-Criq" />
 <author id="sakarovitch" givenname="Jacques" familyname="Sakarovitch" />
 <author id="sakuras" givenname="Edgaras" familyname="Šakuras" />
 <author id="salamon" givenname="Adrian" familyname="Salamon" />
@@ -2414,6 +2443,7 @@
 <author id="schaad" givenname="James L." familyname="Schaad" />
 <author id="schaber" givenname="Spencer D." familyname="Schaber" />
 <author id="schacht" givenname="Cedric" familyname="Schacht" />
+<author id="schaden" givenname="Gerhard" familyname="Schaden" />
 <author id="schaefer" givenname="Moritz R." familyname="Schäfer" />
 <author id="schalueck" givenname="Elmar" familyname="Schalück" />
 <author id="schandl" givenname="Bernd" familyname="Schandl" />
@@ -2439,7 +2469,6 @@
 <author id="schmid-d" givenname="Dominik" familyname="Schmid" />
 <author id="schmidt" givenname="Walter A." familyname="Schmidt" />
 <author id="schmidt-j" givenname="Jan" familyname="Schmidt" />
-<author id="schmidt-m" givenname="Michael" familyname="Schmidt" />
 <author id="schmitt" givenname="Peter" familyname="Schmitt" />
 <author id="schmittbuhl" givenname="Arnaud" familyname="Schmittbuhl" />
 <author id="schmitz" givenname="Thomas A." familyname="Schmitz" />
@@ -2485,7 +2514,6 @@
 <author id="schwarz-g" givenname="Greg" familyname="Schwarz" />
 <author id="schwarz-m" givenname="Max" familyname="Schwarz" />
 <author id="schwarz-n" givenname="Norbert" familyname="Schwarz" />
-<author id="schwarzkopf" givenname="Otfried" familyname="Schwarzkopf" />
 <author id="schweigert" givenname="U." familyname="Schweigert" />
 <author id="schwenk" givenname="Ferdinand" familyname="Schwenk" />
 <author id="schwerdtfeger" givenname="Sebastian" familyname="Schwerdtfeger" />
@@ -2501,6 +2529,7 @@
 <author id="seidman" givenname="Gregory" familyname="Seidman" />
 <author id="seindal" givenname="René" familyname="Seindal" />
 <author id="sejas" givenname="Diego" familyname="Sejas Viscarra" />
+<author id="sekorin" givenname="Vseslav" familyname="Sekorin" />
 <author id="selberg" givenname="Ole Michael" familyname="Selberg" />
 <author id="seliger" givenname="Hendrik G" familyname="Seliger" />
 <author id="selinger" givenname="Peter" familyname="Selinger" />
@@ -2516,7 +2545,6 @@
 <author id="serwin" givenname="Marcin" familyname="Serwin" />
 <author id="setzer" givenname="Nick" familyname="Setzer" />
 <author id="seuranen" givenname="Esa" familyname="Seuranen" />
-<author id="seward" givenname="Julian" familyname="Seward" />
 <author id="sfyrakis" givenname="Chrysovalantis" familyname="Sfyrakis" />
 <author id="sgouros" givenname="Tom" familyname="Sgouros" />
 <author id="shadura" givenname="Andrej" familyname="Shadura" />
@@ -2530,7 +2558,6 @@
 <author id="shaw" givenname="Caitlin" familyname="Shaw" />
 <author id="shawyer" givenname="Bruce" familyname="Shawyer" />
 <author id="shell" givenname="Michael" familyname="Shell" />
-<author id="shemde" givenname="Medeni" familyname="Shemdê" />
 <author id="shen" givenname="Willie" familyname="Shen" />
 <author id="shepherd" givenname="James" familyname="Shepherd" />
 <author id="sherman" givenname="Heather" familyname="Sherman" />
@@ -2609,10 +2636,13 @@
 <author id="soedergran" givenname="Salome" familyname="Södergran" />
 <author id="soehner" givenname="Jörg" familyname="Söhner" />
 <author id="soell" givenname="Thomas" familyname="Söll" />
+<author id="sojka" givenname="Petr" familyname="Sojka" />
 <author id="solomykov" givenname="Basil" familyname="Solomykov" />
 <author id="somefun" givenname="Oluwasegun" familyname="Somefun" />
 <author id="sommer" givenname="Jörg" familyname="Sommer" />
 <author id="sommerfeldt" givenname="Axel" familyname="Sommerfeldt" />
+<author id="song" givenname="Wupei" familyname="Song" />
+<author id="souther" givenname="John" familyname="Souther" />
 <author id="sowa" givenname="Friedhelm" familyname="Sowa" />
 <author id="sozuer" givenname="Sami" familyname="Sozuer" />
 <author id="spalek" givenname="Robert" familyname="Spalek" />
@@ -2625,6 +2655,7 @@
 <author id="spinellis" givenname="Diomidis" familyname="Spinellis" />
 <author id="spit" givenname="Werenfried" familyname="Spit" />
 <author id="spittank" givenname="Daniel" familyname="Spittank" />
+<author id="spitz" givenname="Ben" familyname="Spitz" />
 <author id="spitzmueller" givenname="Jürgen" familyname="Spitzmüller" />
 <author id="spivak" givenname="Michael" familyname="Spivak" />
 <author id="spivey" givenname="Mike" familyname="Spivey" />
@@ -2639,6 +2670,7 @@
 <author id="stacey" givenname="Andrew" familyname="Stacey" />
 <author id="stachelek" givenname="Joseph" familyname="Stachelek" />
 <author id="stajano" givenname="Frank" familyname="Stajano" />
+<author id="stalder" givenname="Alain" familyname="Stalder" />
 <author id="stallman" givenname="Richard M." familyname="Stallman" />
 <author id="stambulchik" givenname="Evgeny" familyname="Stambulchik" />
 <author id="stanier" givenname="Alan" familyname="Stanier" />
@@ -2697,8 +2729,10 @@
 <author id="sturm" givenname="Thomas F." familyname="Sturm" />
 <author id="suchard" givenname="Jan Eike" familyname="Suchard" />
 <author id="suckale" givenname="Jakob" familyname="Suckale" />
+<author id="sueer" givenname="Sonat" familyname="Süer" />
 <author id="sullivan" givenname="Wayne" familyname="Sullivan" />
 <author id="sun" givenname="Tong" familyname="Sun" />
+<author id="sun-q" givenname="Quan" familyname="Sun" />
 <author id="sun-w" givenname="Wenchang" familyname="Sun" />
 <author id="sun-x" givenname="Xiao" familyname="Sun" />
 <author id="sun-z" givenname="Zhonghao" familyname="Sun" />
@@ -2777,7 +2811,6 @@
 <author id="tinnefeld" givenname="Karsten" familyname="Tinnefeld" />
 <author id="titz" givenname="Thomas" familyname="Titz" />
 <author id="tkadlec" givenname="Josef" familyname="Tkadlec" />
-<author id="tlwg" givenname="Thai Linux Working Group" />
 <author id="tnair" givenname="Rishikesan" familyname="T. Nair" />
 <author id="toal" givenname="Graham" familyname="Toal" />
 <author id="tobin" givenname="Geoffrey" familyname="Tobin" />
@@ -2883,6 +2916,7 @@
 <author id="verhoeff" givenname="Tom" familyname="Verhoeff" />
 <author id="verhoeven" givenname="Richard" familyname="Verhoeven" />
 <author id="verhoeven-y" givenname="Yves" familyname="Verhoeven" />
+<author id="verma" givenname="Nilesh" familyname="Verma" />
 <author id="vermaseren" givenname="Jos" familyname="Vermaseren" />
 <author id="vermeer" givenname="Martin" familyname="Vermeer" />
 <author id="verna" givenname="Didier" familyname="Verna" />
@@ -2947,6 +2981,7 @@
 <author id="waltm" givenname="Marijn" familyname="Waltman" />
 <author id="wan" givenname="Zhen" familyname="Wan" />
 <author id="wang" givenname="Yue" familyname="Wang" />
+<author id="wang-a" givenname="Aihua" familyname="Wang" />
 <author id="wang-h" givenname="HaiYing" familyname="Wang" />
 <author id="wang-h-p" givenname="Hsin-Po" familyname="Wang" />
 <author id="wang-j" givenname="Junwei" familyname="Wang" />
@@ -2954,6 +2989,7 @@
 <author id="wang-q" givenname="Qifan" familyname="Wang" />
 <author id="wang-r" givenname="Ran" familyname="Wang" />
 <author id="wang-x" givenname="Xu" familyname="WANG" />
+<author id="wang-y" givenname="Yang" familyname="Wang" />
 <author id="wang-z" givenname="Zhaoli" familyname="Wang" />
 <author id="warbrick" givenname="Jon" familyname="Warbrick" />
 <author id="ward" givenname="Martin" familyname="Ward" />
@@ -3041,7 +3077,6 @@
 <author id="wittenburg" givenname="Kim" familyname="Wittenburg" />
 <author id="woch" givenname="J" familyname="Woch" />
 <author id="wolczko" givenname="Mario" familyname="Wolczko" />
-<author id="wolf" givenname="Klaus-J." familyname="Wolf" />
 <author id="wolfe" givenname="Warren" familyname="Wolfe" />
 <author id="wolff" givenname="Thomas" familyname="Wolff" />
 <author id="wolfsteiner" givenname="Lukas" familyname="Wolfsteiner" />
@@ -3075,6 +3110,7 @@
 <author id="yamaji" givenname="Akira" familyname="Yamaji" />
 <author id="yamamoto" givenname="Munehiro" familyname="Yamamoto" />
 <author id="yamashita" givenname="Hironobu" familyname="Yamashita" />
+<author id="yamazaki" givenname="Yosuke" familyname="Yamazaki" />
 <author id="yanai" givenname="Shimon" familyname="Yanai" />
 <author id="yang" givenname="Yang" familyname="Yang" />
 <author id="yang-j" givenname="Jingxuan" familyname="Yang" />
@@ -3085,6 +3121,7 @@
 <author id="yasuoka" givenname="Koichi" familyname="Yasuoka" />
 <author id="yato" givenname="Takayuki" familyname="Yato" />
 <author id="yavuz" givenname="Volkan" familyname="Yavuz" />
+<author id="yazdi" givenname="Parsa" familyname="Yazdi" />
 <author id="ydx" givenname="Y.D.X."/>
 <author id="ye" givenname="Lei" familyname="Ye" />
 <author id="yi" givenname="Qu" familyname="Yi" />
@@ -3117,6 +3154,7 @@
 <author id="zhang" givenname="Linbo" familyname="Zhang" />
 <author id="zhang-c" givenname="Chennan" familyname="Zhang" />
 <author id="zhang-e" givenname="Eric" familyname="Zhang" />
+<author id="zhang-f" givenname="Fu" familyname="Zhang" />
 <author id="zhang-g" givenname="Gary" familyname="Zhang" />
 <author id="zhang-r" givenname="Ruixi" familyname="Zhang" />
 <author id="zhang-s" givenname="Shenxing" familyname="Zhang" />
@@ -3158,6 +3196,7 @@
 <author id="zubrinic" givenname="Darko" familyname="Žubrinić" />
 <author id="zucatelli" givenname="Fernando H. G." familyname="Zucatelli" />
 <author id="zuijlen" givenname="Matijs" familyname="van Zuijlen" />
+<author id="zuurbier" givenname="Paul" familyname="Zuurbier" />
 <author id="zwahlen" givenname="Cedric V." familyname="Zwahlen" />
 <author id="zwols" givenname="Yori" familyname="Zwols" />
 <author id="zydowitz" givenname="O" familyname="Zydowitz" />
