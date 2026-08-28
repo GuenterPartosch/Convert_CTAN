@@ -1,6 +1,6 @@
 Messages (CTANOut)
 ==================
-2024-08-12
+2026-07-09
 
 Errors
 ------
@@ -34,3 +34,4 @@ Warning pickle file '<pickle file>' not found; local information files ignored
 Warning unknown language code '<code>' in '<documentation|description>'; ignored
 Warning XML file for package '<package>' not found
 Warning XML file for package '<package>' not well-formed
+Warning Any unspecified error

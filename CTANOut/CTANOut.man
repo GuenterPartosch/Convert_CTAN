@@ -1,10 +1,11 @@
 usage: CTANOut [-h] [-a] [-stat] [-v] [-V] [-A <author template>] [-b <btype>]
-               [-d <directory>] [-k <key template>] [-L <license template>]
-               [-m <mode>] [-mt] [-nf] [-o <output>] [-s <skip>]
-               [-sb <skip biblatex>] [-t <name template>] [-y <year template>]
+               [-d <OS directory (folder)>] [-k <key template>]
+               [-L <license template>] [-m <mode>] [-mt] [-nf] [-o <output>]
+               [-s <skip>] [-sb <skip biblatex>] [-t <name template>]
+               [-y <year template>]
 
 CTANOut
-Version: 2.68 (2025-02-12)
+Version: 3.13 (2026-08-21)
 
 Converts CTAN XLM package files to LaTeX, RIS, plain, BibLaTeX, Excel [tab separated].
 
@@ -21,7 +22,7 @@ Options related to output:
                         names -- Default: ^.+$
   -b, --btype <btype>   Type of BibLaTex entries to be generated [only for
                         BibLateX mode] -- Default: @online
-  -d, --directory <directory>
+  -d, --directory <OS directory (folder)>
                         Folder for input and output files -- Default: .\
   -k, --key_template <key template>
                         Template for output filtering on the base of keys --

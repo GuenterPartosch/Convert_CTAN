@@ -1,19 +1,19 @@
 Examples (CTANOut)
 ==================
-2024-08-13
+2026-07-31
 
-Call the Python program CTANOut:
+Call the Python program CTANLOad:
 
-The following possibilities are available for this:
+The following alternatives are available:
 
 1. python -u CTANOut.py <option(s)>
--- always works
+   -- always works
 2. CTANOut.py <option(s)>
--- if the OS knows how to handle Python files (files with the name extension .py)
+   -- if the OS knows how to handle Python files (files with the name extension .py)
 3. CTANOut <option(s)>
--- if there is an executable (in Windows a file with the name extension .exe)
+   -- if there is an executable (in Windows a file with the name extension .exe)
 
-In the following examples we will use possibility 3.
+In the following examples we will use alternative 3.
 
 CTANOut
     RIS is output format (default)
@@ -151,11 +151,19 @@ CTANOut -y "2022|2023" -k "font|class"  -A "Voß|Oberdieck" -v -stat -nf
 
 Regular expressions
 -------------------
-The options -t,  -k, and -L need regular expressions as values.
-such as
+Regular expressions can be used with the -t, -L, -A,  y, and -k options.
+Such as
 
--k latex                matches all topic names which contain "latex"
--t "latex|ltx|l3|lt3"   matches all file names which contain "latex", "ltx", "l3|" or "t3"
--t "^.+$"               matches all file names (at least one character)
--t "^{a-b]"             matches all file names which begin with letters a-b
--t "^{a-z].*in$"        matches all file names which begin with letters a-z and end with 'in'
+-k latex                matches all topic names which contain "latex" 
+-t "latex|ltx|l3|lt3"   matches all package names which contain "latex", "ltx", "l3|" or "t3"
+-t "^.+$"               matches all package names
+-t "^{a-b]"             matches all package names which begin with letters a-b
+-A "Voß|Mittelbach"     matches all author names which contain "Voß" or "Mittelbach"
+-y "1999|20[0-2][0-9]"  matches the years 1999 or "20[0-2][0-9]"
+-L "lppl|BSD"           Matches all license names which contain "lppl" or "BSD"
+
+Caution
+-------
+As regular expressions may contain special characters (such as "|" in the examples above) 
+that also have a specific meaning for the operating system, they should be enclosed in 
+quotation marks. 
