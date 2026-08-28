@@ -1,3 +1,7 @@
+[CTANLoadOut] Info: CTANLoadOut
+
+[CTANLoadOut] Info: original call: CTANLoadOut.py -h
+
 usage: CTANLoadOut [-h] [-a] [-V] [-d <directory>] [-mo] [-o <output name>]
                    [-tout <timeout>] [-stat] [-v] [-A author template]
                    [-k <key template>] [-L <license template>]
@@ -14,7 +18,7 @@ usage: CTANLoadOut [-h] [-a] [-V] [-d <directory>] [-mo] [-o <output name>]
                    [-l] [-p] [-r]
 
 CTANLoadOut
-Version: 1.57 (2025-02-12)
+Version: 2.17 (2026-08-22)
 
 Combines the tasks of CTANLoad  and CTANOut:
 CTANLoad: Loads XLM and PDF documentation files from CTAN a/o generates some special lists, and prepares data for CTANOut.
@@ -44,22 +48,22 @@ Other global options:
   -v, --verbose         [CTANLoadOut] Flag: Output is verbose. -- Default:
                         False
 
-Options for CTANLoad and CTANOut:
+Options for CTANLoad + CTANOut:
   -A, --author_template author template
-                        [CTANLoad and CTANOut] Name template for authors --
-                        Default: ^.+$
+                        [CTANLoad and CTANOut] General name template for
+                        authors -- Default: ^.+$
   -k, --key_template <key template>
-                        [CTANLoad and CTANOut] Template for keys -- Default:
-                        ^.+$
+                        [CTANLoad and CTANOut] General template for keys --
+                        Default: ^.+$
   -L, --license_template <license template>
-                        [CTANLoad and CTANOut] Name template for licenses --
-                        Default: ^.+$
+                        [CTANLoad and CTANOut] General name template for
+                        licenses -- Default: ^.+$
   -t, --name_template <name template>
-                        [CTANLoad and CTANOut] Template for package names --
-                        Default: ^.+$
+                        [CTANLoad and CTANOut] General template for package
+                        names -- Default: ^.+$
   -y, --year_template <year template>
-                        [CTANLoad and CTANOut] Template for years -- Default:
-                        ^19[89][0-9]|20[012][0-9]$
+                        [CTANLoad and CTANOut] General template for years --
+                        Default: ^19[89][0-9]|20[012][0-9]$
 
 Options for CTANLoad:
   -Al, --author_load_template <author load template>
@@ -105,6 +109,7 @@ Options for CTANOut:
                         [CTANOut] Template for package names -- Default: ^.+$
   -yo, --year_out_template <year out template>
                         [CTANOut] Template for years -- Default:
+                        ^19[89][0-9]|20[012][0-9]$
 
 Options for special actions:
   -c, --check_integrity

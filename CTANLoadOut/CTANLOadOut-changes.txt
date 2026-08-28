@@ -1,97 +1,141 @@
 Changes (CTANLoadOut)
 =====================
-(2026-04-15)
+(2026-08-27)
 
-# 0.1  2021-05-01 start
-# 0.9  2021-05-04 first working version
-# 1.0  2021-05-24 program completed
-# 1.1  2021-05-28 compilation enabled
-# 1.2  2021-05-31 some improvements (calls, compilation)
-# 1.3  2021-06-12 auxiliary function fold: shorten long option lists for output
-# 1.4  2021-06-20 some smaller errors/deficiencies corrected
-# 1.5  2021-06-23 error correction
-# 1.6  2021-06-24 adaption for the CTANLoad option -r
-# 1.7  2021-06-25 some new handling of subprocesses
-# 1.8  2021-06-25 transfer of options to CTANLoad (Regeneration) improved; handling of -r improved
-# 1.9  2021-07-01 adaption of the option -k (CTANLoad); new options -ko and -kl
-# 1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove specified temporary LaTeX files
-# 1.11 2021-07-05 function fold restructured
-# 1.12 2021-07-06 new error message: tried to use the program indirectly
-# 1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced
-# 1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
-# 1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
-# 1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
-# 1.17 2021-07-18 output (listing of program options) enhanced
-# 1.18 2021-07-18 xyz.tex and all other LaTeX relevant files before compilation a/o -mt removed
-# 1.19 2021-07-19 there is no compilation if -A a/o -k a/o -t results "no packages found"
-# 1.20 2021-07-19 -mo now prevents unintended loading of CTANLoad
-# 1.21 2021-11-27 -sb (CTANOut) enabled
-# 1.22 2021-11-28 process time and total time can be computed
-# 1.23 2021-11-28 greater parts of comment blocks moved to external text files
-# 1.24 2021-12-30 option -L enabled; changes in argparse, in the func_call_load and func_call_output functions
-# 1.25 2022-01-02 argparse messages changed
-# 1.26 2022-01-12 changes in func_call_compile, main, call_ouput
-# 1.27 2022-01-22 corrections and changes of log output on terminal
-# 1.28 2022-02-28 processing of -L, -Ll, -Lo (and related options) improved
-# 1.29 2023-06-22 all Python comments revised
-# 1.30 2023-06-22 new option -dbg (debugging) + processing
-# 1.31 2023-06-22 processing of options improved; esp. to prevent collissions
-# 1.32 2023-06-22 new option -nf (no files) installed + processing: relevant in CTANOut
-# 1.33 2023-06-22 some additional requests/settings to avoid collissions of -nf with other options
-# 1.34 2023-06-22 variable names (in the context of argparse) unified
-# 1.35 2023-06-22 func_call_check improved
-# 1.36 2023-06-22 new option -y (filtering on the base of years) + processing; relevant in CTANLoad and CTANOut
-# 1.37 2023-06-26 some minor changes in statistics output
-# 1.38 2023-06-28 fold() changed to adjust protocoll output
-# 1.39 2023-07-01 messages with an additional identifier "[CTANLoadOut]"
-# 1.40 2023-07-30 YEAR_TEMPLATE_DEFAULT adjusted to YEAR_TEMPLATE_DEFAULT in CTANLoad and CTANOut
-# 1.41 2023-07-30 minor changes in message texts: to be executed --> is to be processed
-# 1.42 2023-07-30 output of PROGRAMNAME_EXT / PROGRAM_VERSION / PROGRAM_DATE when -stat is set
-# 1.43 2023-07-30 new concept for separation lines
-# 1.44 2024-04-10 Time measurement for compilations; corresponding statistical output in each case
+0.1  2021-05-01 start
+0.9  2021-05-04 first working version
+1.0  2021-05-24 program completed
+1.1  2021-05-28 compilation enabled
+1.2  2021-05-31 some improvements (calls, compilation)
+1.3  2021-06-12 auxiliary function fold: shorten long option lists for output
+1.4  2021-06-20 some smaller errors/deficiencies corrected
+1.5  2021-06-23 error correction
+1.6  2021-06-24 adaption for the CTANLoad option -r
+1.7  2021-06-25 some new handling of subprocesses
+1.8  2021-06-25 transfer of options to CTANLoad (Regeneration) improved; handling of -r improved
+1.9  2021-07-01 adaption of the option -k (CTANLoad); new options -ko and -kl
+1.10 2021-07-01 new auxiliary function remove_LaTeX_file: remove specified temporary LaTeX files
+1.11 2021-07-05 function fold restructured
+1.12 2021-07-06 new error message: tried to use the program indirectly
+1.13 2021-07-07 remove temporary files enhanced: new function remove_other_file; remove_LaTeX_file enhanced
+1.14 2021-07-15 option -A as in CTANOut enabled (-Ao and -Al, too)
+1.15 2021-07-15 parameter 'encoding="utf8"' in subprocess.run calls removed
+1.16 2021-07-15 some output texts changed + error messages for program exits always verbose
+1.17 2021-07-18 output (listing of program options) enhanced
+1.18 2021-07-18 xyz.tex and all other LaTeX relevant files before compilation a/o -mt removed
+1.19 2021-07-19 there is no compilation if -A a/o -k a/o -t results "no packages found"
+1.20 2021-07-19 -mo now prevents unintended loading of CTANLoad
+1.21 2021-11-27 -sb (CTANOut) enabled
+1.22 2021-11-28 process time and total time can be computed
+1.23 2021-11-28 greater parts of comment blocks moved to external text files
+1.24 2021-12-30 option -L enabled; changes in argparse, in the func_call_load and func_call_output functions
+1.25 2022-01-02 argparse messages changed
+1.26 2022-01-12 changes in func_call_compile, main, call_ouput
+1.27 2022-01-22 corrections and changes of log output on terminal
+1.28 2022-02-28 processing of -L, -Ll, -Lo (and related options) improved
+1.29 2023-06-22 all Python comments revised
+1.30 2023-06-22 new option -dbg (debugging) + processing
+1.31 2023-06-22 processing of options improved; esp. to prevent collissions
+1.32 2023-06-22 new option -nf (no files) installed + processing: relevant in CTANOut
+1.33 2023-06-22 some additional requests/settings to avoid collissions of -nf with other options
+1.34 2023-06-22 variable names (in the context of argparse) unified
+1.35 2023-06-22 func_call_check improved
+1.36 2023-06-22 new option -y (filtering on the base of years) + processing; relevant in CTANLoad and CTANOut
+1.37 2023-06-26 some minor changes in statistics output
+1.38 2023-06-28 fold() changed to adjust protocoll output
+1.39 2023-07-01 messages with an additional identifier "[CTANLoadOut]"
+1.40 2023-07-30 YEAR_TEMPLATE_DEFAULT adjusted to YEAR_TEMPLATE_DEFAULT in CTANLoad and CTANOut
+1.41 2023-07-30 minor changes in message texts: to be executed --> is to be processed
+1.42 2023-07-30 output of PROGRAMNAME_EXT / PROGRAM_VERSION / PROGRAM_DATE when -stat is set
+1.43 2023-07-30 new concept for separation lines
+1.44 2024-04-10 Time measurement for compilations; corresponding statistical output in each case
 
-# 1.45   2024-04-13 new concept for [CTANLoadOut, check], [..., compilation], [..., index], [..., load], [..., output], [..., regeneration]
-# 1.45.1 2024-04-13 everywhere: subprocess.run instead of subprocess.popen
-# 1.45.2 2024-04-13 everywhere; parameter check=True, timeout=<number>
-# 1.45.3 2024-04-13 global variable timeoutDefault for [CTANLoadOut, check], [..., compilation], [..., index], [..., load], [..., output], [..., regeneration]
-# 1.45.4 2024-04-13 better, more detailed handling of errors
-# 1.45.5 2024-04-13 in [..., load], [..., output], [..., regeneration]: stdout is linked to a temporary auxiliary file that is processed line by line
+1.45   2024-04-13 new concept for [CTANLoadOut, check], [..., compilation], [..., index], [..., load], [..., output], [..., regeneration]
+1.45.1 2024-04-13 everywhere: subprocess.run instead of subprocess.popen
+1.45.2 2024-04-13 everywhere; parameter check=True, timeout=<number>
+1.45.3 2024-04-13 global variable timeoutDefault for [CTANLoadOut, check], [..., compilation], [..., index], [..., load], [..., output], [..., regeneration]
+1.45.4 2024-04-13 better, more detailed handling of errors
+1.45.5 2024-04-13 in [..., load], [..., output], [..., regeneration]: stdout is linked to a temporary auxiliary file that is processed line by line
 
-# 1.46   2024-04-16 additional parameter 'errors="ignore"' for 'with TemporaryFile' in func_call_load, func_call_output
-# 1.47   2024-04-17 addition: [CTANLoadOut, check], [..., compilation], [..., index], [..., load], [..., output], [..., regeneration]: except KeyboardInterrupt
-# 1.48   2024-04-22 compiles related subprocesses revised: now more robust against coding errors
-# 1.49   2024-04-22 .pdf and .log files removed before step2 and step3 in compilation subprocess
+1.46   2024-04-16 additional parameter 'errors="ignore"' for 'with TemporaryFile' in func_call_load, func_call_output
+1.47   2024-04-17 addition: [CTANLoadOut, check], [..., compilation], [..., index], [..., load], [..., output], [..., regeneration]: except KeyboardInterrupt
+1.48   2024-04-22 compiles related subprocesses revised: now more robust against coding errors
+1.49   2024-04-22 .pdf and .log files removed before step2 and step3 in compilation subprocess
 
-# 1.50   2024-04-23 tiout management revised
-# 1.50.1 2024-04-23 variables renamed: timeoutDefault --> timeout etc
-# 1.50.2 2024-04-23 new global variables: TIMEOUT_DEFAULT and TIMEOUT_TEXT
-# 1.50.3 2024-04-23 new section in arparse processing: new options -tout and --timeout + corr. assigmnent to timeout
+1.50   2024-04-23 tiout management revised
+1.50.1 2024-04-23 variables renamed: timeoutDefault --> timeout etc
+1.50.2 2024-04-23 new global variables: TIMEOUT_DEFAULT and TIMEOUT_TEXT
+1.50.3 2024-04-23 new section in arparse processing: new options -tout and --timeout + corr. assigmnent to timeout
 
-# 1.51   2024-05-94 new section in exception handling: UnicodeDecodeError
-# 1.52   2024-06-02 BTYPE_DEFAULT changed to "@online"
-# 1.53   2024-06-11 additional values for -m: tsv, csv
-# 1.54   2024-06-12 some texts for -h and arparse changed
+1.51   2024-05-94 new section in exception handling: UnicodeDecodeError
+1.52   2024-06-02 BTYPE_DEFAULT changed to "@online"
+1.53   2024-06-11 additional values for -m: tsv, csv
+1.54   2024-06-12 some texts for -h and arparse changed
 
-# 1.55   2024-07-20 argparse revised
-# 1.55.1 2024-07-20 additional parameter in .ArgumentParser: prog, epilog, formatter_class
-# 1.55.2 2024-07-20 subdivision into groups by .add_argument_group
-# 1.55.3 2024-07-20 additional arguments in .add_argument (if it makes sense): type, metavar, action, dest
- 
-# 1.56   2025-02-09 everywhere: all source code lines wrapped at a maximum of 80 characters
-# 1.57   2025-02-12 no test: __name__ == "__main__; ==> CTANLoad.py can be imported
-# 1.58   2025-10-05 time specification with unit
-# 1.59   2025-11-03 new: argparse groups
-# 1.60   2025-11-03 argparse texts revised (x)
-# 1.61   2025-11-17 texts changed: MAKE_OUTPUT_TEXT, PDF_OUTPUT_TEXT
+1.55   2024-07-20 argparse revised
+1.55.1 2024-07-20 additional parameter in .ArgumentParser: prog, epilog, formatter_class
+1.55.2 2024-07-20 subdivision into groups by .add_argument_group
+1.55.3 2024-07-20 additional arguments in .add_argument (if it makes sense): type, metavar, action, dest
 
-# 2.0    2026-04-01 Complete revision (too many changes to list in the code)
-# 2.0.1  2026-04-01 Functions with type annotations
-# 2.0.2  2026-04-01 Variable annotations (where appropriate and possible)
-# 2.0.3  2026-04-01 Constants in uppercase
-# 2.0.4  2026-04-01 .format replaced with f-strings (where appropriate)
-# 2.0.5  2026-04-01 __doc__ texts supplemented and standardised
-# 2.0.6  2026-04-01 Standardised: Code up to a maximum of column 71
-# 2.0.7  2026-04-01 Standardised: Comments from column 72 onwards
+1.56   2025-02-09 everywhere: all source code lines wrapped at a maximum of 80 characters
+1.57   2025-02-12 no test: __name__ == "__main__; ==> CTANLoad.py can be imported
+1.58   2025-10-05 time specification with unit
+1.59   2025-11-03 new: argparse groups
+1.60   2025-11-03 argparse texts revised (x)
+1.61   2025-11-17 texts changed: MAKE_OUTPUT_TEXT, PDF_OUTPUT_TEXT
 
-# 2.1    2026-04-15 corrections where arguments have been combined 
+2.0    2026-04-01 Complete revision (too many changes to list in the code)
+2.0.1  2026-04-01 Functions with type annotations
+2.0.2  2026-04-01 Variable annotations (where appropriate and possible)
+2.0.3  2026-04-01 Constants in uppercase
+2.0.4  2026-04-01 .format replaced with f-strings (where appropriate)
+2.0.5  2026-04-01 __doc__ texts supplemented and standardised
+2.0.6  2026-04-01 Standardised: Code up to a maximum of column 71
+2.0.7  2026-04-01 Standardised: Comments from column 72 onwards
 
+2.1    2026-04-15 corrections where arguments have been combined
+2.2    2026-07-16 more f-strings
+2.3    2026-07-16 actTime -> ACT_TIME; actDate -> ACT_DATE (and is therefore recognisable as a constant)
+2.4    2026-07-16 encoding for subprocesses depends on operating system now
+
+2.5    2026-07-17 backtracing
+2.5.1  2026-07-17 new module traceback
+2.5.2  2026-07-17 call traceback.print_exc()
+
+2.6    2026-07-18 data class used
+2.6.0  2026-07-18 new module dataclasses imported
+2.6.1  2026-07-18 new class dataclass-variable (including all globally used variables) defined
+2.6.2  2026-07-18 instance "dc_var" of this class created
+2.6.3  2026-07-18 if necessary: Function definitions supplemented by the parameter "dc=dc_var"
+2.6.4  2026-07-18 relevant local variables prefixed with "dc." and/or non-local with "dc_var"   
+2.6.5  2026-07-18 original definitions of globally used variables removed
+2.6.6  2026-07-18 "global" statements removed
+2.6.7  2026-07-18 __doc__ texts supplemented/adapted to the data class
+
+2.7    2026-07-19 new functions (which group specific instructions)
+2.7.1  2026-07-19 definitions of argparse_process, argparse_postprocessing, pre_make_calls, make_calls
+2.7.2  2026-07-19 Accessing the new functions
+
+2.8    2026-07-19 data class dataclass_variable: converted to the existing global constants
+2.9    2026-07-19 timout is float now
+
+2.10   2026-07-20 Simplification of the 'make_calls' function
+2.10.1  2026-07-20 in particular, (A) and (B) simplified
+2.10.2  2026-07-20 new internal functions 'inner_load', 'inner_output'  for (A) and/or (B)
+
+2.11    2026-07-21 New additional comments in 'make_calls' [(A), (B)]
+2.12    2026-07-22 __doc__ text for module
+
+2.13    2026-07-25 Break the function 'make_calls' into some functions.
+2.13.2  2026-07-25 Accessing the new features in main()
+2.13.3  2026-07-25 Add documentation and comments to functions.
+2.13.4  2026-07-26 Take into account changes to the module’s __doc__ text.
+2.13.5  2026-07-26 Remove the remnants of the 'make_calls' function.
+
+2.14    2026-08-19 Avoid compiling LaTeX files with no real content
+2.14.1  2026-08-19 new constant MIN_TEX_SIZE 
+2.14.2  2026-08-19 additional query + new error message
+
+2.15    2026-08-20 options log revised
+2.16    2026-08-21 Calculation and output of the input string
+2.17    2026-08-22 name and size of the resulting PDF file

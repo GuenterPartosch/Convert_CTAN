@@ -1,26 +1,52 @@
 Functions (CTANLoadout)
 =======================
-2026-04-18
+2026-08-26
 
-fold(s)                                  function foldauxiliary functionshortens/foldens long option lists for output
-func_call_load()                         function func_call_load()CTANLoad is processed.            
-func_call_check()                        function func_call_check()CTANLoad (Check) is processed.
-func_call_regeneration()                 function func_call_regeneration()CTANLoad (Regeneration) is processed.
-func_call_output()                       function func_call_output()CTANOut is processed.
-func_call_compile()                      Compiles the generated LaTeX file
-head()                                   function headshows the called options
+Class:
+-----
+dataclass_variable          data class
+
+with method:
+-----------
+report                      Outputs the current values of the variables defined in 'dataclass_variable'.
+
+Functions:
+---------
+argparse_postprocessing()                function: Postprocesses some parameters for the program CTANLoadOut.
+argparse_process()                       function: Defines the arguments for the program CTANLoadOut and starts it.
+fold()                                   auxiliary function: shortens/foldens long option lists for output
+func_call_load()                         function: CTANLoad is processed.            
+func_call_check()                        function: CTANLoad (Check) is processed.
+func_call_regeneration()                 function: CTANLoad (Regeneration) is processed.
+func_call_output()                       function: CTANOut is processed.
+func_call_compile()                      function: Compiles the generated LaTeX file
+head()                                   function: shows the called options
+make_call_check(dc=dc_var):              # function: constructs the call for checking (call_check).
+make_call_compile(dc=dc_var):            # function: Constructs the calls for compiling and index.
+make_call_load(dc=dc_var):               # function: Constructs the call for loading (call_load).
+make_call_output(dc=dc_var):             # function: Constructs the call for output generating (call_output).
+make_call_regeneration(dc=dc_var):       # function: Constructs the call for regeneration (call_regneration).
 main()                                   main function
-remove_LaTeX_file(t)                     auxiliary function remove_LaTeX_fileremoves named LaTeX file.
-remove_other_file(t)                     auxiliary function remove_other_fileremoves named other file
+remove_LaTeX_file(t)                     auxiliary function: removes named LaTeX file.
+remove_other_file(t)                     auxiliary function: removes named other file.
 
 
+Hierarchy:
+---------
 main()
+    ---> argparse_process
+    ---> argparse_postprocessing
     ---> head
     ---> func_call_regeneration
     ---> func_call_load
     ---> func_call_check
     ---> func_call_output
     ---> func_call_compile
+    ---> make_call_check
+    ---> make_call_compile
+    ---> make_call_load
+    ---> make_call_output
+    ---> make_call_regneration
 head()                                                            
     ---> folddef 
 func_call_compile
