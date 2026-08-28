@@ -1,6 +1,6 @@
 Changes (CTANLoad.py)
 =====================
-2026-04-15
+2026-08-27
 
 2.0    2019-10-01 completely revised
 2.0.1  2019-10-03 smaller changes: messages + command parsing
@@ -186,3 +186,28 @@ Changes (CTANLoad.py)
 3.0.7  2026-04-01 Standardised: Comments from column 72 onwards
 
 3.1    2026-04-15 in dload_XML_files: better handling with processor error (and other exceptions)
+3.2    2026-05-01 for XML and PDF files: downloads with number
+3.3    2026-05-08 print statements containing \+ simplified
+3.4    2026-06-30 unspecified "except:" replaced by "except Exception as err:"
+
+3.5    2026-07-02 data class used
+3.5.0  2026-07-13 new module dataclasses
+3.5.1  2026-07-02 new class dataclass-variable (including all globally used variables) derfined
+3.5.2  2026-07-02 instance "dc_var" of this class created
+3.5.3  2026-07-02 if necessary: Function definitions supplemented by the parameter "dc=dc_var"
+3.5.4  2026-07-02 relevant local variables prefixed with "dc." and/or non-local with "dc_var"
+3.5.5  2026-07-03 original definitions of globally used variables removed
+3.5.6  2026-07-03 "global" statements removed
+3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the data class
+
+3.6    2026-07-05 ACT_PROGRAMNAME depends on OPERATINGSYS now
+3.7    2026-07-05 XML and PDF downloads: number of download
+
+3.8    2026-07-13 backtracing
+3.8.1  2026-07-13 new module traceback
+3.8.2  2026-07-13 call traceback.print_exc()
+
+3.9    2026-07-23 correction for not-existing key in licenses.xml
+3.10   2026-08-05 correction in dataclass_variable: collections with default factory
+3.11   2026-08-10 Calculation and output of the input string
+3.12   2026-08-15 log output of the options in the call revised

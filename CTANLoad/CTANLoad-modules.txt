@@ -1,17 +1,19 @@
 Modules (CTANLoad)
 ==================
-2024-03-17
+2026-07-13
 
-import argparse                    # parse arguments
-import os                          # delete a file on disk, for instance
-from os import path                # path informations
-import pickle                      # read/write pickle data
-import platform                    # get OS informations
-import random                      # used for random integers
-import re                          # handle regular expressions
-import subprocess                  # handling of sub-processes
-import sys                         # system calls
-import time                        # used for random seed, time measurement
-import xml.etree.ElementTree as ET # XML processing
-from threading import Thread       # handling of threads
-import pyperclip3 as pc            # writing to clipboard
+import argparse                                                         # parse arguments
+import os                                                               # delete a file on disk, for instance
+from os import path                                                     # path informations
+import pickle                                                           # read/write pickle data
+import platform                                                         # get OS informations
+import random                                                           # used for random integers
+import re                                                               # handle regular expressions
+import subprocess                                                       # handling of sub-processes
+import sys                                                              # system calls
+import time                                                             # used for random seed, time measurement
+import xml.etree.ElementTree as ET                                      # XML processing
+from threading import Thread                                            # handling of threads
+import pyperclip3 as pc                                                 # writing to clipboard
+from dataclasses import dataclass, field                                # Python data classes are used
+import traceback                                                        # error backtracing  ---> modules

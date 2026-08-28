@@ -12,6 +12,8 @@ CTANLoadOut.py, menu_CTANLoadOut.py).
 CTANLoad.py loads XLM and PDF documentation files from
 CTAN a/o generates some special lists, and prepares data for CTANOut.
 
+Call of CTANLoad.py
+-------------------
 CTANLoad.py may be started by:
 
 1. python -u CTANLoad.py <option(s)>
@@ -23,7 +25,8 @@ CTANLoad.py may be started by:
 -- if there is an executable (in Windows a file with the name
    extension .exe)
 
- ---------------------------------------------------------------
+Compilation:
+-----------
  CTANLoad.py may be compiled by
 
  (a) pyinstaller
@@ -39,30 +42,118 @@ CTANLoad.py may be started by:
 
  --> provides CTANLoad.exe (Windows) a/o CTANLoad (Linux)
 
- Requirements:
+Requirements:
+------------
  + operating system windows 10/11 or Linux (like Linux Mint or Ubuntu
    or Debian)
+
  + wget a/o wget2 is installed
  + Python installation 3.10 or newer
  + a series of Python modules (see the import instructions below)
 
- ---------------------------------------------------------------
- see also: CTANLoad-changes.txt
-           CTANLoad-examples.txt
-           CTANLoad-examples.bat
-           CTANLoad-functions.txt
-           CTANLoad-messages.txt
-           CTANLoad-modules.txt
-           CTANLoad.man
-           CTAN-files.txt
-           call.txt
-           installation.txt
-           wget.txt
+Class:
+-----
+dataclass_variable          data class 
+
+with method:
+-----------
+report                      Outputs the current values of the variables defined in
+                            'dataclass_variable'.
+
+Functions:
+---------
+analyze_XML_file(file)      Function analyze_XML_file(file): Analyzes
+                            a XML package file
+call_check()                Function call_check: Processes all necessary
+                            steps for a integrity check
+call_load()                 Function call_load: Processes all steps for
+                            a complete ctanload call
+call_plain()                Function call_plain: Processes all steps for
+                            a plain call
+check_integrity(always=False) Function check_integrity(): Checks
+                            integrity (tests for inconsistencies)
+dload_authors()             Function dload_authors(): Downloads XML file
+                            'authors' from CTAN and generate dictionary
+                            'authors'.
+dload_document_file(href, key, name, XML_file)  Function
+                            dload_document_file(href, key, name):
+                            Downloads one information file (PDF) from
+                            CTAN.
+dload_licenses()            Function dload_licenses: Downloads XML file
+                            'licenses' from CTAN and generates
+                            dictionary 'licenses'.
+dload_packages()            Function dload_packages: Downloads XML file
+                            'packages' from CTAN and generates
+                            dictionary 'packages'.
+dload_topics()              Function dload_topics(): Downloads XML file
+                            'topics' from CTANB and generates
+                            dictionary 'topics'.
+dload_XML_files(p)          Function dload_XML_files: Downloads XML
+                            package files.
+fold(s)                     Function fold(): Auxiliary function:
+                            Shortens/folds long option values for output.
+generate_lists()            Function generate_lists: Generates some
+                            special files (with lists).
+generate_pickle1()          Function generate_pickle1
+generate_pickle2()          Function generate_pickle2
+generate_topicspackages()   Function generate_topicspackages:
+                            Generates/rewrites topicspackages,
+                            packagetopics, authorpackages,
+                            licensepackages, and yearpackages.
+get_package_set()           Function get_package_set: Analyzes
+                            dictionary 'packages' for name templates.
+get_PDF_files(d)            Function get_PDF_files(d): Lists all PDF
+                            files in a specified OS folder.
+get_XML_files(d)            Function get_XML_files: Lists all XML files
+                            in the current OS folder.
+get_xyz_lap()               Function get_xyz_lap: Loads and analyzes
+                            xyz.lap for author templates.
+get_xyz_llp()               Function get_xyz_llp: Loads and analyzes
+                            xyz.llp for liocense templates.
+get_xyz_lpt()               Function get_xyz_lpt: Loads and analyzes
+                            xyz.lpt for topic templates.
+get_year_set()              Function get_package_set: Analyzes
+                            dictionary 'yearpackages' for year templates.
+load_XML_toc()              Function load_XML_toc(): Loads pickle file 2
+                            (which contains XML_toc).
+main()                      Function main(): Main Function (calls the
+                            other functions).
+make_statistics()           Function make_statistics(): Prints
+                            statistics on terminal.
+regenerate_pickle_files()   Function regenerate_pickle_files:
+                            Regenerates corrupted pickle files.
+set_PDF_toc()               set_PDF_toc: Fills PDF_toc on the basis of
+                            XML_toc.
+test_clipboard()            auxiliary function: Sents a program call
+                            to clipboard.
+verify_PDF_files()          Function verify_PDF_files: Checks actualized
+                            PDF_toc/delete a PDF file if necessary.
+
+see also:
+--------
++ installation.txt
++ firststeps.txt
++ call.txt
++ wget.txt
++ CTAN-files.txt
+
++ CTANLoad-changes.txt
++ CTANLoad-examples.txt
++ CTANLoad-examples.bat
++ CTANLoad-functions.txt
++ CTANLoad-messages.txt
++ CTANLoad-modules.txt
++ CTANLoad.man
 """
 
 
 # ==================================================================
 # Imports
+
+# 3.5    2026-07-02 data class used
+# 3.5.0  2026-07-13 new module dataclasses
+# 3.7    2026-07-13 backtracing
+# 3.7.1  2026-07-13 new module traceback
 
 import argparse                                                         # parse arguments
 import os                                                               # delete a file on disk, for instance
@@ -77,6 +168,8 @@ import time                                                             # used f
 import xml.etree.ElementTree as ET                                      # XML processing
 from threading import Thread                                            # handling of threads
 import pyperclip3 as pc                                                 # writing to clipboard
+from dataclasses import dataclass, field                                # Python data classes are used
+import traceback                                                        # error backtracing  ---> modules
 
 
 # ==================================================================
@@ -85,21 +178,26 @@ import pyperclip3 as pc                                                 # writin
 # ------------------------------------------------------------------
 # The program
 
+# 3.6    2026-07-05 ACT_PROGRAMNAME depends on OPERATINGSYS now
+
 PRG_NAME        = "CTANLoad.py"
 PRG_AUTHOR      = "Günter Partosch"
 PRG_EMAIL       = "Guenter.Partosch@web.de;\nformerly:" + \
                   " Guenter.Partosch@hrz.uni-giessen.de"
-PRG_VERSION     = "3.1"
-PRG_DATE        = "2026-04-15"
+PRG_VERSION     = "3.12"
+PRG_DATE        = "2026-08-15"
 PRG_INST        = "formerly: Justus-Liebig-Universität Gießen," +\
                   " Hochschulrechenzentrum"
 
-operatingsys    = platform.system()                                     # actual operating system
+OPERATINGSYS    = platform.system()                                     # actual operating system
 call            = sys.argv
-calledprogram   = sys.argv[0]                                           # name of called program
-act_programname = calledprogram.split("\\")[-1]
-parameters      = call[1:]                                              # all parts of call (with the xception of the first)
-call[0]         = act_programname                                       # actual name (with path) of the called program
+CALLEDPROGRAM   = sys.argv[0]                                           # name of called program
+if OPERATINGSYS == "Windows":
+    ACT_PROGRAMNAME = CALLEDPROGRAM.split("\\")[-1]
+else:
+    ACT_PROGRAMNAME = CALLEDPROGRAM.split("/")[-1]
+PARAMETERS      = call[1:]                                              # all parts of call (with the xception of the first)
+call[0]         = ACT_PROGRAMNAME                                       # actual name (with path) of the called program
 
 # 2.24   2024-03-04 wget processor and subprocess timeout now
 #                   configurable
@@ -108,12 +206,7 @@ WGET            = "wget2"                                               # wget p
 TIMEOUT_DEFAULT = 60                                                    # default for timeout in subprocess (in sec.)
 
 EMPTY           = ""
-no_tp:int       = 0                                                     # number of packages selected per topics
-no_ap:int       = 0                                                     # number of packages selected per author names
-no_np:int       = 0                                                     # number of packages selected per n<mes
-no_lp:int       = 0                                                     # number of packages selected per licenses
-no_ly:int       = 0                                                     # number of packages selected per years
-
+BLANK           = " "
 
 # ------------------------------------------------------------------
 # Texts for argparse and help
@@ -145,7 +238,7 @@ INTEGRITY_TEXT        = "Flag: Checks the integrity of the " +\
 REGENERATE_TEXT       = "Flag: Regenerates the two pickle files."
 
 # -----------------------------------------------------------------
-# Defaults/variables for argparse
+# Defaults for argparse
 
 DOWNLOAD_DEFAULT         = False                                        # default for option -f (no PDF download)
 INTEGRITY_DEFAULT        = False                                        # default for option -c (no integrity check)
@@ -163,71 +256,11 @@ REGENERATE_DEFAULT       = False                                        # defaul
 DEBUGGING_DEFAULT        = False                                        # default for option -dbg (no debugging)
 
 ACT_DIREC           = "."
-if operatingsys == "Windows":
-    direc_sep      = "\\"
+if OPERATINGSYS == "Windows":
+    DIREC_SEP      = "\\"                                               
 else:
-    direc_sep      = "/"
-direc_default       = ACT_DIREC + direc_sep                             # default for -d (output OS folder)
-
-download:bool           = None                                          # option -f    (no PDF download)
-integrity:bool          = None                                          # option -c    (no integrity check)
-lists:bool              = None                                          # option -n    (special lists are not generated)
-number:int              = 0                                             # option -n    (maximum number of files to be loaded)
-output_name:str         = EMPTY                                         # option -o    (generic file name)
-statistics:bool         = None                                          # option -stat (no statistics output)
-name_template:str       = EMPTY                                         # option -t    (name template for file loading)
-author_template:str     = EMPTY                                         # option -A    (author name template)
-license_template:str    = EMPTY                                         # option -L    (license name template)
-key_template:str        = EMPTY                                         # option -k    (key template)
-year_template:str       = EMPTY                                         # option -y    (year template)
-verbose:bool            = None                                          # option -n    (output is not verbose)
-debugging:bool          = None                                          # option -dbg  (debugging)
-
-# ------------------------------------------------------------------
-# Dictionaries, tuples and sets
-
-authorpackages        = {}                                              # Python dictionary: list of authors and their packages
-licensepackages       = {}                                              # Python dictionary: list of licenses and their packages
-authors               = {}                                              # Python dictionary: list of authors
-packages              = {}                                              # Python dictionary: list of packages
-licenses              = {}                                              # Python dictionary: list of licenses
-packagetopics         = {}                                              # Python dictionary: list of packages and their topics
-topics                = {}                                              # Python dictionary: list of topics
-topicspackages        = {}                                              # Python dictionary: list of topics and their packages
-yearpackages          = {}                                              # Python dictionary: list of years and their packagesauthorpackage_file
-XML_toc               = {}                                              # Python dictionary: list of PDF files:  XML_toc[href]=...PDF file
-PDF_toc               = {}                                              # Python set: list of PDF files: PDF_toc[lfn]=...package file
-PDF_notloaded         = set()                                           # Python set: list of PDF files: PDF not downloaded
-not_well_formed       = set()                                           # Python set: list of XML files: XML file not well-formed/EMPTY
-file_not_found        = set()                                           # Python set: list of packages: XML file for package not found
-PDF_XML               = set()                                           # Python set: list of XML files: inconsistencies with PDF files for packages
-all_XML_files         = ()                                              # Python tuple: list with the names of all XML files
-selected_packages_lpt = set()                                           # Python set: list of packages with selected topics
-selected_packages_lap = set()                                           # Python set: list of packages with selected authors
-selected_packages_llp = set()                                           # Python set: list of packages with selected licenses
-
-# XML_toc
-#   Structure:                 XML_toc[href] = (XML file, key, onename)
-#   generated and changed in:  analyze_XML_file(file), check_integrity()
-#   inspected in:              analyze_XML_file(file), check_integrity()
-#   stored in pickle file:     generate_pickle2()
-#   loaded from pickle file:   load_XML_toc()
-#
-# PDF_toc
-#   Structure:                 PDF_toc[fkey + "-" + onename] = file
-#   generated in:              get_PDF_files(d)
-#   changed in                 analyze_XML_file(file), check_integrity()
-#   inspected in:              check_integrity()
-
-# 1st pickle file:
-#   name:      CTAN.pkl
-#   contains:  authors, packages, topics, licenses, topicspackages,
-#              packagetopics, authorpackages, licensepackages,
-#              yearpackages
-#
-# 2nd pickle file:
-#   name:      CTAN2.pkl
-#   contains:  XML_toc
+    DIREC_SEP      = "/"
+DIREC_DEFAULT       = ACT_DIREC + DIREC_SEP                             # default for -d (output OS folder)
 
 # ------------------------------------------------------------------
 # Settings for wget (authors, packages, topics)
@@ -247,23 +280,193 @@ PKL_FILE2           = "CTAN2.pkl"                                       # name o
 ACT_DATE            = time.strftime("%Y-%m-%d")                         # actual date of program execution
 ACT_TIME            = time.strftime("%X")                               # actual time of program execution
 
-counter:int         = 0                                                 # counter for downloaded XML files (in the actual session)
-pdfcounter:int      = 0                                                 # counter for downloaded PDF files (in the actual session)
-pdfctrerr:int       = 0                                                 # counter for not downloaded PDF files (in the actual session)
-corrected:int        = 0                                                 # counter of corrected entries in XML_toc (in the actual session)
-
 EXT                 = ".xml"                                            # file name extension for downloaded XML files
 RNDG                = 2                                                 # optional rounding of float numbers
 LEFT                = 35                                                # width of labels in statistics
 ELLIPSE             = " ..."                                            # abbreviate texts
-ok:bool             = None                                              # Flag: status of processing
 
 RESET_TEXT          = "[CTANLoad] Warning: '{0}' reset to {1} " +\
                       "(due to {2})"
 EXCLUSION           = ["authors.xml", "topics.xml", "packages.xml",
-                       "licenses.xml"]                                  # XML files which are not a package file
+                       "licenses.xml"]                                  # XML files which are not package files
 
 random.seed(time.time())                                                # seed for random number generation
+
+
+# ==================================================================
+@dataclass
+class dataclass_variable():                                             # class dataclass_var
+    """
+    The ‘@dataclass’ decorator marks this class as a data class. In our
+    case, ‘dataclass_variable’ is used to store the overall state of the
+    system (including all globally used variables). The relevant
+    variables are defined in the class; qualified access is achieved via
+    an instance of the class.
+
+    Methods:
+    -------
+    a) In 'dataclass_variable', a number of methods are automatically
+       implemented, such as .__init__(), .__repr__() and .__eq__().
+    b) user-defined method .report(): outputs the current values of the
+       variables defined in 'dataclass_variable'.
+
+    Example:
+    -------
+    a) Definition and initialisation: name_template:str = EMPTY
+    b) later: dc_var = dataclass_variable()
+    c) access: ... dc_var.name_template ...
+    """
+
+    # 3.5    2026-07-02 data class used
+    # 3.5.1  2026-07-02 new class dataclass-variable (including all
+    #                   globally used variables) derfined
+    # 3.5.2  2026-07-02 instance "dc_var" of this class created
+    # 3.10   2026-08-05 correction in dataclass_variable: collections
+    #                   with default factory
+
+    # ------------------------------------------------------------------
+    # variables/defaults for argparse
+    author_template:str     = AUTHOR_TEMPLATE_DEFAULT                   # option -A    (author name template)
+    debugging:bool          = DEBUGGING_DEFAULT                         # option -dbg  (debugging)
+    direc:str               = DIREC_DEFAULT                             # option -d    (name of the OS directory)
+    download:bool           = DOWNLOAD_DEFAULT                          # option -f    (no PDF download)
+    integrity:bool          = INTEGRITY_DEFAULT                         # option -c    (no integrity check)
+    key_template:str        = KEY_TEMPLATE_DEFAULT                      # option -k    (key template)
+    license_template:str    = LICENSE_TEMPLATE_DEFAULT                  # option -L    (license name template)
+    lists:bool              = LISTS_DEFAULT                             # option -n    (special lists are not generated)
+    name_template:str       = NAME_TEMPLATE_DEFAULT                     # option -t    (name template for file loading)
+    number:int              = NUMBER_DEFAULT                            # option -n    (maximum number of files to be loaded)
+    output_name:str         = OUTPUT_NAME_DEFAULT                       # option -o    (generic file name)
+    regenerate:bool         = REGENERATE_DEFAULT                        # option -r    (pickle files are to be regenerated)
+    statistics:bool         = STATISTICS_DEFAULT                        # option -stat (no statistics output)
+    verbose:bool            = VERBOSE_DEFAULT                           # option -v    (output is verbose)
+    year_template:str       = YEAR_TEMPLATE_DEFAULT                     # option -y    (year template)
+
+    # ------------------------------------------------------------------
+    # other settings
+    counter:int         = 0                                             # counter for downloaded XML files (in the actual session)
+    pdfcounter:int      = 0                                             # counter for downloaded PDF files (in the actual session)
+    pdfctrerr:int       = 0                                             # counter for not downloaded PDF files (in the actual session)
+    corrected:int       = 0                                             # counter of corrected entries in XML_toc (in the actual session)
+    ok:bool             = None                                          # global flag: status of processing
+    no_error:bool       = None                                          # global flag: no error
+
+    # ------------------------------------------------------------------
+    # some other counters
+    no_tp:int       = 0                                                 # number of packages selected per topics
+    no_ap:int       = 0                                                 # number of packages selected per author names
+    no_np:int       = 0                                                 # number of packages selected per n<mes
+    no_lp:int       = 0                                                 # number of packages selected per licenses
+    no_ly:int       = 0                                                 # number of packages selected per years
+  
+    # ------------------------------------------------------------------
+    # Dictionaries, tuples and sets
+    authorpackages:dict       = field(default_factory=dict)             # Python dictionary: list of authors and their packages
+    licensepackages:dict      = field(default_factory=dict)             # Python dictionary: list of licenses and their packages
+    authors:dict              = field(default_factory=dict)             # Python dictionary: list of authors
+    packages:dict             = field(default_factory=dict)             # Python dictionary: list of packages
+    licenses:dict             = field(default_factory=dict)             # Python dictionary: list of licenses
+    packagetopics:dict        = field(default_factory=dict)             # Python dictionary: list of packages and their topics
+    topics:dict               = field(default_factory=dict)             # Python dictionary: list of topics
+    topicspackages:dict       = field(default_factory=dict)             # Python dictionary: list of topics and their packages
+    yearpackages:dict         = field(default_factory=dict)             # Python dictionary: list of years and their packagesauthorpackage_file
+    XML_toc:dict              = field(default_factory=dict)             # Python dictionary: list of PDF files:  XML_toc[href]=...PDF file
+    PDF_toc:dict              = field(default_factory=dict)             # Python dictionary: list of PDF files: PDF_toc[lfn]=...package file
+    PDF_notloaded:set         = field(default_factory=set)              # Python set: list of PDF files: PDF not downloaded
+    not_well_formed:set       = field(default_factory=set)              # Python set: list of XML files: XML file not well-formed/EMPTY
+    file_not_found:set        = field(default_factory=set)              # Python set: list of packages: XML file for package not found
+    PDF_XML:set               = field(default_factory=set)              # Python set: list of XML files: inconsistencies with PDF files for packages
+    all_XML_files:tuple       = field(default_factory=tuple)            # Python tuple: list with the names of all XML files
+    selected_packages_lpt:set = field(default_factory=set)              # Python set: list of packages with selected topics
+    selected_packages_lap:set = field(default_factory=set)              # Python set: list of packages with selected authors
+    selected_packages_llp:set = field(default_factory=set)              # Python set: list of packages with selected licenses
+
+    # ------------------------------------------------------------------
+    def report(self, full:bool=False):
+        """
+        Outputs the current values of the variables defined in
+        'dataclass_variable'.
+
+        Parameter:
+        ---------
+        full : bool:
+               if True, all menbers of sets, lists, tuples, and
+               dictionaries, else only their lengths.
+               default: False
+        """
+        
+        tmp = dir(self)
+        for f in tmp:
+            tmp2 = eval("self." + f) 
+            if isinstance(tmp2, (set, dict, list, tuple)) and not full:
+                tmp3 = len (tmp2)
+            else:
+                tmp3 = tmp2
+            if (not "__" in f) and (f != 'report'):
+                print(f"{f:<22} {tmp3}")
+
+    # ------------------------------------------------------------------
+    # XML_toc
+    #   Structure:                 XML_toc[href] = (XML file, key,
+    #                              onename)
+    #   generated and changed in:  analyze_XML_file(file),
+    #                              check_integrity()
+    #   inspected in:              analyze_XML_file(file),
+    #                              check_integrity()
+    #   stored in pickle file:     generate_pickle2()
+    #   loaded from pickle file:   load_XML_toc()
+    #
+    # PDF_toc
+    #   Structure:                 PDF_toc[fkey + "-" + onename] = file
+    #   generated in:              get_PDF_files(d)
+    #   changed in                 analyze_XML_file(file),
+    #                              check_integrity()
+    #   inspected in:              check_integrity()
+    #
+    # dc.authors: Python dictionary (sorted)
+    #   each element: [author key]: <tuple with givenname and
+    #                 familyname>
+    #
+    # dc.packages: Python dictionary (sorted)
+    #   each element: [package key]: <tuple with package name and
+    #                 package title>
+    #
+    # dc.licenses: Python dictionary (sorted)
+    #   each element: [license key]: <license title>
+    #
+    # dc.topics: Python dictionary (sorted)
+    #   each element: [topics name]: <topics title>
+    #
+    # dc.topicspackages: Python dictionary (unsorted)
+    #   each element: [topic key]: <list with package names>
+    #
+    # dc.packagetopics: Python dictionary (sorted)
+    #   each element: [topic key]: <list with package names>
+    #
+    # dc.authorpackages: Python dictionary (unsorted)
+    #   each element: [author key]: <list with package names>
+    #
+    # dc.licensepackages: Python dictionary (mostly sorted)
+    #   each element: [license key]: <list with package names>
+    #
+    # dc.yearpackages: Python dictionary
+    #   each element: [year]: <list with package names>
+
+    # 1st pickle file:
+    #   name:      CTAN.pkl
+    #   contains:  authors, packages, topics, licenses, topicspackages,
+    #              packagetopics, authorpackages, licensepackages,
+    #              yearpackages
+    #
+    # 2nd pickle file:
+    #   name:      CTAN2.pkl
+    #   contains:  XML_toc
+
+# ------------------------------------------------------------------
+dc_var = dataclass_variable()                                           # generate instance of dataclass_variable
+
+# 3.5    2026-07-02 data class used
+# 3.5.2  2026-07-02 instance "dc_var" of this class created
 
 
 # ==================================================================
@@ -351,7 +554,7 @@ group1.add_argument("-d", "--directory",                                # Parame
                     "%(default)s",
                     action  = "store",
                     dest    = "direc",
-                    default = direc_default)
+                    default = DIREC_DEFAULT)
 
 group1.add_argument("-L", "--license_template",                         # Parameter -L/--license_template
                     metavar = "<license template>",
@@ -416,25 +619,31 @@ group2.add_argument("-r", "--regenerate_pickle_files",                  # Parame
                     dest    = "regenerate_pickle_files",
                     default = REGENERATE_DEFAULT)
 
-# ------------------------------------------------------------------
+
+#===================================================================
 # Getting parsed values
 
-args             = parser.parse_args()                                  # all the parameters of programm call
+# 3.5    2026-07-02 data class used
+# 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+#                   and/or non-local with "dc_var"
 
-author_template  = args.author_template                                 # parameter -A
-license_template = args.license_template                                # parameter -L
-direc            = args.direc                                           # parameter -d
-download         = args.download_files                                  # parameter -f
-integrity        = args.check_integrity                                 # parameter -c
-key_template     = args.key_template                                    # parameter -k
-lists            = args.lists                                           # parameter -l
-number           = int(args.number)                                     # parameter -n
-regenerate       = args.regenerate_pickle_files                         # parameter -r
-statistics       = args.statistics                                      # parameter -stat
-name_template    = args.name_template                                   # parameter -k
-verbose          = args.verbose                                         # parameter -v
-year_template    = args.year_template                                   # parameter -y
-debugging        = args.debugging                                       # parameter -dbg
+
+args                    = parser.parse_args()                           # all the parameters of programm call
+
+dc_var.author_template  = args.author_template                          # parameter -A
+dc_var.license_template = args.license_template                         # parameter -L
+dc_var.direc            = args.direc                                    # parameter -d
+dc_var.download         = args.download_files                           # parameter -f
+dc_var.integrity        = args.check_integrity                          # parameter -c
+dc_var.key_template     = args.key_template                             # parameter -k
+dc_var.lists            = args.lists                                    # parameter -l
+dc_var.number           = int(args.number)                              # parameter -n
+dc_var.regenerate       = args.regenerate_pickle_files                  # parameter -r
+dc_var.statistics       = args.statistics                               # parameter -stat
+dc_var.name_template    = args.name_template                            # parameter -k
+dc_var.verbose          = args.verbose                                  # parameter -v
+dc_var.year_template    = args.year_template                            # parameter -y
+dc_var.debugging        = args.debugging                                # parameter -dbg
 
 
 # ==================================================================
@@ -442,40 +651,43 @@ debugging        = args.debugging                                       # parame
 # Correct OS folder name, test OS folder existence a/o install OS folder
 
 # 2.49   2025-02-11 more f-strings
+# 3.3    2026-05-08 print statements containing \+ have been simplified
 
-direc              = direc.strip()                                      # correct OS folder name (-d)
-if direc[len(direc) - 1] != direc_sep:
-    direc += direc_sep
-if not path.exists(direc):
+dc_var.direc              = dc_var.direc.strip()                        # correct OS folder name (-d)
+if dc_var.direc[len(dc_var.direc) - 1] != DIREC_SEP:
+    dc_var.direc += DIREC_SEP
+if not path.exists(dc_var.direc):
     try:
-        os.mkdir(direc)
-    except OSError:
-        print(f"[CTANLoad] Warning: Creation of the OS folder " +\
-              f"'{direc}' failed")
+        os.mkdir(dc_var.direc)
+    except OSError as err:
+        print(f"[CTANLoad] Warning: Creation of the OS folder",
+              f"'{dc_var.direc}' failed", err)
     else:
-        print(f"[CTANLoad] Info: Successfully created the OS folder " +\
-              f"'{direc}' ")
+        print(f"[CTANLoad] Info: Successfully created the OS folder",
+              f"'{dc_var.direc}' ")
 
-output_name        = direc + args.output_name                           # parameter -d
+dc_var.output_name        = dc_var.direc + args.output_name             # parameter -d
 
-# ------------------------------------------------------------------
+
+#===================================================================
 # additional files, if you want to search topics a/a authors and their
-# corr. packages
+# corresponding packages
 
-topicpackage_file:str   = output_name + ".lpt"                          # name of a the xyz.lpt file
-authorpackage_file:str  = output_name + ".lap"                          # name of a the xyz.lap file
-licensepackage_file:str = output_name + ".llp"                          # name of a the xyz.llp file
+topicpackage_file:str   = dc_var.output_name + ".lpt"                   # name of a the xyz.lpt file
+authorpackage_file:str  = dc_var.output_name + ".lap"                   # name of a the xyz.lap file
+licensepackage_file:str = dc_var.output_name + ".llp"                   # name of a the xyz.llp file
 
-# ------------------------------------------------------------------
+
+#===================================================================
 # special regular expressions
 
-p2           = re.compile(name_template)                                # regular expression based on parameter -t
+p2           = re.compile(dc_var.name_template)                         # regular expression based on parameter -t
 p3           = re.compile("^[0-9]{10}-.+[.]pdf$")                       # regular expression for local PDF file names
 p4           = re.compile("^.+[.]xml$")                                 # regular expression for local XML file names
-p5           = re.compile(key_template)                                 # regular expression for topics
-p6           = re.compile(author_template)                              # regular expression for author names
-p7           = re.compile(license_template)                             # regular expression for licenses
-p9           = re.compile(year_template)                                # regular expression
+p5           = re.compile(dc_var.key_template)                          # regular expression for topics
+p6           = re.compile(dc_var.author_template)                       # regular expression for author names
+p7           = re.compile(dc_var.license_template)                      # regular expression for licenses
+p9           = re.compile(dc_var.year_template)                         # regular expression
 p10          = re.compile(YEAR_TEMPLATE_DEFAULT)                        # regular expression based on -y
 
 
@@ -483,16 +695,27 @@ p10          = re.compile(YEAR_TEMPLATE_DEFAULT)                        # regula
 # Auxiliary function
 
 # ------------------------------------------------------------------
-def test_clipboard():                                                   # auxiliary function test_clipboard()
+def test_clipboard(dc=dc_var):                                          # auxiliary function test_clipboard()
     """
-    Constructs a program call and sents it to clipboard.
+    Constructs a program call of CTANLoad.py and sents it to clipboard.
 
     The function works on the base of some special messages (file not
     found, not well-formed, ...)
 
-    no parameters
+    an installed xclip is required on linux systems.
 
-    possible message:
+    Parameter:
+    ---------
+    dc   instance of the data class  'dataclass_var'
+         default: dc_var
+
+    The function needs access to a variable in the data class dc:
+    ------------------------------------------------------------
+    dc.debugging   bool:
+                   global flag: debugging enabled  
+
+    Possible message:
+    ----------------
     + Warning: An error occured
     """
 
@@ -501,37 +724,46 @@ def test_clipboard():                                                   # auxili
     #                   clipboard if there is nothing to do
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    # an installed xclip is required on linux systems.
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:test_clipboard")
 
     tmpset  = set()
     TMPSTR1 = 'python -u ctanload.py -t "'
     TMPSTR2 = '" -f -v -stat'
     tmpstr  = EMPTY
-    tmpset  = file_not_found | not_well_formed | PDF_XML
+    tmpset  = dc.file_not_found | dc.not_well_formed | dc.PDF_XML       # union of sets
     TMPSTR3 = 'echo "Nothing to do"'
     
-    for f in tmpset:
-        if tmpstr == EMPTY:
+    for f in tmpset:                                                    # construct the chain for parameter -t
+        if tmpstr == EMPTY: 
             tmpstr = f
         else:
             tmpstr += "$|^" + f
-    try:
+    try:                                                                # Construct the complete call
         if tmpstr != EMPTY:
             tmpstr = "^" + tmpstr + "$"
             pc.copy(TMPSTR1 + tmpstr + TMPSTR2)
         else:
             pc.copy(TMPSTR3)
-    except:
+    except Exception as err:
         print("""
 "--- Warning: An error occured:
 Nothing has been sent to clipboard.
-Maybe, on Linux systems you have to install xclip before.""")
+Maybe, on Linux systems you have to install xclip before.""", err)
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:test_clipboard")
 
 # ------------------------------------------------------------------
@@ -539,12 +771,17 @@ def fold(s:str) ->str:                                                  # auxili
     """
     auxiliary function: Shortens/foldens long option values for output.
 
-    Returns the folded paragraph s.
+    Parameter:
+    ---------
+    s (str): paragraph to be folded
 
-    parameter:
-    s : paragraph to be folded
+    Returns:
+    -------
+    Returns a folded string.
 
-    no messages
+    Messages:
+    --------
+    There are no specific messages.
     """
 
     OFFSET   = 64 * " "
@@ -570,21 +807,39 @@ def fold(s:str) ->str:                                                  # auxili
 # Functions for main part
 
 # ------------------------------------------------------------------
-def analyze_XML_file(file:str):                                         # Function analyze_XML_file(file)
+def analyze_XML_file(file:str, dc=dc_var):                              # Function analyze_XML_file(file)
     """
     Analyzes a XML package file for documentation (PDF) files.
 
-    Rewrites the global variables XML_toc and PDF_toc.
+    Rewrites the variables dc.XML_toc and dc.PDF_toc in the data
+    class dc.
 
-    parameter:
-    file: XML file to be parsed/analyzed
+    Parameters:
+    ----------
+    file (str): name of the XML file to be parsed/analyzed
+                no default
+    dc        : instance of the data class 'dataclass_var'
+                default: dc_var
 
-    global variables:
-    XML_toc            global Python dictionary for XML files
-    PDF_toc            global Python dictionary for PDF files
-    not_well_formed    Python list: XML file not well-formed/empty
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.XML_toc          Python dictionary:
+                        collection for XML files
+    dc.PDF_toc          Python dictionary:
+                        collection for PDF files
+    dc.not_well_formed  Python list:
+                        contains empty or not well-formed XML files
+    dc.debugging        bool:
+                        Flag: debugging enabled
+    dc.verbose          bool:
+                        global flag: output is verbose
 
-    possible messages:
+    Call:
+    ----
+    + dload_document_file
+
+    Possible messages:
+    -----------------
     + Warning: local XML file '{0}' not found
     + Warning: local XML file for package '{0}' EMPTY or not well-formed
     """
@@ -597,15 +852,21 @@ def analyze_XML_file(file:str):                                         # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global XML_toc                                                      # global Python dictionary for XML files
-    global PDF_toc                                                      # global Python dictionary for PDF files
-    global not_well_formed                                              # Python list: XML file not well-formed/EMPTY
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:analyze_XML_file")
-
-    # analyze_XML_file --> dload_document_file
 
     error:bool = False
 
@@ -614,14 +875,14 @@ def analyze_XML_file(file:str):                                         # Functi
         onePackage     = ET.parse(f)                                    # parses the XML file
         onePackageRoot = onePackage.getroot()                           # gets root
     except FileNotFoundError:                                           # file not found
-        if verbose:
+        if dc.verbose:
             print(f"--- Warning: local XML file '{file}' not found")
-    except:                                                             # parsing not successfull
-        if verbose:
+    except Exception as err:                                                             # parsing not successfull
+        if dc.verbose:
             print("---- Warning: local XML file for",
-                  f"package '{file}' empty or not well-formed")
+                  f"package '{file}' empty or not well-formed", err)
         error = True
-        not_well_formed.add(re.sub(".xml", EMPTY, file))                # appends name of file to the not_well_formed set
+        dc.not_well_formed.add(re.sub(".xml", EMPTY, file))             # appends name of file to the not_well_formed set
 
     if not error:
         ll           = list(onePackageRoot.iter("documentation"))       # all documentation elements == all documentation childs
@@ -631,175 +892,210 @@ def analyze_XML_file(file:str):                                         # Functi
             if ".pdf" in href:                                          # there is ".pdf" in the string ==> PDF file
                 fnames  = re.split("/", href)                           # splits this string at "/"
                 href2   = href.replace("ctan:/", CTANURL2)              # constructs the correct URL
-                if href in XML_toc:                                     # href allready used?
-                    (tmp, fkey, onename) = XML_toc[href]                # gets the components
+                if href in dc.XML_toc:                                  # href allready used?
+                    (tmp, fkey, onename) = dc.XML_toc[href]             # gets the components
                     onename = onename.replace("+", "-")
                 else:                                                   # href not allready used?
                     onename = fnames[len(fnames) - 1]                   # gets the file name
                     fkey    = str(random.randint(1000000000,
                                                  9999999999))           # constructs a random file name
                     onename = onename.replace("+", "-")
-                    XML_toc[href] = (file, fkey, onename)               # stores this new file name
-                if download:
+                    dc.XML_toc[href] = (file, fkey, onename)            # stores this new file name
+                if dc.download:
                     if dload_document_file(href2, fkey, onename, file): # loads the PDF document
-                        PDF_toc[fkey + "-" + onename] = file
+                        dc.PDF_toc[fkey + "-" + onename] = file
         f.close()                                                       # closes the analyzed XML file
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:analyze_XML_file")
 
 # ------------------------------------------------------------------
-def call_check():                                                       # Function call_check
+def call_check(dc=dc_var):                                              # Function call_check
     """
     Processes all necessary steps for a integrity check.
 
-    Rewrites the global PDF_toc, XML_toc, authors, licenses, packages,
-    topics,  topicspackages, packagetopics, number, counter, pdfcounter,
-    yearpackages.
+    Rewrites the variables dc.PDF_toc, dc.XML_toc, dc.authors,
+    dc.licenses, dc.packages, dc.topics,  dc.topicspackages,
+    dc.packagetopics, dc.number, dc.counter, dc.pdfcounter,
+    dc.yearpackages in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc   instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    PDF_toc         global Python dictionary for PDF files
-    XML_toc         global Python dictionary
-    authors         global Python dictionary with authors
-    licenses        global Python dictionary with licenses
-    packages        global Python dictionary with packages
-    topics          global Python dictionary with topics
-    topicspackages  python dictionary: list of topics and their packages
-    packagetopics   python dictionary: list of packages and their topics
-    number          maximum number of files to be loaded
-    counter         counter for downloadd XML and PDF files
-    pdfcounter      counter for downloaded PDF files
-    yearpackages    python dictionary: list of years and their
-                    packagesauthorpackage_file ??
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.PDF_toc         Python dictionary:
+                       for PDF files
+    dc.XML_toc         Python dictionary:
+                       for XML files
+    dc.authors         Python dictionary:
+                       collection with authors
+    dc.licenses        Python dictionary:
+                       collection with licenses
+    dc.packages        Python dictionary:
+                       collection with packages
+    dc.topics          Python dictionary:
+                       collection with topics
+    dc.topicspackages  Python dictionary:
+                       collection of topics and their corresponding packages
+    dc.packagetopics   Python dictionary:
+                       list of packages and their topics
+    dc.number          int:
+                       maximum number of files to be loaded
+    dc.counter         int:
+                       counter for downloadd XML and PDF files
+    dc.pdfcounter      int:
+                       counter for downloaded PDF files
+    dc.yearpackages    Python dictionary:
+                       list of years and their corresponding packages
+    dc.debugging       bool:
+                       Flag: debugging 
 
-    no messages
+    Calls:
+    -----
+    + get_PDF_files
+    + dload_topics
+    + dload_authors
+    + dload_licenses
+    + dload_packages
+    + generate_topicspackages
+    + generate_pickle1
+    + generate_lists
+    + check_integrity
+
+    Messages:
+    --------
+    There are no specific messages.
     """
+    
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    # call_check --> get_PDF_files
-    # call_check --> dload_topics
-    # call_check --> dload_authors
-    # call_check --> dload_licenses
-    # call_check --> dload_packages
-    # call_check --> generate_topicspackages
-    # call_check --> generate_pickle1
-    # call_check --> generate_lists
-    # call_check --> check_integrity
-
-    global PDF_toc                                                      # global Python dictionary for PDF files
-    global XML_toc                                                      # global Python dictionary
-    global authors                                                      # global Python dictionary withn authors
-    global licenses                                                     # global Python dictionary with licenses
-    global packages                                                     # global Python dictionary with packages
-    global topics                                                       # global Python dictionary with topics
-    global topicspackages                                               # Python dictionary: list of topics and their packages
-    global packagetopics                                                # Python dictionary: list of packages and their topics
-    global number                                                       # maximum number of files to be loaded
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-    global yearpackages                                                 # Python dictionary: list of years and their packagesauthorpackage_file
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:call_check")
 
-    get_PDF_files(direc)                                                # gets a list with all the PDF files in direc
+    get_PDF_files(dc.direc)                                             # gets a list with all the PDF files in direc
     dload_topics()                                                      # loads the file topics.xml
     dload_authors()                                                     # loads the file authors.xml
     dload_licenses()                                                    # load sthe file licenses.xml
     dload_packages()                                                    # loads the file packages.xml
-    generate_topicspackages()                                           # Generates topicspackages, ...
+    generate_topicspackages()                                           # Generates dc.topicspackages, ...
 
-    thr3 = Thread(target=generate_pickle1)                              # dumps authors, packages, topics, licenses, topicspackages, packagetopics,
-                                                                        # authorpackages, licensepackages, yearpackages
+    thr3 = Thread(target=generate_pickle1)                              # dumps dc.authors, dc.packages, dc.topics, dc.licenses, dc.topicspackages, dc.packagetopics,
+                                                                        # dc.authorpackages, dc.licensepackages, dc.yearpackages
     thr3.start()
     thr3.join()
 
-    if lists:                                                           # if lists are to be generated
+    if dc.lists:                                                        # if lists are to be generated
         generate_lists()                                                # generates x.loa, x.lop, x.lok, x.lol, x.lpt, x.lap, x.llp
 
-    if integrity:                                                       # if the integrity is to be checked
+    if dc.integrity:                                                    # if the integrity is to be checked
         check_integrity()                                               # when indicated: remove files or entries
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:call_check")
 
 # ------------------------------------------------------------------
-def call_load():                                                        # Function call_load
+def call_load(dc=dc_var):                                               # Function call_load
     """
     Processes all steps for a complete ctanload call (without integrity
     check).
 
-    Rewrites the global PDF_toc, XML_toc, authors, licenses, packages,
-    topics, topicspackages, number, counter, pdfcounter, yearpackages,
-    no_tp, no_ap, no_np, no_lp, no_ly.
+    Rewrites the variables dc.PDF_toc, dc.XML_toc, dc.authors,
+    dc.licenses, dc.packages,  dc.topics, dc.topicspackages, dc.number,
+    dc.counter, dc.pdfcounter, dc.yearpackages, dc.no_tp, dc.no_ap,
+    dc.no_np, dc.no_lp, dc.no_ly in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc   nstance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    PDF_toc             global Python dictionary for PDF files
-    XML_toc             global Python dictionary
-    authors             global Python dictionary with authors
-    licenses            global Python dictionary with licenses
-    packages            global Python dictionary with packages
-    topics              global Python dictionary with topics
-    topicspackages      python dictionary: list of topics and their
-                        packages
-    number              maximum number of files to be loaded
-    counter             counter for downloadd XML and PDF files
-    pdfcounter          counter for downloaded PDF files
-    yearpackages        python dictionary: list of years and their
-                        packagesauthorpackage_file
-    no_tp               number of packages selected per topics
-    no_ap               number of packages selected per author names
-    no_np               number of packages selected per n<mes
-    no_lp               number of packages selected per licenses
-    no_ly               number of packages selected per years
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.PDF_toc          Python dictionary:
+                        for PDF files
+    dc.XML_toc          Python dictionary:
+                        for XML files
+    dc.authors          Python dictionary:
+                        collection with authors
+    dc.licenses         Python dictionary:
+                        collection with licenses
+    dc.packages         Python dictionary:
+                        collection with packages
+    dc.topics           Python dictionary:
+                        collection with topics
+    dc.topicspackages   Python dictionary:
+                        collection of topics and their corresponding packages
+    dc.number           int:
+                        maximum number of files to be loaded
+    dc.counter          int:
+                        counter for downloadd XML and PDF files
+    dc.pdfcounter       int:
+                        counter for downloaded PDF files
+    dc.yearpackages     Python dictionary:
+                        list of years and their corr. packages
+    dc.no_tp            int:
+                        number of packages selected per topics
+    dc.no_ap            int:
+                        number of packages selected per author names
+    dc.no_np            int:
+                        number of packages selected per n<mes
+    dc.no_lp            int:
+                        number of packages selected per licenses
+    dc.no_ly            int:
+                        number of packages selected per years
+    dc.debugging        bool:
+                        global flag: debugging enabled
+    dc.verbose          bool:
+                        global flag: output is verbose
 
-    possible message:
+    Calls:
+    -----
+    +  get_PDF_files
+    +  dload_topics
+    +  dload_authors
+    +  dload_licenses
+    +  dload_packages
+    +  load_XML_toc
+    +  set_PDF_toc
+    +  dload_XML_files
+    +  generate_pickle1
+    +  generate_pickle2
+    +  get_xyz_lpt
+    +  get_xyz_lap
+    +  get_xyz_llp
+    +  get_year_set
+    
+    Possible message:
+    ----------------
     + Warning: no correct XML file for any specified package found
     """
 
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    # call_load --> get_PDF_files
-    # call_load --> dload_topics
-    # call_load --> dload_authors
-    # call_load --> dload_licenses
-    # call_load --> dload_packages
-    # call_load --> load_XML_toc
-    # call_load --> set_PDF_toc
-    # call_load --> dload_XML_files
-    # call_load --> generate_pickle1
-    # call_load --> generate_pickle2
-    # call_load --> get_xyz_lpt
-    # call_load --> get_xyz_lap
-    # call_load --> get_xyz_llp
-    # call_load --> get_year_set
-
-    global PDF_toc                                                      # global Python dictionary for PDF files
-    global XML_toc                                                      # global Python dictionary
-    global authors                                                      # global Python dictionary with authors
-    global licenses                                                     # global Python dictionary with licenses
-    global packages                                                     # global Python dictionary with packages
-    global topics                                                       # global Python dictionary with topics
-    global topicspackages                                               # Python dictionary: list of topics and their packages
-    global number                                                       # maximum number of files to be loaded
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-    global yearpackages                                                 # Python dictionary: list of years and their packagesauthorpackage_file
-    global no_tp                                                        # number of packages selected per topics
-    global no_ap                                                        # number of packages selected per author names
-    global no_np                                                        # number of packages selected per n<mes
-    global no_lp                                                        # number of packages selected per licenses
-    global no_ly                                                        # number of packages selected per years
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:call_load")
 
-    get_PDF_files(direc)                                                # Lists all PDF files in a specified OS folder.
+    get_PDF_files(dc.direc)                                             # Lists all PDF files in a specified OS folder.
     load_XML_toc()                                                      # Loads pickle file 2 (which contains XML_toc)
     set_PDF_toc()
 
@@ -807,11 +1103,11 @@ def call_load():                                                        # Functi
     dload_authors()                                                     # loads the file authors.xml
     dload_licenses()                                                    # loads the file licenses.xml
     dload_packages()                                                    # loads the file packages.xml
-    generate_topicspackages()                                           # Generates topicspackages, ...
+    generate_topicspackages()                                           # Generates dc.topicspackages, ...
 
     all_packages = set()                                                # initializes set
-    for f in packages:
-        all_packages.add(f)                                             # constructs a set object (packages has not the right format)
+    for f in dc.packages:
+        all_packages.add(f)                                             # constructs a set object (dc.packages has not the right format)
 
     tmp_tp = all_packages.copy()                                        # initializes tmp_tp (topics)
     tmp_ap = all_packages.copy()                                        # initializes tmp_ap (authors)
@@ -819,125 +1115,161 @@ def call_load():                                                        # Functi
     tmp_lp = all_packages.copy()                                        # initializes tmp_lp (licenses)
     tmp_ly = all_packages.copy()                                        # initializes tmp_ly (years)
 
-    if (name_template != NAME_TEMPLATE_DEFAULT):
+    if (dc.name_template != NAME_TEMPLATE_DEFAULT):
         tmp_np = get_package_set()                                      # analyzes 'packages' for name templates
-    if (key_template != KEY_TEMPLATE_DEFAULT):
+    if (dc.key_template != KEY_TEMPLATE_DEFAULT):
         tmp_tp = get_xyz_lpt()                                          # loads xyz.lpt and analyze it for key templates
-    if (author_template != AUTHOR_TEMPLATE_DEFAULT):
+    if (dc.author_template != AUTHOR_TEMPLATE_DEFAULT):
         tmp_ap = get_xyz_lap()                                          # loads xyz.lap and analyze it for author templates
-    if (license_template != LICENSE_TEMPLATE_DEFAULT):
+    if (dc.license_template != LICENSE_TEMPLATE_DEFAULT):
         tmp_lp = get_xyz_llp()                                          # loads xyz.llp and analyze it for license templates
-    if (year_template != YEAR_TEMPLATE_DEFAULT):
+    if (dc.year_template != YEAR_TEMPLATE_DEFAULT):
         tmp_ly = get_year_set()                                         # looks for packages with the correct year templates
 
     tmp_pp = tmp_tp & tmp_ap & tmp_np & tmp_lp & tmp_ly                 # builts an set intersection
     if len(tmp_pp) == 0:
-        if verbose:
+        if dc.verbose:
             print("--- Warning: no correct XML file for any specified",
-                  " package found")
+                  "package found")
 
     tmp_p  = sorted(tmp_pp)                                             # builts an intersection
 
     dload_XML_files(tmp_p)                                              # loads and processe all required XML files in series
 
-    no_tp = len(tmp_tp)
-    no_ap = len(tmp_ap)
-    no_np = len(tmp_np)
-    no_lp = len(tmp_lp)
-    no_ly = len(tmp_ly)
+    dc.no_tp = len(tmp_tp)
+    dc.no_ap = len(tmp_ap)
+    dc.no_np = len(tmp_np)
+    dc.no_lp = len(tmp_lp)
+    dc.no_ly = len(tmp_ly)
 
-    thr1 = Thread(target=generate_pickle2)                              # dumps XML_toc via pickle file via thread
+    thr1 = Thread(target=generate_pickle2)                              # dumps dc.XML_toc via pickle file via thread
     thr1.start()
     thr1.join()
     thr2 = Thread(target=generate_pickle1)                              # dumps some lists to pickle file
     thr2.start()
     thr2.join()
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:call_load")
 
 # ------------------------------------------------------------------
-def call_plain():                                                       # Function call_plain
+def call_plain(dc=dc_var):                                              # Function call_plain
     """
     Processes all steps for a plain call.
 
-    Rewrtites the global PDF_toc, authors, licenses, packages, topics,
-    topicspackages, packagetopics, authorpackages, yearpackages.
+    Rewrtites the variables dc.PDF_toc, dc.authors, dc.licenses,
+    dc.packages, dc.topics, dc.topicspackages, dc.packagetopics,
+    dc.authorpackages, dc.yearpackages in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc   instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    PDF_toc         global Python dictionary for PDF files
-    authors         global Python dictionary with authors
-    licenses        global Python dictionary with licenses
-    packages        global Python dictionary with packages
-    topics          global Python dictionary with topics
-    topicspackages  Python dictionary: Warning 7 list of topics and
-                    their packages
-    packagetopics   Python dictionary: list of packages and their topics
-    authorpackages  Python dictionary: list of authors and their 
-                    packages
-    yearpackages    Python dictionary: list of years and their
-                    packagesauthorpackage_file
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.PDF_toc          Python dictionary:
+                        for PDF files
+    dc.authors          Python dictionary:
+                        collection with authors
+    dc.licenses         Python dictionary:
+                        collection with licenses
+    dc.packages         Python dictionary:
+                        collection with packages
+    dc.topics           Python dictionary:
+                        collection with topics
+    dc.topicspackages   Python dictionary:
+                        collection of topics and their corr. packages
+    dc.packagetopics    Python dictionary:
+                        list of packages and their corr. topics
+    dc.authorpackages   Python dictionary:
+                        list of authors and their corr. packages
+    dc.yearpackages     Python dictionary:
+                        list of years and their corr. packages
+    dc.debugging        bool:
+                        Flag: debugging 
 
-    no messages
+    Calls:
+    -----
+    +  get_PDF_files
+    +  dload_topics
+    +  dload_authors
+    +  dload_licenses
+    +  dload_packages
+    +  generate_topicspackages
+       generate_pickle1
+    
+    Messages:
+    --------
+    There are no specific messages.
     """
 
-    # call_plain --> get_PDF_files
-    # call_plain --> dload_topics
-    # call_plain --> dload_authors
-    # call_plain --> dload_licenses
-    # call_plain --> dload_packages
-    # call_plain --> generate_topicspackages
-    # call_plain --> generate_pickle1
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    global PDF_toc                                                      # global Python dictionary for PDF files
-    global authors                                                      # global Python dictionary with< authors
-    global licenses                                                     # global Python dictionary with licenses
-    global packages                                                     # global Python dictionary with packages
-    global topics                                                       # global Python dictionary with topics
-    global topicspackages                                               # Python dictionary: Warning 7 list of topics and their packages
-    global packagetopics                                                # Python dictionary: list of packages and their topics
-    global authorpackages                                               # Python dictionary: list of authors and their packages
-    global yearpackages                                                 # Python dictionary: list of years and their packagesauthorpackage_file
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:call_plain")
 
-    get_PDF_files(direc)                                                # Lists all PDF files in a specified OS folder.
+    get_PDF_files(dc.direc)                                             # Lists all PDF files in a specified OS folder.
     dload_topics()                                                      # loads the file topics.xml
     dload_authors()                                                     # loads the file authors.xml
     dload_licenses()                                                    # loads the file licenses.xml
     dload_packages()                                                    # loads the file packages.xml
-    generate_topicspackages()                                           # generate topicspackages, ...
-    thr3 = Thread(target=generate_pickle1)                              # dumps authors, packages, topics, licenses, topicspackages,
-                                                                        # packagetopics, authorpackages, licensepackages, yearpackages (via thread)
+    generate_topicspackages()                                           # generate dc.topicspackages, ...
+    thr3 = Thread(target=generate_pickle1)                              # dumps authors, dc.packages, dc.topics, dc.licenses, dc.topicspackages,
+                                                                        # dc.packagetopics, dc.authorpackages, dc.licensepackages, dc.yearpackages (via thread)
     thr3.start()
     thr3.join()
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:call_plain")
 
 # ------------------------------------------------------------------
-def check_integrity(always:bool=False):                                 # Function check_integrity()
+def check_integrity(always:bool=False, dc=dc_var):                      # Function check_integrity()
     """
     Checks integrity (tests for inconsistencies).
 
-    Rewrites the global variables corrected, PDF_toc, no_error, ok,
-    PDF_XML.
+    Rewrites the variables dc.corrected, dc.PDF_toc, dc.no_error, dc.ok,
+    dc.PDF_XML in the data class dc.
 
-    parameter:
-    always : generation of pickle2 can be controlled (bool)
+    Parameters:
+    ---------_
+    always (bool) : generation of pickle2 can be controlled
+                    default: False   
+    dc            : instance of the data class 'dataclass_var'
+                    default: dc_var
 
-    global variables:
-    corrected   number of corrections
-    PDF_toc     PDF_toc, structure: PDF_toc[file] = fkey + "-" +
-                onename
-    no_error    Flag: no error
-    ok          Flag: ok
-    PDF_XML     Python set: inconsistencies with PDF file
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.corrected    int:
+                    number of corrections
+    dc.PDF_toc      Python dictionary:
+                    structure: PDF_toc[file] = fkey + "-" + onename
+    dc.no_error     bool:
+                    Flag: no error
+    dc.ok           bool:
+                    global flag: status of processing
+    dc.PDF_XML      Python set:
+                    inconsistencies with PDF file
+    dc.debugging    bool:
+                    Flag: debugging enabled
+    dc.verbose      bool:
+                    global flag: output is verbose
 
-    possible (error) messages:
+    calls:
+    -----
+    + load_XML_toc
+    + generate_pickle2
+    + verify_PDF_filespossib
+    
+    Possible (error) messages:
+    -------------------------
     + Warning: entry '{0}'
     + Warning: XML file '{0}' in OS deleted
     + Warning: entry '{0}' in dictionary deleted
@@ -946,129 +1278,139 @@ def check_integrity(always:bool=False):                                 # Functi
     + Info: no error with integrity check
     """
 
-    # check_integrity --> load_XML_tocdin dictionary, but OS file is
-    #                     empty
-    # check_integrity --> generate_pickle2
-    # check_integrity --> verify_PDF_filespossib
-
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.49   2025-02-11 more f-strings
-    # 2.51   2025-09-02 check_integrity (-l): Show inconsistencies + list of missing files
+    # 2.51   2025-09-02 check_integrity (-l): Show inconsistencies +
+    #                   list of missing files
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    global corrected                                                    # number of corrections
-    global PDF_toc                                                      # PDF_toc, structure: PDF_toc[file] = fkey + "-" + onename
-    global no_error                                                     # Flag: no error
-    global ok                                                           # Flag: ok
-    global PDF_XML                                                      # Python set: inconsistencies with PDF file
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:check_integrity")
 
-    if verbose:
+    if dc.verbose:
         print("--- Info: integrity check")
-    load_XML_toc()                                                      # loads the 2nd pickle file (XML_toc) XML_toc, struct ure: XML_toc[href] = (file, fkey, onename)
-    no_error = True
+    load_XML_toc()                                                      # loads the 2nd pickle file (dc.XML_toc) dc.XML_toc, struct ure: dc.XML_toc[href] = (file, fkey, onename)
+    dc.no_error = True
 
-    tmpdict = {}                                                        # for a copy of XML_toc
-    for f in XML_toc:                                                   # makes a copy of XML_toc
-        tmpdict[f] = XML_toc[f]
+    tmpdict = {}                                                        # for a copy of dc.XML_toc
+    for f in dc.XML_toc:                                                # makes a copy of dc.XML_toc
+        tmpdict[f] = dc.XML_toc[f]
 
 # ..................................................................
     for f in tmpdict:                                                   # loop: all entries in a copy of XML_toc
         tmp:str    = tmpdict[f]
         f_name:str = (tmp[0].split("."))[0]                             # gets the name of the XML file (without extension)
-        xlfn:str   = direc + tmp[0]                                     # local file name for current XML file
-        plfn:str   = direc + tmp[1] + "-" + tmp[2]                      # local file name for current PDF file
+        xlfn:str   = dc.direc + tmp[0]                                  # local file name for current XML file
+        plfn:str   = dc.direc + tmp[1] + "-" + tmp[2]                   # local file name for current PDF file
         xex:str    = os.path.isfile(xlfn)                               # test: XLM file exists?
         pex:str    = os.path.isfile(plfn)                               # test: PDF file exists?
 
         if xex:                                                         # XLM file exists
             if os.path.getsize(xlfn) == 0:                              # but file is empty
-                if verbose:
+                if dc.verbose:
                     print(f"----- Warning: entry '{xlfn}' ")
                 os.remove(xlfn)                                         # OS file removed
-                if verbose:
-                    print(f"----- Warning: XML file '{xlfn}' " +\
+                if dc.verbose:
+                    print(f"----- Warning: XML file '{xlfn}'",
                           "in OS deleted")
-                del XML_toc[f]                                          # entry deleted
-                if verbose:
-                    print(f"----- Warning: entry '{xlfn}' " + \
+                del dc.XML_toc[f]                                       # entry deleted
+                if dc.verbose:
+                    print(f"----- Warning: entry '{xlfn}'",
                           "in dictionary deleted")
-                no_error = False                                        # flag set
-                corrected += 1                                          # number of corrections increasedtuda-ci.xml
+                dc.no_error = False                                     # flag set
+                dc.corrected += 1                                       # number of corrections increasedtuda-ci.xml
             else:                                                       # XML file not empty
                 if os.path.isfile(plfn):                                # test: PDF file exists?
                     if os.path.getsize(plfn) != 0:
-                        PDF_toc[tmp[1] + "-" + tmp[2]] = tmp[0]         # generate entry in PDF_toc
+                        dc.PDF_toc[tmp[1] + "-" + tmp[2]] = tmp[0]      # generate entry in PDF_toc
                     else:
-                        if verbose:
-                            print(f"----- Warning: entry '{plfn}' (" +\
+                        if dc.verbose:
+                            print(f"----- Warning: entry '{plfn}' (",
                                   f"{tmp[0]}) in",
                                   "dictionary, but OS file is empty")
                         os.remove(plfn)                                 # OS file removed
-                        if verbose:
+                        if dc.verbose:
                             print(f"----- Warning: PDF file '{plfn}'",
                                   "in OS deleted")
-                        del XML_toc[f]                                  # entry deleted
-                        if verbose:
-                            print(f"----- Warning: entry '{plfn}' " +\
+                        del dc.XML_toc[f]                               # entry deleted
+                        if dc.verbose:
+                            print(f"----- Warning: entry '{plfn}'",
                                   "in dictionary")
-                        PDF_XML.add(f_name)
-                        no_error = False                                # flag set
-                        corrected += 1                                  # number of correct increased
+                        dc.PDF_XML.add(f_name)
+                        dc.no_error = False                             # flag set
+                        dc.corrected += 1                               # number of correct increased
                 else:
-                    if verbose:
-                        print(f"----- Warning: entry '{plfn}' " + \
+                    if dc.verbose:
+                        print(f"----- Warning: entry '{plfn}'",
                               f"({tmp[0]}) in",
                               "dictionary but PDF file not found")
-                    del XML_toc[f]                                      # entry deleted
-                    if verbose:
+                    del dc.XML_toc[f]                                   # entry deleted
+                    if dc.verbose:
                         print(f"----- Warning: entry '{plfn}' in",
                               "dictionary deleted")
-                    PDF_XML.add(f_name)
-                    no_error = False                                    # flag set
-                    corrected += 1                                      #  number of corr. increased
+                    dc.PDF_XML.add(f_name)
+                    dc.no_error = False                                 # flag set
+                    dc.corrected += 1                                   #  number of corr. increased
         else:                                                           # XML file does not exist
             print(f"----- Warning: entry '{xlfn}' in dictionary,",
                   "but OS file not found")
-            del XML_toc[f]                                              # entry deleted
-            print(f"----- Warning: entry '{xlfn}' " +\
+            del dc.XML_toc[f]                                           # entry deleted
+            print(f"----- Warning: entry '{xlfn}'",
                   "in dictionary deleted")
-            no_error   = False                                          # flag set
-            corrected += 1                                              # number of corrections increased
+            dc.no_error   = False                                       # flag set
+            dc.corrected += 1                                           # number of corrections increased
 
     thr5 = Thread(target=verify_PDF_files)                              # check actualized PDF_toc; delete a PDF file if necessary (via thread)
     thr5.start()
     thr5.join()
 
 # ..................................................................
-    if no_error and ok and (not always):                                # there is no error
-        if verbose:
+    if dc.no_error and dc.ok and (not always):                          # there is no error
+        if dc.verbose:
             print("----- Info: no error with integrity check")
     else:
         thr2 = Thread(target=generate_pickle2)                          # generate a new version of the 2nd pickle file (via thread)
         thr2.start()
         thr2.join()
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:check_integrity")
 
 # ------------------------------------------------------------------
-def dload_authors():                                                    # Function dload_authors()
+def dload_authors(dc=dc_var):                                           # Function dload_authors()
     """
     Downloads XML file 'authors' from CTAN and generates dictionary
     'authors'.
 
-    Rewrites the global dictionary authors.
+    Rewrites the dictionary dc.authors in the data class dc.
 
-    no parameter
+    Parameter:
+    ---------
+    dc  : instance of the data class 'dataclass_var'
+          default: dc_var
 
-    global variable:
-    authors             global Python dictionary with authors
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.authors    Python dictionary:
+                  collection with authors
+    dc.debugging  bool:
+                  global flag: debugging enabled
+    dc.verbose    bool:
+                  global flag: output is verbose
 
-    possible (error) medssages:
+    Possible (error) medssages:
+    --------------------------
     + Info: XML file '{0}' downloaded ('{1}.xml' on PC)
     + Info: authors downloaded
     + Error: standard XML file '{0}' not found
@@ -1095,15 +1437,27 @@ def dload_authors():                                                    # Functi
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.49   2025-02-11 more f-strings
     # 2.55   2025-12-12 subprocess.run calls revised 
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global authors                                                      # global Python dictionary with authors
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:dload_authors")
 
     FILE            = "authors"                                         # file name
     FILE2           = FILE + EXT                                        # file name (with extension)
-    parameter_P:str = "-P" + direc                                      # parameter -P for wget
+    parameter_P:str = "-P" + dc.direc                                   # parameter -P for wget
     parameter_O:str = "-O" + FILE2                                      # parameter -O for wget
     CALL1           = "https://ctan.org/xml/2.0/"                       # base URL for authors, packages, ...
     callx:list      = [WGET, parameter_P,  parameter_O, CALL1 + FILE]   # command for subprocess.run
@@ -1116,9 +1470,9 @@ def dload_authors():                                                    # Functi
                                  stdout=subprocess.PIPE,
                                  universal_newlines=True)
 
-        if verbose:
+        if dc.verbose:
             print(f"--- Info: XML file '{FILE}' downloaded",
-                  f"('{direc + FILE}.xml' on PC)")
+                  f"('{dc.direc + FILE}.xml' on PC)")
         try:
             authorsTree  = ET.parse(FILE2)                              # parses the XML file 'authors.xml'
             authorsRoot  = authorsTree.getroot()                        # gets the root
@@ -1135,70 +1489,92 @@ def dload_authors():                                                    # Functi
                         gname = child.attrib['givenname']               # gets attribute givenname
                     if str(attr) == "familyname":
                         fname = child.attrib['familyname']              # gets attribute familyname
-                authors[key] = (gname, fname)
-            if verbose:
+                dc.authors[key] = (gname, fname)
+            if dc.verbose:
                 print("----- Info: authors downloaded")
-        except FileNotFoundError:                                       # file not found
-            if verbose:
-                print(f"--- Error: standard XML file '{FILE2}' " +\
-                      "not found")
+        except FileNotFoundError as err:                                       # file not found
+            if dc.verbose:
+                print(f"--- Error: standard XML file '{FILE2}'",
+                      "not found", err, traceback.print_exc())
             sys.exit("--- Error: programm terminated")                  # program terminated
-        except:                                                         # parsing was not successfull
-            if verbose:
+        except Exception as err1:                                                         # parsing was not successfull
+            if dc.verbose:
                 print(f"--- Error: standard XML file '{FILE2}' empty",
-                      "or not well-formed")
+                      "or not well-formed", err1, traceback.print_exc())
                 print("--- Error:", sys.exc_info()[0], "\n   ",
                       sys.exc_info()[1])
             sys.exit("--- Error: programm terminated")                  # program terminated
     except subprocess.CalledProcessError as exc:                        # processor not found
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
     except FileNotFoundError as exc:                                    # file not found / file not downloaded
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print(f"--- Error; processor '{WGET}' not found")
+            print(f"--- Error; processor '{WGET}' not found", exc,
+                  traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
     except subprocess.TimeoutExpired as exc:                            # timeout
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated any unspecified error
-        if verbose:
+        if dc.verbose:
             tmp_a = "    any unspecified error"
-            print(f"--- Error: XML file '{FILE}' not " +\
+            print(f"--- Error: XML file '{FILE}' not",
                   f"downloaded\n{tmp_a}")
             print("--- ", sys.exc_info()[0])
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:dload_authors")
 
 # ------------------------------------------------------------------
 def dload_document_file(href:str, key:str, name:str,
-                        XML_file:str) ->bool:                           # Function dload_document_file (href, key, name):
+                        XML_file:str, dc=dc_var) ->bool:                # Function dload_document_file (href, key, name):
     """
     Downloads one information file (PDF) from CTAN.
-
-    Returns the status of the PDF download.
-    Rewrites the global variables pdfcounter, pdfctrerr.
+    
+    Rewrites the variables dc.pdfcounter, dc.pdfctrerr in the data
+    class dc.
 
     Parameters:
-    href     : URL of document (PDF file)
-    key      : key, direc, name build the name of the new document
-    name     : name of the PDF file
-    XML_file : name of the XML file with href
+    ----------
+    href (str)     : URL of a document (PDF file)
+                     no default
+    key (str)      : key, dc.direc, name build the name of the new document
+                     no default
+    name (str)     : name of the PDF file
+                     no default
+    XML_file (str) : name of the XML file with href
+                     no default
+    dc             : instance of the data class 'dataclass_var'
+                     default: dc_var
 
-    global variables:
-    pdfcounter          counter for downloaded PDF files
-    pdfctrerr           counter for not downloaded PDF files
+    Returns:
+    -------
+    Returns the status (bool) of the PDF download.
+
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.pdfcounter       int:
+                        counter for downloaded PDF files
+    dc.pdfctrerr        int:
+                        counter for not downloaded PDF files
                         (in the actual session)
-    PDF_notloaded       Python list: PDF not downloaded
-    PDF_XML             Python set: list of XML files: inconsistencies
-                        with PDF files for packagessubprocess.run
+    dc.PDF_notloaded    Python list:
+                        PDF not downloaded
+    dc.PDF_XML          Python set:
+                        list of XML files: inconsistencies with PDF
+                        files for packagessubprocess.run
+    dc.debugging        bool:
+                        global flag: debugging enabled
+    dc.verbose          bool:
+                        global flag: output is verbose
 
-    possible (error) messages:
+    Possible (error) messages:
+    -------------------------
     + Info: PDF documentation file '{0}' downloaded
     + Info: unique local file name: '{0}'
     + Warning: PDF documentation file '{0}' not downloaded
@@ -1222,20 +1598,31 @@ def dload_document_file(href:str, key:str, name:str,
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
     # 2.55   2025-12-12 subprocess.run calls revised 
+    # 3.2    2026-05-01 for XML and PDF files: downloads with number
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.7    2026-07-05 XML and PDF downloads: number of download
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global pdfcounter                                                   # counter for downloaded PDF files
-    global pdfctrerr                                                    # counter for not downloaded PDF files (in the actual session)
-    global PDF_notloaded                                                # Python list: PDF not downloaded
-    global PDF_XML                                                      # Python set: list of XML files: inconsistencies with PDF files for packages
-
-    if debugging:
+    if dc.debugging:
         print("+++ -CTANLoad:dload_document_file")
 
     # to be improved
 
     name:str        = name.replace("+", "-")
     CALL2           = "https://ctan.org/xml/2.0/pkg/"                   # base wget call for package files
-    parameter_P:str = "-P" + direc                                      # parameter -P for wget
+    parameter_P:str = "-P" + dc.direc                                   # parameter -P for wget
     parameter_O:str = "-O" + key + "-" + name                           # parameter -O for wget
 
     call:list       = [WGET, parameter_P, parameter_O, href]
@@ -1245,54 +1632,65 @@ def dload_document_file(href:str, key:str, name:str,
         process = subprocess.run(call, stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE,
                                  timeout=TIMEOUT_DEFAULT)
-        if verbose:
-            print(f"------- Info: PDF documentation file '{name}' " +\
+        if dc.verbose:
+            print(f"------- Info: PDF documentation file '{name}'",
                   "downloaded")
-            tmpxx = direc + key + "-" + name
-            print(f"------- Info: unique local file name: '{tmpxx}'")
-        pdfcounter = pdfcounter + 1                                     # number of downloaded PDF files incremented
+            tmpxx = dc.direc + key + "-" + name
+            print(f"------- (PDF {dc.pdfcounter + 1}) Info:",
+                  f"unique local file name: '{tmpxx}'")
+        dc.pdfcounter = dc.pdfcounter + 1                               # number of downloaded PDF files incremented
         noterror = True
     except FileNotFoundError as exc:                                    # file not found / file not downloaded
-        PDF_notloaded.add(name)                                         # appends name of file to the PDF_notloaded list
-        PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
-        if verbose:
+        dc.PDF_notloaded.add(name)                                      # appends name of file to the PDF_notloaded list
+        dc.PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
+        if dc.verbose:
            print("------- Warning: PDF documentation",
-                 f"file '{name}' not downloaded")
+                 f"file '{name}' not downloaded", exc)
     except subprocess.CalledProcessError as exc:                        # processor not found
-        PDF_notloaded.add(name)                                         # appends name of file to the PDF_notloaded list
-        PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
-        if verbose:
+        dc.PDF_notloaded.add(name)                                      # appends name of file to the PDF_notloaded list
+        dc.PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
+        if dc.verbose:
             print("------- Warning: PDF documentation",
-                  f"file '{name}' not downloaded")
+                  f"file '{name}' not downloaded", exc)
     except subprocess.TimeoutExpired as exc:                            # timeout
-        PDF_notloaded.add(name)                                         # append sname of file to the PDF_notloaded list
-        PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
-        if verbose:
+        dc.PDF_notloaded.add(name)                                      # append sname of file to the PDF_notloaded list
+        dc.PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
+        if dc.verbose:
             print("------- Warning: PDF documentation",
-                  f"file '{name}' not downloaded")
-    except:                                                             # any unspecified error
-        PDF_notloaded.add(name)                                         # appends name of file to the PDF_notloaded list
-        PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
-        if verbose:
+                  f"file '{name}' not downloaded", exc)
+    except Exception as err:                                                             # any unspecified error
+        dc.PDF_notloaded.add(name)                                      # appends name of file to the PDF_notloaded list
+        dc.PDF_XML.add(re.sub(".xml", EMPTY, XML_file))
+        if dc.verbose:
             print("------- Warning: PDF documentation",
-                  f"file '{name}' not downloaded")
+                  f"file '{name}' not downloaded", err)
 
     return noterror
 
 # ------------------------------------------------------------------
-def dload_licenses():                                                   # Function dload_licenses
+def dload_licenses(dc=dc_var):                                          # Function dload_licenses
     """
     Downloads the'licenses' XML file from CTAN and generates the
-    'licenses' dictionary.
+    'dc.licenses' dictionary.
 
-    Rewrites the global variable licenses.
+    Rewrites the variable dc.licenses in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variable:
-    licenses            global Python dictionary with licenses
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.licenses   Python dictionary:
+                  collection with licenses 
+    dc.debugging  bool:
+                  global flag: debugging enabled
+    dc.verbose    bool:
+                  global flag: output is verbose
 
-    possible (error) messages:
+    Possible (error) messages:
+    -------------------------
     + Error: programm terminated
     + Error: standard XML file '{0}' empty or not well-formed
     + Error: standard XML file '{0}' not found
@@ -1318,15 +1716,28 @@ def dload_licenses():                                                   # Functi
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
     # 2.55   2025-12-12 subprocess.run calls revised 
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
+    # 3.9    2026-07-23 correction for not-existing key in licenses.xml
 
-    global licenses                                                     # global Python dictionary with licenses
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:dload_licenses")
 
     FILE            = "licenses"                                        # file name
     FILE2           = FILE + EXT                                        # file name (with extension)
-    parameter_P:str = "-P" + direc                                      # parameter -P for wget
+    parameter_P:str = "-P" + dc.direc                                   # parameter -P for wget
     parameter_O:str = "-O" + FILE2                                      # parameter -O for wget
     CALL1           = "https://ctan.org/xml/2.0/"                       # base URL for authors, packages, ...
     callx:list      = [WGET, parameter_P,  parameter_O, CALL1 + FILE]   # command for subprocess.run
@@ -1338,9 +1749,9 @@ def dload_licenses():                                                   # Functi
                                  stdout=subprocess.PIPE,
                                  universal_newlines=True)
 
-        if verbose:
+        if dc.verbose:
             print(f"--- Info: XML file '{FILE}' downloaded",
-                  f"('{direc + FILE}.xml' on PC)")
+                  f"('{dc.direc + FILE}.xml' on PC)")
         try:
             licensesTree   = ET.parse(FILE2)                            # parses the XML file 'topics.xml'
             licensesRoot   = licensesTree.getroot()                     # gets the root
@@ -1356,63 +1767,77 @@ def dload_licenses():                                                   # Functi
                         name = child.attrib['name']                     # gets attribute name
                     elif str(attr) == "free":
                         free = child.attrib['free']                     # gets attribute free
-                licenses[key] = (name, free)
-            licenses["noinfo"]      = ("noinfo", EMPTY)                 # correction; not in lincenses.xml
-            licenses["collection"]  = ("collection", EMPTY)             # correction; not in lincenses.xml
-            licenses["digest"]      = ("digest", EMPTY)                 # correction; not in lincenses.xml
-            if verbose:
+                dc.licenses[key] = (name, free)
+            dc.licenses["noinfo"]      = ("noinfo", EMPTY)              # correction; not in lincenses.xml
+            dc.licenses["collection"]  = ("collection", EMPTY)          # correction; not in lincenses.xml
+            dc.licenses["digest"]      = ("digest", EMPTY)              # correction; not in lincenses.xml
+            dc.licenses["lppl1.1"]     = ("The LaTeX Project " +\
+                                         "Public License 1.1", EMPTY)   # correction; not in lincenses.xml
+            # <license key="lppl1.2" name="The LaTeX Project Public License 1.2" free="true" />
+            if dc.verbose:
                 print("----- Info: licenses downloaded")
-        except FileNotFoundError:                                       # file not found
-            if verbose:
-                print(f"--- Error: standard XML file '{FILE2}' " +\
-                      "not found")
+        except FileNotFoundError as err:                                       # file not found
+            if dc.verbose:
+                print(f"--- Error: standard XML file '{FILE2}'",
+                      "not found", err, traceback.print_exc())
             sys.exit("--- Error: programm terminated")                  # program terminated
-        except:                                                         # parsing was not successfull
-            if verbose:
+        except Exception as err:                                        # parsing was not successfull
+            if dc.verbose:
                 print(f"--- Error: standard XML file '{FILE2}' empty",
-                      "or not well-formed")
+                      "or not well-formed", err)
                 print("--- Error:", sys.exc_info()[0], "\n   ",
                       sys.exc_info()[1])
             sys.exit("--- Error: programm terminated")                  # program terminated
     except subprocess.CalledProcessError as exc:                        # processor not found
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
     except FileNotFoundError as exc:                                    # file not found / file not downloaded
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
             print(f"--- Error; processor '{WGET}' not found")
-        sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
+        sys.exit("[CTANLoad] Error: programm terminated", exc,
+                 traceback.print_exc())                                 # program terminated
     except subprocess.TimeoutExpired as exc:                            # timeout
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated any unspecified error
-        if verbose:
+        if dc.verbose:
             tmp_a = "    any unspecified error"
-            print(f"--- Error: XML file '{FILE}' " +\
+            print(f"--- Error: XML file '{FILE}'",
                   f"not downloaded\n{tmp_a}")
             print("--- ", sys.exc_info()[0])
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:dload_licenses")
 
 # ------------------------------------------------------------------
-def dload_packages():                                                   # Function dload_packages
+def dload_packages(dc=dc_var):                                          # Function dload_packages
     """
     Downloads XML file 'packages' from CTAN and generates dictionary
     'packages'.
 
-    Rewrites the global dictionary 'packages'.
+    Rewrites the dictionary dc.packages in the data class dc..
 
-    no parameters
+    Parameter:
+    ---------
+    dc  : instance of the data class 'dataclass_var'
+          default: dc_var
 
-    global variable:
-    packages    global Python dictionary with packages
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.packages   Python dictionary:
+                  collection with packages
+    dc.debugging  bool:
+                  global flag: debugging enabled
+    dc.verbose    bool:
+                  global flag: output is verbose
 
-    possible error messages:
+    Possible error messages:
+    -----------------------
     + Error: processor '{0}' not found
     + Error: programm terminated
     + Error: standard XML file '{0}' empty or not well-formed
@@ -1440,15 +1865,27 @@ def dload_packages():                                                   # Functi
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
     # 2.55   2025-12-12 subprocess.run calls revised 
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global packages                                                     # global Python dictionary with packages
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:dload_packages")
 
     FILE            = "packages"                                        # file name
     FILE2           = FILE + EXT                                        # file name (with extension)
-    parameter_P:str = "-P" + direc                                      # parameter -P for wget
+    parameter_P:str = "-P" + dc.direc                                   # parameter -P for wget
     parameter_O:str = "-O" + FILE2                                      # parameter -O for wget
     CALL1           = "https://ctan.org/xml/2.0/"                       # base URL for authors, packages, ...
     callx:list      = [WGET, parameter_P,  parameter_O, CALL1 + FILE]
@@ -1460,9 +1897,9 @@ def dload_packages():                                                   # Functi
                                  stdout=subprocess.PIPE,
                                  universal_newlines=True)
 
-        if verbose:
+        if dc.verbose:
             print(f"--- Info: XML file '{FILE}' downloaded",
-                  f"('{direc + FILE}.xml' on PC)")
+                  f"('{dc.direc + FILE}.xml' on PC)")
         try:                                                            # parses 'packages' tree
             packagesTree = ET.parse(FILE2)                              # parses the XML file 'packages.xml'
             packagesRoot = packagesTree.getroot()                       # gets the root
@@ -1479,61 +1916,72 @@ def dload_packages():                                                   # Functi
                     if str(attr) == "caption":
                         caption = child.attrib['caption']
                                                                         # gets attribute caption
-                packages[key] = (name, caption)
-            if verbose:
+                dc.packages[key] = (name, caption)
+            if dc.verbose:
                 print("----- Info: packages downloaded")
-        except FileNotFoundError:                                       # file not found
-            if verbose:
-                print(f"--- Error: standard XML file '{FILE2}' " +\
-                      "not found")
+        except FileNotFoundError as err:                                       # file not found
+            if dc.verbose:
+                print(f"--- Error: standard XML file '{FILE2}'",
+                      "not found", err, traceback.print_exc())
             sys.exit("--- Error: programm terminated")                  # program terminated
-        except:                                                         # parsing was not successfull
-            if verbose:
+        except Exception as err:                                                         # parsing was not successfull
+            if dc.verbose:
                 print(f"--- Error: standard XML file '{FILE2}' empty",
-                      "or not well-formed")
+                      "or not well-formed", err)
                 print("--- Error:", sys.exc_info()[0], "\n   ",
                       sys.exc_info()[1])
             sys.exit("--- Error: programm terminated")                  # program terminated
     except subprocess.CalledProcessError as exc:                        # processor not found
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
     except FileNotFoundError as exc:                                    # file not found / file not downloaded
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
             print(f"--- Error; processor '{WGET}' not found")
-        sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
+        sys.exit("[CTANLoad] Error: programm terminated", exc,
+                 traceback.print_exc())                                 # program terminated
     except subprocess.TimeoutExpired as exc:                            # timeout
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
-    except:                                                             # any unspecified error
-        if verbose:
+    except Exception as err1:                                                             # any unspecified error
+        if dc.verbose:
             tmp_a = "    any unspecified error"
-            print(f"--- Error: XML file '{FILE}' not " +\
-                  f"downloaded\n{tmp_a}")
+            print(f"--- Error: XML file '{FILE}' not",
+                  f"downloaded\n{tmp_a}", err1, traceback.print_exc())
             print("--- ", sys.exc_info()[0])
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:dload_packages")
 
 # ------------------------------------------------------------------
-def dload_topics():                                                     # Function dload_topics()
+def dload_topics(dc=dc_var):                                            # Function dload_topics()
     """
     Downloads XML file 'topics' from CTAN and generates the
-    'topics' dictionary.
+    'dc.topics' dictionary.
 
-    Rewrites the global dictionary 'topics'.
+    Rewrites the dictionary dc.topics in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variable:
-    topics      global Python dictionary with topics
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.topics     Python dictionary:
+                  collection with topics
+    dc.debugging  bool:
+                  global flag: debugging enabled
+    dc.verbose    bool:
+                  global flag: output is verbose
 
-    possible error messages:
+    Possible error messages:
+    -----------------------
     + Error: processor '{0}' not found
     + Error: programm terminated
     + Error: standard XML file '{0}' empty or not well-formed
@@ -1561,15 +2009,25 @@ def dload_topics():                                                     # Functi
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
     # 2.55   2025-12-12 subprocess.run calls revised 
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global topics                                                       # global Python dictionary with topics
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:dload_topics")
 
     FILE            = "topics"                                          # file name
     FILE2           = FILE + EXT                                        # file name (with extension)
-    parameter_P:str = "-P" + direc                                      # parameter -P for wget
+    parameter_P:str = "-P" + dc.direc                                   # parameter -P for wget
     parameter_O:str = "-O" + FILE2                                      # parameter -O for wget
     CALL1           = "https://ctan.org/xml/2.0/"                       # base URL for authors, packages, ...
     callx:list      = [WGET, parameter_P,  parameter_O, CALL1 + FILE]
@@ -1581,9 +2039,9 @@ def dload_topics():                                                     # Functi
                                  stdout=subprocess.PIPE,
                                  universal_newlines=True)
 
-        if verbose:
+        if dc.verbose:
             print(f"--- Info: XML file '{FILE}' downloaded",
-                  f"('{direc + FILE}.xml' on PC)")
+                  f"('{dc.direc + FILE}.xml' on PC)")
         try:
             topicsTree   = ET.parse(FILE2)                              # parses the XML file 'topics.xml'
             topicsRoot   = topicsTree.getroot()                         # gets the root
@@ -1597,68 +2055,87 @@ def dload_topics():                                                     # Functi
                         key = child.attrib['name']                      # gets attribute name
                     if str(attr) == "details":
                         details = child.attrib['details']               # gets attribute details
-                topics[key] = details
-            if verbose:
+                dc.topics[key] = details
+            if dc.verbose:
                 print("----- Info: topics downloaded")
-        except FileNotFoundError:                                       # file not found
-            if verbose:
-                print(f"--- Error: standard XML file '{FILE2}' " +\
-                      "not found")
+        except FileNotFoundError as err:                                # file not found
+            if dc.verbose:
+                print(f"--- Error: standard XML file '{FILE2}'",
+                      "not found", err, traceback.print_exc())
             sys.exit("--- Error: programm terminated")                  # program terminated
-        except:                                                         # parsing was not successfull
-            if verbose:
+        except Exception as err:                                        # parsing was not successfull
+            if dc.verbose:
                 print(f"--- Error: standard XML file '{FILE2}' empty",
-                      "or not well-formed")
+                      "or not well-formed", err, traceback.print_exc())
                 print("--- Error:", sys.exc_info()[0], "\n   ",
                       sys.exc_info()[1])
             sys.exit("--- Error: programm terminated")                  # program terminated
-        topics["norsk"] = "Nynorsk"                                     # Emergency entry !!!!
+        dc.topics["norsk"] = "Nynorsk"                                  # Emergency entry !!!!
     except subprocess.CalledProcessError as exc:                        # processor not found
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
     except FileNotFoundError as exc:                                    # file not found / file not downloaded
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print(f"--- Error; processor '{WGET}' not found")
+            print(f"--- Error; processor '{WGET}' not found", exc,
+                 traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
     except subprocess.TimeoutExpired as exc:                            # timeout
-        if verbose:
+        if dc.verbose:
             print(f"--- Error: XML file '{FILE}' not downloaded")
-            print("--- Error:", exc)
+            print("--- Error:", exc, traceback.print_exc())
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated any unspecified error
-        if verbose:
+        if dc.verbose:
             tmp_a = "    any unspecified error"
-            print(f"--- Error: XML file '{FILE}' not " +\
+            print(f"--- Error: XML file '{FILE}' not",
                   "downloaded\n{tmp_a}")
             print("--- ", sys.exc_info()[0])
         sys.exit("[CTANLoad] Error: programm terminated")               # program terminated
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:dload_topics")
 
 # ------------------------------------------------------------------
-def dload_XML_files(p:str):                                             # Function dload_XML_files
+def dload_XML_files(p:list, dc=dc_var):                                 # Function dload_XML_files
     """
     Downloads XML package files.
 
-    Rewrites the global variables topicspackages, number, counter,
-    pdfcounter, yearpackages.
+    Rewrites the variables dc.topicspackages, dc.number, dc.counter,
+    dc.pdfcounter, dc.yearpackages in the data class dc.
 
-    parameter:
-    p: packages a/o selected_packages
+    Parameters:
+    ---------
+    p (list) : names of packages a/o selected_packages
+               no default
+    dc       : instance of the data class 'dataclass_var'
+               default: dc_var
 
-    global variables:
-    topicspackages  python dictionary: list of topics and their
-                    packages
-    number          maximum number of files to be loaded
-    counter         counter for downloadd XML and PDF files
-    pdfcounter      counter for downloaded PDF files
-    yearpackages    python dictionary: list of years and their
-                    packagesauthorpackage_file
+    The function needs access to some var iables in the data class dc:
+    -----------------------------------------------------------------
+    dc.topicspackages  Python dictionary:
+                       collection of topics and their corresponding
+                       packages
+    dc.number          int::
+                       maximum number of files to be loaded
+    dc.counter         int:
+                       counter for downloadd XML and PDF files
+    dc.pdfcounter      int:
+                       counter for downloaded PDF files
+    dc.yearpackages    Python dictionary:
+                       list of years and their corresponding packages
+    dc.debugging       bool:
+                       global flag: debugging enabled
+    dc.verbose         bool:
+                       global flag: output is verbose
 
-    possible messages:
+    Call:
+    ----
+    + analyze_XML_file
+
+    Possible messages:
+    -----------------
     + Info: XML file for package '{0}' downloaded ('{1}.xml' on PC)
     + Warning: maximum number ({0}) of downloaded XML+PDF files
                exceeded
@@ -1684,24 +2161,30 @@ def dload_XML_files(p:str):                                             # Functi
     # 2.55   2025-12-12 subprocess.run calls revised 
     # 3.1    2026-04-15 in dload_XML_files: better handling with
     #                   processor error (and other exceptions)
+    # 3.2    2026-05-01 for XML and PDF files: downloads with number
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.7    2026-07-05 XML and PDF downloads: number of download
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    # dload_XML_file --> analyze_XML_file
-
-    global topicspackages                                               # Python dictionary: list of topics and their packages
-    global number                                                       # maximum number of files to be loaded
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-    global yearpackages                                                 # Python dictionary: list of years and their packagesauthorpackage_file
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:dload_XML_files")
 
     CALL2           = "https://ctan.org/xml/2.0/pkg/"                   # base URL for package files
-    parameter_P:str = "-P" + direc                                      # parameter -P for wget
+    parameter_P:str = "-P" + dc.direc                                   # parameter -P for wget
 
     for f in p:                                                         # all packages found in 'packages'
-        if p2.match(f) and (counter + pdfcounter < number):             # file name matches name_template
-            counter     = counter + 1                                   # ioncrement counter
+        if p2.match(f) and (dc.counter + dc.pdfcounter < dc.number):    # file name matches name_template
+            dc.counter  = dc.counter + 1                                # ioncrement counter
             parameter_O = "-O" + f + EXT                                # parameter -O for wget
             file        = f
 
@@ -1714,43 +2197,45 @@ def dload_XML_files(p:str):                                             # Functi
                                          stdout=subprocess.PIPE,
                                          universal_newlines=True)
 
-                if verbose:
-                    print(f"----- Info: XML file for package",
-                          f"'{f}' downloaded ('{direc + f}.xml' on PC)")
+                if dc.verbose:
+                    print(f"----- Info: (XML {dc.counter})",
+                          "XML file for package",
+                          f"'{f}' downloaded ('{dc.direc + f}.xml' on PC)")
                 analyze_XML_file(f + EXT)                               # if download is set: analyze the associated XML file
             except FileNotFoundError as exc:                            # file not found /  file not downloaded
-                if verbose:
-                    print(f"--- Warning: XML file '{file}' not " +\
+                if dc.verbose:
+                    print(f"--- Warning: XML file '{file}' not",
                           "downloaded")
-                    print(f"--- Warning: processor '{WGET}' not found")
+                    print(f"--- Warning: processor '{WGET}' not found",
+                          exc)
             except subprocess.CalledProcessError as exc:                # processor not found
-                if verbose:
-                    print(f"--- Warning: XML file '{file}' not " +\
+                if dc.verbose:
+                    print(f"--- Warning: XML file '{file}' not",
                           "downloaded")
                     print("--- Warning:", exc)
             except subprocess.TimeoutExpired as exc:                    # timeout
-                if verbose:
-                    print(f"--- Warning: XML file '{file}' not " +\
+                if dc.verbose:
+                    print(f"--- Warning: XML file '{file}' not",
                           "downloaded")
                     print("--- Warning:", exc)
-            except:                                                     # any unspecified error
-                if verbose:
+            except Exception as exc:                                    # any unspecified error
+                if dc.verbose:
                     tmp_a = "    any unspecified error"
                     print(f"--- Warning: XML file '{file}' not",
-                          f"downloaded\n{tmp_a}")
+                          f"downloaded\n{tmp_a}", exc)
                     print("--- ", sys.exc_info()[0])
 
-    if counter + pdfcounter >= number:                                  # limit for downloaded files
-        if verbose:
-            print("--- Warning: maximum number " +\
-                  f"({str(counter + pdfcounter)})",
+    if dc.counter + dc.pdfcounter >= dc.number:                         # limit for downloaded files
+        if dc.verbose:
+            print("--- Warning: maximum number",
+                  f"({str(dc.counter + dc.pdfcounter)})",
                   "of downloaded XML+PDF files exceeded")
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:dload_XML_files")
 
 # ------------------------------------------------------------------
-def generate_lists():                                                   # Function generate_lists
+def generate_lists(dc=dc_var):                                          # Function generate_lists
     """
     Generates some special files (with lists).
     
@@ -1762,9 +2247,36 @@ def generate_lists():                                                   # Functi
     generates xyz.lap file (list of authors and associated packages)
     generates xyz.llp file (list of licenses and associated packages).
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    possible messages:
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.debugging        bool:
+                        global flag: debugging enabled
+    dc.verbose          bool:
+                        global flag: output is verbose
+    dc.authorpackages   Python dictionary:
+                        list of authors and their corresponding packages
+    dc.authors          Python dictionary:
+                        collection with authors
+    dc.licensepackages  Python dictionary:
+                        list of licenses and their corresponding packages
+    dc.licenses         Python dictionary:
+                        collection with licenses
+    dc.output_name	str:
+	                generic file name for output files
+    dc.packages         Python dictionary:
+                        collection with packages
+    dc.topics           Python dictionary:
+                        collection with topics
+    dc.topicspackages   Python dictionary:
+                        collection of topics and their corresponding packages
+ 
+    Possible messages:
+    -----------------
     + Info: file '<file>' (list of authors and associated packages)
             generated
     + Info: file '<file>' (list of authors) generated
@@ -1781,20 +2293,27 @@ def generate_lists():                                                   # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:generate_lists")
 
     # .................................................
     # generate xyz.loa file (list of authors)                           xyz.loa
 
-    loa_file = output_name + ".loa"
+    loa_file = dc.output_name + ".loa"
 
     loa = open(loa_file, encoding="utf-8", mode="w")                    # opens xyz.loa file
-    for f in authors:                                                   # loop
-        loa.write(str(authors[f]) + "\n")
+    for f in dc.authors:                                                # loop
+        loa.write(str(dc.authors[f]) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{loa_file}'",
               "(list of authors) generated")
     loa.close()                                                         # closes xyz.loa file
@@ -1802,13 +2321,13 @@ def generate_lists():                                                   # Functi
     # .................................................
     # generate xyz.lop file (list of packages)                          xyz.lop
 
-    lop_file = output_name + ".lop"
+    lop_file = dc.output_name + ".lop"
 
     lop = open(lop_file, encoding="utf-8", mode="w")                    # opens xyz.lop file
-    for f in packages:                                                  # loop
-        lop.write(str(packages[f]) + "\n")
+    for f in dc.packages:                                               # loop
+        lop.write(str(dc.packages[f]) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{lop_file}' (list of packages)",
               "generated")
     lop.close()                                                         # closes xyz.lop file
@@ -1819,14 +2338,14 @@ def generate_lists():                                                   # Functi
     # 2.40   2024-03-25 generation of xyz.lok, xyz.lol, xyz.lpt, 
     #                   xyz.lap, xyz.llp corrected a/o improved
 
-    lok_file = output_name + ".lok"
+    lok_file = dc.output_name + ".lok"
 
     lok = open(lok_file, encoding="utf-8", mode="w")                    # opens xyz.lok file
-    for f in topics:                                                    # loop
-        tmp = (f, topics[f])
+    for f in dc.topics:                                                 # loop
+        tmp = (f, dc.topics[f])
         lok.write(str(tmp) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{lok_file}' (list of topics) generated")
     lok.close()                                                         # closes xyz.lok file
 
@@ -1836,14 +2355,14 @@ def generate_lists():                                                   # Functi
     # 2.40   2024-03-25 generation of xyz.lok, xyz.lol, xyz.lpt, 
     #                   xyz.lap, xyz.llp corrected a/o improved
 
-    lol_file = output_name + ".lol"
+    lol_file = dc.output_name + ".lol"
 
     lol = open(lol_file, encoding="utf-8", mode="w")                    # opens xyz.lol file
-    for f in licenses:                                                  # loop
-        tmp = (f, licenses[f])
+    for f in dc.licenses:                                               # loop
+        tmp = (f, dc.licenses[f])
         lol.write(str(tmp) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{lol_file}' (list of licenses)",
               "generated")
     lol.close()                                                         # closes xyz.lol file
@@ -1854,14 +2373,14 @@ def generate_lists():                                                   # Functi
     # 2.40   2024-03-25 generation of xyz.lok, xyz.lol, xyz.lpt, 
     #                   xyz.lap, xyz.llp corrected a/o improved
 
-    lpt_file = output_name + ".lpt"
+    lpt_file = dc.output_name + ".lpt"
 
     lpt = open(lpt_file, encoding="utf-8", mode="w")                    # open xyz.lpt file
-    for f in topicspackages:                                            # loop
-        tmp =(f, topicspackages[f])
+    for f in dc.topicspackages:                                         # loop
+        tmp =(f, dc.topicspackages[f])
         lpt.write(str(tmp) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{lpt_file}' (list of topics and",
               "associated packages) generated")
     lpt.close()                                                         # closes xyz.lpt file
@@ -1872,14 +2391,14 @@ def generate_lists():                                                   # Functi
     # 2.40   2024-03-25 generation of xyz.lok, xyz.lol, xyz.lpt, 
     #                   xyz.lap, xyz.llp corrected a/o improved
 
-    lap_file = output_name + ".lap"
+    lap_file = dc.output_name + ".lap"
 
     lap = open(lap_file, encoding="utf-8", mode="w")                    # opens xyz.lap file
-    for f in authorpackages:                                            # loop
-        tmp = (f, authorpackages[f])
+    for f in dc.authorpackages:                                         # loop
+        tmp = (f, dc.authorpackages[f])
         lap.write(str(tmp) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{lap_file}' (list of authors and",
               "associated packages) generated")
     lap.close()                                                         # closes xyz.lap file
@@ -1890,32 +2409,64 @@ def generate_lists():                                                   # Functi
     # 2.40   2024-03-25 generation of xyz.lok, xyz.lol, xyz.lpt, 
     #                   xyz.lap, xyz.llp corrected a/o improved
 
-    llp_file = output_name + ".llp"
+    llp_file = dc.output_name + ".llp"
 
     llp = open(llp_file, encoding="utf-8", mode="w")                    # open xyz.llp file
-    for f in licensepackages:                                           # loop
-        tmp = (f, licensepackages[f])
+    for f in dc.licensepackages:                                        # loop
+        tmp = (f, dc.licensepackages[f])
         llp.write(str(tmp) + "\n")
 
-    if verbose:
+    if dc.verbose:
         print(f"--- Info: file '{llp_file}' (list of licenses and",
               "associated packages) generated")
     llp.close()                                                         # closes xyz.llp file
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:generate_lists")
 
 # ------------------------------------------------------------------
-def generate_pickle1():                                                 # Function generate_pickle1
+def generate_pickle1(dc=dc_var):                                        # Function generate_pickle1
     """
     Performs a pickle dump.
 
-    Dumps the actual versions of authors, packages, licenses, topics,
-    topicspackages, packagetopics, licensepackages, yearpackages
+    Dumps the actual versions of dc.authors, dc.packages, dc.licenses,
+    dc.topics, dc.topicspackages, dc.packagetopics, dc.licensepackages,
+    dc.yearpackages
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    possible (error) messages:
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.debugging        bool:
+                        global flag: debugging enabled
+    dc.verbose          bool:
+                        global flag: output is verbose
+    dc.authors          Python dictionary:
+                        collection with authors
+    dc.packages         Python dictionary:
+                        collection with packages
+    dc.licenses         Python dictionary:
+                        collection with licenses
+    dc.topics           Python dictionary:
+                        collection with topics
+    dc.topicspackages   Python dictionary:
+                        collection of topics and their corresponding packages
+    dc.packagetopics    Python dictionary:
+                        list of packages and their topics
+    dc.authorpackages   Python dictionary:
+                        list of authors and their corresponding packages
+    dc.licensepackages  Python dictionary:
+                        list of licenses and their corresponding packages
+    dc.yearpackages     Python dictionary:
+                        list of years and their corresponding packages
+    dc.direc      	str:
+                  	name of the OS directory
+
+    Possible (error) messages:
+    -------------------------
     + Info: pickle file '{0}' written
     + Warning: pickle file '{0}' cannot be loaded a/o written
     """
@@ -1924,69 +2475,91 @@ def generate_pickle1():                                                 # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:generate_pickle1")
 
-    # authors: Python dictionary (sorted)
+    # dc.authors: Python dictionary (sorted)
     #   each element: [author key]: <tuple with givenname and
     #                 familyname>
     #
-    # packages: Python dictionary (sorted)
+    # dc.packages: Python dictionary (sorted)
     #   each element: [package key]: <tuple with package name and
     #                 package title>
     #
-    # licenses: Python dictionary (sorted)
+    # dc.licenses: Python dictionary (sorted)
     #   each element: [license key]: <license title>
     #
-    # topics: Python dictionary (sorted)
+    # dc.topics: Python dictionary (sorted)
     #   each element: [topics name]: <topics title>
     #
-    # topicspackages: Python dictionary (unsorted)
+    # dc.topicspackages: Python dictionary (unsorted)
     #   each element: [topic key]: <list with package names>
     #
-    # packagetopics: Python dictionary (sorted)
+    # dc.packagetopics: Python dictionary (sorted)
     #   each element: [topic key]: <list with package names>
     #
-    # authorpackages: Python dictionary (unsorted)
+    # dc.authorpackages: Python dictionary (unsorted)
     #   each element: [author key]: <list with package names>
     #
-    # licensepackages: Python dictionary (mostly sorted)
+    # dc.licensepackages: Python dictionary (mostly sorted)
     #   each element: [license key]: <list with package names>
     #
-    # yearpackages: Python dictionary
+    # dc.yearpackages: Python dictionary
     #   each element: [year]: <list with package names>
 
-    pickle_name1  = direc + PKL_FILE                                    # path of the pickle file
+    pickle_name1  = dc.direc + PKL_FILE                                 # path of the pickle file
     
     try:
         pickle_file1  = open(pickle_name1, "bw")                        # opens the pickle file
-        pickle_data1  = (authors, packages, topics, licenses,
-                         topicspackages, packagetopics, authorpackages,
-                         licensepackages, yearpackages)
+        pickle_data1  = (dc.authors, dc.packages, dc.topics,
+                         dc.licenses, dc.topicspackages,
+                         dc.packagetopics, dc.authorpackages,
+                         dc.licensepackages, dc.yearpackages)
         pickle.dump(pickle_data1, pickle_file1)                         # dumps the data
         pickle_file1.close()                                            # closes the file
-        if verbose:
+        if dc.verbose:
             print(f"--- Info: pickle file '{pickle_name1}' written")
-    except:
-        if verbose:
+    except Exception as exc:
+        if dc.verbose:
             print(f"--- Warning: pickle file '{pickle_name1}' cannot",
-                  "be loaded a/o written")
+                  "be loaded a/o written", exc)
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:generate_pickle1")
 
 # ------------------------------------------------------------------
-def generate_pickle2():                                                 # Function generate_pickle2
+def generate_pickle2(dc=dc_var):                                        # Function generate_pickle2
     """
     Performs a pickle dump.
 
-    Needs actual XML_toc:
-    XML_toc       : list with download information files
+    Needs actual variable dc.XML_toc in the data class dc:
+    
+    dc.XML_toc  list with download information files
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    possible (error) messages:
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.debugging  bool:
+                  global flag: debugging enabled
+    dc.verbose    bool:
+                  global flag: output is verbose
+
+    Possible (error) messages:
+    -------------------------
     + Info: pickle file '{0}' written
     + Warning: pickle file '{0}' cannot be loaded a/o written
     """
@@ -1995,75 +2568,99 @@ def generate_pickle2():                                                 # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:generate_pickle2")
 
-    pickle_name2  = direc + PKL_FILE2
+    pickle_name2  = dc.direc + PKL_FILE2
     try:
         pickle_file2  = open(pickle_name2, "bw")                        # opens the 2nd .pkl file
-        pickle_data2  = XML_toc                                         # prepares the data
+        pickle_data2  = dc.XML_toc                                      # prepares the data
         pickle.dump(pickle_data2, pickle_file2)                         # dumps the data
         pickle_file2.close()                                            # closes the file
-        if verbose:
+        if dc.verbose:
             print(f"--- Info: pickle file '{pickle_name2}' written")
-    except:                                                             # not successfull
-        if verbose:
+    except Exception as exc:                                                             # not successfull
+        if dc.verbose:
             print(f"--- Warning: pickle file '{pickle_name2}' cannot",
-                  "be loaded a/o written")
+                  "be loaded a/o written", exc)
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:generate_pickle2")
 
 # ------------------------------------------------------------------
-def generate_topicspackages():                                          # Function generate_topicspackages
+def generate_topicspackages(dc=dc_var):                                 # Function generate_topicspackages
     """
-    Generates/rewrites topicspackages, packagetopics, authorpackages,
-    licensepackages, and yearpackages.
+    Generates/rewrites dc.topicspackages, dc.packagetopics,
+    dc.authorpackages,  dc.licensepackages, and dc.yearpackages.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    topicspackages  Python dictionary: list of topics and their
-                    packages
-    packagetopics   Python dictionary: list of packages and their
-                    topics
-    authorpackages  Python dictionary: list of authors and their
-                    packages
-    licensepackages Python dictionary: list of licenses and their
-                    packages
-    yearpackages    Python dictionary: list of years and their
-                    packagesauthorpackage_file
-    file_not_found  Python set: XML file not found
-    not_well_formed Python set: XML file not well-formed/empty
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.topicspackages   Python dictionary
+                        collection of topics and their corresponding packages
+    dc.packagetopics    Python dictionary
+                        ist of packages and their topics
+    dc.authorpackages   Python dictionary
+                        list of authors and their corresponding packages
+    dc.licensepackages  Python dictionary
+                        list of licenses and their corresponding packages
+    dc.yearpackages     Python dictionary
+                        list of years and their corr. packages
+    dc.file_not_found   Python set
+                        XML file not found
+    dc.not_well_formed  Python set
+                        XML file not well-formed/empty
+    dc.debugging        bool:
+                        global flag: debugging enabled
+    dc.verbose          bool:
+                        global flag: output is verbose
 
-    possible (error) messages:
+    Possible (error) messages:
+    -------------------------
     + Warning: local XML file for package '{0}' empty or not
                well-formed
     + Warning: local XML file for package '<file>' not found
-    + Info: packagetopics, topicspackages, authorpackage,
-            yearpackages collected
+    + Info: dc.packagetopics, dc.topicspackages, authorpackage,
+            dc.yearpackages collected
     """
 
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.4    2026-06-30 unspecified "except:" replaced by
+    #                   "except Exception as err:"
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global topicspackages                                               # Python dictionary: list of topics and their packages
-    global packagetopics                                                # Python dictionary: list of packages and their topics
-    global authorpackages                                               # Python dictionary: list of authors and their packages
-    global licensepackages                                              # Python dictionary: list of licenses and their packages
-    global yearpackages                                                 # Python dictionary: list of years and their packagesauthorpackage_file
-    global file_not_found                                               # Python set: XML file not found
-    global not_well_formed                                              # Python set: XML file not well-formed/empty
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:generate_topicspackages")
 
-    yearpackages = {}
+    dc.yearpackages = {}
 
-    for f in packages:                                                  # all package XML files are loaded (+ analyzed) in series
+    for f in dc.packages:                                               # all package XML files are loaded (+ analyzed) in series
         tmpyears = []                                                   # initialize tmpyears
         maxyears = '1970'                                               # initialize maxyears
         try:                                                            # tries to open and parse file
@@ -2082,15 +2679,15 @@ def generate_topicspackages():                                          # Functi
 
                 for i in kk:                                            # in keyval: one attribute: value
                     key = i.get("value", EMPTY)                         # gets attribute value
-                    if key in topicspackages:
-                        topicspackages[key].append(f)
+                    if key in dc.topicspackages:
+                        dc.topicspackages[key].append(f)
                     else:
-                        topicspackages[key] = [f]
+                        dc.topicspackages[key] = [f]
 
-                    if f in packagetopics:
-                        packagetopics[f].append(key)
+                    if f in dc.packagetopics:
+                        dc.packagetopics[f].append(key)
                     else:
-                        packagetopics[f] = [key]
+                        dc.packagetopics[f] = [key]
 
                 for j in aa:                                            # in authorref: 4 attributes: givenname, familyname, key, id
                     key1 = j.get("givenname", EMPTY)                    # gets attribute givenname
@@ -2099,18 +2696,18 @@ def generate_topicspackages():                                          # Functi
                     key4 = j.get("id", EMPTY)                           # gets attribute id
                     if key4 != EMPTY:
                         key3 = key4
-                    if key3 in authorpackages:
-                        authorpackages[key3].append(f)
+                    if key3 in dc.authorpackages:
+                        dc.authorpackages[key3].append(f)
                     else:
-                        authorpackages[key3] = [f]
+                        dc.authorpackages[key3] = [f]
 
                 for k in ll:                                            # in license: 2 attributes: type, free
                     key5 = k.get("type", EMPTY)                         # get attribute type
                     key6 = k.get("free", EMPTY)                         # get attribute free
-                    if key5 in licensepackages:
-                        licensepackages[key5].append(f)
+                    if key5 in dc.licensepackages:
+                        dc.licensepackages[key5].append(f)
                     else:
-                        licensepackages[key5] = [f]
+                        dc.licensepackages[key5] = [f]
 
                 for m in mm:                                            # in version: 2 attributes: date, number
                     key7 = m.get("date", EMPTY)                         # gets attribute date
@@ -2137,45 +2734,62 @@ def generate_topicspackages():                                          # Functi
                 if len(tmpyears) >= 1:
                     maxyears = max(tmpyears)
 
-                if maxyears in yearpackages:
-                    yearpackages[maxyears].append(f)
+                if maxyears in dc.yearpackages:
+                    dc.yearpackages[maxyears].append(f)
                 else:
-                    yearpackages[maxyears] = [f]
+                    dc.yearpackages[maxyears] = [f]
 
-            except:                                                     # parsing was not successfull
-                if verbose:
+            except Exception as err:                                    # parsing was not successfull
+                if dc.verbose:
                     print(f"----- Warning: local XML file for",
-                          f"package '{f}' empty or not well-formed")
+                          f"package '{f}' empty or not well-formed",
+                          err)
                 ff.close()
-                not_well_formed.add(f)                                  # appends file name to the not_well_formed list
-        except FileNotFoundError:                                       # file not downloaded
-            if verbose and integrity:
+                dc.not_well_formed.add(f)                               # appends file name to the not_well_formed list
+        except FileNotFoundError as err:                                # file not downloaded
+            if dc.verbose and dc.integrity:
                 print(f"----- Warning: local XML file for",
                       f"package '{f}' not found")
-            file_not_found.add(f)                                       # appends file name to the file_not_found list
-    if verbose:
-        print("--- Info: packagetopics, topicspackages, authorpackage,",
-              "yearpackages collected")
+            dc.file_not_found.add(f)                                    # appends file name to the file_not_found list
+    if dc.verbose:
+        print("--- Info: packagetopics, topicspackages,"
+              "authorpackage, yearpackages collected")
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:generate_topicspackages")
 
 # ------------------------------------------------------------------
-def get_xyz_lpt() ->list:                                               # Function get_xyz_lpt
+def get_xyz_lpt(dc=dc_var) ->list:                                      # Function get_xyz_lpt
     """
     Loads and analyzes xyz.lpt for topic templates.
 
+    Rewrites the variables dc.number, dc.counter, dc.pdfcounter in the
+    data class dc.
+
+    Returns:
+    -------
     Returns a list of selected packages.
-    Rewrites the global number, counter, pdfcounter.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    number      maximum number of files to be loaded
-    counter     counter for downloadd XML and PDF files
-    pdfcounter  counter for downloaded PDF files
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.number       int:
+                    maximum number of files to be loaded
+    dc.counter      int:
+                    counter for downloadd XML and PDF files
+    dc.pdfcounter   int:
+                    counter for downloaded PDF files
+    dc.debugging    bool:
+                    global flag: debugging enabled
+    dc.verbose      bool:
+                    global flag: output is verbose
 
-    possible (error) messages:
+    Possible (error) messages:
+    -------------------------
     + Error: local file '{0}' cannot be loaded; please call ctanload
              -l  before
     + Warning: no package found which matches the" specified {0}
@@ -2186,12 +2800,18 @@ def get_xyz_lpt() ->list:                                               # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global number                                                       # maximum number of files to be loaded
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-
-    if debugging:
+    if dc.debugging:
         print("+++ -CTANLoad:get_xyz_lpt")
 
     try:
@@ -2201,37 +2821,54 @@ def get_xyz_lpt() ->list:                                               # Functi
             if p5.match(top):                                           # collects packages with
                                                                         # specified key_template
                 for g in pack:
-                    selected_packages_lpt.add(g)
+                    dc.selected_packages_lpt.add(g)
         f.close()                                                       # closes file
-    except IOError:
-        if verbose:                                                     # there is an error
+    except IOError as err:
+        if dc.verbose:                                                  # there is an error
             print(f"[CTANLoad] Error: local file",
                   "'{topicpackage_file}' cannot",
-                  "be loaded; please call ctanload -l ... before")
+                  "be loaded; please call ctanload -l ... before", err,
+                  traceback.print_exc())
         sys.exit()                                                      # program terminates
-    if len(selected_packages_lpt) == 0:                                 # no matching packages found
-        if verbose:
+    if len(dc.selected_packages_lpt) == 0:                              # no matching packages found
+        if dc.verbose:
             tmp_t = "topic"
             print("--- Warning: no package found which matches the",
-                  f"specified {tmp_t} template '{key_template}'")
-    return selected_packages_lpt
+                  f"specified {tmp_t} template '{dc.key_template}'")
+    return dc.selected_packages_lpt
 
 # ------------------------------------------------------------------
-def get_xyz_llp() ->list:                                               # Function get_xyz_llp
+def get_xyz_llp(dc=dc_var) ->list:                                      # Function get_xyz_llp
     """
     Loads and analyzes xyz.llp for license templates.
 
+    Rewrites the variables dc.number, dc.counter, dc.pdfcounter in the
+    data class dc.
+
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
+
+    Returns:
+    -------
     Returns a list of selected packages.
-    Rewrites the global variables number, counter, pdfcounter.
 
-    no parameters
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.number       int:
+                    maximum number of files to be loaded
+    dc.counter      int:
+                    counter for downloadd XML and PDF files
+    dc.pdfcounter   int:
+                    counter for downloaded PDF files
+    dc.debugging    bool:
+                    global flag: debugging 
+    dc.verbose      bool:
+                    global flag: output is verbose
 
-    global variables:
-    number      maximum number of files to be loaded
-    counter     counter for downloadd XML and PDF files
-    pdfcounter  counter for downloaded PDF files
-
-    possible (error) messages:
+    Possible (error) messages:
+    -------------------------
     + Error: local file '{0}' cannot be loaded; please call
              ctanload -l  before
     + Warning: no package found which matches the specified {0}
@@ -2242,57 +2879,80 @@ def get_xyz_llp() ->list:                                               # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global number                                                       # maximum number of files to be loaded
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-
-    if debugging:
+    if dc.debugging:
         print("+++ -CTANLoad:get_xyz_llp")
 
     try:
         f = open(licensepackage_file, encoding="utf-8", mode="r")       # opens file
         for line in f:
             lic, pack = eval(line.strip())
-            lic2      = licenses[lic][0]
-            lic3      = licenses[lic][1]
+            lic2      = dc.licenses[lic][0]
+            lic3      = dc.licenses[lic][1]
             if lic3 == "true":
                 lic3 = "free"
             else:
                 lic3 = "not free"
             if p7.match(lic2) or p7.match(lic) or p7.match(lic3):       # collects packages with specified licenses
                 for g in pack:
-                    selected_packages_llp.add(g)
+                    dc.selected_packages_llp.add(g)
         f.close()                                                       # closes file
-    except IOError:
-        if verbose:                                                     # there is an error
+    except IOError as err:
+        if dc.verbose:                                                  # there is an error
             print(f"[CTANLoad] Error: local file",
-                  "'{licensepackage_file}' cannot",
-                  "be loaded; please call ctanload -l ... before")
+                  f"'{licensepackage_file}' cannot",
+                  "be loaded; please call ctanload -l ... before", err,
+                  traceback.print_exc())
         sys.exit()                                                      # program terminates
-    if len(selected_packages_llp) == 0:                                 # no matching packages found
-        if verbose:
+    if len(dc.selected_packages_llp) == 0:                              # no matching packages found
+        if dc.verbose:
             tmp_l = "license"
             print("--- Warning: no package found which matches the",
-                  f"specified {tmp_l} template '{license_template}'")
-    return selected_packages_llp
+                  f"specified {tmp_l} template '{dc.license_template}'")
+    return dc.selected_packages_llp
 
 # ------------------------------------------------------------------
-def get_xyz_lap() ->list:                                               # Function get_xyz_lap
+def get_xyz_lap(dc=dc_var) ->list:                                      # Function get_xyz_lap
     """
     Loads and analyzes xyz.lap for author templates.
 
+    Rewrites the variables dc.number, dc.counter, dc.pdfcounterin the
+    data class dc.
+
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
+
+    Returns:
+    -------
     Returns a list of selected packages.
-    Rewrites the global number, counter, pdfcounter.
 
-    no parameters
-
-    global variables:
-    number      maximum number of files to be loaded
-    counter     counter for downloadd XML and PDF files
-    pdfcounter  counter for downloaded PDF files
-
-    possible (error) messages:
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.number       int:
+                    maximum number of files to be loaded
+    dc.counter      int:
+                    counter for downloadd XML and PDF files
+    dc.pdfcounter   int:
+                    counter for downloaded PDF files
+    dc.debugging    bool:
+                    global flag: debugging 
+    dc.verbose      bool:
+                    global flag: output is verbose
+ 
+    Possible (error) messages:
+    -------------------------
     + Error: local file '{0}' cannot be loaded; please call ctanload
              -l  before
     + Warning: no package found which matches the" specified {0}
@@ -2306,12 +2966,18 @@ def get_xyz_lap() ->list:                                               # Functi
     #                   messages
     # 2.56   2025-12-20 Extension of the try...except construct;
     #                   new warning
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.8    2026-07-13 backtracing
+    # 3.8.2  2026-07-13 call traceback.print_exc()
 
-    global number                                                       # maximum number of files to be loaded
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-
-    if debugging:
+    if dc.debugging:
         print("+++ -CTANLoad:get_xyz_lap")
 
     try:
@@ -2320,41 +2986,55 @@ def get_xyz_lap() ->list:                                               # Functi
         for line in f:
             auth, pack = eval(line.strip())                             # gets the items author and package
             try:
-                if authors[auth][1] != EMPTY:                           # extracts author's familyname
-                    auth2 = authors[auth][1]
+                if dc.authors[auth][1] != EMPTY:                        # extracts author's familyname
+                    auth2 = dc.authors[auth][1]
                 else:
-                    auth2 = authors[auth][0]
+                    auth2 = dc.authors[auth][0]
                 if p6.match(auth2):                                     # collects packages with specified authors
                     for g in pack:
-                        selected_packages_lap.add(g)
-            except KeyError:
-                if verbose:
+                        dc.selected_packages_lap.add(g)
+            except KeyError as err:
+                if dc.verbose:
                     print(f"--- Warning: no author found with",
-                          f"reference '{auth}'; ignored")
+                          f"reference '{auth}'; ignored", err)
         f.close()                                                       # closes file
-    except IOError:
-        if verbose:                                                     # there is an IO error
+    except IOError as err:
+        if dc.verbose:                                                  # there is an IO error
             print(f"[CTANLoad] Error: local file",
                   f"'{authorpackage_file}' cannot",
-                  "be loaded; please call ctanload -l ... before")
+                  "be loaded; please call ctanload -l ... before", err,
+                  traceback.print_exc())
         sys.exit()                                                      # program terminates
-    if len(selected_packages_lap) == 0:                                 # no matching packages found
-        if verbose:
+    if len(dc.selected_packages_lap) == 0:                              # no matching packages found
+        if dc.verbose:
             tmp_a = "author"
             print("--- Warning: no package found which matches the",
-                  f"specified {tmp_a} template '{author_template}'")
-    return selected_packages_lap
+                  f"specified {tmp_a} template '{dc.author_template}'")
+    return dc.selected_packages_lap
 
 # ------------------------------------------------------------------
-def get_package_set() ->set:                                            # Function get_package_set
+def get_package_set(dc=dc_var) ->set:                                   # Function get_package_set
     """
-    Analyzes dictionary 'packages' for name templates.
+    Analyzes dictionary 'dc.packages' for name templates.
 
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
+
+    Returns:
+    -------
     Returns a list of selected packages.
 
-    no parameters
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.debugging  bool:
+                  global flag: debugging enabled
+    dc.verbose    bool:
+                  global flag: output is verbose
 
-    possible message:
+    Possible message:
+    ----------------
     + Warning: no package found which matches the specified {0}
                template '{1}'
     """
@@ -2363,37 +3043,56 @@ def get_package_set() ->set:                                            # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    if debugging:
+    if dc.debugging:
         print("+++ -CTANLoad:get_package_set")
 
     tmp = set()
     
-    for f in packages:                                                  # loop over all the packages
+    for f in dc.packages:                                               # loop over all the packages
         if p2.match(f):                                                 # check: package name matches template
             tmp.add(f)
     if len(tmp) == 0:                                                   # no matching packages found
-        if verbose:
+        if dc.verbose:
             tmp_n = "name"
             print("--- Warning: no package found which matches the",
-                  f"specified {tmp_n} template '{name_template}'")
+                  f"specified {tmp_n} template '{dc.name_template}'")
     return tmp
 
 # ------------------------------------------------------------------
-def get_year_set() ->set:                                               # Function get_package_set
+def get_year_set(dc=dc_var) ->set:                                      # Function get_package_set
     """
-    Analyzes dictionary 'yearpackages' for year templates.
+    Analyzes dictionary 'dc.yearpackages' for year templates.
 
+    Rewrites the variable dc.yearpackages in the data class dc.
+
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
+
+    Retruns:
+    -------
     Returns a list of yselected packages.
-    Rewrites the global yearpackages.
 
-    no parameters
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.yearpackages   Python dictionary
+                      list of years and their corresponding packages
+    dc.debugging      bool:
+                      global flag: debugging enabled
+    dc.verbose        bool:
+                      global flag: output is verbose
 
-    global variable:
-    yearpackages  python dictionary: list of years and their
-                  packagesauthorpackage_file
-
-    possible message:
+    Possible message:
+    ----------------
     + Warning: no package found which matches the specified {0}
       template '{1}'
     """
@@ -2402,42 +3101,67 @@ def get_year_set() ->set:                                               # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    global yearpackages                                                 # Python dictionary:
-                                                                        # list of years and their packagesauthorpackage_file
-
-    if debugging:
+    if dc.debugging:
         print("+++ -CTANLoad:get_year_set")
 
     tmp = set()
     
-    for f in yearpackages:                                              # loop over all the year-package correspondences
+    for f in dc.yearpackages:                                           # loop over all the year-package correspondences
         if p9.match(f):                                                 # check: year matches year_template
-            tmp2 = set(yearpackages[f])
+            tmp2 = set(dc.yearpackages[f])
             tmp = tmp | tmp2
     if len(tmp) == 0:                                                   # no matching packages found
-        if verbose:
+        if dc.verbose:
             tmp_y = "year"
             print("--- Warning: no package found which matches the ",
-                  f"specified {tmp_y} template '{year_template}'")
+                  f"specified {tmp_y} template '{dc.year_template}'")
     return tmp
 
 # ------------------------------------------------------------------
-def get_PDF_files(d:str):                                               # Function get_PDF_files(d)
+def get_PDF_files(d:str, dc=dc_var):                                    # Function get_PDF_files(d)
     """
     Lists all PDF files in the specified OS folder d.
 
-    parameter:
-    d: OS folder
+    Parameters:
+    ---------_
+    d (str) : name of an OS folder
+              no dfefault
+    dc      : instance of the data class 'dataclass_var'
+              default: dc_var
 
-    Rewrites the global PDF_toc.
+    Rewrites the variable dc.PDF_toc in the data class dc.
 
-    no messages
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.PDF_toc    Python dictionary:
+                  collection with PDF files
+    dc.debugging  bool:
+                  global flag: debugging 
+
+    Messages:
+    --------
+    There are no specific messages.
     """
 
-    global PDF_toc                                                      # global Python dictionary for PDF files
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:get_PDF_files")
 
     tmp  = os.listdir(d)                                                # gets OS folder list
@@ -2445,25 +3169,46 @@ def get_PDF_files(d:str):                                               # Functi
     for f in tmp:                                                       # all PDF files in current OS folder
         if p3.match(f):                                                 # check: file name matches "^[0-9]{10}-.+[.]pdf$"
             tmp2[f] = EMPTY                                             # presets with empty string
-    PDF_toc = tmp2
+    dc.PDF_toc = tmp2
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:get_PDF_files")
 
 # ------------------------------------------------------------------
-def get_XML_files(d:str) ->list:                                        # Function get_XML_files
+def get_XML_files(d:str, dc=dc_var) ->list:                             # Function get_XML_files
     """
     Lists all XML files in the current OS folder d.
 
+    Parameters:
+    ----------
+    d (str) : name of an OS folder
+              no default
+    dc      : instance of the data class 'dataclass_var'
+              default: dc_var
+
+    Returns:
+    -------
     Returns a list of XML files.
 
-    parameter:
-    d : name of the OS folder
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.debugging  bool:
+                  global flag: debugging 
 
-    no messages
+    Messages:
+    --------
+    There are no specific messages.
     """
 
-    if debugging:
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+
+    if dc.debugging:
         print("+++ -CTANLoad:get_XML_files")
 
     tmp  = os.listdir(d)                                                # gets OS folder list
@@ -2475,56 +3220,98 @@ def get_XML_files(d:str) ->list:                                        # Functi
     return tmp2
 
 # ------------------------------------------------------------------
-def load_XML_toc():                                                     # Function load_XML_toc()
+def load_XML_toc(dc=dc_var):                                            # Function load_XML_toc()
     """
-    Loads pickle file 2 (which contains XML_toc).
+    Loads pickle file 2 (which contains dc.XML_toc).
 
-    Rewrites the global XML_toc.
+    Rewrites the dc.XML_toc in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variable:
-    XML_toc     global Python dictionary with XML files
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.XML_toc    Python dictionary
+                  collection with XML files
+    dc.debugging  bool:
+                  global flag: debugging 
 
-    no messages
+    Messages:
+    --------
+    There are no specific messages.
     """
 
-    global XML_toc                                                      # global Python dictionary with XML files
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:load_XML_toc")
 
     try:
-        pickleFile2 = open(direc + PKL_FILE2, "br")                     # opens the pickle file
-        XML_toc     = pickle.load(pickleFile2)                          # unpickles the data
+        pickleFile2 = open(dc.direc + PKL_FILE2, "br")                  # opens the pickle file
+        dc.XML_toc  = pickle.load(pickleFile2)                          # unpickles the data
         pickleFile2.close()
     except IOError:                                                     # not successfull
         pass                                                            # do nothing
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:load_XML_toc")
 
 # ------------------------------------------------------------------
-def main():                                                             # Function main()
+def main(dc=dc_var):                                                    # Function main()
     """
     Main Function (calls the other functions).
 
-    Rewrites the global PDF_toc, download, lists, integrity, number,
-    template, author_template, regenerate.
+    Rewrites the variables dc.PDF_toc, dc.download, dc.lists,
+    dc.integrity, dc.number, template, dc.author_template,
+    dc.regenerate in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    PDF_toc             global Python dictionary for PDF files
-    download            Flag: PDF files are to be downloaded
-    lists               Flag; special list are to be generated
-    integrity           Flag: integrity is to checked
-    number              maximum number of files to be loaded
-    template            template for package names
-    author_template     template for author names
-    regenerate          Flag: pickle files are to regenerated
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.PDF_toc          Python dictionary:
+                        for PDF files
+    dc.download         bool:
+                        Flag: PDF files are to be downloaded
+    dc.lists            bool:
+                        Flag: special list are to be generated
+    dc.integrity        bool:
+                        Flag: integrity is to checked
+    dc.number           int:
+                        maximum number of files to be loaded
+    dc.author_template  str:
+                        template for author names
+    dc.regenerate       bool:
+                        Flag: pickle files are to regenerated
+    dc.debugging        bool:
+                        global flag: debugging 
+    dc.output_name	str:
+	                generic file name for output files
 
-    possible (error) messages:
+    calls:
+    -----
+    + call_plain
+    + call_check
+    + call_load
+    + make_statistics
+    + regenerate_pickle_files
+    + check_integrity
+    + test_clipboard
+
+    Possible (error) messages:
+    -------------------------
     + Info: Program call (with more details)
     + Info: Program call:
     + Info: program successfully completed
@@ -2537,125 +3324,125 @@ def main():                                                             # Functi
     + Warning: '{0}' reset to {1} (due to {2})
     """
 
-    # main --> call_plain
-    # main --> call_check
-    # main --> call_load
-    # main --> make_statistics
-    # main --> regenerate_pickle_files
-    # main --> check_integrity
-    # main --> test_clipboard
-
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.52   2025-10-05 time specification with unit
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.3    2026-05-08 print statements containing \+ have been
+    #                   simplified
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
+    # 3.12   2026-08-15 log output of the options in the call revised
 
-    global PDF_toc                                                      # global Python dictionary for PDF files
-    global download                                                     # Flag: PDF files are to be downloaded
-    global lists                                                        # Flag; special list are to be generated
-    global integrity                                                    # Flag: integrity is to checked
-    global number                                                       # maximum number of files to be loaded
-    global template                                                     # template for package names
-    global author_template                                              # template for author names
-    global regenerate                                                   # Flag: pickle files are to regenerated
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:main")
 
     starttotal  = time.time()                                           # begin of time measure
     startprocess= time.process_time()                                   # begin of time measure
 
-    n_bool    = name_template != NAME_TEMPLATE_DEFAULT                  # Flag: -t is set
-    k_bool    = key_template != KEY_TEMPLATE_DEFAULT                    # Flag: -k is set
-    a_bool    = author_template != AUTHOR_TEMPLATE_DEFAULT              # Flag: -A is set
-    l_bool    = license_template != LICENSE_TEMPLATE_DEFAULT            # Flag: -L is set
-    y_bool    = year_template != YEAR_TEMPLATE_DEFAULT                  # Flag: -y is set
-    i_bool    = integrity != INTEGRITY_DEFAULT                          # Flag: -c is set
-    r_bool    = regenerate != REGENERATE_DEFAULT                        # Flag: -r is set
+    n_bool    = dc.name_template != NAME_TEMPLATE_DEFAULT               # Flag: -t is set
+    k_bool    = dc.key_template != KEY_TEMPLATE_DEFAULT                 # Flag: -k is set
+    a_bool    = dc.author_template != AUTHOR_TEMPLATE_DEFAULT           # Flag: -A is set
+    l_bool    = dc.license_template != LICENSE_TEMPLATE_DEFAULT         # Flag: -L is set
+    y_bool    = dc.year_template != YEAR_TEMPLATE_DEFAULT               # Flag: -y is set
+    i_bool    = dc.integrity != INTEGRITY_DEFAULT                       # Flag: -c is set
+    r_bool    = dc.regenerate != REGENERATE_DEFAULT                     # Flag: -r is set
 
     load      = n_bool or k_bool or a_bool or l_bool or y_bool          # load
-    check     = (not load) and ((lists != LISTS_DEFAULT) or i_bool)     # check
+    check     = (not load) and ((dc.lists != LISTS_DEFAULT) or i_bool)  # check
     newpickle = (not load) and (not check) and r_bool                   # newpickle
     plain     = (not load) and (not check) and (not newpickle)          # plain
 
-    if verbose:
-        print("\n" + "[CTANLoad] Info: Program call:", call)
+    for f in range(1, len(call)):
+        if not "-" in call[f]:
+            call[f] = '"' + call[f] + '"'
+    arguments = BLANK.join(call[1:])                                    # get the parameters of function call
+
+    if dc.verbose:
+        print("\n" + "[CTANLoad] Info: Program call:",
+              "CTANLoad.py" + BLANK + arguments)
 
     if load:                                                            # load mode
-        if (lists != LISTS_DEFAULT):                                    # -l reset
-            lists = False
-            if verbose:
+        if (dc.lists != LISTS_DEFAULT):                                 # -l reset
+            dc.lists = False
+            if dc.verbose:
                 print(RESET_TEXT.format("-l", False,
                                         "'-n' or '-t' or '-f'"))
-        if (integrity != INTEGRITY_DEFAULT):                            # -c reset
-            integrity = False
-            if verbose:
+        if (dc.integrity != INTEGRITY_DEFAULT):                         # -c reset
+            dc.integrity = False
+            if dc.verbose:
                 print(RESET_TEXT.format("-c", False,
                                         "'-n' or '-t' or '-f'"))
-        if (regenerate != REGENERATE_DEFAULT):                          # -r reset
-            regenerate = False
-            if verbose:
+        if (dc.regenerate != REGENERATE_DEFAULT):                       # -r reset
+            dc.regenerate = False
+            if dc.verbose:
                 print(RESET_TEXT.format("-r", False,
                                         "'-n' or '-t' or '-f'"))
 
     if check:                                                           # check mode
-        if (regenerate != REGENERATE_DEFAULT):                          # -r reset
-            regenerate = False
-            if verbose:
+        if (dc.regenerate != REGENERATE_DEFAULT):                       # -r reset
+            dc.regenerate = False
+            if dc.verbose:
                 print(RESET_TEXT.format("-r", False, "'-l' or '-c'"))
 
     if newpickle:                                                       # newpickle mode
-        if number <= NUMBER_DEFAULT:
-            number  = 3000                                              # -n reset
-            if verbose:
+        if dc.number <= NUMBER_DEFAULT:
+            dc.number  = 3000                                           # -n reset
+            if dc.verbose:
                 print(RESET_TEXT.format("-n", 3000, "'-r'"))
-        if download == DOWNLOAD_DEFAULT:
-            download = True                                             # -f reset
-            if verbose:
+        if dc.download == DOWNLOAD_DEFAULT:
+            dc.download = True                                          # -f reset
+            if dc.verbose:
                 print(RESET_TEXT.format("-f", True, "'-r'"))
 
-    if verbose:                                                         # output on terminal (options in call)
-        print("\n" + "[CTANLoad] Info: Program call (with more " +\
+    if dc.verbose:                                                      # output on terminal (options in call)
+        print("\n" + "[CTANLoad] Info: Program call (with more",
               "details):  CTANLoad.py")
-        if (integrity != INTEGRITY_DEFAULT):                            # parameter -c
+        if (dc.integrity != INTEGRITY_DEFAULT):                         # parameter -c
             print(f"  {'-c':5} {'(' + INTEGRITY_TEXT + ')':55}")
-        if (download != DOWNLOAD_DEFAULT):                              # parameter -f
+        if (dc.download != DOWNLOAD_DEFAULT):                           # parameter -f
             print(f"  {'-f':5} {'(' + DOWNLOAD_TEXT + ')':55}")
-        if (lists != LISTS_DEFAULT):                                    # parameter -l
+        if (dc.lists != LISTS_DEFAULT):                                 # parameter -l
             tmpl = '(' + (LISTS_TEXT + ')')[0:50] + ELLIPSE
             print(f"  {'-l':5} {tmpl:55}")
-        if (regenerate != REGENERATE_DEFAULT):                          # parameter -r
+        if (dc.regenerate != REGENERATE_DEFAULT):                       # parameter -r
             print(f"  {'-r':5} {'(' + REGENERATE_TEXT + ')':55}")
-        if (statistics != STATISTICS_DEFAULT):                          # parameter -stat
+        if (dc.statistics != STATISTICS_DEFAULT):                       # parameter -stat
             print(f"  {'-stat':5} {'(' + STATISTICS_TEXT + ')':55}")
-        if (verbose != VERBOSE_DEFAULT):                                # parameter -v
+        if (dc.verbose != VERBOSE_DEFAULT):                             # parameter -v
             print(f"  {'-v':5} {'(' + VERBOSE_TEXT + ')':55}")
 
-        if (author_template != AUTHOR_TEMPLATE_DEFAULT):                # parameter -A
+        if (dc.author_template != AUTHOR_TEMPLATE_DEFAULT):             # parameter -A
             tmpA = '(' + AUTHOR_TEMPLATE_TEXT + ')'
-            print(f"  {'-A':5} {tmpA:55} {fold(author_template)}")
-        if (direc != direc_default):                                    # parameter -d
-            print(f"  {'-d':5} {'(' + DIREC_TEXT + ')':55} {direc}")
-        if (key_template != KEY_TEMPLATE_DEFAULT):                      # parameter -k
+            print(f"  {'-A':5} {tmpA:55} {fold(dc.author_template)}")
+        if (dc.direc != DIREC_DEFAULT):                                 # parameter -d
+            print(f"  {'-d':5} {'(' + DIREC_TEXT + ')':55} {dc.direc}")
+        if (dc.key_template != KEY_TEMPLATE_DEFAULT):                   # parameter -k
             tmpk = '(' + KEY_TEMPLATE_TEXT + ')'
-            print(f"  {'-k':5} {tmpk:55} {fold(key_template)}")
-        if (license_template != LICENSE_TEMPLATE_DEFAULT):              # parameter -L
+            print(f"  {'-k':5} {tmpk:55} {fold(dc.key_template)}")
+        if (dc.license_template != LICENSE_TEMPLATE_DEFAULT):           # parameter -L
             tmpL = '(' + LICENSE_TEMPLATE_TEXT + ')'
-            print(f"  {'-L':5} {tmpL:55} {fold(license_template)}")
-        if (number != NUMBER_DEFAULT):                                  # parameter -n
-            print(f"  {'-n':5} {'(' + NUMBER_TEXT + ')':55} {number}")
-        if (output_name != direc + OUTPUT_NAME_DEFAULT):                # parameter -o
+            print(f"  {'-L':5} {tmpL:55} {fold(dc.license_template)}")
+        if (dc.number != NUMBER_DEFAULT):                               # parameter -n
+            print(f"  {'-n':5} {'(' + NUMBER_TEXT + ')':55} {dc.number}")
+        if (dc.output_name != dc.direc + OUTPUT_NAME_DEFAULT):          # parameter -o
             tmpo = '(' + OUTPUT_TEXT + ')'
             print(f"  {'-o':5} {tmpo:55} {args.output_name}")
-        if (name_template != NAME_TEMPLATE_DEFAULT):                    # parameter -t
+        if (dc.name_template != NAME_TEMPLATE_DEFAULT):                 # parameter -t
             tmpt = '(' + NAME_TEMPLATE_TEXT + ')'
-            print(f"  {'-t':5} {tmpt:55} {fold(name_template)}")
-        if (year_template != YEAR_TEMPLATE_DEFAULT):                    # parameter -y
+            print(f"  {'-t':5} {tmpt:55} {fold(dc.name_template)}")
+        if (dc.year_template != YEAR_TEMPLATE_DEFAULT):                 # parameter -y
             tmpy = '(' + YEAR_TEXT + ')'
-            print(f"  {'-y':5} {tmpy:55} {fold(year_template)}")
+            print(f"  {'-y':5} {tmpy:55} {fold(dc.year_template)}")
         print("\n")
 
-    if statistics:                                                      # if statistics are to be output
+    if dc.statistics:                                                   # if statistics are to be output
         pp = 5
         endtotal   = time.time()
 
@@ -2671,22 +3458,22 @@ def main():                                                             # Functi
     else:
         pass                                                            # do nothing
 
-    if verbose:
-        if (len(file_not_found) >= 1) and (not load):
+    if dc.verbose:
+        if (len(dc.file_not_found) >= 1) and (not load):
             print("--- Info: summary: package not found:",
-                  file_not_found)
-        if len(not_well_formed) >= 1:
+                  dc.file_not_found)
+        if len(dc.not_well_formed) >= 1:
             print("--- Info: summary: file not well-formed or empty:",
-                  not_well_formed)
-        if len(PDF_notloaded) >= 1:
+                  dc.not_well_formed)
+        if len(dc.PDF_notloaded) >= 1:
             print("--- Info: summary: PDF could not be loaded:",
-                  PDF_notloaded)
-        if len(PDF_XML) >= 1:
+                  dc.PDF_notloaded)
+        if len(dc.PDF_XML) >= 1:
             print("--- Info: summary:",
-                  "inconsistencies with PDF files for", PDF_XML)
+                  "inconsistencies with PDF files for", dc.PDF_XML)
         print("[CTANLoad] Info: program successfully completed")
 
-    if statistics:                                                      # if statistics are to be output
+    if dc.statistics:                                                   # if statistics are to be output
         PP = 5
         make_statistics()                                               # Print statistics on terminal
 
@@ -2700,23 +3487,78 @@ def main():                                                             # Functi
 
     test_clipboard()
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:main")
 
 # ------------------------------------------------------------------
-def make_statistics():                                                  # Function make_statistics()
+def make_statistics(dc=dc_var):                                         # Function make_statistics()
     """
     Prints statistics on terminal.
 
-    Rewrites global variables counter, pdfcounter.
+    Rewrites the variables dc.counter, dc.pdfcounter in the data
+    class dc.
 
-    no parameter
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    counter     counter for downloaded XML and PDF files
-    pdfcounter  counter for downloaded PDF files
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.counter          int:
+                        counter for downloaded XML and PDF files
+    dc.pdfcounter       int:
+                        counter for downloaded PDF files
+    dc.debugging        bool:
+                        global flag: debugging 
+    dc.author_template	str:
+			Author template for package XML files
+    dc.authors          Python dictionary:
+                        collection with authors
+    dc.corrected    	int:
+                    	number of corrections
+    dc.counter          int:
+                        counter for downloadd XML and PDF files
+    dc.direc      	str:
+                  	name of the OS directory
+    dc.download         bool:
+                        Flag: PDF files are to be downloaded
+    dc.integrity        bool:
+                        Flag: integrity is to checked
+    dc.key_template	str:
+			Key template for package XML files
+    dc.license_template	str:
+			License template for package XML files
+    dc.licenses         Python dictionary:
+                        collection with licenses
+    dc.name_template	str:
+			Name template for package XML files
+    dc.no_tp            int:
+                        number of packages selected per topics
+    dc.no_ap            int:
+                        number of packages selected per author names
+    dc.no_np            int:
+                        number of packages selected per n<mes
+    dc.no_lp            int:
+                        number of packages selected per licenses
+    dc.no_ly            int:
+                        number of packages selected per years
+    dc.packages         Python dictionary:
+                        collection with packages
+    dc.PDF_toc          Python dictionary:
+                        Collection for PDF files
+    dc.pdfcounter       int:
+                        counter for downloaded PDF files
+    dc.pdfctrerr        int:
+                        counter for not downloaded PDF files
+                        (in the actual session)
+    dc.topics           Python dictionary:
+                        collection with topics
+    dc.year_template	str:
+			Template for filtering on the base of years
 
-    possible messages:
+    Possible messages:
+    -----------------
     + no. of packages (based on authors)
     + no. of packages (based on keys)
     + no. of packages (based on licenses)
@@ -2738,19 +3580,24 @@ def make_statistics():                                                  # Functi
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    global counter                                                      # counter for downloadd XML and PDF files
-    global pdfcounter                                                   # counter for downloaded PDF files
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:make_statistics")
 
     L             = LEFT + 1                                            # layout parameter
     R             = 5                                                   # layout parameter
-    load:bool     = (name_template != EMPTY)
+    load:bool     = (dc.name_template != EMPTY)
     nrXMLfile:int = 0                                                   # initialze counter
 
-    XMLdir = os.listdir(direc)                                          # files in the current OS folder
+    XMLdir = os.listdir(dc.direc)                                       # files in the current OS folder
     for f in XMLdir:
         if p4.match(f):                                                 # check: XML file name matches "^.+[.]xml$"
             nrXMLfile += 1
@@ -2761,203 +3608,245 @@ def make_statistics():                                                  # Functi
           PRG_VERSION, "|", PRG_DATE, "\n")
 
     print("total number of authors on CTAN:".ljust(L),
-          str(len(authors)).rjust(R))
+          str(len(dc.authors)).rjust(R))
     print("total number of topics on CTAN:".ljust(L),
-          str(len(topics)).rjust(R))
+          str(len(dc.topics)).rjust(R))
     print("total number of packages on CTAN:".ljust(L),
-          str(len(packages)).rjust(R))
+          str(len(dc.packages)).rjust(R))
     print("total number of licenses on CTAN:".ljust(L),
-          str(len(licenses)).rjust(R))
-    if download or (counter > 0):
+          str(len(dc.licenses)).rjust(R))
+    if dc.download or (dc.counter > 0):
         print("number of downloaded XML files:".ljust(L),
-              str(counter).rjust(R), "(in the actual session)")
+              str(dc.counter).rjust(R), "(in the actual session)")
         print("number of downloaded PDF files:".ljust(L),
-              str(pdfcounter).rjust(R), "(in the actual session)")
+              str(dc.pdfcounter).rjust(R), "(in the actual session)")
         print("number of not downloaded PDF files:".ljust(L),
-              str(pdfctrerr).rjust(R), "(in the actual session)")
+              str(dc.pdfctrerr).rjust(R), "(in the actual session)")
     print("total number of local PDF files:".ljust(L),
-          str(len(PDF_toc)).rjust(R))
+          str(len(dc.PDF_toc)).rjust(R))
     print("total number of local XML files:".ljust(L),
           str(nrXMLfile).rjust(R))
-    if integrity:
+    if dc.integrity:
         print("number of corrected entries:".ljust(L),
-              str(corrected).rjust(R), "(in the actual session)")
+              str(dc.corrected).rjust(R), "(in the actual session)")
 
-    print(EMPTY)                                                        # success of filtering
-    if name_template != NAME_TEMPLATE_DEFAULT:                          #   name filtering
+    print(EMPTY)                                                       
+    if dc.name_template != NAME_TEMPLATE_DEFAULT:                       # name filtering
         print("no. of packages (based on names):".ljust(L),
-              str(no_np).rjust(R))
-    if key_template != KEY_TEMPLATE_DEFAULT:                            #   key template
+              str(dc.no_np).rjust(R))
+    if dc.key_template != KEY_TEMPLATE_DEFAULT:                         # key template
         print("no. of packages (based on keys):".ljust(L),
-              str(no_tp).rjust(R))
-    if license_template != LICENSE_TEMPLATE_DEFAULT:                    #   license template
+              str(dc.no_tp).rjust(R))
+    if dc.license_template != LICENSE_TEMPLATE_DEFAULT:                 # license template
         print("no. of packages (based on licenses):".ljust(L),
-              str(no_lp).rjust(R))
-    if author_template != AUTHOR_TEMPLATE_DEFAULT:                      #   author template
+              str(dc.no_lp).rjust(R))
+    if dc.author_template != AUTHOR_TEMPLATE_DEFAULT:                   # author template
         print("no. of packages (based on authors):".ljust(L),
-              str(no_ap).rjust(R))
-    if year_template != YEAR_TEMPLATE_DEFAULT:                          #   year template
+              str(dc.no_ap).rjust(R))
+    if dc.year_template != YEAR_TEMPLATE_DEFAULT:                       # year template
         print("no. of packages (based on years):".ljust(L),
-              str(no_ly).rjust(R))
+              str(dc.no_ly).rjust(R))
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:make_statistics")
-
+ 
 # ------------------------------------------------------------------
-def regenerate_pickle_files():                                          # regenerate_pickle_files
+def regenerate_pickle_files(dc=dc_var):                                 # regenerate_pickle_files
     """
     Regenerates corrupted pickle files.
 
-    Rewrites CTAN1.pkl, CTAN2.pkl, XML_toc, PDF_toc, authors, packages,
-    topics, licenses, topicspackages, packagetopics, authorpackages,
-    licensepackages, yearpackages.
+    Rewrites the variables CTAN1.pkl, CTAN2.pkl, a/o the variables
+    dc.XML_toc, dc.PDF_toc, dc.authors, dc.packages, dc.topics,
+    dc.licenses, dc.topicspackages, dc.packagetopics, dc.authorpackages,
+    licensepackages, dc.yearpackages in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    XML_toc          global Python dictionary with XML files
-    PDF_toc          global Python dictionary with PDF files
-    authors          global Python dictionary with authors
-    packages         global Python dictionary with packages
-    topics           global Python dictionary with topics
-    licenses         global Python dictionary with licenses
-    topicspackages   Python dictionary: list of topics and their
-                     packages
-    packagetopics    Python dictionary: list of packages and their
-                     topics
-    authorpackages   Python dictionary: list of authors and their
-                     packages
-    licensepackages  Python dictionary: list of licenses and their
-                     packages
-    yearpackages     Python dictionary: list of years and their
-                     packagesauthorpackage_file
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.XML_toc          Python dictionary:
+                        collection with XML files
+    dc.PDF_toc          Python dictionary:
+                        collection with PDF files
+    dc.authors          Python dictionary:
+                        collection with authors
+    dc.packages         Python dictionary:
+                        collection with packages
+    dc.topics           Python dictionary:
+                        collection with topics
+    dc.licenses         Python dictionary:
+                        collection with licenses
+    dc.topicspackages   Python dictionary:
+                        collection of topics and their corresponding packages
+    dc.packagetopics    Python dictionary:
+                        list of packages and their topics
+    dc.authorpackages   Python dictionary:
+                        list of authors and their corresponding packages
+    dc.licensepackages  Python dictionary:
+                        list of licenses and their corresponding packages
+    dc.yearpackages     Python dictionary:
+                        list of years and their corresponding packages
+    dc.debugging        bool:
+                        global flag: debugging 
 
-    possible messages:
+    Calls:
+    -----
+    +  get_PDF_files
+    +  dload_authors
+    +  dload_packages
+    +  dload_topics
+    +  dload_licenses
+    +  generate_topicspackages
+    +  analyze_XML_file
+    +  generate_pickle2
+    +  generate_pickle1
+    +  get_XML_files
+
+    Possible messages:
+    -----------------
     + Info: Regeneration of '{0}'
     + Info: local XML file '{0}'
     + Info: Regeneration of '{0}'
     """
 
-    # generate_pickle_files --> get_PDF_files
-    # generate_pickle_files --> dload_authors
-    # generate_pickle_files --> dload_packages
-    # generate_pickle_files --> dload_topics
-    # generate_pickle_files --> dload_licenses
-    # generate_pickle_files --> generate_topicspackages
-    # generate_pickle_files --> analyze_XML_file
-    # generate_pickle_files --> generate_pickle2
-    # generate_pickle_files --> generate_pickle1
-    # generate_pickle_files --> get_XML_files
-
     # 2.46   2025-02-04 messages in functions' __doc__ texts listed
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    global XML_toc                                                      # global Python dictionary with XML files
-    global PDF_toc                                                      # global Python dictionary with PDF files
-    global authors                                                      # global Python dictionary with authors
-    global packages                                                     # global Python dictionary with packages
-    global topics                                                       # global Python dictionary with topics
-    global licenses                                                     # global Python dictionary with licenses
-    global topicspackages                                               # Python dictionary: list of topics and their packages
-    global packagetopics                                                # Python dictionary: list of packages and their topics
-    global authorpackages                                               # Python dictionary: list of authors and their packages
-    global licensepackages                                              # Python dictionary: list of licenses and their packages
-    global yearpackages                                                 # Python dictionary: list of years and their packagesauthorpackage_file
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:regenerate_pickle_files")
 
 # .................................................................
 # Regeneration of CTAN2.pkl
-# CTAN2.pkl needs XML_toc
+# CTAN2.pkl needs dc.XML_toc
 # one thread
 
-    if verbose:
-        print(f"--- Info: Regeneration of '{direc + PKL_FILE2}'")
+    if dc.verbose:
+        print(f"--- Info: Regeneration of '{dc.direc + PKL_FILE2}'")
 
-    get_PDF_files(direc)                                                # List all PDF files in a specified OS folder.
-    dload_authors()                                                     # loads authors
+    get_PDF_files(dc.direc)                                             # List all PDF files in a specified OS folder.
+    dload_authors()                                                     # loads dc.authors
     dload_packages()                                                    # loads packages
     dload_topics()                                                      # loads topics
     dload_licenses()                                                    # loads licenses
-    generate_topicspackages()                                           # generates topicspackages, packagetopics, authorpackages, licensepackages, yearpackages
+    generate_topicspackages()                                           # generates dc.topicspackages, dc.packagetopics, dc.authorpackages, licensepackages, dc.yearpackages
 
-    for f in get_XML_files(direc):
-        if verbose:
-            print(f"----- Info: local XML file '{direc + f}'")
+    for f in get_XML_files(dc.direc):
+        if dc.verbose:
+            print(f"----- Info: local XML file '{dc.direc + f}'")
         analyze_XML_file(f)
 
-    thr1 = Thread(target=generate_pickle2)                              # dumps XML_toc info CTAN2.pkl
+    thr1 = Thread(target=generate_pickle2)                              # dumps dc.XML_toc info CTAN2.pkl
     thr1.start()
     thr1.join()
 
 # .................................................................
 # Regeneration of CTAN1.pkl
-# CTAN1.pkl needs authors, packages, topics, licenses, topicspackages,
-# packagetopics, authorpackages, yearpackages one thread
+# CTAN1.pkl needs dc.authors, dc.packages, dc.topics, dc.licenses,
+# dc.topicspackages, dc.packagetopics, dc.authorpackages,
+# dc.yearpackages one thread
 
-    if verbose:
-        print(f"--- Info: Regeneration of '{direc + PKL_FILE}'")
+    if dc.verbose:
+        print(f"--- Info: Regeneration of '{dc.direc + PKL_FILE}'")
 
-    thr2 = Thread(target=generate_pickle1)                              # dumps authors, packages,
-                                                                        # topics, licenses, topicspackages, packagetopics,
-                                                                        # authorpackages, licensepackages, yearpackages into CTAN1.pkl
+    thr2 = Thread(target=generate_pickle1)                              # dumps dc.authors, dc.packages,
+                                                                        # dc.topics, dc.licenses, dc.topicspackages, dc.packagetopics,
+                                                                        # dc.authorpackages, licensepackages, dc.yearpackages into CTAN1.pkl
     thr2.start()
     thr2.join()
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:regenerate_pickle_files")
 
 # ------------------------------------------------------------------
-def set_PDF_toc():                                                      # Function set_PDF_toc
+def set_PDF_toc(dc=dc_var):                                             # Function set_PDF_toc
     """
-    Fills PDF_toc on the basis of XML_toc.
+    Fills dc.PDF_toc on the basis of dc.XML_toc.
 
-    Rewrites the global PDF_toc, XML_toc.
+    Rewrites the variables dc.PDF_toc, dc.XML_toc in the data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    PDF_toc     global Python dictionary with PDF files
-    XML_toc     global Python dictionary with PDF files
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------
+    dc.PDF_toc    Python dictionary:
+                  collection with PDF files
+    dc.XML_toc    Python dictionary:
+                  collection with XML files
+    dc.direc      str:
+                  name of the OS directory
+    dc.debugging  bool:
+                  global flag: debugging 
 
-    no messages
+    Messages:
+    --------
+    There are no specific messages.
     """
 
-    global PDF_toc                                                      # global Python dictionary with PDF files
-    global XML_toc                                                      # global Python dictionary with XML files
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:set_PDF_toc")
 
-    for f in XML_toc:
-        (xlfn, fkey, plfn) = XML_toc[f]
-        if os.path.exists(direc + xlfn) and os.path.\
-           exists(direc + fkey + "-" + plfn):
-            PDF_toc[fkey + "-" + plfn] = xlfn
+    for f in dc.XML_toc:
+        (xlfn, fkey, plfn) = dc.XML_toc[f]
+        if os.path.exists(dc.direc + xlfn) and os.path.\
+           exists(dc.direc + fkey + "-" + plfn):
+            dc.PDF_toc[fkey + "-" + plfn] = xlfn
         else:
             pass
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:set_PDF_toc")
 
 # ------------------------------------------------------------------
-def verify_PDF_files():                                                 # Function verify_PDF_files
+def verify_PDF_files(dc=dc_var):                                        # Function verify_PDF_files
     """
-    Checks actualized PDF_toc; deletes a PDF file if necessary.
+    Checks actualized dc.PDF_toc; deletes a PDF file if necessary.
 
-    Rewrites the global variables ok, PDF_toc, and corrected.
+    Rewrites the variables dc.ok, dc.PDF_toc, and dc.correctedin the
+    data class dc.
 
-    no parameters
+    Parameter:
+    ---------
+    dc : instance of the data class 'dataclass_var'
+         default: dc_var
 
-    global variables:
-    ok          Flag: ok
-    PDF_toc     global Python dictionary with PDF files
-    corrected   number of corrections
+    The function needs access to some variables in the data class dc:
+    ----------------------------------------------------------------  
+    dc.ok         bool:
+                  global flag: status of processing
+    dc.PDF_toc    Python dictionary:
+                  collection collection with PDF files
+    dc.corrected  int:
+                  number of corrections
+    dc.debugging  bool:
+                  global flag: debugging 
 
-    possible (error) messages:
+    Possible (error) messages:
+    -------------------------
     + Warning: PDF file '{0}' without associated XML file
     + Warning: PDF file '{0}' in OS deleted
     """
@@ -2966,33 +3855,36 @@ def verify_PDF_files():                                                 # Functi
     # 2.49   2025-02-11 more f-strings
     # 2.53   2025-11-01 in __doc__ text: list the respective (error)
     #                   messages
+    # 3.5    2026-07-02 data class used
+    # 3.5.3  2026-07-02 if necessary: Function definitions supplemented
+    #                   by the parameter "dc=dc_var"
+    # 3.5.4  2026-07-02 relevant local variables prefixed with "dc."
+    #                   and/or non-local with "dc_var"
+    # 3.5.6  2026-07-03 "global" statements removed
+    # 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the
+    #                   data class 
 
-    global ok                                                           # Flag: ok
-    global PDF_toc                                                      # global Python dictionary with
-                                                                        # PDF files
-    global corrected                                                    # number of corrections
-
-    if debugging:
+    if dc.debugging:
         print("+++ >CTANLoad:verify_PDF_files")
 
-    ok = True
+    dc.ok = True
     
-    for g in PDF_toc:                                                   # loop: move through PDF_toc
-        if PDF_toc[g] == EMPTY:                                         # no entry: no ass. XML file
-            ok = False
-            if verbose:
+    for g in dc.PDF_toc:                                                # loop: move through dc.PDF_toc
+        if dc.PDF_toc[g] == EMPTY:                                      # no entry: no ass. XML file
+            dc.ok = False
+            if dc.verbose:
                 print(f"----- Warning: PDF file '{g}' without",
                       "associated XML file")
             if os.path.isfile(g):                                       # g is file
                 os.remove(g)                                            # deletes the PDF file (if it exists)
-                corrected += 1                                          # number of corrections increased
-                if verbose:
+                dc.corrected += 1                                       # number of corrections increased
+                if dc.verbose:
                     print("----- Warning:",
                           f"PDF file '{g}' in OS deleted")
         else:
             pass
 
-    if debugging:
+    if dc.debugging:
         print("+++ <CTANLoad:verify_PDF_files")
 
 
@@ -3199,16 +4091,51 @@ main()
 # 3.0.7  2026-04-01 Standardised: Comments from column 72 onwards
 
 # 3.1    2026-04-15 in dload_XML_files: better handling with processor error (and other exceptions)
+# 3.2    2026-05-01 for XML and PDF files: downloads with number
+# 3.3    2026-05-08 print statements containing \+ simplified
+# 3.4    2026-06-30 unspecified "except:" replaced by "except Exception as err:"
+
+# 3.5    2026-07-02 data class used
+# 3.5.0  2026-07-13 new module dataclasses
+# 3.5.1  2026-07-02 new class dataclass-variable (including all globally used variables) derfined
+# 3.5.2  2026-07-02 instance "dc_var" of this class created
+# 3.5.3  2026-07-02 if necessary: Function definitions supplemented by the parameter "dc=dc_var"
+# 3.5.4  2026-07-02 relevant local variables prefixed with "dc." and/or non-local with "dc_var"
+# 3.5.5  2026-07-03 original definitions of globally used variables removed
+# 3.5.6  2026-07-03 "global" statements removed
+# 3.5.7  2026-07-04 __doc__ texts supplemented/adapted to the data class
+
+# 3.6    2026-07-05 ACT_PROGRAMNAME depends on OPERATINGSYS now
+# 3.7    2026-07-05 XML and PDF downloads: number of download
+
+# 3.8    2026-07-13 backtracing
+# 3.8.1  2026-07-13 new module traceback
+# 3.8.2  2026-07-13 call traceback.print_exc()
+
+# 3.9    2026-07-23 correction for not-existing key in licenses.xml
+# 3.10   2026-08-05 correction in dataclass_variable: collections with default factory
+# 3.11   2026-08-10 Calculation and output of the input string
+# 3.12   2026-08-15 log output of the options in the call revised
+
+# + L.3367: arguments: Berechnung und Ausgabe (x)
+# - Eintrag an geeigneter Stelle: fehlend topic, license
 
 # - gravierender Fehler: -A xyz führt zum Programmabbruch
 # - neue Fehlermeldung registrieren
 # - neu machen: Funktionshierarchie, Beispiele, Übersicht über Meldungen
+# - laden per ctrl c abbrechbar
+# - dictionary.get() wo angebracht
+# - doctext im google-stylebzw. numpy-Style; siehe Anleitungen; z.B. https://realpython.com/documenting-python-code/
+# - if __name__ == "__main__": main() verwenden
+# - finally-clause bei geöffneten Dateien
+# - try...except vereinheitlichen + überarbeiten; weniger aggressiv
+# - lokale Changes kontrollieren, insb. traceback.print_exc()
 
 # Es fehlen noch  bzw. Probleme:
 # - unterschiedliche Verzeichnisse für XML- und PDF-Dateien? (-)
 # - GNU-wget ersetzen durch python-Konstrukt; https://pypi.org/project/python3-wget/ (geht eigentlich nicht)(-) (?)
 # - Fehler bei -r; es wird jedesmal CTAN.pkl neu gemacht (?)
-# - neues feature: alle ungladenen Pakete laden (?)
+# - neues feature: alle ungeladenen Pakete laden (?)
 # - Auswahl nach Datum (-)
 # - später: get_CTAN_lap und get_CTAN_lpt umstellen auf direkte CTAN-Abfrage (?)
 # - neu machen: Funktionshierarchie, Beispiele, Übersicht über Meldungen

@@ -1,38 +1,47 @@
 Functions in CTANLoad.py
 ========================
-2024-08-12
+2026-07-13
 
-analyze_XML_file(file)                           Function analyze_XML_file(file): Analyzes a XML package file
-call_check()                                     Function call_check: Processes all necessary steps for a integrity check
-call_load()                                      Function call_load: Processes all steps for a complete ctanload call
-call_plain()                                     Function call_plain: Processes all steps for a plain call
-check_integrity(always=False)                    Function check_integrity(): Checks integrity (tests for inconsistencies)
-dload_authors()                                  Function dload_authors(): Downloads XML file 'authors' from CTAN and generate dictionary 'authors'.
-dload_document_file(href, key, name, XML_file)   Function dload_document_file(href, key, name): Downloads one information file (PDF) from CTAN.
-dload_licenses()                                 Function dload_licenses: Downloads XML file 'licenses' from CTAN and generates dictionary 'licenses'.
-dload_packages()                                 Function dload_packages: Downloads XML file 'packages' from CTAN and generates dictionary 'packages'.
-dload_topics()                                   Function dload_topics(): Downloads XML file 'topics' from CTANB and generates dictionary 'topics'.
-dload_XML_files(p)                               Function dload_XML_files: Downloads XML package files.
-fold(s)                                          Function fold(): Auxiliary function: Shortens/folds long option values for output.
-generate_lists()                                 Function generate_lists: Generates some special files (with lists).
-generate_pickle1()                               Function generate_pickle1
-generate_pickle2()                               Function generate_pickle2
-generate_topicspackages()                        Function generate_topicspackages: Generates/rewrites topicspackages, packagetopics, authorpackages, licensepackages, and yearpackages.
-get_package_set()                                Function get_package_set: Analyzes dictionary 'packages' for name templates.
-get_PDF_files(d)                                 Function get_PDF_files(d): Lists all PDF files in a specified OS folder.
-get_XML_files(d)                                 Function get_XML_files: Lists all XML files in the current OS folder.
-get_xyz_lap()                                    Function get_xyz_lap: Loads and analyzes xyz.lap for author templates.
-get_xyz_llp()                                    Function get_xyz_llp: Loads and analyzes xyz.llp for liocense templates.
-get_xyz_lpt()                                    Function get_xyz_lpt: Loads and analyzes xyz.lpt for topic templates.
-get_year_set()                                   Function get_package_set: Analyzes dictionary 'yearpackages' for year templates.
-load_XML_toc()                                   Function load_XML_toc(): Loads pickle file 2 (which contains XML_toc).
-main()                                           Function main(): Main Function (calls the other functions).
-make_statistics()                                Function make_statistics(): Prints statistics on terminal.
-regenerate_pickle_files()                        Function regenerate_pickle_files: Regenerates corrupted pickle files.
-set_PDF_toc()                                    set_PDF_toc: Fills PDF_toc on the basis of XML_toc.
-test_clipboard()                                 auxiliary function: Sents a program call to clipboard.
-verify_PDF_files()                               Function verify_PDF_files: Checks actualized PDF_toc/delete a PDF file if necessary.
+Class:
+-----
+dataclass_variable          data class 
 
+with method:
+-----------
+report                      Outputs the current values of the variables defined in 'dataclass_variable'.
+
+Functions:
+---------
+analyze_XML_file(file)      Function analyze_XML_file(file): Analyzesa XML package file
+call_check()                Function call_check: Processes all necessaryteps for a integrity check
+call_load()                 Function call_load: Processes all steps fora complete ctanload call
+call_plain()                Function call_plain: Processes all steps fora plain call
+check_integrity(always=False) Function check_integrity(): Checksintegrity (tests for inconsistencies)
+dload_authors()             Function dload_authors(): Downloads XML file'authors' from CTAN and generate Dictionary 'authors'.
+dload_document_file(href, key, name, XML_file)  Function dload_document_file(href, key, name): Downloads one information file (PDF) fromCTAN.
+dload_licenses()            Function dload_licenses: Downloads XML file'licenses' from CTAN and generatesdictionary 'licenses'.
+dload_packages()            Function dload_packages: Downloads XML file'packages' from CTAN and generatesdictionary 'packages'.
+dload_topics()              Function dload_topics(): Downloads XML file'topics' from CTANB and generatesdictionary 'topics'.
+dload_XML_files(p)          Function dload_XML_files: Downloads XML package files.
+fold(s)                     Function fold(): Auxiliary function: Shortens/folds long option values for output.
+generate_lists()            Function generate_lists: Generates some special files (with lists).
+generate_pickle1()          Function generate_pickle1
+generate_pickle2()          Function generate_pickle2
+generate_topicspackages()   Function generate_topicspackages: Generates/rewrites topicspackages, packagetopics, authorpackages, licensepackages, and yearpackages.
+get_package_set()           Function get_package_set: Analyzes dictionary 'packages' for name templates.
+get_PDF_files(d)            Function get_PDF_files(d): Lists all PDF files in a specified OS folder.
+get_XML_files(d)            Function get_XML_files: Lists all XML files in the current OS folder.
+get_xyz_lap()               Function get_xyz_lap: Loads and analyzes xyz.lap for author templates.
+get_xyz_llp()               Function get_xyz_llp: Loads and analyzes xyz.llp for liocense templates.
+get_xyz_lpt()               Function get_xyz_lpt: Loads and analyzes xyz.lpt for topic templates.
+get_year_set()              Function get_package_set: Analyzes dictionary 'yearpackages' for year templates.
+load_XML_toc()              Function load_XML_toc(): Loads pickle file 2 (which contains XML_toc).
+main()                      Function main(): Main Function (calls the other functions).
+make_statistics()           Function make_statistics(): Prints statistics on terminal.
+regenerate_pickle_files()   Function regenerate_pickle_files: Regenerates corrupted pickle files.
+set_PDF_toc()               set_PDF_toc: Fills PDF_toc on the basis of XML_toc.
+test_clipboard()            auxiliary function: Sents a program call to clipboard.
+verify_PDF_files()          Function verify_PDF_files: Checks actualized PDF_toc/delete a PDF file if necessary.
 
 Hierarchy
 ---------
