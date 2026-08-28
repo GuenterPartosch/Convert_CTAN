@@ -1,17 +1,28 @@
 Installation
 ============
-2026-04-29
+2026-08-27
 
 * Download the archive [programs.zip] from Git.
-* Unpack the Archive into an empty Directory.
-* Make sure you have a programme installed on your computer that allows you to 
-  download files from the internet (such as [wget2]).
-** Note 1: You can find wget2 as [wget2] in the CTAN_Convert bundle, and after 
-   installation in the CTAN_Convert folder.
+* Unpack the archive into an empty directory.
+
+Requirements
+------------
+1) Make sure you have a programme installed on your computer that allows you to 
+   download files from the internet (such as [wget2]).
+** Note 1: You can find wget2 as [wget2] in the Convert_CTAN bundle, and after 
+   installation in the Convert_CTAN folder.
 ** Note 2: If you are using a different compatible programme, you will need to 
    amend the relevant lines in the CTANLoad.py script: 
    WGET = "wget2"
 
-The programs can then be called. See also [call.txt].
+2) The programs of the Convert_CTAN bundle need some modules:
+   Please ensure that the relevant modules are installed on your computer. 
+   You may need to install them using pip, for examplec 
+   pip install argparse
+
+   See also [CTANLoad-modules.txt], [CTANOut-modules.txt], [CTANLoadOut-modules.txt], and 
+   [menu_CTANLoadOut-modules.txt]
+
+* The programs can then be called. See also [call.txt]. 
 
 

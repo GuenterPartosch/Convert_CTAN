@@ -1,7 +1,7 @@
 CTANLoad + CTANOut + CTANLoadOut + menu_CTANLoadOut
 ===================================================
 files in the context of CTANLoad.py, CTANOut.py, CTANLoadOut.py, and menu_CTANLoadOut
-2026-04-30
+2026-08-26
 
 xyz   is a generic file name (option -o in CTANLoad or CTANOut)
 abc   is a name of a CTAN package

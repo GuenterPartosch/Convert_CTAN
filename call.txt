@@ -1,29 +1,29 @@
 Call
 ====
-2026-04-30
+2026-07-31
 
-Python must be available on the computer so that the programmes in the bundle can be called at all.
+Python must be available on the computer so that the programs in the bundle can be called at all.
 
 Then the following cases are conceivable in the command line (in Windows: command prompt):
 
 1) python -u <program> <Option(s)>
    Always works if Python is installed.
 
-   <program>:  CTANLoad-py  | CTANOut.py | CTANLoadOut.py | menu_CTANLoadOut.py
-   <option(s): see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man].
+   <program>  :  CTANLoad-py  | CTANOut.py | CTANLoadOut.py | menu_CTANLoadOut.py
+   <option(s)>:  see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man].
    menu_CTANLoadOut.py is called without parameters.
 
 2) <program> <option(s)>
    Always works if the operating system knows how to handle .py files.
 
-   <program>:  CTANLoad-py | CTANOut.py | CTANLoadOut.py | menu_CTANLoadOut.py
-   <option(s): see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man].
-   menu_CTANLoadOut.py is called without parameters.
+   <program>:   CTANLoad-py | CTANOut.py | CTANLoadOut.py | menu_CTANLoadOut.py
+   <option(s)>: see [CTANLoad.man], [CTANOut.man], or [CTANLoadOut.man].
+   menu_CTANLoadOut.py is called without any parameters.
 
 3) <executable> <opition(s)>
    Works if there is an executable program (in Windows: .exe file).
 
    <executable>:  CTANLoad.exe | CTANOut.exe 
-   <option(s): see [CTANLoad.man] or [CTANOut.man]
+   <option(s)>:   see [CTANLoad.man] or [CTANOut.man]
    	
    
