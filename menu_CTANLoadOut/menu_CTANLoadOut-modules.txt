@@ -1,6 +1,6 @@
 Modules (Menu_CTANLoadOut):
 ===========================
-(2026-04-18)
+(2026-08-26)
 
 import tkinter as tk                                                    # basis for the most things
 import tkinter.ttk as ttk                                               # an alternative
@@ -10,7 +10,8 @@ import sys                                                              # system
 import platform                                                         # OS informations
 import subprocess                                                       # handling of sub-processes
 from tempfile import TemporaryFile                                      # subprocess.run
-import textwrap                                                         # wrapping of texts
+import textwrap                                                         # wrapping of Texts
+from dataclasses import dataclass, field                                # Python data classes are used
 
 from CTANLoad import PRG_VERSION as CTANLOAD_VERSION                    # version of CTANLoad.py
 from CTANLoad import PRG_DATE as CTANLOAD_DATE                          # date of CTANLoad.py

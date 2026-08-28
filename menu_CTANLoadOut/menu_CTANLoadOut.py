@@ -183,11 +183,13 @@ TIMEOUT                  = 1000                                         # timeou
 # 1.15   2025-10-02: -d adapted to different operating systems
 
 if OPERATINGSYS == "Windows":                                           # the directory separator depends on the OS
-    dir_sep = "\\"
-    act_dir = ".\\"
+    DIR_SEP = "\\"
+    ACT_DIR = ".\\"
+    ENC     = "cp1252"
 else:
-    dir_sep = "/"
-    act_dir = "./"
+    DIR_SEP = "/"
+    ACT_DIR = "./"
+    ENC     = "utf-8"
     
 version = f"""
 Call sequence:
@@ -1345,10 +1347,10 @@ def start_call():                                                       # functi
     log = EMPTY
     
     try:                                                                # start the subprocess in a try/except constrauct
-        with TemporaryFile("r+", encoding="utf-8",
+        with TemporaryFile("r+", encoding=ENC,
                            errors="ignore") as f:                       # temporary file
             process_load = subprocess.run(call, check=True,
-                              timeout=TIMEOUT, encoding="utf-8",
+                              timeout=TIMEOUT, encoding=ENC,
                               stdout=f, stderr=subprocess.PIPE,
                               universal_newlines=True)
             f.seek(0)                                                   # rewind file
@@ -1358,24 +1360,32 @@ def start_call():                                                       # functi
             if len(load_errormessage) > 0:
                 print(load_errormessage)
     except subprocess.CalledProcessError as exc:                        # process error
-        print(f"[CTANLoadOut] Error: called process '{call[1]}' " +\
-              "not found,", sys.exc_info()[0])
+        if dc.verbose:
+            print(f"[CTANLoadOut] Error: called process '{call[1]}' " +\
+                  "with errors,", exc, traceback.print_exc())
         sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated    
     except FileNotFoundError as exc:                                    # file not found
-        print(f"[CTANLoadOut] Error: file '{call[0]}' not found", exc)
+        if dc.verbose:
+            print(f"[CTANLoadOut] Error: file '{call[0]}' not found",
+                  exc, traceback.print_exc())
         sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
     except subprocess.TimeoutExpired as exc:                            # timeout
-        print("[CTANLoadOut] Error: timeout error", TIMEOUT)
+        if dc.verbose:
+            print("[CTANLoadOut] Error: timeout error", TIMEOUT)
         sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
     except KeyboardInterrupt as exc:                                    # keyboard interrupt
-        print("[CTANLoadOut] Error: keyboard interrupt", exc)
+        if dc.verbose:
+            print("[CTANLoadOut] Error: keyboard interrupt", exc,
+                  traceback.print_exc())
         sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
     except UnicodeDecodeError as exc:                                   # unicode decode error
-        print("[CTANLoadOut] Error: unicode decode error", exc)
+        if dc.verbose:
+            print("[CTANLoadOut] Error: unicode decode error", exc,
+                  traceback.print_exc())
         sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
-    except:                                                             # any unspecified error
-        print("[CTANLoadOut] Error: any unspecified error",
-              sys.exc_info())
+    except Exception as exc:                                            # any unspecified error
+        print("[CTANLoadOut] Error: any unspecified error", exc,
+              traceback.print_exc())
         sys.exit("[CTANLoadOut] Error: program terminated")             # program terminated
 
     tkm.showinfo(mm,
@@ -1468,7 +1478,7 @@ OPTIONS = {
     "-d"   : ("text",                                                   # -d
               "[CTANLoad+CTANOut] OS folder (directory) for input" +\
               " and output files",
-              act_dir,
+              ACT_DIR,
               None,
               None),
     "-tout": ("number",                                                 # -tout
@@ -1767,7 +1777,7 @@ EXAMPLES = {
 # _B : tkinter buttons
 # _CB: tkinter comboboxes
 
-nr = len(SEQUENCE)                                                      # number of elements in SEQUENCE
+nr  = len(SEQUENCE)                                                     # number of elements in SEQUENCE
 _E  = [None for f in range(nr)]                                         # list for ttk.Entry
 _L  = [None for f in range(nr)]                                         # list for ttk.Label
 _V  = [None for f in range(nr)]                                         # list for tk variables
@@ -1857,6 +1867,9 @@ mm.mainloop()                                                           # main l
 
 
 # ====================================================================
+# + exception handling more precise now
+# + encoding depends on operating system now: constant ENC
+
 # + Änderungen an Optionswerten einfacher machen; z.B. set_value("-m") (x)
 # + alte werte werden verwendet bei mehrfachen Aufrufen des Menüs (x)
 # + Warnings sparsamer einsetzen (x)
