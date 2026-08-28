@@ -340,6 +340,7 @@
 ('journ-personal', 'personal journals, diaries, etc.')
 ('journ-src', 'sources and/or old copies of journals')
 ('journalpub', 'typesetting journals, etc')
+('kazakh', 'support for typesetting Kazakh')
 ('keyval', 'key-value argument systems')
 ('korean', 'support for typesetting Korean')
 ('korean-doc', 'documentation in Korean')

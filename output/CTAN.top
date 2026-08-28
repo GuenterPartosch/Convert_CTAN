@@ -1,6 +1,6 @@
 % file: all.top (in LaTeX format)
-% date: 2026-04-29
-% time: 19:51:54
+% date: 2026-08-27
+% time: 17:12:34
 % is called by all.tex
 
 \section{Used topics, short explainations}
@@ -616,8 +616,4 @@
 \item[\texttt{word-count}] count the ‘words’ in a document
 \item[\texttt{word-proc}] dealing with word processors
 \item[\texttt{xetex}] XeTeX, material supporting it, and packages requiring it
-\item[\texttt{bibtex-sty}] bibtex-sty(unknown)
-\item[\texttt{expl3}] expl3(unknown)
-\item[\texttt{latex-doc}] latex-doc(unknown)
-\item[\texttt{litprog-tools}] litprog-tools(unknown)
 \end{labeling}

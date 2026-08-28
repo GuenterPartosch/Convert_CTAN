@@ -1,0 +1,1 @@
+tlmgr update  --all -repository https://ftp.fau.de/ctan/systems/texlive/tlnet/ 
